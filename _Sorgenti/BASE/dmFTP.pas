@@ -200,7 +200,7 @@ begin
 
   Files.Clear;
 
-  StartWait('Attendre...', true);
+  StartWait('Lettura dei file sul server FTP...', true);
   try
     IdFTP.List();
   finally
@@ -221,7 +221,7 @@ end;
 
 procedure TFTP.Download(const SrcFileName, DestFileName: string);
 begin
-  StartWait('Attendre...', true);
+  StartWait('Scaricamento del file...', true);
   try
     ProgressBox.Caption := 'Download';
     ProgressBox.FirstLabel := 'Download';
@@ -234,7 +234,7 @@ end;
 
 procedure TFTP.Upload(const SrcFileName, DestFileName: string);
 begin
-  StartWait('Attendre...', true);
+  StartWait('Invio del file...', true);
   try
     IdFTP.Put(SrcFileName, DestFileName, false);
   finally
