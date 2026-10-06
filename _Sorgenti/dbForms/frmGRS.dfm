@@ -1,0 +1,81 @@
+inherited FormGRS: TFormGRS
+  Caption = 'FormGRS'
+  ClientWidth = 641
+  StyleElements = [seFont, seClient, seBorder]
+  OnCreate = FormCreate
+  ExplicitWidth = 657
+  TextHeight = 15
+  inherited dxBarManager: TdxBarManager
+    PixelsPerInch = 96
+  end
+  inherited popActions: TdxBarPopupMenu
+    PixelsPerInch = 96
+  end
+  object ActionList: TActionList
+    Images = zDmImages.ImageList24
+    Left = 232
+    Top = 88
+    object Esporta: TdxFileSaveAs
+      Caption = 'Export GRS'
+      Dialog.DefaultExt = '*.xlsx'
+      Dialog.Filter = 'File Excel|*.xlsx|Tutti|*.*'
+      Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+      ImageIndex = 6
+      OnAccept = EsportaAccept
+    end
+    object ImportaGRS: TdxFileOpen
+      Caption = 'Importa GRS'
+      Dialog.DefaultExt = '*.xlsx'
+      Dialog.Filter = 
+        'Excel|*.xlsx|File csv|*.csv|Excel 97|*.xls|File xml|*.xml|Tutti|' +
+        '*.*'
+      ImageIndex = 56
+      OnAccept = ImportaGRSAccept
+    end
+    object ImportaSIUF: TdxFileOpen
+      Caption = 'Importa SIUF'
+      Dialog.DefaultExt = '*.xls'
+      Dialog.Filter = 'Excel|*.xlsx|Excel 97|*.xls|Tutti|*.*'
+      ImageIndex = 66
+      OnAccept = ImportaSIUFAccept
+    end
+    object ImportaGOL: TdxFileOpen
+      Caption = 'Importa GOL'
+      Dialog.DefaultExt = '*.xlsx'
+      Dialog.Filter = 'Excel|*.xlsx|Tutti|*.*'
+      ImageIndex = 70
+      OnAccept = ImportaGOLAccept
+    end
+    object ElaboraFileImport: TAction
+      Caption = 'Elabora'
+      ImageIndex = 4
+      OnExecute = ElaboraFileImportExecute
+    end
+    object EliminaFileImport: TAction
+      Caption = 'Elimina File'
+      ImageIndex = 43
+      OnExecute = EliminaFileImportExecute
+    end
+    object GeneraIncarico: TAction
+      Caption = 'Genera Incarico'
+      ImageIndex = 302
+      OnExecute = GeneraIncaricoExecute
+    end
+    object GeneraRilevamento: TAction
+      Caption = 'Genera Rilevamento'
+      ImageIndex = 125
+      OnExecute = GeneraRilevamentoExecute
+    end
+    object ElaboraRigheImportNonValide: TAction
+      Caption = 'Elabora Righe Non Valide'
+      ImageIndex = 4
+      OnExecute = ElaboraRigheImportNonValideExecute
+    end
+    object CooperazioneApplicativa: TAction
+      Caption = 'Invia SIUF'
+      ImageIndex = 230
+      OnExecute = CooperazioneApplicativaExecute
+      OnUpdate = CooperazioneApplicativaUpdate
+    end
+  end
+end

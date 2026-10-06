@@ -1,0 +1,144 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{4154E579-638A-429C-A19B-A98BC128EBB7}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="_Sorgenti\Gesty.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_UnitTest\_src\GestyTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="X:\LZ_Check\LZ_Check.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_Sorgenti_GestyTools\GestyTools.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_Sorgenti_GestyTools\GestyScript.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_Sorgenti_Server\GestyServerApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_Sorgenti_Server\mod_gesty_server_24.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_Sorgenti_Web\GestyWeb.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_Sorgenti_QuestionariWeb\GestyQuestionariWeb.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="_sorgenti_capac_stub\capac.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Gesty">
+        <MSBuild Projects="_Sorgenti\Gesty.dproj"/>
+    </Target>
+    <Target Name="Gesty:Clean">
+        <MSBuild Projects="_Sorgenti\Gesty.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Gesty:Make">
+        <MSBuild Projects="_Sorgenti\Gesty.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestyTests">
+        <MSBuild Projects="_UnitTest\_src\GestyTests.dproj"/>
+    </Target>
+    <Target Name="GestyTests:Clean">
+        <MSBuild Projects="_UnitTest\_src\GestyTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestyTests:Make">
+        <MSBuild Projects="_UnitTest\_src\GestyTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LZ_Check">
+        <MSBuild Projects="X:\LZ_Check\LZ_Check.dproj"/>
+    </Target>
+    <Target Name="LZ_Check:Clean">
+        <MSBuild Projects="X:\LZ_Check\LZ_Check.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LZ_Check:Make">
+        <MSBuild Projects="X:\LZ_Check\LZ_Check.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestyTools">
+        <MSBuild Projects="_Sorgenti_GestyTools\GestyTools.dproj"/>
+    </Target>
+    <Target Name="GestyTools:Clean">
+        <MSBuild Projects="_Sorgenti_GestyTools\GestyTools.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestyTools:Make">
+        <MSBuild Projects="_Sorgenti_GestyTools\GestyTools.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestyScript">
+        <MSBuild Projects="_Sorgenti_GestyTools\GestyScript.dproj"/>
+    </Target>
+    <Target Name="GestyScript:Clean">
+        <MSBuild Projects="_Sorgenti_GestyTools\GestyScript.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestyScript:Make">
+        <MSBuild Projects="_Sorgenti_GestyTools\GestyScript.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestyServerApp">
+        <MSBuild Projects="_Sorgenti_Server\GestyServerApp.dproj"/>
+    </Target>
+    <Target Name="GestyServerApp:Clean">
+        <MSBuild Projects="_Sorgenti_Server\GestyServerApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestyServerApp:Make">
+        <MSBuild Projects="_Sorgenti_Server\GestyServerApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="mod_gesty_server_24">
+        <MSBuild Projects="_Sorgenti_Server\mod_gesty_server_24.dproj"/>
+    </Target>
+    <Target Name="mod_gesty_server_24:Clean">
+        <MSBuild Projects="_Sorgenti_Server\mod_gesty_server_24.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="mod_gesty_server_24:Make">
+        <MSBuild Projects="_Sorgenti_Server\mod_gesty_server_24.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestyWeb">
+        <MSBuild Projects="_Sorgenti_Web\GestyWeb.dproj"/>
+    </Target>
+    <Target Name="GestyWeb:Clean">
+        <MSBuild Projects="_Sorgenti_Web\GestyWeb.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestyWeb:Make">
+        <MSBuild Projects="_Sorgenti_Web\GestyWeb.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="GestyQuestionariWeb">
+        <MSBuild Projects="_Sorgenti_QuestionariWeb\GestyQuestionariWeb.dproj"/>
+    </Target>
+    <Target Name="GestyQuestionariWeb:Clean">
+        <MSBuild Projects="_Sorgenti_QuestionariWeb\GestyQuestionariWeb.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GestyQuestionariWeb:Make">
+        <MSBuild Projects="_Sorgenti_QuestionariWeb\GestyQuestionariWeb.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="capac">
+        <MSBuild Projects="_sorgenti_capac_stub\capac.dproj"/>
+    </Target>
+    <Target Name="capac:Clean">
+        <MSBuild Projects="_sorgenti_capac_stub\capac.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="capac:Make">
+        <MSBuild Projects="_sorgenti_capac_stub\capac.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Gesty;GestyTests;LZ_Check;GestyTools;GestyScript;GestyServerApp;mod_gesty_server_24;GestyWeb;GestyQuestionariWeb;capac"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Gesty:Clean;GestyTests:Clean;LZ_Check:Clean;GestyTools:Clean;GestyScript:Clean;GestyServerApp:Clean;mod_gesty_server_24:Clean;GestyWeb:Clean;GestyQuestionariWeb:Clean;capac:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Gesty:Make;GestyTests:Make;LZ_Check:Make;GestyTools:Make;GestyScript:Make;GestyServerApp:Make;mod_gesty_server_24:Make;GestyWeb:Make;GestyQuestionariWeb:Make;capac:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

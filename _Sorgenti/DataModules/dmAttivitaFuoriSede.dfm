@@ -1,0 +1,2 @@
+inherited AttivitaFuoriSede: TAttivitaFuoriSede
+end

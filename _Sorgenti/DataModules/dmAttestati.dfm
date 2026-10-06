@@ -1,0 +1,2 @@
+inherited Attestati: TAttestati
+end

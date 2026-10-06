@@ -1,0 +1,2 @@
+inherited Scadenze: TScadenze
+end

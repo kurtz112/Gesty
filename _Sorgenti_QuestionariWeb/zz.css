@@ -1,0 +1,60 @@
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#toobar {
+  height: 50px;
+  width: 100%;
+  margin-right: 5px;
+}
+
+.toobar-nominativo {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* max-width: 70%; */
+}
+
+#FormContainer {
+  /* background-color: yellow; */
+  border: 1px solid transparent;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#footer {
+  width: 100%;
+  bottom: 0;
+  height: 25px;
+/*  margin-top: 25px; */
+}
+
+/* ********************************************************* */
+
+/* DataGrid */
+.zz-dataGrid-toolbar {
+ font-size: 20px;
+ font-weight: bold;
+ /* background-color: Khaki; */
+}
+
+/* ********************************************************* */
+
+/* dxButton disabilitati: il theme builder li pone in grigio */
+.dx-button.dx-button-success.dx-state-disabled {
+  background-color: #007bff; important!
+}
+
+.dx-button.dx-state-disabled .dx-button-text,
+.dx-button.dx-button-success.dx-state-disabled .dx-button-text{
+  color: white; important!
+}
+

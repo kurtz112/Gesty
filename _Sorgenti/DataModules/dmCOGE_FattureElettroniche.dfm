@@ -1,0 +1,2 @@
+inherited COGE_FattureElettroniche: TCOGE_FattureElettroniche
+end

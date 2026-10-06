@@ -1,0 +1,2 @@
+inherited DocumentazioneBridgeMessaggi: TDocumentazioneBridgeMessaggi
+end

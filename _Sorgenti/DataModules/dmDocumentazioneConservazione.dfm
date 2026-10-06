@@ -1,0 +1,2 @@
+inherited DocumentazioneConservazione: TDocumentazioneConservazione
+end

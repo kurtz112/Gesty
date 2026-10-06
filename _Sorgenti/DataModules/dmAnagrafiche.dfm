@@ -1,0 +1,2 @@
+inherited Anagrafiche: TAnagrafiche
+end

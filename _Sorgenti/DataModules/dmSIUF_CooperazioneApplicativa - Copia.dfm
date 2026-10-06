@@ -1,0 +1,2 @@
+inherited SIUF_CooperazioneApplicativa: TSIUF_CooperazioneApplicativa
+end

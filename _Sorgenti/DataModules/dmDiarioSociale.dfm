@@ -1,0 +1,2 @@
+inherited DiarioSociale: TDiarioSociale
+end

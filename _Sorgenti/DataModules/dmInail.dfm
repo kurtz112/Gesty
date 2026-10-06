@@ -1,0 +1,2 @@
+inherited Inail: TInail
+end

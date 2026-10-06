@@ -1,0 +1,45 @@
+GenHelp=>HelpGen
+
+gesty
+elenco icone: caption invece di name
+salva rtf
+indicizza
+
+
+
+
+procedure TfrmTest.Button1Click(Sender: TObject);
+var
+  Compiler: THelpGenCompiler;
+
+  FileName: String;
+  Files: TStringDynArray;
+  topics: TStringList;
+  order: Integer;
+begin
+  memoLog.Lines.Clear;
+
+  Button1.Enabled := False;
+  try
+    Compiler := THelpGenCompiler.Create(edtFolder.Text + '\DOCX',
+    edtFolder.Text);
+    try
+      Compiler.ProjectName := 'Gesty';
+      Compiler.Title := 'Gesty';
+      Compiler.DefaultTopic := '';
+
+      Compiler.logProc := procedure(S: string)
+        begin
+          memoLog.Lines.Add(S);
+        end;
+
+      Compiler.GenerateFilesCHM;
+      Compiler.CompileCHM;
+      // HHC.Compile;
+    finally
+      FreeAndNil(Compiler);
+    end;
+  finally
+    Button1.Enabled := True;
+  end;
+end;

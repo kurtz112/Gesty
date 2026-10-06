@@ -1,0 +1,2 @@
+inherited DocumentazioneMessaggiRegistro: TDocumentazioneMessaggiRegistro
+end

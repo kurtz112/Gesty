@@ -1,0 +1,2 @@
+inherited Timesheet: TTimesheet
+end

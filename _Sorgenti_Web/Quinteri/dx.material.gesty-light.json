@@ -1,0 +1,30 @@
+{
+    "items": [
+        {
+            "key": "$base-border-radius",
+            "value": "25px"
+        },
+        {
+            "key": "$base-accent",
+            "value": "rgba(83, 130, 42, 1)"
+        },
+        {
+            "key": "$button-normal-color",
+            "value": "rgba(0, 0, 0, 1)"
+        },
+        {
+            "key": "$base-bg",
+            "value": "rgba(238, 245, 255, 1)"
+        },
+        {
+            "key": "$button-normal-bg",
+            "value": "rgba(172, 220, 133, 1)"
+        }
+    ],
+    "baseTheme": "material.lime.light",
+    "outputColorScheme": "gesty-light",
+    "makeSwatch": false,
+    "version": "23.2.4",
+    "widgets": [],
+    "removeExternalResources": true
+}

@@ -1,0 +1,58 @@
+###############################################################################
+# 1. Ignora tutto di default
+###############################################################################
+*
+
+###############################################################################
+# 2. Eccezioni: Cartelle e file da tracciare
+###############################################################################
+# Traccia tutto dentro _Sorgenti
+!_Sorgenti/
+!_Sorgenti/**
+
+# Traccia QUALSIASI cartella che inizi con _Sorgenti_ (es. _Sorgenti_GestyTools, _Sorgenti_Server, ecc.)
+!_Sorgenti_*/
+!_Sorgenti_*/**
+
+# Traccia la cartella _UnitTest e tutto il suo contenuto
+!_UnitTest/
+!_UnitTest/**
+
+# Traccia solo il file GESTY.LZ dentro _bin (il resto di _bin viene ignorato)
+!_bin/
+_bin/*
+!_bin/GESTY.LZ
+!*.groupproj
+
+# Mantieni i file di configurazione di Git
+!.gitignore
+!.gitattributes
+
+
+###############################################################################
+# 3. Ignora file temporanei e di compilazione (Delphi / zBuilder / Windows)
+###############################################################################
+# Delphi
+*.exe
+*.dcu
+*.map
+*.jdbg
+*.drc
+*.rsm
+*.tds
+*.identcache
+*.local
+*.stat
+*.dsk
+*.~*
+*.bak
+__history/
+__recovery/
+_dcu/
+dcu/
+Win32/
+Win64/
+
+# zBuilder e Windows
+*.zbtmp
+Thumbs.db

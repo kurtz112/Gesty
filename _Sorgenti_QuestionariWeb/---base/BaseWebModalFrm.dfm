@@ -1,0 +1,2 @@
+inherited BaseWebModalForm: TBaseWebModalForm
+end

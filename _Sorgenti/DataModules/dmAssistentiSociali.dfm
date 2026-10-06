@@ -1,0 +1,2 @@
+﻿inherited AssistentiSociali: TAssistentiSociali
+end

@@ -1,0 +1,2 @@
+inherited COGE_Configurazione: TCOGE_Configurazione
+end

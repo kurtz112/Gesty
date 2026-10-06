@@ -1,0 +1,2 @@
+inherited BaseWebDialogForm: TBaseWebDialogForm
+end

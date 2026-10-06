@@ -1,0 +1,3 @@
+inherited DocumentazioneBridgeProtocollo: TDocumentazioneBridgeProtocollo
+  
+end

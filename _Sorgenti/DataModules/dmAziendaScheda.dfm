@@ -1,0 +1,2 @@
+inherited AziendaScheda: TAziendaScheda
+end

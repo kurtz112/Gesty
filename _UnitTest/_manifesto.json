@@ -1,0 +1,131 @@
+﻿{
+ "data": "2026-10-06T10:26:25.672+02:00",
+ "progetto": "Gesty_Group",
+ "file": [
+  {
+   "percorso": "_esterne\\_Sorgenti\\API\\CooperazioneApplicativa\\SIUF.CooperazioneApplicativa.Builder.pas",
+   "dimensione": 33791,
+   "sha256": "6184c90d8abe5ae58baadc63fce36bc74cd3757dda07e106d538d0dede44e33f"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\API\\CooperazioneApplicativa\\SIUF.CooperazioneApplicativa.Client.pas",
+   "dimensione": 12270,
+   "sha256": "9bd993d8f84b4305fbd0b7f80ef077f41f3dee94e4bc3be4fba3cf6b87e0fb0c"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\API\\CooperazioneApplicativa\\SIUF.CooperazioneApplicativa.Types.pas",
+   "dimensione": 18059,
+   "sha256": "b1f939d319cc28a4be6fdda6ff6b1e540853d8b346ef41f019868434202a8eb0"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\API\\CooperazioneApplicativa\\SIUF.CooperazioneApplicativa.Validator.pas",
+   "dimensione": 15715,
+   "sha256": "fdad3cf153e926340530731702bc5f01a38d16ce75e598b55a76ccf50a85d651"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Configuration.pas",
+   "dimensione": 14620,
+   "sha256": "f9fe063ae5e9153664e5eaf1910c41665976019cdfc5170962f44ce0e98e297c"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Protocol.Claude.pas",
+   "dimensione": 10689,
+   "sha256": "fdb78b4a95736983cdb6013dc9ff567379058ea3bf099515a6aad9d3a09ad4ef"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Protocol.Gemini.pas",
+   "dimensione": 10979,
+   "sha256": "ee3444dba1e05d81bb0944dafd54ca7a42a98fe21f8cd2e50e46fe86310ab8f2"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Protocol.Ollama.pas",
+   "dimensione": 7111,
+   "sha256": "504a55e820eccf44f43dcd15c9028e268d81e7c8618d88a2d907d5ed3c0b1351"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Protocol.OpenAI.pas",
+   "dimensione": 12391,
+   "sha256": "9d552b36ff467312bd5eea6def3aa55e6f4e9a6813660e7db983f3cdfcb3861c"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Protocol.pas",
+   "dimensione": 7724,
+   "sha256": "ba81a42b858551502c503cb9c0b4509f77e3163dd30a8a46acaff17b67925ff1"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\BASE\\AI\\zAI.Tools.pas",
+   "dimensione": 14775,
+   "sha256": "3c06736f1564242e50bf0031db257d9d2e4882597806a3ecf503fd4f85c61819"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\Varie\\Gesty.Types.pas",
+   "dimensione": 9150,
+   "sha256": "e986fc2e115e3618711fef87c01866eec03c9522f3e4e2b486fbff3372c25556"
+  },
+  {
+   "percorso": "_esterne\\_Sorgenti\\Varie\\ValutazioniPrestazioni.types.pas",
+   "dimensione": 6212,
+   "sha256": "3bbaa647f54975b646a1f174bcb4f5ce1cd1e6ff1a789c8ab381c9b6c001d1b7"
+  },
+  {
+   "percorso": "_src\\GestyTests.dpr",
+   "dimensione": 3846,
+   "sha256": "816ea09724ef9c7659bc7649f716bbe1ec3382e244003db4b746063ef682ed99"
+  },
+  {
+   "percorso": "_src\\GestyTests.dproj",
+   "dimensione": 14892,
+   "sha256": "a778426230ce6cf8de751649f63d25cd0440f33889aaac4c090e49422f275ac8"
+  },
+  {
+   "percorso": "_src\\GestyTests.res",
+   "dimensione": 152412,
+   "sha256": "1e4afed2e69555560cfcacfa4303c9723a5452866288bce672839ea174a879b5"
+  },
+  {
+   "percorso": "_src\\Test.Gesty.Types.pas",
+   "dimensione": 6719,
+   "sha256": "c4fca5920fd57f877e40edfbdec819c2ebfa45bdc85af1d9aa54a37ff0bf1b7c"
+  },
+  {
+   "percorso": "_src\\Test.SIUF.Builder.pas",
+   "dimensione": 22076,
+   "sha256": "fa1358e0dc6b64bfe79f9dc3f91b6cdb6eb16df6759687b04245b0bc0c25f5f8"
+  },
+  {
+   "percorso": "_src\\Test.SIUF.Client.pas",
+   "dimensione": 7931,
+   "sha256": "85e6bf6d9d6f86c09698aa2682d12b09395475aa13ff9c177d0f07642289c222"
+  },
+  {
+   "percorso": "_src\\Test.SIUF.Types.pas",
+   "dimensione": 7717,
+   "sha256": "7fae835dcd10d361c3249dc6ed535d4ea50c690a0d59e3a858713dcbeb469e4c"
+  },
+  {
+   "percorso": "_src\\Test.SIUF.Validator.pas",
+   "dimensione": 16837,
+   "sha256": "c660e496bb2a2f718aeb0bbd8edc425bb014caf1339c6f6e486545c595e6cee9"
+  },
+  {
+   "percorso": "_src\\Test.ValutazioniPrestazioni.Types.pas",
+   "dimensione": 3131,
+   "sha256": "62bac2dec11fd61fe879923275edabf90c4d4b270bb92a7245b0ac403eea5fa6"
+  },
+  {
+   "percorso": "_src\\Test.zAI.Configuration.pas",
+   "dimensione": 10535,
+   "sha256": "5d3f8cbb4d77dc1603a38d060a7c891d829ddc4ec545e2dd0c19d95f62362192"
+  },
+  {
+   "percorso": "_src\\Test.zAI.Protocol.pas",
+   "dimensione": 29095,
+   "sha256": "9c386ec8fe3db6cd07fc6a6cf6905fa4b2826c32be6ca507665cc4a14dac86de"
+  },
+  {
+   "percorso": "_src\\Test.zAI.Tools.pas",
+   "dimensione": 18918,
+   "sha256": "ffdf60d88509d907995e865fc3495c3f4fb4346368619dde2250caf75c940bf1"
+  }
+ ]
+}

@@ -1,0 +1,2 @@
+inherited AS_Rendicontazione: TAS_Rendicontazione
+end

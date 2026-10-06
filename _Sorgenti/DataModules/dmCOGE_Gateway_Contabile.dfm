@@ -1,0 +1,2 @@
+inherited COGE_Gateway_Contabile: TCOGE_Gateway_Contabile
+end

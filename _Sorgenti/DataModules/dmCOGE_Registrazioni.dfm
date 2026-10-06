@@ -1,0 +1,2 @@
+inherited COGE_Registrazioni: TCOGE_Registrazioni
+end

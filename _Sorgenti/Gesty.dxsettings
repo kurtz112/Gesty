@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SplashForms>
+	<Version>1.0.0</Version>
+	<ShowSplashFormOnStartup>false</ShowSplashFormOnStartup>
+	<Data>
+			<Version>1</Version>
+			<Item>
+				<Name>Standard</Name>
+				<Kind>0</Kind>
+				<Kind_Name>Splash</Kind_Name>
+				<Content>
+					<Version>1</Version>
+					<Width>540</Width>
+					<Height>280</Height>
+					<Color>66051</Color>
+					<Item Kind="2" Kind_Name="TdxSplashFormBase.TImage" Name="Filigrana" Left="300" Top="-25" Width="320" Height="320" AlignH="0" AlignV="0" Color="66051" Transparent="1" SizeMode="1" Opacity="0.2">
+						<Image Size="952" xml:space="preserve">PHN2ZyB4PSIwIiB5PSIwIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmVyc2lvbj0iMS4xIgogICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDx0aXRsZT5sZWFmIGljb248L3RpdGxlPgogICAgPGRlc2M+bGVhZiBpY29uIGZyb20gdGhlIEljb25FeHBlcmllbmNlLmNvbSBHLUNvbGxlY3Rpb24uIENvcHlyaWdodCBieSBJTkNPUlMgR21iSCAod3d3LmluY29ycy5jb20pLjwvZGVzYz4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik00NjMuOTUsMGM4MS44LDE2Ny41IDcuMiw0NDggLTIyNCw0NDhjLTQwLjksMCAtNzkuMywtMTQuOSAtMTA5LjY1LC0zOS41NWMtMTIuNTUsMjQuMSAtMjQuMSw1Mi44IC0zNC4zLDg3LjU1Yy02LjksMTEuMSAtMjIuOTUsMTYuMSAtMzcuMiwxMy44NWMtMTQuMywtMi4yNSAtMjYuODUsLTExLjggLTI2Ljg1LC0yOS44NWMxOS44NSwtNDUuMzUgNDEuMiwtODAuNiA2My42LC0xMDguOWMtMTkuOCwtMjguNCAtMzEuNiwtNjIuNiAtMzEuNiwtOTkuMWMwLC0yNTYgMzEyLC0xMjAuMiA0MDAsLTI3MnoiIGZpbGw9IiM3Y2IxNDIiLz4KICAgICAgICA8cGF0aCBkPSJNNDMxLjYsMTI4LjZjMC4xNSwtMC4yIDAuMjUsLTAuNCAwLjM1LC0wLjZjMTkuMzUsLTM0LjEgMzIsLTc1LjUgMzEuOTUsLTEyOGM4MS44LDE2Ny41IDcuMiw0NDggLTIyNCw0NDhjLTQwLjksMCAtNzkuMiwtMTQuOSAtMTA5LjYsLTM5LjVjLTEyLjU1LDI0LjEgLTI0LjA1LDUyLjggLTM0LjI1LDg3LjVjLTYuOTUsMTEuMSAtMjIuOTUsMTYuMSAtMzcuMiwxMy44NWMwLDAgMS43LC03LjMgNS4xNSwtMjEuODVjOTUuOSwtMjYzLjcgMjU1LjY1LC0xODQuMiAzNjcuNiwtMzU5LjR6IiBmaWxsPSIjNjg5ZDM4Ii8+CiAgICA8L2c+Cjwvc3ZnPg==</Image>
+					</Item>
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Bordo" Left="0" Top="0" Width="8" Height="280" AlignH="0" AlignV="0" Color="-9921224" Transparent="0" FontName="Segoe UI" FontSize="8" FontStyle="0" TextColor="66051" WordWrap="0">
+						<Text></Text>
+					</Item>
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Filetto" Left="44" Top="230" Width="452" Height="2" AlignH="0" AlignV="0" Color="-9921224" Transparent="0" FontName="Segoe UI" FontSize="8" FontStyle="0" TextColor="66051" WordWrap="0">
+						<Text></Text>
+					</Item>
+					<Item Kind="2" Kind_Name="TdxSplashFormBase.TImage" Name="Marchio" Left="44" Top="36" Width="76" Height="76" AlignH="0" AlignV="0" Color="66051" Transparent="1" SizeMode="1" Opacity="1">
+						<Image Size="952" xml:space="preserve">PHN2ZyB4PSIwIiB5PSIwIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmVyc2lvbj0iMS4xIgogICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICAgIDx0aXRsZT5sZWFmIGljb248L3RpdGxlPgogICAgPGRlc2M+bGVhZiBpY29uIGZyb20gdGhlIEljb25FeHBlcmllbmNlLmNvbSBHLUNvbGxlY3Rpb24uIENvcHlyaWdodCBieSBJTkNPUlMgR21iSCAod3d3LmluY29ycy5jb20pLjwvZGVzYz4KICAgIDxnPgogICAgICAgIDxwYXRoIGQ9Ik00NjMuOTUsMGM4MS44LDE2Ny41IDcuMiw0NDggLTIyNCw0NDhjLTQwLjksMCAtNzkuMywtMTQuOSAtMTA5LjY1LC0zOS41NWMtMTIuNTUsMjQuMSAtMjQuMSw1Mi44IC0zNC4zLDg3LjU1Yy02LjksMTEuMSAtMjIuOTUsMTYuMSAtMzcuMiwxMy44NWMtMTQuMywtMi4yNSAtMjYuODUsLTExLjggLTI2Ljg1LC0yOS44NWMxOS44NSwtNDUuMzUgNDEuMiwtODAuNiA2My42LC0xMDguOWMtMTkuOCwtMjguNCAtMzEuNiwtNjIuNiAtMzEuNiwtOTkuMWMwLC0yNTYgMzEyLC0xMjAuMiA0MDAsLTI3MnoiIGZpbGw9IiM3Y2IxNDIiLz4KICAgICAgICA8cGF0aCBkPSJNNDMxLjYsMTI4LjZjMC4xNSwtMC4yIDAuMjUsLTAuNCAwLjM1LC0wLjZjMTkuMzUsLTM0LjEgMzIsLTc1LjUgMzEuOTUsLTEyOGM4MS44LDE2Ny41IDcuMiw0NDggLTIyNCw0NDhjLTQwLjksMCAtNzkuMiwtMTQuOSAtMTA5LjYsLTM5LjVjLTEyLjU1LDI0LjEgLTI0LjA1LDUyLjggLTM0LjI1LDg3LjVjLTYuOTUsMTEuMSAtMjIuOTUsMTYuMSAtMzcuMiwxMy44NWMwLDAgMS43LC03LjMgNS4xNSwtMjEuODVjOTUuOSwtMjYzLjcgMjU1LjY1LC0xODQuMiAzNjcuNiwtMzU5LjR6IiBmaWxsPSIjNjg5ZDM4Ii8+CiAgICA8L2c+Cjwvc3ZnPg==</Image>
+					</Item>
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Titolo" Left="136" Top="38" Width="340" Height="58" AlignH="0" AlignV="0" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="42" FontStyle="1" TextColor="66051" WordWrap="0">
+						<Text>Gesty</Text>
+					</Item>
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Sottotitolo" Left="140" Top="102" Width="380" Height="26" AlignH="0" AlignV="0" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="17" FontStyle="0" TextColor="66051" WordWrap="0">
+						<Text>Formazione professionale e servizi alla persona</Text>
+					</Item>
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Stato" Default="1" Left="44" Top="166" Width="320" Height="24" AlignH="0" AlignV="1" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="16" FontStyle="0" TextColor="66051" WordWrap="1">
+						<Text>Avvio in corso...</Text>
+					</Item>
+					<Item Kind="3" Kind_Name="TdxSplashFormBase.TProgress" Name="Avanzamento" Default="1" Left="44" Top="200" Width="452" Height="10" AlignH="0" AlignV="0" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="14" FontStyle="0" TextColor="66051" WordWrap="1" MinValue="0" MaxValue="100" Value="0" Animated="1" IndeterminateMode="2" ShowText="0"/>
+					<Item Kind="6" Kind_Name="TdxSplashFormBase.TFormattedApplicationInfo" Name="Versione" Left="344" Top="240" Width="152" Height="24" AlignH="2" AlignV="1" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="14" FontStyle="0" TextColor="66051" WordWrap="0">
+						<DisplayMask xml:space="preserve">Versione %Version%</DisplayMask>
+					</Item>
+					<Item Kind="6" Kind_Name="TdxSplashFormBase.TFormattedApplicationInfo" Name="Copyright" Left="44" Top="240" Width="300" Height="24" AlignH="0" AlignV="1" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="14" FontStyle="0" TextColor="66051" WordWrap="0">
+						<DisplayMask xml:space="preserve">Copyright © %CurrentYear% %Company%</DisplayMask>
+					</Item>
+				</Content>
+				<FadeIn>true</FadeIn>
+				<FadeOut>true</FadeOut>
+			</Item>
+			<Item>
+				<Name>Standard</Name>
+				<Kind>1</Kind>
+				<Kind_Name>Wait</Kind_Name>
+				<Content>
+					<Version>1</Version>
+					<Width>179</Width>
+					<Height>73</Height>
+					<Color>66051</Color>
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Text1" Default="1" Left="65" Top="28" Width="178" Height="16" AlignH="0" AlignV="1" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="16" FontStyle="0" TextColor="66051" WordWrap="1">
+						<Text>Attendere...</Text>
+					</Item>
+					<Item Kind="4" Kind_Name="TdxSplashFormBase.TAnimation" Name="Animation1" Left="24" Top="20" Width="33" Height="33" AlignH="0" AlignV="0" Color="66051" Transparent="1" SizeMode="1" Opacity="1"/>
+				</Content>
+			</Item>
+			<Defaults>
+				<Splash>Standard</Splash>
+				<Wait>Standard</Wait>
+			</Defaults>
+	</Data>
+</SplashForms>
+<Appearance>
+	<Version>1.0.0</Version>
+	<Enabled>true</Enabled>
+	<ShowNotifications>true</ShowNotifications>
+	<Kind>0</Kind>
+	<NativeStyle>false</NativeStyle>
+	<ScrollbarMode>2</ScrollbarMode>
+	<ScrollMode>0</ScrollMode>
+	<SkinName></SkinName>
+	<RenderMode>0</RenderMode>
+	<TouchMode>false</TouchMode>
+	<FormCorners>2</FormCorners>
+	<SkinPaletteName></SkinPaletteName>
+	<ShowFormShadow>2</ShowFormShadow>
+	<UseSkins>false</UseSkins>
+	<UseImageSet>0</UseImageSet>
+	<UseSkinsInPopupMenus>true</UseSkinsInPopupMenus>
+	<LightStyleMode>3</LightStyleMode>
+	<UseGlobalSkin>true</UseGlobalSkin>
+	<Skins>
+		<dxSkinWXI>false</dxSkinWXI>
+		<dxSkinTheBezier>false</dxSkinTheBezier>
+		<dxSkinOffice2019Colorful>false</dxSkinOffice2019Colorful>
+		<dxSkinOffice2019Black>false</dxSkinOffice2019Black>
+		<dxSkinOffice2019DarkGray>false</dxSkinOffice2019DarkGray>
+		<dxSkinOffice2019White>false</dxSkinOffice2019White>
+		<dxSkinBasic>false</dxSkinBasic>
+		<dxSkinBlack>false</dxSkinBlack>
+		<dxSkinBlue>false</dxSkinBlue>
+		<dxSkinBlueprint>false</dxSkinBlueprint>
+		<dxSkinCaramel>false</dxSkinCaramel>
+		<dxSkinCoffee>false</dxSkinCoffee>
+		<dxSkinDarkroom>false</dxSkinDarkroom>
+		<dxSkinDarkSide>false</dxSkinDarkSide>
+		<dxSkinDevExpressDarkStyle>false</dxSkinDevExpressDarkStyle>
+		<dxSkinDevExpressStyle>false</dxSkinDevExpressStyle>
+		<dxSkinFoggy>false</dxSkinFoggy>
+		<dxSkinGlassOceans>false</dxSkinGlassOceans>
+		<dxSkinHighContrast>false</dxSkinHighContrast>
+		<dxSkiniMaginary>false</dxSkiniMaginary>
+		<dxSkinLilian>false</dxSkinLilian>
+		<dxSkinLiquidSky>false</dxSkinLiquidSky>
+		<dxSkinLondonLiquidSky>false</dxSkinLondonLiquidSky>
+		<dxSkinMcSkin>false</dxSkinMcSkin>
+		<dxSkinMetropolis>false</dxSkinMetropolis>
+		<dxSkinMetropolisDark>false</dxSkinMetropolisDark>
+		<dxSkinMoneyTwins>false</dxSkinMoneyTwins>
+		<dxSkinOffice2007Black>false</dxSkinOffice2007Black>
+		<dxSkinOffice2007Blue>false</dxSkinOffice2007Blue>
+		<dxSkinOffice2007Green>false</dxSkinOffice2007Green>
+		<dxSkinOffice2007Pink>false</dxSkinOffice2007Pink>
+		<dxSkinOffice2007Silver>false</dxSkinOffice2007Silver>
+		<dxSkinOffice2010Black>false</dxSkinOffice2010Black>
+		<dxSkinOffice2010Blue>false</dxSkinOffice2010Blue>
+		<dxSkinOffice2010Silver>false</dxSkinOffice2010Silver>
+		<dxSkinOffice2013DarkGray>false</dxSkinOffice2013DarkGray>
+		<dxSkinOffice2013LightGray>false</dxSkinOffice2013LightGray>
+		<dxSkinOffice2013White>false</dxSkinOffice2013White>
+		<dxSkinOffice2016Colorful>false</dxSkinOffice2016Colorful>
+		<dxSkinOffice2016Dark>false</dxSkinOffice2016Dark>
+		<dxSkinPumpkin>false</dxSkinPumpkin>
+		<dxSkinSeven>false</dxSkinSeven>
+		<dxSkinSevenClassic>false</dxSkinSevenClassic>
+		<dxSkinSharp>false</dxSkinSharp>
+		<dxSkinSharpPlus>false</dxSkinSharpPlus>
+		<dxSkinSilver>false</dxSkinSilver>
+		<dxSkinSpringtime>false</dxSkinSpringtime>
+		<dxSkinStardust>false</dxSkinStardust>
+		<dxSkinSummer2008>false</dxSkinSummer2008>
+		<dxSkinTheAsphaltWorld>false</dxSkinTheAsphaltWorld>
+		<dxSkinValentine>false</dxSkinValentine>
+		<dxSkinVisualStudio2013Blue>false</dxSkinVisualStudio2013Blue>
+		<dxSkinVisualStudio2013Dark>false</dxSkinVisualStudio2013Dark>
+		<dxSkinVisualStudio2013Light>false</dxSkinVisualStudio2013Light>
+		<dxSkinVS2010>false</dxSkinVS2010>
+		<dxSkinWhiteprint>false</dxSkinWhiteprint>
+		<dxSkinXmas2008Blue>false</dxSkinXmas2008Blue>
+	</Skins>
+</Appearance>
