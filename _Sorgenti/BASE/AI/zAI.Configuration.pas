@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-09-13
+// Ultima modifica: 2026-10-06
 // ---------------------------------------------------------------------------
 
 unit zAI.Configuration;
@@ -150,6 +150,33 @@ implementation
 
 uses
   System.IOUtils;
+
+type
+  // File di configurazione letto tutto in memoria. TIniFile passa da
+  // GetPrivateProfileString con un buffer fisso di 2048 caratteri, e le
+  // istruzioni di sistema piu' lunghe tornavano troncate senza nessun avviso
+  // (R-037). TMemIniFile non ha limiti, ma restituisce i valori cosi' come
+  // sono scritti, mentre Windows toglie le virgolette, semplici o doppie, che
+  // racchiudono il valore: qui si fa lo stesso, perche' un file scritto a mano
+  // con APIKey="..." continui a funzionare. ReadInteger e ReadBool passano da
+  // ReadString, quindi valgono anche per loro.
+  //
+  // La codifica non si impone: TMemIniFile riconosce il BOM e senza BOM legge
+  // e riscrive nella codifica ANSI, come faceva TIniFile. Imporre UTF-8
+  // renderebbe illeggibili le lettere accentate dei file gia' scritti.
+  TFileConfigurazione = class(TMemIniFile)
+  public
+    function ReadString(const Section, Ident, Default: string): string; override;
+  end;
+
+function TFileConfigurazione.ReadString(const Section, Ident, Default: string): string;
+begin
+  Result := inherited ReadString(Section, Ident, Default);
+
+  if (Result.Length >= 2) and CharInSet(Result.Chars[0], ['"', '''']) and
+    (Result.Chars[Result.Length - 1] = Result.Chars[0]) then
+    Result := Result.Substring(1, Result.Length - 2);
+end;
 
 var
   SharedConfiguration: TzAIConfiguration = nil;
@@ -376,7 +403,7 @@ end;
 
 procedure TzAIConfiguration.LoadFromIniFile(const AFileName, ASection: string);
 var
-  IniFile: TIniFile;
+  IniFile: TFileConfigurazione;
   ModelList: string;
 begin
 
@@ -387,7 +414,7 @@ begin
  end;
 
 
-  IniFile := TIniFile.Create(AFileName);
+  IniFile := TFileConfigurazione.Create(AFileName);
   try
     DriverName := IniFile.ReadString(ASection, 'DriverName', FDriverName);
     APIKey := IniFile.ReadString(ASection, 'APIKey', FAPIKey);
@@ -422,9 +449,12 @@ end;
 
 procedure TzAIConfiguration.SaveToIniFile(const AFileName, ASection: string);
 var
-  IniFile: TIniFile;
+  IniFile: TFileConfigurazione;
 begin
-  IniFile := TIniFile.Create(AFileName);
+  // Il file si rilegge per intero e si riscrive per intero: le altre sezioni
+  // restano, le righe di commento (;) no, perche' TMemIniFile non le tiene.
+  // Di norma si salva solo alla prima apertura, quando il file non c'e'.
+  IniFile := TFileConfigurazione.Create(AFileName);
   try
     IniFile.WriteString(ASection, 'DriverName', FDriverName);
     // Attenzione: la chiave finisce in chiaro nel file. Se il file non e'
@@ -441,6 +471,9 @@ begin
     IniFile.WriteInteger(ASection, 'HistoryDepth', FHistoryDepth);
     IniFile.WriteBool(ASection, 'RegisterDevExpressChatClient', FRegisterDevExpressChatClient);
     IniFile.WriteString(ASection, 'Models', FModels.CommaText);
+
+    // TMemIniFile scrive solo qui: senza, le modifiche restano in memoria
+    IniFile.UpdateFile;
   finally
     IniFile.Free;
   end;

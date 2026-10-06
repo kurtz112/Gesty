@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-03
+// Ultima modifica: 2026-10-06
 // ---------------------------------------------------------------------------
 
 unit Test.zAI.Configuration;
@@ -63,12 +63,14 @@ type
     procedure Ini_IstruzioniSuPiuRighe;
     [Test]
     procedure Ini_FileMancante_CreatoCoiValoriAttuali;
-    // R-037: TIniFile.ReadString legge al massimo 2047 caratteri
-    // (System.IniFiles, buffer fisso): istruzioni di sistema piu' lunghe
-    // tornano troncate senza nessun avviso
+    // R-037: con TIniFile le istruzioni oltre 2047 caratteri tornavano
+    // troncate senza nessun avviso
     [Test]
-    [Ignore('R-037: TIniFile tronca le istruzioni di sistema oltre 2047 caratteri')]
     procedure Ini_IstruzioniLunghe_Intere;
+    // Windows toglieva le virgolette attorno al valore: un file scritto a
+    // mano con APIKey="..." deve continuare a funzionare
+    [Test]
+    procedure Ini_VirgoletteAttornoAlValore_Tolte;
   end;
 
 implementation
@@ -327,6 +329,25 @@ begin
   finally
     Riletta.Free;
   end;
+end;
+
+procedure TTestConfigurazioneAI.Ini_VirgoletteAttornoAlValore_Tolte;
+begin
+  TFile.WriteAllText(FFileIni,
+    '[' + AIConfigurationSection + ']' + sLineBreak +
+    'APIKey="chiave di prova"' + sLineBreak +
+    'Model=''modello''' + sLineBreak +
+    'AssistantName=Nome "con" virgolette' + sLineBreak +
+    'MaxToken="512"' + sLineBreak);
+
+  FConfigurazione.LoadFromIniFile(FFileIni);
+
+  Assert.AreEqual('chiave di prova', FConfigurazione.APIKey);
+  Assert.AreEqual('modello', FConfigurazione.Model);
+  // Virgolette in mezzo al valore: restano
+  Assert.AreEqual('Nome "con" virgolette', FConfigurazione.AssistantName);
+  // Anche i numeri passano da ReadString
+  Assert.AreEqual(512, FConfigurazione.MaxToken);
 end;
 
 initialization
