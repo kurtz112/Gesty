@@ -385,11 +385,11 @@ begin
   zSystem.AppName := 'Gesty';
   zSystem.FDPhysFBDriverLink := FDPhysFBDriverLink;
 
-  // La schermata di avvio deve sparire prima della finestra di accesso, che e'
-  // modale e aspetta l'utente: lasciargliela sopra farebbe sembrare
-  // l'applicazione bloccata.
-  CloseSplash;
-
+  // La schermata di avvio non si nasconde qui: la nasconde e la rimette
+  // zPack (zSecurityLoginFrm) solo se la finestra di accesso si apre davvero,
+  // e dalla sua posizione ricava il monitor su cui aprirla. Nascosta prima,
+  // zPack non sapeva piu' dove stava e la finestra di accesso finiva sul
+  // monitor scelto da Windows. Stesso comportamento di WinTarif e zTicser.
   zSystem.Login(true, false,
     procedure
     begin

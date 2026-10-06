@@ -857,8 +857,13 @@ begin
 
   BaseStatusBar.Panels[0].Visible := false; // verr  attivato da UpdateToolMDI;
   AggiornaStatusBar;
-  //
-  //
+
+  // Sullo stesso monitor della schermata di avvio e della finestra di
+  // accesso, prima di ingrandirsi: la finestra si ingrandisce sul monitor in
+  // cui sta. Senza, con poDesktopCenter finiva sul monitor al centro del
+  // desktop, e alla chiusura RicordaPosizioneDiLavoro salvava quello,
+  // trascinandoci anche la schermata dell'avvio successivo.
+  PortaSulMonitorDiLavoro(Self);
   WindowState := wsMaximized;
 
   ApplyModuli;
@@ -869,7 +874,9 @@ begin
   ActionListController := TActionListController.Create;
   ActionListController.register(ActionList);
 
-  CloseSplash;
+  // La schermata di avvio non si chiude piu' qui: resta a video per tutta la
+  // creazione della finestra principale e la chiude il .dpr subito dopo
+  // CreateForm, cioe' appena prima che questa finestra compaia.
 
   InitSkin;
 

@@ -58,6 +58,13 @@ procedure StatoSplash(const Messaggio: string);
 // c'e' ancora nessuna finestra a cui chiederlo.
 procedure RicordaPosizioneDiLavoro(AForm: TCustomForm);
 
+// Porta la finestra al centro del monitor della schermata di avvio. La chiama
+// MainForm prima di ingrandirsi: senza, il monitor lo sceglierebbe la
+// posizione del .dfm (poDesktopCenter), e la finestra principale potrebbe
+// comparire su un monitor diverso da quello della schermata e della finestra
+// di accesso.
+procedure PortaSulMonitorDiLavoro(AForm: TForm);
+
 implementation
 
 uses
@@ -135,7 +142,7 @@ end;
 // Monitor su cui sta davvero lavorando l'utente, nell'ordine:
 //
 // 1. dove stava la finestra principale l'ultima volta (file .login);
-// 2. la finestra principale, se esiste gia' (le comparse dopo l'accesso);
+// 2. la finestra principale, se esiste gia';
 // 3. la finestra attiva;
 // 4. il puntatore del mouse;
 // 5. il monitor primario.
@@ -146,7 +153,7 @@ end;
 // aiuta: chi lancia il programma da un'icona sul primo schermo e poi lavora
 // sul quarto ha il mouse sul primo. L'unica risposta giusta e' quella
 // ricordata dalla sessione precedente.
-function MonitorDiLavoro: TMonitor;
+function CercaMonitorDiLavoro: TMonitor;
 begin
   result := MonitorDellaVoltaScorsa;
 
@@ -161,6 +168,37 @@ begin
 
   if not assigned(result) then
     result := Screen.PrimaryMonitor;
+end;
+
+// Monitor scelto alla prima richiesta e poi mantenuto: schermata, finestra di
+// accesso e finestra principale devono stare tutte sullo stesso, e la
+// schermata non deve saltare da un monitor all'altro fra una comparsa e
+// l'altra dello stesso avvio.
+var
+  MonitorScelto: TMonitor = nil;
+
+function MonitorDiLavoro: TMonitor;
+begin
+  if not assigned(MonitorScelto) then
+    MonitorScelto := CercaMonitorDiLavoro;
+
+  result := MonitorScelto;
+end;
+
+procedure PortaSulMonitorDiLavoro(AForm: TForm);
+var
+  Area: TRect;
+begin
+  if not assigned(AForm) then
+    Exit;
+
+  Area := MonitorDiLavoro.WorkareaRect;
+
+  // poDesigned, altrimenti alla comparsa poDesktopCenter ricentrerebbe la
+  // finestra sul desktop intero, buttando via la posizione decisa qui.
+  AForm.Position := poDesigned;
+  AForm.SetBounds(Area.Left + (Area.Width - AForm.Width) div 2,
+    Area.Top + (Area.Height - AForm.Height) div 2, AForm.Width, AForm.Height);
 end;
 
 function TrovaTesto(Splash: TdxSplashFormBase; const Nome: string): TdxSplashFormBase.TText;
@@ -204,12 +242,6 @@ begin
   TzSecurity.LoadSkinFromIni;
 end;
 
-// Monitor scelto alla prima comparsa e poi mantenuto: la schermata non deve
-// saltare da un monitor all'altro fra una comparsa e l'altra dello stesso
-// avvio.
-var
-  MonitorScelto: TMonitor = nil;
-
 procedure PosizionaSplash;
 var
   Splash: TdxSplashFormBase;
@@ -220,18 +252,17 @@ begin
   if not(Splash is TdxSplashForm) then
     Exit;
 
-  if not assigned(MonitorScelto) then
-    MonitorScelto := MonitorDiLavoro;
-
   // La posizione non e' salvata nella definizione: TdxSplashForm.LoadFromXml
   // legge solo FadeIn e FadeOut, quindi Position resta sul valore predefinito,
   // che centra la schermata sul monitor della finestra in primo piano. Alla
   // seconda comparsa - quella dopo la finestra di accesso - in primo piano puo'
   // esserci un'altra applicazione, e la schermata salta sul suo monitor. Con
   // Custom la posizione la decidiamo qui, e resta la stessa per tutto l'avvio.
+  // Custom serve anche a zPack: e' il segnale che la finestra di accesso va
+  // aperta sul monitor della schermata.
   TdxSplashForm(Splash).Position := TdxSplashFormPosition.Custom;
 
-  Centro := MonitorScelto.WorkareaRect.CenterPoint;
+  Centro := MonitorDiLavoro.WorkareaRect.CenterPoint;
 
   // Le dimensioni si leggono dal contenuto: Splash.Width e Splash.Height sono
   // ancora zero finche' la schermata non e' comparsa almeno una volta.
