@@ -54,6 +54,15 @@ type
     procedure ContrattiNewRecord(DataSet: TDataSet);
     procedure ContrattiAfterCreateFields(DataSet: TDataSet);
     procedure ContrattoAnnoFormativoChange(Field: TField);
+  private
+    // Mantis #107 - 2026-10-07: coerenza fra e-mail e flag firma elettronica sulla scheda persona
+    FControlloFirmaInCorso: Boolean;
+    procedure RisorseAfterCreateFields(DataSet: TDataSet);
+    procedure RisorseEMailChange(Field: TField);
+    procedure RisorseFirmaElettronicaChange(Field: TField);
+    function EMailUtilizzabilePerFirma(const EMail: string): Boolean;
+    function HaIncarichiInCorso(const IdRisorsa: Integer): Boolean;
+    procedure AvvisaEMailNonUtilizzabilePerFirma(const EMail: string);
   protected
     procedure GetInquadramento(const idRisorsa: integer; const Data: TDateTime; out IdInquadramento: integer; out TipoContratto: string);
     procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
@@ -241,6 +250,7 @@ begin
     DataSet.AfterInsert := RisorseCampiReadOnly;
     DataSet.AfterPost := RisorseCampiReadOnly;
     DataSet.AfterCancel := RisorseCampiReadOnly;
+    DataSet.OnAfterCreateFields := RisorseAfterCreateFields;
   end
   else
     if sameText(DataSetName, 'RilevamentiControlloPeriodico') then
@@ -590,6 +600,14 @@ begin
     begin
       Risorse.Append;
       Risorse.FieldByName('TIPO_RISORSA').asString := 'P';
+      // Mantis #107 - 2026-10-07: la persona nasce senza firma elettronica e il flag si attiva
+      // da solo quando l'operatore compila un'e-mail valida per la firma
+      FControlloFirmaInCorso := True;
+      try
+        Risorse.FieldByName('FIRMA_ELETTRONICA').AsBoolean := False;
+      finally
+        FControlloFirmaInCorso := False;
+      end;
       Risorse.FieldByName('DATA_ATTIVAZIONE').AsDateTime := Date;
       Risorse.FieldByName('DATA_DISATTIVAZIONE').AsDateTime := EncodeDate(9999, 12, 31);
       Risorse.FieldByName('AUTORIZZAZIONE_USO_IMMAGINE').asBoolean := true;
@@ -794,6 +812,103 @@ begin
     RettificaDlg.DestroyControls;
   finally
     RettificaIndirizzo := False;
+  end;
+end;
+
+procedure TRisorse.RisorseAfterCreateFields(DataSet: TDataSet);
+begin
+  // Mantis #107 - 2026-10-07
+  DataSet.FieldByName('E_MAIL').OnChange := RisorseEMailChange;
+  DataSet.FieldByName('FIRMA_ELETTRONICA').OnChange := RisorseFirmaElettronicaChange;
+end;
+
+function TRisorse.EMailUtilizzabilePerFirma(const EMail: string): Boolean;
+var
+  Esito: Variant;
+begin
+  // Mantis #107 - 2026-10-07: stessa regola della funzione E_MAIL_VALIDA del database (formato
+  // accettato da Namirial eSignAnyWhere), applicata al testo sanificato come fa l'invio della
+  // busta: i due controlli devono dare lo stesso esito
+  if Trim(EMail) = '' then
+    Exit(False);
+
+  Esito := Config.Database.ExecSQLScalar('SELECT E_MAIL_VALIDA(SANIFICATION.SANIFICA_TESTO(:EMAIL)) FROM RDB$DATABASE', [EMail]);
+  Result := (not VarIsNull(Esito)) and (Esito = True);
+end;
+
+function TRisorse.HaIncarichiInCorso(const IdRisorsa: Integer): Boolean;
+begin
+  // Mantis #107 - 2026-10-07: con un incarico in corso o futuro, un flag spento significa che i
+  // contratti cartacei sono gia' stati stampati
+  Result := Config.Database.ExecSQLScalar('SELECT IIF(EXISTS(SELECT 1 FROM INCARICHI WHERE INCARICHI.ID_RISORSA = :ID_RISORSA AND INCARICHI.DATA_FINE_INCARICO >= CURRENT_DATE), 1, 0) FROM RDB$DATABASE', [IdRisorsa]) = 1;
+end;
+
+procedure TRisorse.AvvisaEMailNonUtilizzabilePerFirma(const EMail: string);
+begin
+  if Trim(EMail) = '' then
+    ConfirmOk('Senza un indirizzo e-mail la persona non potrà essere usata per le firme elettroniche. Il flag firma elettronica è stato disattivato.', mtWarning)
+  else
+    ConfirmOk('L''indirizzo e-mail non è valido per la firma elettronica (formato richiesto dal fornitore di firma): la persona non potrà essere usata per le firme elettroniche. Il flag firma elettronica è stato disattivato.', mtWarning);
+end;
+
+procedure TRisorse.RisorseEMailChange(Field: TField);
+var
+  DataSet: TDataSet;
+  FirmaElettronica: TField;
+begin
+  // Mantis #107 - 2026-10-07: e-mail valida = il flag si attiva subito dopo il campo; non valida =
+  // avviso e flag spento. Vale per le sole persone: per le aziende l'e-mail di firma e' un'altra
+  if FControlloFirmaInCorso then
+    Exit;
+
+  DataSet := Field.DataSet;
+  if DataSet.FieldByName('TIPO_RISORSA').AsString <> 'P' then
+    Exit;
+
+  FirmaElettronica := DataSet.FieldByName('FIRMA_ELETTRONICA');
+
+  FControlloFirmaInCorso := True;
+  try
+    if EMailUtilizzabilePerFirma(Field.AsString) then
+    begin
+      if (not FirmaElettronica.AsBoolean) and
+         ((DataSet.State = dsInsert) or (not HaIncarichiInCorso(DataSet.FieldByName('ID_RISORSA').AsInteger))) then
+        FirmaElettronica.AsBoolean := True;
+    end
+    else
+    begin
+      if FirmaElettronica.AsBoolean or (Trim(Field.AsString) <> '') then
+        AvvisaEMailNonUtilizzabilePerFirma(Field.AsString);
+
+      if FirmaElettronica.AsBoolean then
+        FirmaElettronica.AsBoolean := False;
+    end;
+  finally
+    FControlloFirmaInCorso := False;
+  end;
+end;
+
+procedure TRisorse.RisorseFirmaElettronicaChange(Field: TField);
+var
+  DataSet: TDataSet;
+begin
+  // Mantis #107 - 2026-10-07: un flag acceso a mano senza e-mail valida viene respinto con un avviso
+  if FControlloFirmaInCorso then
+    Exit;
+
+  DataSet := Field.DataSet;
+  if (not Field.AsBoolean) or (DataSet.FieldByName('TIPO_RISORSA').AsString <> 'P') then
+    Exit;
+
+  if EMailUtilizzabilePerFirma(DataSet.FieldByName('E_MAIL').AsString) then
+    Exit;
+
+  FControlloFirmaInCorso := True;
+  try
+    AvvisaEMailNonUtilizzabilePerFirma(DataSet.FieldByName('E_MAIL').AsString);
+    Field.AsBoolean := False;
+  finally
+    FControlloFirmaInCorso := False;
   end;
 end;
 

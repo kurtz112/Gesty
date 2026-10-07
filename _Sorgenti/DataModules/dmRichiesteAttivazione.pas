@@ -40,6 +40,11 @@ type
     cardInquadramento: TzDbCardDlg;
   private
     procedure CopiaAllegatiDaRichiestaAttivazioneInRisorsa(const idRichiesta: integer);
+    // Mantis #107 - 2026-10-07: avviso sull'e-mail non utilizzabile per la firma elettronica
+    procedure RichiestaAfterCreateFields(DataSet: TDataSet);
+    procedure RichiestaEMailChange(Field: TField);
+  protected
+    procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
   public
     procedure RicopiaAllegatiRisorsa;
     function ConvalidaRichiestaAttivazione: Boolean;
@@ -56,11 +61,51 @@ implementation
 
 uses
   System.IOUtils,
+  ConfigModule,
   Gesty_StoredProcs,
   zMemoDialog,
   zMsg;
 
 {$R *.dfm}
+
+procedure TRichiesteAttivazione.AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet);
+begin
+  inherited;
+
+  // Mantis #107 - 2026-10-07
+  if SameText(DataSetName, 'Richieste_Attivazione') or SameText(DataSetName, 'RichiesteDaApprovare') then
+    DataSet.OnAfterCreateFields := RichiestaAfterCreateFields;
+end;
+
+procedure TRichiesteAttivazione.RichiestaAfterCreateFields(DataSet: TDataSet);
+var
+  Campo: TField;
+begin
+  // Mantis #107 - 2026-10-07
+  Campo := DataSet.FindField('E_MAIL');
+  if Assigned(Campo) then
+    Campo.OnChange := RichiestaEMailChange;
+end;
+
+procedure TRichiesteAttivazione.RichiestaEMailChange(Field: TField);
+var
+  Esito: Variant;
+  TipoRisorsa: TField;
+begin
+  // Mantis #107 - 2026-10-07: sulla richiesta non c'e' il flag (lo decide il trigger alla generazione
+  // della persona, con la stessa regola): qui si avvisa subito che l'e-mail non servira' per la firma.
+  // Stessa regola della funzione E_MAIL_VALIDA, applicata al testo sanificato come fa l'invio
+  TipoRisorsa := Field.DataSet.FindField('TIPO_RISORSA');
+  if Assigned(TipoRisorsa) and (TipoRisorsa.AsString <> 'P') then
+    Exit;
+
+  if Trim(Field.AsString) = '' then
+    Exit;
+
+  Esito := Config.Database.ExecSQLScalar('SELECT E_MAIL_VALIDA(SANIFICATION.SANIFICA_TESTO(:EMAIL)) FROM RDB$DATABASE', [Field.AsString]);
+  if VarIsNull(Esito) or (Esito <> True) then
+    ConfirmOk('L''indirizzo e-mail non è valido per la firma elettronica (formato richiesto dal fornitore di firma): la persona, una volta attivata, non potrà essere usata per le firme elettroniche e il flag firma elettronica nascerà spento.', mtWarning);
+end;
 
 function TRichiesteAttivazione.ApprovaRichiestaAttivazione: Boolean;
 var
