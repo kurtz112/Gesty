@@ -62,16 +62,24 @@ type
     function DataStampaBandoDocenti: TDateTime;
     procedure TimeReportGetParametri(out idRisorsa, idIncarico: integer);
     procedure TimesheetAnnualeBeforeOpen(DataSet: TDataSet);
+    function AttivaConFinestra(DataSet: TzFbDataSet): boolean;
+    procedure AttivaInBlocco(Incarichi: TList<integer>; const Azione: string);
   protected
     procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
 
   public
     function IdIncaricoSelezionato: integer;
     function IdProgettoSelezionato: integer;
-    procedure Verificato(Incarichi: TList<integer>);
-    procedure AutorizzaIncarico;
-    procedure ModificaEstensore;
-    procedure IncongruitaVerificata;
+    // Mantis #183 - 2026-10-02: le azioni dell'iter lavorano su un elenco di
+    // incarichi e sul dataset da cui arrivano: lo stesso codice serve l'elenco
+    // unico IncarichiDaLavorare e quello delle ore residue.
+    procedure AutorizzazioneFinanziaria(Incarichi: TList<integer>; const Azione: string);
+    procedure AutorizzazioneDirezione(Incarichi: TList<integer>; const Azione: string);
+    procedure AttivaIncarico(const DataSetName: string; Incarichi: TList<integer>; const Azione: string);
+    procedure ModificaEstensore(const DataSetName: string);
+    procedure AccettaOreResidue(const DataSetName: string; Incarichi: TList<integer>);
+    function FaseDegliIncarichi(Incarichi: TList<integer>; out Azione: string): string;
+    procedure Procedi(Incarichi: TList<integer>; const Fase, Azione: string);
     procedure CopiaMaterie;
     procedure NuovoPianoPersonale;
     procedure IscrizioneStudenti;
@@ -100,6 +108,7 @@ uses
   WinApi.ShellAPI,
   System.IOUtils,
   System.DateUtils,
+  System.Math,
   dxRichEdit.Control,
   Gesty_StoredProcs,
   ConfigModule,
@@ -115,6 +124,10 @@ uses
   zOffice.Reports;
 
 {$R *.dfm}
+
+const
+  // Mantis #183 - 2026-10-01: elenco unico delle richieste da lavorare
+  DATASET_DA_LAVORARE = 'IncarichiDaLavorare';
 
 procedure TProgetti.DataModuleCreate(Sender: TObject);
 begin
@@ -200,21 +213,25 @@ begin
   FreeAndNil(DocentiIncarichiSelezionati);
 end;
 
-procedure TProgetti.Verificato(Incarichi: TList<integer>);
+// Mantis #183 - 2026-10-02: era Verificato (procedura INCARICO_VERIFICATO)
+procedure TProgetti.AutorizzazioneDirezione(Incarichi: TList<integer>; const Azione: string);
 var
   id: integer;
-  sp: TSP_incarico_Verificato;
+  sp: TSP_incarico_Autorizzazione_Direzione;
 begin
   Assert(assigned(Incarichi));
   if Incarichi.Count = 0 then
     exit;
 
-  if not ConfirmYesNo('Segnare come verificati gli incarichi selezionati?') then
+  // Mantis #183 - 2026-10-01: il testo del comando e' quello del cliente
+  // (ZZ_INCARICHI_FASI.AZIONE): a Codebri "Autorizza", altrove
+  // "Autorizzazione della direzione"
+  if not ConfirmYesNo(Format('%s: %d incarichi selezionati. Procedere?', [Azione, Incarichi.Count])) then
     exit;
 
-  ProgressBox.Show(Incarichi.Count, 'Incarichi Verificati', 'Incarichi Verificati', 'Attendere...');
+  ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
   try
-    sp := TSP_incarico_Verificato.create(WriteTrans);
+    sp := TSP_incarico_Autorizzazione_Direzione.create(WriteTrans);
     try
       for id in Incarichi do
       begin
@@ -229,6 +246,113 @@ begin
   finally
     ProgressBox.Close;
   end;
+end;
+
+// Mantis #183 - 2026-10-02: autorizzazione finanziaria, dove e' una fase
+// propria (prima della direzione). Chi puo' darla lo decide
+// INCARICO_AUTORIZZAZIONE_FINANZIARIA (Incarichi.AutorizzazioneFinanziaria).
+procedure TProgetti.AutorizzazioneFinanziaria(Incarichi: TList<integer>; const Azione: string);
+var
+  id: integer;
+  sp: TSP_incarico_Autorizzazione_Finanziaria;
+begin
+  Assert(assigned(Incarichi));
+  if Incarichi.Count = 0 then
+    exit;
+
+  if not ConfirmYesNo(Format('%s: %d incarichi selezionati. Procedere?', [Azione, Incarichi.Count])) then
+    exit;
+
+  ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
+  try
+    sp := TSP_incarico_Autorizzazione_Finanziaria.create(WriteTrans);
+    try
+      for id in Incarichi do
+      begin
+        sp.Id_Incarico := id;
+        sp.ExecuteAndCommit;
+      end;
+    finally
+      FreeAndNil(sp);
+    end;
+
+    RefreshDataSets;
+  finally
+    ProgressBox.Close;
+  end;
+end;
+
+// Mantis #183 - 2026-10-01: fase comune degli incarichi selezionati
+// nell'elenco unico, e testo del comando che la esegue. Restituisce '' se la
+// selezione e' vuota o mescola fasi diverse (lo dice all'utente).
+function TProgetti.FaseDegliIncarichi(Incarichi: TList<integer>; out Azione: string): string;
+var
+  DataSet: TzFbDataSet;
+  Segnalibro: TBookmark;
+  id: integer;
+  Fase: string;
+  FasiDiverse: boolean;
+begin
+  result := '';
+  Azione := '';
+
+  if (not assigned(Incarichi)) or (Incarichi.Count = 0) then
+    exit;
+
+  DataSet := GetDataSet(DATASET_DA_LAVORARE);
+  FasiDiverse := false;
+
+  Segnalibro := DataSet.Bookmark;
+  DataSet.DisableControls;
+  try
+    for id in Incarichi do
+    begin
+      if not DataSet.Locate('ID_INCARICO', id, []) then
+        continue;
+
+      Fase := DataSet.FieldByName('FASE').AsString;
+
+      if result = '' then
+      begin
+        result := Fase;
+        Azione := DataSet.FieldByName('PROSSIMO_PASSO').AsString;
+      end
+      else
+        if not SameText(result, Fase) then
+          FasiDiverse := true;
+    end;
+  finally
+    if DataSet.BookmarkValid(Segnalibro) then
+      DataSet.Bookmark := Segnalibro;
+    DataSet.EnableControls;
+  end;
+
+  if FasiDiverse then
+  begin
+    ConfirmOk('Gli incarichi selezionati sono in fasi diverse: selezionarne di una fase sola.');
+    result := '';
+    Azione := '';
+  end;
+end;
+
+// Mantis #183 - 2026-10-01: esegue il passaggio della fase. Le fasi della firma
+// le gestisce la form (portano alla gestione dei contratti).
+procedure TProgetti.Procedi(Incarichi: TList<integer>; const Fase, Azione: string);
+begin
+  if SameText(Fase, 'FINANZIARIA') then
+    AutorizzazioneFinanziaria(Incarichi, Azione)
+  else
+    if SameText(Fase, 'DIREZIONE') then
+      AutorizzazioneDirezione(Incarichi, Azione)
+    else
+      if SameText(Fase, 'ATTIVAZIONE') then
+        AttivaIncarico(DATASET_DA_LAVORARE, Incarichi, Azione)
+      else
+        if SameText(Fase, 'ORE_RESIDUE') then
+          AccettaOreResidue(DATASET_DA_LAVORARE, Incarichi)
+        else
+          if Fase <> '' then
+            ConfirmOk('Per questa fase non c''' + #232 + ' un passaggio da eseguire dall''elenco.');
 end;
 
 procedure TProgetti.AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet);
@@ -381,14 +505,15 @@ begin
     GetDataSet('Progetti_Materie_Incarichi').Reopen();
 end;
 
-procedure TProgetti.ModificaEstensore;
+procedure TProgetti.ModificaEstensore(const DataSetName: string);
 var
   DataSet: TzFbDataSet;
   idEstensore: integer;
   IdIncaricoSelezionato: integer;
   sp: TSP_incarico_Set_Estensore;
 begin
-  DataSet := GetDataSet('IncarichiDaAutorizzare');
+  // Mantis #183 - 2026-10-01: dall'elenco storico o dall'elenco unico
+  DataSet := GetDataSet(DataSetName);
 
   if DataSet.IsEmpty then
     exit;
@@ -420,27 +545,36 @@ begin
   DataSet.Reopen(true);
 end;
 
-procedure TProgetti.IncongruitaVerificata;
+procedure TProgetti.AccettaOreResidue(const DataSetName: string; Incarichi: TList<integer>);
 var
   DataSet: TzFbDataSet;
-  idEstensore: integer;
-  IdIncaricoSelezionato: integer;
-  sp: TSP_incarico_Set_Congruo;
+  id: integer;
+  sp: TSP_incarico_Accetta_Ore_Residue;
 begin
-  DataSet := GetDataSet('IncarichiNonCongrui');
-
-  if DataSet.IsEmpty then
+  // Mantis #183 - 2026-10-02: era IncongruitaVerificata. Piu' incarichi con una
+  // sola conferma
+  Assert(assigned(Incarichi));
+  if Incarichi.Count = 0 then
     exit;
 
-  IdIncaricoSelezionato := DataSet.FieldByName('ID_INCARICO').AsInteger;
+  DataSet := GetDataSet(DataSetName);
 
-  if not ConfirmYesNo('Si desidera considerare l''incarico ' + IdIncaricoSelezionato.ToString + ' congruo?') then
-    exit;
+  if Incarichi.Count = 1 then
+  begin
+    if not ConfirmYesNo('Accettare le ore residue dell''incarico ' + Incarichi[0].ToString + '?') then
+      exit;
+  end
+  else
+    if not ConfirmYesNo(Format('Accettare le ore residue dei %d incarichi selezionati?', [Incarichi.Count])) then
+      exit;
 
-  sp := TSP_incarico_Set_Congruo.create(WriteTrans);
+  sp := TSP_incarico_Accetta_Ore_Residue.create(WriteTrans);
   try
-    sp.Id_Incarico := IdIncaricoSelezionato;
-    sp.ExecuteAndCommit;
+    for id in Incarichi do
+    begin
+      sp.Id_Incarico := id;
+      sp.ExecuteAndCommit;
+    end;
   finally
     FreeAndNil(sp);
   end;
@@ -786,24 +920,119 @@ begin
   end;
 end;
 
-procedure TProgetti.AutorizzaIncarico;
+// Mantis #183 - 2026-10-01: attivazione di piu' incarichi. Quelli che non
+// chiedono ne' protocollo ne' contratto passano insieme, con la data di oggi e
+// una sola conferma (a CAPAC il 42% delle autorizzazioni dell'ultimo anno);
+// gli altri passano dalla finestra di sempre, uno alla volta.
+// Mantis #183 - 2026-10-06: era AutorizzaIncarico (procedura INCARICO_AUTORIZZA,
+// ora INCARICO_ATTIVA).
+procedure TProgetti.AttivaIncarico(const DataSetName: string; Incarichi: TList<integer>; const Azione: string);
+var
+  DataSet: TzFbDataSet;
+  InBlocco, UnoAllaVolta: TList<integer>;
+  id: integer;
+  oldRecNo: integer;
+begin
+  Assert(assigned(Incarichi));
+  if Incarichi.Count = 0 then
+    exit;
+
+  DataSet := GetDataSet(DataSetName);
+
+  if DataSet.IsEmpty then
+    exit;
+
+  oldRecNo := DataSet.RecNo;
+
+  InBlocco := TList<integer>.create;
+  UnoAllaVolta := TList<integer>.create;
+  try
+    for id in Incarichi do
+      if DataSet.Locate('ID_INCARICO', id, []) then
+        if DataSet.FieldByName('RICHIEDE_PROTOCOLLO').AsBoolean or DataSet.FieldByName('RICHIEDE_CONTRATTO').AsBoolean then
+          UnoAllaVolta.Add(id)
+        else
+          InBlocco.Add(id);
+
+    AttivaInBlocco(InBlocco, Azione);
+
+    for id in UnoAllaVolta do
+      if DataSet.Locate('ID_INCARICO', id, []) then
+        if not AttivaConFinestra(DataSet) then
+          break; // annullato dall'utente: i successivi restano da attivare
+  finally
+    FreeAndNil(UnoAllaVolta);
+    FreeAndNil(InBlocco);
+  end;
+
+  /// ////////////////////
+  /// Con reopen elimina i record attivati, esclusi dal filtro.
+  /// RecNo dovrebbe posizionare sul record successivo [richiesta di Paolo]
+
+  StartWait('Attendere...', true);
+  try
+    DataSet.DisableControls;
+    try
+      DataSet.Reopen(true); // <-------------------
+      if not DataSet.IsEmpty then
+        DataSet.RecNo := Min(oldRecNo, DataSet.RecordCount);
+    finally
+      DataSet.EnableControls;
+    end;
+  finally
+    StopWait;
+  end;
+end;
+
+procedure TProgetti.AttivaInBlocco(Incarichi: TList<integer>; const Azione: string);
+var
+  id: integer;
+  sp: TSP_incarico_Attiva;
+begin
+  if Incarichi.Count = 0 then
+    exit;
+
+  if not ConfirmYesNo(Format('%s: %d incarichi senza protocollo e senza contratto, con la data di oggi. Procedere?', [Azione, Incarichi.Count])) then
+    exit;
+
+  ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
+  try
+    sp := TSP_incarico_Attiva.create(WriteTrans);
+    try
+      for id in Incarichi do
+      begin
+        sp.Id_Incarico := id;
+        sp.Data_Attivazione := Date;
+        sp.Data_Protocollo.Clear;
+        sp.Numero_Protocollo.Clear;
+        sp.ExecuteAndCommit;
+      end;
+    finally
+      FreeAndNil(sp);
+    end;
+  finally
+    ProgressBox.Close;
+  end;
+end;
+
+// La finestra di sempre (data, protocollo, parametro di ricavo) sull'incarico
+// corrente del dataset, con la stampa automatica del contratto. False se
+// l'utente annulla.
+function TProgetti.AttivaConFinestra(DataSet: TzFbDataSet): boolean;
 var
   RichiedeContratto: boolean;
-  DataSet: TzFbDataSet;
-  DataSetStampa: TzFbDataSet;
 
   IdIncaricoSelezionato: integer;
-  DataAutorizzazione: TDateTime;
+  DataAttivazione: TDateTime;
   DataProtocollo: TDateTime;
-  DescIncaricoDaAutorizzare: string;
+  DescIncaricoDaAttivare: string;
   NumeroProtocollo: string;
   Protocolla: boolean;
   ParametroRicavoSpecifico: double;
   StringList: TStringList;
-  sp: TSP_incarico_Autorizza;
-  oldRecNo: integer;
+  sp: TSP_incarico_Attiva;
 begin
-  DataSet := GetDataSet('IncarichiDaAutorizzare');
+  result := false;
 
   if DataSet.IsEmpty then
     exit;
@@ -811,7 +1040,7 @@ begin
   IdIncaricoSelezionato := DataSet.FieldByName('ID_INCARICO').AsInteger;
   Protocolla := DataSet.FieldByName('RICHIEDE_PROTOCOLLO').AsBoolean;
   RichiedeContratto := DataSet.FieldByName('RICHIEDE_CONTRATTO').AsBoolean;
-  DataAutorizzazione := Date;
+  DataAttivazione := Date;
 
   DataProtocollo := Date;
   NumeroProtocollo := '';
@@ -832,18 +1061,18 @@ begin
     StringList.add('Tipo Incarico: ' + DataSet.FieldByName('TIPO_INCARICO').AsString);
     StringList.add('Finanziamento: ' + DataSet.FieldByName('FINANZIAMENTO').AsString);
     StringList.add('Tipo Finanziamento: ' + DataSet.FieldByName('TIPO_FINANZIAMENTO').AsString);
-    DescIncaricoDaAutorizzare := StringList.Text;
+    DescIncaricoDaAttivare := StringList.Text;
   finally
     FreeAndNil(StringList);
   end;
 
-  if not ChiediParametriProtocolloIncarico(Protocolla, DescIncaricoDaAutorizzare, DataAutorizzazione, DataProtocollo, NumeroProtocollo, ParametroRicavoSpecifico) then
+  if not ChiediParametriProtocolloIncarico(Protocolla, DescIncaricoDaAttivare, DataAttivazione, DataProtocollo, NumeroProtocollo, ParametroRicavoSpecifico) then
     exit;
 
-  sp := TSP_incarico_Autorizza.create(WriteTrans);
+  sp := TSP_incarico_Attiva.create(WriteTrans);
   try
     sp.Id_Incarico := IdIncaricoSelezionato;
-    sp.Data_Autorizzazione := DataAutorizzazione;
+    sp.Data_Attivazione := DataAttivazione;
 
     if Protocolla then
     begin
@@ -876,27 +1105,7 @@ begin
       ReportsManager.WithOid(IdIncaricoSelezionato).Preview('Contratto', DataSet);
     end;
 
-  /// ////////////////////
-  /// ////////////////////
-  /// Con reopen elimina il record corrente, essendo escluso dal filtro.
-  /// RecNo dovrebbe posizionare sul record successivo [richiesta di Paolo]
-
-  StartWait('Attendere...', true);
-  try
-    DataSet.DisableControls;
-    try
-      oldRecNo := DataSet.RecNo;
-      DataSet.Reopen(true); // <-------------------
-      DataSet.RecNo := oldRecNo;
-    finally
-      DataSet.EnableControls;
-    end;
-  finally
-    StopWait;
-  end;
-  /// ////////////////////
-  /// ////////////////////
-  /// ////////////////////
+  result := true;
 end;
 
 function TProgetti.GetLezioniDaRendicontare(out Data: TDateTime; out IdProgetto: integer): boolean;

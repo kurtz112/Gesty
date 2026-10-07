@@ -442,6 +442,12 @@ procedure TWizInserimentoIncaricoForm.cardIncaricoAfterCreateControls(Sender: TO
 begin
   inherited;
   // cardIncarico.HideField('NOTE');
+
+  // Mantis #183 - 2026-10-01: la motivazione si vede solo dove e' attiva
+  // (CONFIG.INCARICHI_MOTIVAZIONE_VISIBILE). FORCE_HIDDEN di OVERRIDES non e'
+  // applicato dalle schede, quindi si nasconde da qui.
+  if not WizInserimentoIncarico.MotivazioneVisibile then
+    cardIncarico.HideField('MOTIVAZIONE');
 end;
 
 procedure TWizInserimentoIncaricoForm.CreaNuovoCorsoExecute(Sender: TObject);

@@ -91,14 +91,14 @@ type
     EliminaIncarico: TAction;
     Integrazione: TAction;
     RettificaProtocollo: TAction;
-    AnnullaAutorizzazioneIncarico: TAction;
+    AnnullaAttivazioneIncarico: TAction;
     CreaUtenteDominio: TAction;
     ValidaOrePerSettore: TAction;
     AnnullaValidazionePerSettore: TAction;
     RilevamentoOreFatturate: TAction;
     RilevamentoOreTogliFatturate: TAction;
     GeneraAutorizzazionePagamentoXRisorsa: TAction;
-    procedure AnnullaAutorizzazioneIncaricoExecute(Sender: TObject);
+    procedure AnnullaAttivazioneIncaricoExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure edProgettoPropertiesEditValueChanged(Sender: TObject);
     procedure edAnnoPropertiesChange(Sender: TObject);
@@ -269,7 +269,7 @@ procedure TFormRisorse.OLD_AfterCreateComponent(const DataSetName: String; Compo
         // view.AddAction(Integrazione, zDmImages.ImageList16).HideInView;
         // view.AddAction(EliminaIncarico, zDmImages.ImageList16);
         // view.AddAction(RettificaProtocollo, zDmImages.ImageList16);
-        // view.AddAction(AnnullaAutorizzazioneIncarico, zDmImages.ImageList16).HideInView;
+        // view.AddAction(AnnullaAttivazioneIncarico, zDmImages.ImageList16).HideInView;
         // view.InitActions;
 // 
         // Tools.AddFiltroAnnoSolare(view, Risorse.GetDataSet(DataSetName), ivNull);
@@ -914,10 +914,11 @@ begin
   Risorse.GeneraIncaricoSupplenza;
 end;
 
-procedure TFormRisorse.AnnullaAutorizzazioneIncaricoExecute(Sender: TObject);
+// Mantis #183 - 2026-10-06: era AnnullaAutorizzazioneIncaricoExecute
+procedure TFormRisorse.AnnullaAttivazioneIncaricoExecute(Sender: TObject);
 begin
   inherited;
-  Risorse.AnnullaAutorizzazioneIncarico;
+  Risorse.AnnullaAttivazioneIncarico;
 end;
 
 procedure TFormRisorse.CreaUtenteDominioExecute(Sender: TObject);

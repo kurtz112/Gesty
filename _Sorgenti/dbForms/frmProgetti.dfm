@@ -17,26 +17,16 @@ inherited FormProgetti: TFormProgetti
     Images = zDmImages.ImageList24
     Left = 336
     Top = 176
-    object Verificato: TAction
-      Caption = 'Verificato'
-      ImageIndex = 18
-      OnExecute = VerificatoExecute
-    end
-    object AutorizzaIncarico: TAction
-      Caption = 'Autorizza Incarico'
-      ImageIndex = 107
-      OnExecute = AutorizzaIncaricoExecute
-    end
     object ModificaEstensore: TAction
       Caption = 'Modifica Estensore'
       ImageIndex = 164
       Visible = False
       OnExecute = ModificaEstensoreExecute
     end
-    object IncongruitaVerificata: TAction
-      Caption = 'Incongruit'#224' Verificata'
+    object AccettaOreResidue: TAction
+      Caption = 'Accetta Ore Residue'
       ImageIndex = 402
-      OnExecute = IncongruitaVerificataExecute
+      OnExecute = AccettaOreResidueExecute
     end
     object CopiaMaterie: TAction
       Caption = 'Copia Materie'
@@ -97,6 +87,12 @@ inherited FormProgetti: TFormProgetti
       Caption = 'Esporta PDF'
       ImageIndex = 5
       OnExecute = EsportaPDFFirmatiDigitalmenteExecute
+    end
+    object Procedi: TAction
+      Caption = 'Procedi'
+      Hint = 'Esegue il passaggio della fase degli incarichi selezionati'
+      ImageIndex = 18
+      OnExecute = ProcediExecute
     end
   end
 end

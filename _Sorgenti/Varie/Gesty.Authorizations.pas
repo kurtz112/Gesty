@@ -20,12 +20,19 @@ type
     ORARIO_ELIMINAZIONE = 'CalendarioCorsi.Eliminazione';
 
     INCARICHI_SUPERVISORE = 'Incarichi.Supervisore';
-    INCARICHI_VERIFICA_INCONGRUITA = 'Incarichi.VerificaIncongruita';
+    // Mantis #183 - 2026-10-02: era INCARICHI_VERIFICA_INCONGRUITA ('Incarichi.VerificaIncongruita')
+    INCARICHI_ACCETTA_ORE_RESIDUE = 'Incarichi.AccettaOreResidue';
     INCARICHI_MODIFICA_ESTENSORE = 'Incarichi.ModificaEstensore';
-    INCARICHI_AUTORIZZAZIONE = 'Incarichi.Autorizzazione';
+    // Mantis #183 - 2026-10-06: era INCARICHI_AUTORIZZAZIONE ('Incarichi.Autorizzazione'):
+    // l'autorizzazione che rende operativo l'incarico si chiama attivazione
+    INCARICHI_ATTIVAZIONE = 'Incarichi.Attivazione';
     INCARICHI_VISUALIZZAZIONE = 'Incarichi.Visualizzazione';
     INCARICHI_FORZA_ELIMINAZIONE = 'Incarichi.ForzaEliminazione';
     INCARICHI_VALUTAZIONE = 'Incarichi.Valutazione';
+    // Mantis #183 - 2026-10-02: autorizzazioni per ruolo del ciclo degli incarichi
+    INCARICHI_AUTORIZZAZIONE_FINANZIARIA = 'Incarichi.AutorizzazioneFinanziaria';
+    // era 'Incarichi.VerificaIncarico', senza costante
+    INCARICHI_AUTORIZZAZIONE_DIREZIONE = 'Incarichi.AutorizzazioneDirezione';
 
     RICHIESTE_ATTIV_INSERIMENTO = 'RichiesteAttivazione.Inserimento';
     RICHIESTE_ATTIV_VALUTAZIONE = 'RichiesteAttivazione.Valutazione';

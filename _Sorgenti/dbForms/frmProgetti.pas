@@ -42,10 +42,8 @@ uses
 type
   TFormProgetti = class(TBaseForm)
     ActionList: TActionList;
-    Verificato: TAction;
-    AutorizzaIncarico: TAction;
     ModificaEstensore: TAction;
-    IncongruitaVerificata: TAction;
+    AccettaOreResidue: TAction;
     CopiaMaterie: TAction;
     NuovoPianoPersonale: TAction;
     IscrizioneStudenti: TAction;
@@ -58,23 +56,23 @@ type
     RegistroStudenti: TAction;
     CalendarioCorsi: TAction;
     EsportaPDFFirmatiDigitalmente: TAction;
+    Procedi: TAction;
+    procedure AccettaOreResidueExecute(Sender: TObject);
     procedure AggiungiStudentiStageExecute(Sender: TObject);
-    procedure AutorizzaIncaricoExecute(Sender: TObject);
     procedure BudgetAggiungiRigheExecute(Sender: TObject);
     procedure BudgetCopiaDaAltroProgettoExecute(Sender: TObject);
     procedure CalendarioCorsiExecute(Sender: TObject);
     procedure CopiaMaterieExecute(Sender: TObject);
     procedure EsportaPDFFirmatiDigitalmenteExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure IncongruitaVerificataExecute(Sender: TObject);
     procedure IscrizioneStudentiExecute(Sender: TObject);
     procedure MaterieGeneraIncaricoExecute(Sender: TObject);
     procedure ModificaEstensoreExecute(Sender: TObject);
     procedure NumerazioneRegistroExecute(Sender: TObject);
     procedure NuovaAziendaOspitanteExecute(Sender: TObject);
     procedure NuovoPianoPersonaleExecute(Sender: TObject);
+    procedure ProcediExecute(Sender: TObject);
     procedure RegistroStudentiExecute(Sender: TObject);
-    procedure VerificatoExecute(Sender: TObject);
   private
   protected
     procedure CreateDataModule; override;
@@ -105,6 +103,8 @@ uses
   zDX,
   zBaseLib,
   MDI_Lib,
+  zMsg,
+  frmContratti,
   zSystem;
 
 {$R *.dfm}
@@ -149,28 +149,49 @@ begin
   end;
 end;
 
-procedure TFormProgetti.VerificatoExecute(Sender: TObject);
+// Mantis #183 - 2026-10-02: VerificatoExecute e AutorizzaIncaricoExecute
+// servivano gli elenchi IncarichiDaVerificare e IncarichiDaAutorizzare, tolti:
+// i loro passaggi si eseguono con Procedi dall'elenco unico.
+
+// Mantis #183 - 2026-10-01: un solo comando per l'elenco unico. Il passaggio
+// dipende dalla fase degli incarichi selezionati, che deve essere una sola.
+procedure TFormProgetti.ProcediExecute(Sender: TObject);
 var
   Incarichi: TList<integer>;
   view: TzDbView;
+  Fase, Azione: string;
 begin
+  inherited;
+
+  view := getView('IncarichiDaLavorare');
+
   Incarichi := TList<integer>.Create;
   try
-    view := getView('IncarichiDaVerificare');
     view.GetSelectedRows('ID_INCARICO', Incarichi);
-    Progetti.Verificato(Incarichi);
+
+    Fase := Progetti.FaseDegliIncarichi(Incarichi, Azione);
+
+    if Fase = '' then
+      exit;
+
+    // approvazione e invio della firma stanno nella gestione dei contratti,
+    // con i firmatari e l'aggiornamento dello stato dal fornitore
+    if SameText(Fase, 'FIRMA_DA_APPROVARE') or SameText(Fase, 'FIRMA_DA_INVIARE') then
+    begin
+      if FormCollection.FormExists(TFormContratti) then
+        FormCollection.GetForm(TFormContratti).ShowForm(False)
+      else
+        FormCollection.CreateForm(TFormContratti);
+    end
+    else
+      if SameText(Fase, 'FIRMA_DA_RIFARE') then
+        ConfirmOk('La firma si rimanda dal contratto dell''incarico, fra i suoi documenti, con il comando Firma.')
+      else
+        Progetti.Procedi(Incarichi, Fase, Azione);
   finally
     FreeAndNil(Incarichi);
   end;
-end;
 
-procedure TFormProgetti.AutorizzaIncaricoExecute(Sender: TObject);
-var
-  view: TzDbView;
-begin
-  Progetti.AutorizzaIncarico;
-
-  view := getView('IncarichiDaAutorizzare');
   view.FocusGrid;
 end;
 
@@ -180,16 +201,27 @@ begin
   Progetti.CopiaMaterie;
 end;
 
-procedure TFormProgetti.IncongruitaVerificataExecute(Sender: TObject);
+// Mantis #183 - 2026-10-02: era IncongruitaVerificataExecute, su IncarichiNonCongrui
+procedure TFormProgetti.AccettaOreResidueExecute(Sender: TObject);
+var
+  Incarichi: TList<integer>;
 begin
   inherited;
-  Progetti.IncongruitaVerificata;
+
+  Incarichi := TList<integer>.Create;
+  try
+    getView('IncarichiScadutiConOreResidue').GetSelectedRows('ID_INCARICO', Incarichi);
+    Progetti.AccettaOreResidue('IncarichiScadutiConOreResidue', Incarichi);
+  finally
+    FreeAndNil(Incarichi);
+  end;
 end;
 
 procedure TFormProgetti.ModificaEstensoreExecute(Sender: TObject);
 begin
   inherited;
-  Progetti.ModificaEstensore;
+  // Mantis #183 - 2026-10-01: dall'elenco unico (IncarichiDaLavorare)
+  Progetti.ModificaEstensore(SelectedDataSetName);
 end;
 
 procedure TFormProgetti.NumerazioneRegistroExecute(Sender: TObject);

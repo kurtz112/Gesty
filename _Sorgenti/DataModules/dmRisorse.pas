@@ -116,7 +116,7 @@ type
     procedure SpostaAltroProgetto;
 
     procedure GeneraIncaricoSupplenza;
-    procedure AnnullaAutorizzazioneIncarico;
+    procedure AnnullaAttivazioneIncarico;
   public
     procedure CopiaAllegatiDaRichiestaAttivazioneInRisorsa(const idRichiesta: integer);
   public
@@ -1419,9 +1419,11 @@ begin
   cardProtocollo.Execute;
 end;
 
-procedure TRisorse.AnnullaAutorizzazioneIncarico;
+// Mantis #183 - 2026-10-06: era AnnullaAutorizzazioneIncarico (procedura
+// INCARICO_ANNULLA_AUTORIZZAZIONE, ora INCARICO_ANNULLA_ATTIVAZIONE)
+procedure TRisorse.AnnullaAttivazioneIncarico;
 var
-  sp: TSP_incarico_Annulla_Autorizzazione;
+  sp: TSP_incarico_Annulla_Attivazione;
   id: integer;
 begin
   id := IdIncaricoSelezionato;
@@ -1429,13 +1431,13 @@ begin
   if id = -1 then
     Exit;
 
-  if not ConfirmYesNo(PChar('Attenzione: si desidera annullare l''autorizzazione per l''incarico selezionato?'), mtWarning) then
+  if not ConfirmYesNo(PChar('Attenzione: si desidera annullare l''attivazione dell''incarico selezionato?'), mtWarning) then
     Exit;
 
   StartWait('Attendere...', true);
   try
 
-    sp := GetSP<TSP_incarico_Annulla_Autorizzazione>;
+    sp := GetSP<TSP_incarico_Annulla_Attivazione>;
     try
       sp.Id_Incarico := id;
       sp.ExecuteAndCommit;

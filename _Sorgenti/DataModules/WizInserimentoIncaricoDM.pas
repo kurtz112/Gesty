@@ -93,6 +93,15 @@ type
     function SuperamentoLimiteOccasionali: boolean;
   private
     function GetCostoEnte: currency;
+  private
+    // Mantis #183 - 2026-10-01: motivazione della richiesta, configurata in
+    // CONFIG.INCARICHI_MOTIVAZIONE_* e letta una volta sola
+    FMotivazioneLetta: boolean;
+    FMotivazioneVisibile: boolean;
+    FMotivazioneDefault: string;
+    procedure LeggiMotivazione;
+    function GetMotivazioneVisibile: boolean;
+    procedure ImpostaMotivazioneDefault;
   protected
     procedure CalcolaInquadramento;
   public
@@ -139,6 +148,7 @@ type
     property IdOrario: integer read FIdOrario;
     property PipVisible: boolean read GetPipVisible;
     property CorsiVisible: boolean read GetCorsiVisible;
+    property MotivazioneVisibile: boolean read GetMotivazioneVisibile;
   end;
 
 var
@@ -175,6 +185,9 @@ begin
   FTipoIncarico := '';
   FMateria := '';
   FTotaleOreAttribuite := 0;
+  FMotivazioneLetta := false;
+  FMotivazioneVisibile := false;
+  FMotivazioneDefault := '';
 
   SetAutoCommit(false);
 end;
@@ -352,7 +365,12 @@ begin
   FIdPersonale := -1;
   FIdIncarico := aIdIncarico;
   OpenDataSets;
-  Incarico.DuplicateRecord(false, 'ID_INCARICO;ID_ESTENSORE_RICHIESTA;TIPO_VERIFICA;DATA_VERIFICA;DATA_AUTORIZZAZIONE;DATA_PROTOCOLLO;NUMERO_PROTOCOLLO');
+  // Mantis #183 - 2026-10-06: nessuna autorizzazione si copia, ne' l'utente che
+  // l'ha data (ID_UTENTE_ATTIVAZIONE, prima ID_SUPERVISORE, veniva copiato)
+  Incarico.DuplicateRecord(false, 'ID_INCARICO;ID_ESTENSORE_RICHIESTA;' +
+    'DATA_AUTORIZZAZIONE_FINANZIARIA;ID_UTENTE_AUTORIZZAZIONE_FINANZIARIA;' +
+    'TIPO_AUTORIZZAZIONE_DIREZIONE;DATA_AUTORIZZAZIONE_DIREZIONE;ID_UTENTE_AUTORIZZAZIONE_DIREZIONE;' +
+    'DATA_ATTIVAZIONE;ID_UTENTE_ATTIVAZIONE;DATA_PROTOCOLLO;NUMERO_PROTOCOLLO');
   ClearIdIncarico;
   FIdIncarico := -1;
 end;
@@ -477,6 +495,68 @@ begin
   // se l'utente non è abilitato a vedere i parametri di budget arriverà come null
   if Incarico.FieldByName('PARAMETRO_RICAVO_SPECIFICO').Isnull = true then
     Incarico.FieldByName('PARAMETRO_RICAVO_SPECIFICO').Value := 0;
+
+  // Mantis #183 - 2026-10-01: motivazione obbligatoria per i collaboratori
+  // esterni, solo sulle richieste nuove: quelle gia' inserite restano come sono
+  if MotivazioneVisibile and (Incarico.State = dsInsert) then
+    if (Incarico.FieldByName('TIPO_CONTRATTO').AsString <> '') and (Incarico.FieldByName('TIPO_CONTRATTO').AsString <> 'D') then
+      if Trim(Incarico.FieldByName('MOTIVAZIONE').AsString) = '' then
+        raise Exception.Create('La motivazione ' + #232 + ' obbligatoria per gli incarichi a collaboratori esterni.');
+end;
+
+procedure TWizInserimentoIncarico.LeggiMotivazione;
+var
+  sp: TSP_incarichi_Motivazione_Get;
+begin
+  if FMotivazioneLetta then
+    exit;
+
+  sp := GetSP<TSP_incarichi_Motivazione_Get>;
+  try
+    sp.ExecuteWithoutCommit;
+    FMotivazioneVisibile := (not sp.Visibile.Isnull) and sp.Visibile.Value;
+    FMotivazioneDefault := TrimRight(sp.Testo_Default.Text);
+  finally
+    FreeAndNil(sp);
+  end;
+
+  FMotivazioneLetta := true;
+end;
+
+function TWizInserimentoIncarico.GetMotivazioneVisibile: boolean;
+begin
+  LeggiMotivazione;
+  result := FMotivazioneVisibile;
+end;
+
+// Mantis #183 - 2026-10-01: il testo predefinito entra quando l'inquadramento
+// dice che il collaboratore e' esterno, e solo se la motivazione e' ancora vuota
+procedure TWizInserimentoIncarico.ImpostaMotivazioneDefault;
+var
+  Motivazione, TipoContratto: TField;
+begin
+  if not MotivazioneVisibile then
+    exit;
+
+  if Incarico.State <> dsInsert then
+    exit;
+
+  Motivazione := Incarico.FindField('MOTIVAZIONE');
+  TipoContratto := Incarico.FindField('TIPO_CONTRATTO');
+
+  if (not Assigned(Motivazione)) or (not Assigned(TipoContratto)) then
+    exit;
+
+  if TipoContratto.Isnull or (TipoContratto.AsString = 'D') then
+    exit;
+
+  if Trim(Motivazione.AsString) <> '' then
+    exit;
+
+  if FMotivazioneDefault = '' then
+    exit;
+
+  Motivazione.AsString := FMotivazioneDefault;
 end;
 
 procedure TWizInserimentoIncarico.RettificaIncarico(const aIdIncarico: integer);
@@ -761,6 +841,9 @@ begin
   finally
     FreeAndNil(sp);
   end;
+
+  // Mantis #183 - 2026-10-01
+  ImpostaMotivazioneDefault;
 end;
 
 procedure TWizInserimentoIncarico.AggiungiStudenti;

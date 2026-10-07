@@ -275,10 +275,10 @@ inherited FormRisorse: TFormRisorse
       ImageIndex = 90
       OnExecute = RettificaProtocolloExecute
     end
-    object AnnullaAutorizzazioneIncarico: TAction
-      Caption = 'Annulla Autorizzazione'
+    object AnnullaAttivazioneIncarico: TAction
+      Caption = 'Annulla Attivazione'
       ImageIndex = 106
-      OnExecute = AnnullaAutorizzazioneIncaricoExecute
+      OnExecute = AnnullaAttivazioneIncaricoExecute
     end
     object ValidaOrePerSettore: TAction
       Caption = 'Valida Ore'
