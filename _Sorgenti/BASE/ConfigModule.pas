@@ -2048,7 +2048,9 @@ end;
 // ekCmdDataIn (righe e tempi dei fetch), che sono i due generi che servono a
 // vedere dove passa il tempo fra l'esecuzione e l'arrivo dei record. MonitorBy
 // si legge all'apertura della connessione: serve la riconnessione, in
-// accensione e in spegnimento.
+// accensione e in spegnimento. Con Reconnect (chiude le transazioni, chiude e
+// riapre la connessione), non con Login, che ripresenta la finestra di accesso:
+// nel rilascio 003 era Login e l'utente si ritrovava a riaccedere.
 procedure TConfig.MonitorFireDACPerRegistrazione(AAttiva: Boolean; const AFile: string);
 begin
   if AAttiva then
@@ -2065,7 +2067,7 @@ begin
     FDMoniFlatFileClientLink.Tracing := True;
     Database.Params.MonitorBy := mbFlatFile;
     FMonitorRegistrazioneAttivo := True;
-    Login;
+    Reconnect;
   end
   else
   begin
@@ -2075,7 +2077,7 @@ begin
     Database.Params.MonitorBy := FMonitorByPrecedente;
     FDMoniFlatFileClientLink.EventKinds := FEventKindsPrecedenti;
     FDMoniFlatFileClientLink.FileName := FFileMonitorPrecedente;
-    Login;
+    Reconnect;
   end;
 end;
 
