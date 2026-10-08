@@ -525,6 +525,27 @@ end;
 
 function TRisorse.EditaRisorsaCorrente(Inserting: Boolean): integer;
 
+  procedure PreparaScheda(isAzienda: Boolean);
+  var
+    NuovaScheda: string;
+  begin
+    if isAzienda then
+      NuovaScheda := '__shared.Azienda'
+    else
+      NuovaScheda := '__shared.Personale';
+
+    // Il dialogo resta in memoria fra un'apertura e l'altra (ricrearlo costava
+    // circa 1,4 s a ogni apertura): si distrugge solo quando cambia la scheda,
+    // perche' Execute su una form esistente assegna il CardID alla card senza
+    // ricostruirne i controlli e mostrerebbe la scheda dell'altro tipo.
+    // Va chiamata prima di Risorse.Append, come la distruzione di prima.
+    if RisorsaDlg.CardID <> NuovaScheda then
+    begin
+      RisorsaDlg.DestroyControls;
+      RisorsaDlg.CardID := NuovaScheda;
+    end;
+  end;
+
   procedure PrepareDialog(isAzienda: Boolean; Inserting: Boolean);
   begin
 
@@ -534,7 +555,6 @@ function TRisorse.EditaRisorsaCorrente(Inserting: Boolean): integer;
         RisorsaDlg.Caption := 'Inserimento Azienda'
       else
         RisorsaDlg.Caption := 'Scheda Azienda';
-      RisorsaDlg.CardID := '__shared.Azienda'
     end
     else
     begin
@@ -543,8 +563,6 @@ function TRisorse.EditaRisorsaCorrente(Inserting: Boolean): integer;
         RisorsaDlg.Caption := 'Inserimento Persona'
       else
         RisorsaDlg.Caption := 'Scheda Persona';
-
-      RisorsaDlg.CardID := '__shared.Personale';
     end;
   end;
 
@@ -559,8 +577,6 @@ begin
 
   Risorse := GetDataSet('Risorse');
 
-  RisorsaDlg.DestroyControls;
-
   if Inserting then
   begin
     // isAzienda
@@ -573,6 +589,8 @@ begin
       Exit;
 
     isAzienda := TipoRisorsa = 'A';
+
+    PreparaScheda(isAzienda);
 
     if isAzienda then
     begin
@@ -605,6 +623,8 @@ begin
       Exit;
 
     isAzienda := Risorse.FieldByName('TIPO_RISORSA').asString = 'A';
+
+    PreparaScheda(isAzienda);
   end;
 
   PrepareDialog(isAzienda, Inserting);
@@ -613,8 +633,6 @@ begin
 
   if RisorsaDlg.Execute then
     Result := Risorse.FieldByName('ID_RISORSA').Value;
-
-  RisorsaDlg.DestroyControls;
 end;
 
 procedure TRisorse.GeneraCollegato;
