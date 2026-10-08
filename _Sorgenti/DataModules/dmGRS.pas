@@ -68,6 +68,10 @@ type
     procedure ImportaFileXML(const FileName: string);
     function CleanImportString(const s: string): string;
     function ImportStringEmpty(const s: string): Boolean;
+  private
+    procedure ConfrontaFileImport(const IdFile: integer; out NumeroDifferenze, NumeroLezioni, LezioniDaDecidere: integer);
+    procedure DecidiLezione(const IdFile, IdOrario: integer; const Decisione: string);
+    procedure DecidiLezioniSenzaDecisione(const IdFile: integer; const Decisione: string);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -81,6 +85,7 @@ type
 
     procedure ElaboraFileImport;
     procedure EliminaFileImport;
+    procedure DecidiDifferenze(Lezioni: TList<integer>; const Decisione: string);
   public
     procedure GeneraIncaricoMancante;
     procedure GeneraRilevamentiMancanti(orari: TList<integer>);
@@ -288,6 +293,10 @@ var
   sp: TSP_GRS_IMPORT_FILES_ELABORA;
   DataSet: TzFbDataSet;
   id: integer;
+  NumeroDifferenze: integer;
+  NumeroLezioni: integer;
+  LezioniDaDecidere: integer;
+  Domanda: string;
 begin
   DataSet := GetDataSet('GRS_FILES');
 
@@ -297,10 +306,44 @@ begin
     exit;
   end;
 
-  if not ConfirmYesNo('Si desidera elaborare il file di import selezionato?') then
-    exit;
-
   id := DataSet.FieldByName('ID_GRS_IMPORT_FILE').AsInteger;
+
+  // Mantis #228 - 2026-10-08: prima di scrivere, confronto in sola lettura con le lezioni gia' in Gesty.
+  // Le lezioni che il file cambierebbe vanno decise una per una (mantieni Gesty o sovrascrivi)
+  // oppure tutte insieme: senza decisione l'elaborazione non parte.
+  ConfrontaFileImport(id, NumeroDifferenze, NumeroLezioni, LezioniDaDecidere);
+
+  if LezioniDaDecidere > 0 then
+  begin
+    case ConfirmYesNoCancel(Format('Il file cambierebbe %d lezioni gia'' presenti in Gesty (%d differenze fra docente, codocente, materia, contenuti e presenze).',
+          [LezioniDaDecidere, NumeroDifferenze]) + sLineBreak + sLineBreak +
+        'S'#236': sovrascrivi tutte queste lezioni con i dati del file, comprese le supplenze.' + sLineBreak +
+        'No: decido lezione per lezione nella scheda "Differenze con Gesty", poi rilancio Elabora.' + sLineBreak +
+        'Annulla: non fare niente.', mtWarning) of
+      mrYes:
+        DecidiLezioniSenzaDecisione(id, 'S');
+      mrNo:
+        begin
+          ConfirmOk('Le differenze sono nella scheda "Differenze con Gesty" del file selezionato.' + sLineBreak +
+            'Selezionare le righe e scegliere "Mantieni Gesty" oppure "Sovrascrivi", poi rilanciare Elabora.');
+          exit;
+        end;
+    else
+      exit;
+    end;
+  end
+  else
+  begin
+    Domanda := 'Si desidera elaborare il file di import selezionato?';
+
+    if NumeroLezioni > 0 then
+      Domanda := Format('Il file cambierebbe %d lezioni gia'' presenti in Gesty, tutte gia'' decise nella scheda "Differenze con Gesty".', [NumeroLezioni]) +
+        sLineBreak + sLineBreak + Domanda;
+
+    if not ConfirmYesNo(Domanda) then
+      exit;
+  end;
+
   /// ///////
   StartWait('Attendere...', True);
   try
@@ -316,6 +359,128 @@ begin
     DataSet.LocateNonSQL('ID_GRS_IMPORT_FILE', id, []);
   finally
     StopWait;
+  end;
+end;
+
+// Mantis #228 - 2026-10-08: GRS_IMPORT_FILES_CONFRONTA scrive solo le differenze del file
+// (GRS_IMPORT_FILES_DIFFERENZE), non tocca lezioni, presenze e incarichi
+procedure TGRS.ConfrontaFileImport(const IdFile: integer; out NumeroDifferenze, NumeroLezioni, LezioniDaDecidere: integer);
+var
+  sp: TSP_GRS_IMPORT_FILES_CONFRONTA;
+begin
+  NumeroDifferenze := 0;
+  NumeroLezioni := 0;
+  LezioniDaDecidere := 0;
+
+  StartWait('Confronto con i dati di Gesty...', True);
+  try
+    sp := TSP_GRS_IMPORT_FILES_CONFRONTA.Create(WriteTrans);
+    try
+      sp.Id_Grs_Import_File := IdFile;
+      sp.ExecuteAndCommit;
+
+      if not sp.Numero_Differenze.IsNull then
+        NumeroDifferenze := sp.Numero_Differenze.Value;
+
+      if not sp.Numero_Lezioni.IsNull then
+        NumeroLezioni := sp.Numero_Lezioni.Value;
+
+      if not sp.Numero_Lezioni_Da_Decidere.IsNull then
+        LezioniDaDecidere := sp.Numero_Lezioni_Da_Decidere.Value;
+    finally
+      FreeAndNil(sp);
+    end;
+  finally
+    StopWait;
+  end;
+
+  ReopenDataSet('Grs_Files_Differenze');
+end;
+
+procedure TGRS.DecidiLezione(const IdFile, IdOrario: integer; const Decisione: string);
+var
+  sp: TSP_GRS_IMPORT_FILES_DECIDI;
+begin
+  sp := TSP_GRS_IMPORT_FILES_DECIDI.Create(WriteTrans);
+  try
+    sp.Id_Grs_Import_File := IdFile;
+    sp.Id_Orario := IdOrario;
+    sp.Decisione := Decisione;
+    sp.ExecuteAndCommit;
+  finally
+    FreeAndNil(sp);
+  end;
+end;
+
+// Id_Orario lasciato nullo: la procedura decide per tutte le lezioni del file ancora senza decisione
+procedure TGRS.DecidiLezioniSenzaDecisione(const IdFile: integer; const Decisione: string);
+var
+  sp: TSP_GRS_IMPORT_FILES_DECIDI;
+begin
+  sp := TSP_GRS_IMPORT_FILES_DECIDI.Create(WriteTrans);
+  try
+    sp.Id_Grs_Import_File := IdFile;
+    sp.Decisione := Decisione;
+    sp.ExecuteAndCommit;
+  finally
+    FreeAndNil(sp);
+  end;
+end;
+
+// Mantis #228 - 2026-10-08: decisione dell'operatrice sulle lezioni delle righe selezionate nella
+// scheda "Differenze con Gesty". La decisione vale per l'intera lezione: piu' righe della stessa
+// lezione (docente, materia, presenze dei singoli studenti) contano una volta sola.
+procedure TGRS.DecidiDifferenze(Lezioni: TList<integer>; const Decisione: string);
+var
+  DataSet: TzFbDataSet;
+  IdFile: integer;
+  IdOrario: integer;
+  LezioniDistinte: TList<integer>;
+  Domanda: string;
+begin
+  DataSet := GetDataSet('GRS_FILES');
+
+  if DataSet.IsEmpty then
+  begin
+    ConfirmOk('Nessun file di import selezionato.');
+    exit;
+  end;
+
+  if Lezioni.Count = 0 then
+  begin
+    ConfirmOk('Nessuna differenza selezionata.');
+    exit;
+  end;
+
+  IdFile := DataSet.FieldByName('ID_GRS_IMPORT_FILE').AsInteger;
+
+  LezioniDistinte := TList<integer>.Create;
+  try
+    for IdOrario in Lezioni do
+      if not LezioniDistinte.Contains(IdOrario) then
+        LezioniDistinte.Add(IdOrario);
+
+    if SameText(Decisione, 'M') then
+      Domanda := Format('Mantenere come sono in Gesty le %d lezioni selezionate?', [LezioniDistinte.Count]) + sLineBreak + sLineBreak +
+        'L''elaborazione non cambier'#224' docente, materia, contenuti e presenze di queste lezioni e non creer'#224' supplenze.'
+    else
+      Domanda := Format('Sovrascrivere con i dati del file le %d lezioni selezionate?', [LezioniDistinte.Count]) + sLineBreak + sLineBreak +
+        'L''elaborazione aggiorner'#224' docente, materia, contenuti e presenze e creer'#224' le supplenze necessarie.';
+
+    if not ConfirmYesNo(Domanda) then
+      exit;
+
+    StartWait('Attendere...', True);
+    try
+      for IdOrario in LezioniDistinte do
+        DecidiLezione(IdFile, IdOrario, Decisione);
+    finally
+      StopWait;
+    end;
+
+    ReopenDataSet('Grs_Files_Differenze');
+  finally
+    FreeAndNil(LezioniDistinte);
   end;
 end;
 

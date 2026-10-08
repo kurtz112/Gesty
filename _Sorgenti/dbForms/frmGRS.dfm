@@ -77,5 +77,15 @@ inherited FormGRS: TFormGRS
       OnExecute = CooperazioneApplicativaExecute
       OnUpdate = CooperazioneApplicativaUpdate
     end
+    object DifferenzeMantieniGesty: TAction
+      Caption = 'Mantieni Gesty'
+      Hint = 'Le lezioni selezionate restano come sono in Gesty'
+      OnExecute = DifferenzeMantieniGestyExecute
+    end
+    object DifferenzeSovrascrivi: TAction
+      Caption = 'Sovrascrivi'
+      Hint = 'Le lezioni selezionate prendono i dati del file, con le supplenze'
+      OnExecute = DifferenzeSovrascriviExecute
+    end
   end
 end

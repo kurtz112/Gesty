@@ -58,6 +58,8 @@ type
     EliminaFileImport: TAction;
     ElaboraRigheImportNonValide: TAction;
     CooperazioneApplicativa: TAction;
+    DifferenzeMantieniGesty: TAction;
+    DifferenzeSovrascrivi: TAction;
     procedure CooperazioneApplicativaExecute(Sender: TObject);
     procedure CooperazioneApplicativaUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -70,7 +72,10 @@ type
     procedure ImportaGOLAccept(Sender: TObject);
     procedure ImportaGRSAccept(Sender: TObject);
     procedure ImportaSIUFAccept(Sender: TObject);
+    procedure DifferenzeMantieniGestyExecute(Sender: TObject);
+    procedure DifferenzeSovrascriviExecute(Sender: TObject);
   private
+    procedure DecidiDifferenzeSelezionate(const Decisione: string);
   protected
     procedure SetupComponent(const DataSetName: String; Component: TComponent); override;
     procedure CreateDataModule; override;
@@ -182,6 +187,35 @@ begin
   finally
     FreeAndNil(orari);
   end;
+end;
+
+// Mantis #228 - 2026-10-08: decisione sulle lezioni delle righe selezionate nella scheda
+// "Differenze con Gesty" (M = mantieni Gesty, S = sovrascrivi con il file)
+procedure TFormGRS.DecidiDifferenzeSelezionate(const Decisione: string);
+var
+  Lezioni: TList<integer>;
+  view: TzDbView;
+begin
+  Lezioni := TList<integer>.Create;
+  try
+    view := GetView('Grs_Files_Differenze');
+    view.GetSelectedRows('ID_ORARIO', Lezioni);
+    GRS.DecidiDifferenze(Lezioni, Decisione);
+  finally
+    FreeAndNil(Lezioni);
+  end;
+end;
+
+procedure TFormGRS.DifferenzeMantieniGestyExecute(Sender: TObject);
+begin
+  inherited;
+  DecidiDifferenzeSelezionate('M');
+end;
+
+procedure TFormGRS.DifferenzeSovrascriviExecute(Sender: TObject);
+begin
+  inherited;
+  DecidiDifferenzeSelezionate('S');
 end;
 
 procedure TFormGRS.ImportaGOLAccept(Sender: TObject);
