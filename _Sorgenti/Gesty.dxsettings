@@ -51,13 +51,13 @@
 				<Kind_Name>Wait</Kind_Name>
 				<Content>
 					<Version>1</Version>
-					<Width>179</Width>
-					<Height>73</Height>
+					<Width>460</Width>
+					<Height>80</Height>
 					<Color>66051</Color>
-					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Text1" Default="1" Left="65" Top="28" Width="178" Height="16" AlignH="0" AlignV="1" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="16" FontStyle="0" TextColor="66051" WordWrap="1">
+					<Item Kind="1" Kind_Name="TdxSplashFormBase.TText" Name="Text1" Default="1" Left="72" Top="12" Width="364" Height="56" AlignH="0" AlignV="1" Color="66051" Transparent="1" FontName="Segoe UI" FontSize="12" FontStyle="0" TextColor="66051" WordWrap="1">
 						<Text>Attendere...</Text>
 					</Item>
-					<Item Kind="4" Kind_Name="TdxSplashFormBase.TAnimation" Name="Animation1" Left="24" Top="20" Width="33" Height="33" AlignH="0" AlignV="0" Color="66051" Transparent="1" SizeMode="1" Opacity="1"/>
+					<Item Kind="4" Kind_Name="TdxSplashFormBase.TAnimation" Name="Animation1" Left="24" Top="24" Width="33" Height="33" AlignH="0" AlignV="0" Color="66051" Transparent="1" SizeMode="1" Opacity="1"/>
 				</Content>
 			</Item>
 			<Defaults>
