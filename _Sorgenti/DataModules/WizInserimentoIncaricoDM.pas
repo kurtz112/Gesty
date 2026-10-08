@@ -102,6 +102,13 @@ type
     procedure LeggiMotivazione;
     function GetMotivazioneVisibile: boolean;
     procedure ImpostaMotivazioneDefault;
+  private
+    // Mantis #225 - 2026-10-08: una modalita' di selezione con DATA_OBSOLESCENZA
+    // non si puo' piu' scegliere per richieste con DATA_RICHIESTA successiva
+    FControlloModalitaInCorso: boolean;
+    function ModalitaSelezioneObsoleta(const ModalitaSelezione: string; const DataRichiesta: TDateTime): boolean;
+    procedure ModalitaSelezioneChange(Sender: TField);
+    procedure DataRichiestaChange(Sender: TField);
   protected
     procedure CalcolaInquadramento;
   public
@@ -158,6 +165,8 @@ implementation
 
 uses
   System.Math,
+  System.DateUtils,
+  System.Variants,
   Vcl.Forms,
   ConfigModule,
   Gesty_StoredProcs,
@@ -329,6 +338,8 @@ begin
   Incarico.FieldByName('ID_RISORSA').onChange := CollaboratoreChange;
   Incarico.FieldByName('DATA_INIZIO_INCARICO').onChange := DataChange;
   Incarico.FieldByName('DATA_FINE_INCARICO').onChange := DataChange;
+  Incarico.FieldByName('MODALITA_SELEZIONE').onChange := ModalitaSelezioneChange;
+  Incarico.FieldByName('DATA_RICHIESTA').onChange := DataRichiestaChange;
 end;
 
 procedure TWizInserimentoIncarico.DataChange(Sender: TField);
@@ -347,6 +358,80 @@ end;
 procedure TWizInserimentoIncarico.CollaboratoreChange(Sender: TField);
 begin
   RicalcolaImporti(nil);
+end;
+
+// Mantis #225 - 2026-10-08: l'avviso e' obsoleto se la sua DATA_OBSOLESCENZA e'
+// precedente alla data della richiesta; lo stesso controllo lo fa il trigger
+// INCARICHI_BIU_MODALITA_SELEZIONE al salvataggio
+function TWizInserimentoIncarico.ModalitaSelezioneObsoleta(const ModalitaSelezione: string; const DataRichiesta: TDateTime): boolean;
+var
+  DataObsolescenza: Variant;
+begin
+  result := false;
+
+  if ModalitaSelezione = '' then
+    exit;
+
+  DataObsolescenza := Config.Database.ExecSQLScalar('SELECT ZZ_MODALITA_SELEZIONE_RISORSE.DATA_OBSOLESCENZA FROM ZZ_MODALITA_SELEZIONE_RISORSE WHERE ZZ_MODALITA_SELEZIONE_RISORSE.MODALITA_SELEZIONE = :MODALITA_SELEZIONE', [ModalitaSelezione]);
+
+  if VarIsNull(DataObsolescenza) or VarIsClear(DataObsolescenza) then
+    exit;
+
+  result := DateOf(VarToDateTime(DataObsolescenza)) < DateOf(DataRichiesta);
+end;
+
+procedure TWizInserimentoIncarico.ModalitaSelezioneChange(Sender: TField);
+var
+  DataRichiesta: TField;
+begin
+  // il ripristino del valore rilancia l'evento: la guardia evita che si ripeta
+  if FControlloModalitaInCorso then
+    exit;
+
+  DataRichiesta := Incarico.FieldByName('DATA_RICHIESTA');
+
+  if Sender.IsNull or DataRichiesta.IsNull then
+    exit;
+
+  if not ModalitaSelezioneObsoleta(Sender.AsString, DataRichiesta.AsDateTime) then
+    exit;
+
+  FControlloModalitaInCorso := true;
+  try
+    ConfirmOk('La modalit' + #224 + ' di selezione ' + #171 + Sender.AsString + #187 + ' non ' + #232 + ' pi' + #249 + ' utilizzabile per richieste con questa data.');
+
+    // in modifica torna il valore precedente, in inserimento il campo si svuota
+    if Incarico.State = dsEdit then
+      Sender.Value := Sender.OldValue
+    else
+      Sender.Clear;
+  finally
+    FControlloModalitaInCorso := false;
+  end;
+end;
+
+procedure TWizInserimentoIncarico.DataRichiestaChange(Sender: TField);
+var
+  ModalitaSelezione: TField;
+begin
+  if FControlloModalitaInCorso then
+    exit;
+
+  ModalitaSelezione := Incarico.FieldByName('MODALITA_SELEZIONE');
+
+  if Sender.IsNull or ModalitaSelezione.IsNull then
+    exit;
+
+  if not ModalitaSelezioneObsoleta(ModalitaSelezione.AsString, Sender.AsDateTime) then
+    exit;
+
+  FControlloModalitaInCorso := true;
+  try
+    ConfirmOk('Con questa data della richiesta la modalit' + #224 + ' di selezione ' + #171 + ModalitaSelezione.AsString + #187 + ' non ' + #232 + ' pi' + #249 + ' utilizzabile: scegliere un''altra modalit' + #224 + '.');
+    ModalitaSelezione.Clear;
+  finally
+    FControlloModalitaInCorso := false;
+  end;
 end;
 
 procedure TWizInserimentoIncarico.DuplicaIncarico(const aIdIncarico: integer);
