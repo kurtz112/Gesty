@@ -1,4 +1,4 @@
-// Generata il 08/10/2026 09:59:11
+// Generata il 08/10/2026 23:30:03
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
 unit Gesty_StoredProcs;
 
@@ -12247,6 +12247,58 @@ TSP_grs_Import_Files_Add = class (TzStoredProc)
     property Id_Grs_Import_File: TNullableInt64 read fId_Grs_Import_File;
 end;
 
+[TStoredProcedure('GRS_IMPORT_FILES_CONFRONTA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_grs_Import_Files_Confronta = class (TzStoredProc)
+  private
+    fId_Grs_Import_File: TNullableInt64;
+    fNumero_Differenze: TNullableInt64;
+    fNumero_Lezioni: TNullableInt64;
+    fNumero_Lezioni_Da_Decidere: TNullableInt64;
+  private
+    property Numero_Differenze_internal: TNullableInt64 read fNumero_Differenze write fNumero_Differenze;
+    property Numero_Lezioni_internal: TNullableInt64 read fNumero_Lezioni write fNumero_Lezioni;
+    property Numero_Lezioni_Da_Decidere_internal: TNullableInt64 read fNumero_Lezioni_Da_Decidere write fNumero_Lezioni_Da_Decidere;
+  public
+    //
+    [TParamAttribute('ID_GRS_IMPORT_FILE', ptInput, False)]
+    property Id_Grs_Import_File: TNullableInt64 read fId_Grs_Import_File write fId_Grs_Import_File;
+    //
+    [TParamAttribute('NUMERO_DIFFERENZE', ptOutput, False)]
+    property Numero_Differenze: TNullableInt64 read fNumero_Differenze;
+    //
+    [TParamAttribute('NUMERO_LEZIONI', ptOutput, False)]
+    property Numero_Lezioni: TNullableInt64 read fNumero_Lezioni;
+    //
+    [TParamAttribute('NUMERO_LEZIONI_DA_DECIDERE', ptOutput, False)]
+    property Numero_Lezioni_Da_Decidere: TNullableInt64 read fNumero_Lezioni_Da_Decidere;
+end;
+
+[TStoredProcedure('GRS_IMPORT_FILES_DECIDI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_grs_Import_Files_Decidi = class (TzStoredProc)
+  private
+    fId_Grs_Import_File: TNullableInt64;
+    fId_Orario: TNullableInt64;
+    fDecisione: TNullableString;
+    fNumero_Lezioni: TNullableInt64;
+  private
+    property Numero_Lezioni_internal: TNullableInt64 read fNumero_Lezioni write fNumero_Lezioni;
+  public
+    //
+    [TParamAttribute('ID_GRS_IMPORT_FILE', ptInput, False)]
+    property Id_Grs_Import_File: TNullableInt64 read fId_Grs_Import_File write fId_Grs_Import_File;
+    //
+    [TParamAttribute('ID_ORARIO', ptInput, False)]
+    property Id_Orario: TNullableInt64 read fId_Orario write fId_Orario;
+    //
+    [TParamAttribute('DECISIONE', ptInput, False)]
+    property Decisione: TNullableString read fDecisione write fDecisione;
+    //
+    [TParamAttribute('NUMERO_LEZIONI', ptOutput, False)]
+    property Numero_Lezioni: TNullableInt64 read fNumero_Lezioni;
+end;
+
 [TStoredProcedure('GRS_IMPORT_FILES_ELABORA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_grs_Import_Files_Elabora = class (TzStoredProc)
@@ -12332,6 +12384,58 @@ TSP_grs_Import_Files_Righe_Elaboraz_Add = class (TzStoredProc)
     //
     [TParamAttribute('ID_RILEVAMENTO_ORE_COD_1', ptInput, False)]
     property Id_Rilevamento_Ore_Cod_1: TNullableInt64 read fId_Rilevamento_Ore_Cod_1 write fId_Rilevamento_Ore_Cod_1;
+end;
+
+[TStoredProcedure('GRS_IMPORT_FILES_RISOLVI_RIGA', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_grs_Import_Files_Risolvi_Riga = class (TzStoredProc)
+  private
+    fId_Grs_Import_File_Riga: TNullableInt64;
+    fId_Studente: TNullableInt64;
+    fId_Docente: TNullableInt64;
+    fId_Codocente: TNullableInt64;
+    fId_Progetto: TNullableInt64;
+    fId_Corso: TNullableInt64;
+    fId_Progetto_Trasversale: TNullableInt64;
+    fMateria: TNullableString;
+    fRif_Evento_Formativo: TNullableString;
+  private
+    property Id_Studente_internal: TNullableInt64 read fId_Studente write fId_Studente;
+    property Id_Docente_internal: TNullableInt64 read fId_Docente write fId_Docente;
+    property Id_Codocente_internal: TNullableInt64 read fId_Codocente write fId_Codocente;
+    property Id_Progetto_internal: TNullableInt64 read fId_Progetto write fId_Progetto;
+    property Id_Corso_internal: TNullableInt64 read fId_Corso write fId_Corso;
+    property Id_Progetto_Trasversale_internal: TNullableInt64 read fId_Progetto_Trasversale write fId_Progetto_Trasversale;
+    property Materia_internal: TNullableString read fMateria write fMateria;
+    property Rif_Evento_Formativo_internal: TNullableString read fRif_Evento_Formativo write fRif_Evento_Formativo;
+  public
+    //
+    [TParamAttribute('ID_GRS_IMPORT_FILE_RIGA', ptInput, False)]
+    property Id_Grs_Import_File_Riga: TNullableInt64 read fId_Grs_Import_File_Riga write fId_Grs_Import_File_Riga;
+    //
+    [TParamAttribute('ID_STUDENTE', ptOutput, False)]
+    property Id_Studente: TNullableInt64 read fId_Studente;
+    //
+    [TParamAttribute('ID_DOCENTE', ptOutput, False)]
+    property Id_Docente: TNullableInt64 read fId_Docente;
+    //
+    [TParamAttribute('ID_CODOCENTE', ptOutput, False)]
+    property Id_Codocente: TNullableInt64 read fId_Codocente;
+    //
+    [TParamAttribute('ID_PROGETTO', ptOutput, False)]
+    property Id_Progetto: TNullableInt64 read fId_Progetto;
+    //
+    [TParamAttribute('ID_CORSO', ptOutput, False)]
+    property Id_Corso: TNullableInt64 read fId_Corso;
+    //
+    [TParamAttribute('ID_PROGETTO_TRASVERSALE', ptOutput, False)]
+    property Id_Progetto_Trasversale: TNullableInt64 read fId_Progetto_Trasversale;
+    //
+    [TParamAttribute('MATERIA', ptOutput, False)]
+    property Materia: TNullableString read fMateria;
+    //
+    [TParamAttribute('RIF_EVENTO_FORMATIVO', ptOutput, False)]
+    property Rif_Evento_Formativo: TNullableString read fRif_Evento_Formativo;
 end;
 
 [TStoredProcedure('GRS_IMPORT_GENERA_SUPPLENZA', True)]
@@ -25041,6 +25145,76 @@ TSP_siuf_Cooperazione_Applicativa_Invii_Add = class (TzStoredProc)
     //
     [TParamAttribute('RESPONSE_FULL_FILE_NAME', ptOutput, False)]
     property Response_Full_File_Name: TNullableString read fResponse_Full_File_Name;
+end;
+
+[TStoredProcedure('SIUF_MONITORAGGIO_CAMBIA_STATO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_siuf_Monitoraggio_Cambia_Stato = class (TzStoredProc)
+  private
+    fId_Siuf_Monitoraggio_Registro: TNullableInt64;
+    fStato: TNullableString;
+    fNote: TNullableString;
+  public
+    //
+    [TParamAttribute('ID_SIUF_MONITORAGGIO_REGISTRO', ptInput, False)]
+    property Id_Siuf_Monitoraggio_Registro: TNullableInt64 read fId_Siuf_Monitoraggio_Registro write fId_Siuf_Monitoraggio_Registro;
+    //
+    [TParamAttribute('STATO', ptInput, False)]
+    property Stato: TNullableString read fStato write fStato;
+    //
+    [TParamAttribute('NOTE', ptInput, False)]
+    property Note: TNullableString read fNote write fNote;
+end;
+
+[TStoredProcedure('SIUF_MONITORAGGIO_ESEGUI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_siuf_Monitoraggio_Esegui = class (TzStoredProc)
+  private
+    fData_Dal: TNullableDate;
+    fData_Al: TNullableDate;
+    fOrigine: TNullableString;
+    fId_Siuf_Monitoraggio_Esecuzione: TNullableInt64;
+    fClassi_Controllate: TNullableInt64;
+    fClassi_Ok: TNullableInt64;
+    fDifformita_Aperte: TNullableInt64;
+  private
+    property Id_Siuf_Monitoraggio_Esecuzione_internal: TNullableInt64 read fId_Siuf_Monitoraggio_Esecuzione write fId_Siuf_Monitoraggio_Esecuzione;
+    property Classi_Controllate_internal: TNullableInt64 read fClassi_Controllate write fClassi_Controllate;
+    property Classi_Ok_internal: TNullableInt64 read fClassi_Ok write fClassi_Ok;
+    property Difformita_Aperte_internal: TNullableInt64 read fDifformita_Aperte write fDifformita_Aperte;
+  public
+    //
+    [TParamAttribute('DATA_DAL', ptInput, False)]
+    property Data_Dal: TNullableDate read fData_Dal write fData_Dal;
+    //
+    [TParamAttribute('DATA_AL', ptInput, False)]
+    property Data_Al: TNullableDate read fData_Al write fData_Al;
+    //
+    [TParamAttribute('ORIGINE', ptInput, False)]
+    property Origine: TNullableString read fOrigine write fOrigine;
+    //
+    [TParamAttribute('ID_SIUF_MONITORAGGIO_ESECUZIONE', ptOutput, False)]
+    property Id_Siuf_Monitoraggio_Esecuzione: TNullableInt64 read fId_Siuf_Monitoraggio_Esecuzione;
+    //
+    [TParamAttribute('CLASSI_CONTROLLATE', ptOutput, False)]
+    property Classi_Controllate: TNullableInt64 read fClassi_Controllate;
+    //
+    [TParamAttribute('CLASSI_OK', ptOutput, False)]
+    property Classi_Ok: TNullableInt64 read fClassi_Ok;
+    //
+    [TParamAttribute('DIFFORMITA_APERTE', ptOutput, False)]
+    property Difformita_Aperte: TNullableInt64 read fDifformita_Aperte;
+end;
+
+[TStoredProcedure('SIUF_MONITORAGGIO_ESEGUI_PIANIFICATO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_siuf_Monitoraggio_Esegui_Pianificato = class (TzStoredProc)
+  private
+    fGiorni_Indietro: TNullableInt64;
+  public
+    //
+    [TParamAttribute('GIORNI_INDIETRO', ptInput, False)]
+    property Giorni_Indietro: TNullableInt64 read fGiorni_Indietro write fGiorni_Indietro;
 end;
 
 [TStoredProcedure('SMTP_PARAMS_ASSISTENZA')]
