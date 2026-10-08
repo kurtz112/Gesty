@@ -107,6 +107,12 @@ type
     procedure zSystemAssignFieldOnChangeEvent(Field: TField; const EventName: string);
     procedure zSystemHyperLink(Sender: TObject; FieldName: string; Value: Variant);
   private
+    // Mantis #183 - 2026-10-08: stato del monitor FireDAC prima che la
+    // registrazione per l'assistenza lo accendesse, da rimettere alla chiusura.
+    FMonitorRegistrazioneAttivo: Boolean;
+    FMonitorByPrecedente: TFDMonitorBy;
+    FEventKindsPrecedenti: TFDMoniEventKinds;
+    FFileMonitorPrecedente: string;
     FDisabilitaEventiDB: Boolean;
     // Fasce orarie 2026-09-18: conta i secondi restituiti dal login e
     // si ripresenta al server solo allo scadere.
@@ -227,6 +233,9 @@ type
   public
     procedure DownloadAggiornamento;
     function EditMonitorProps: Boolean;
+    // Mantis #183 - 2026-10-08: accende (AAttiva) o spegne il monitor FireDAC
+    // su file per la registrazione per l'assistenza (SessioneLog.OnMonitorFireDAC).
+    procedure MonitorFireDACPerRegistrazione(AAttiva: Boolean; const AFile: string);
   public
     procedure SaveDataSets;
   public
@@ -374,6 +383,11 @@ begin
   FDMoniCustomClientLink.EventKinds := [ekError, ekConnConnect, ekConnTransact, ekCmdPrepare, ekCmdExecute, ekComponent, ekSQL];
 
   FDMoniFlatFileClientLink.FileName := ChangeFileExt(Application.ExeName, '.monitor_trace');
+
+  // Mantis #183 - 2026-10-08: la registrazione per l'assistenza puo' chiedere
+  // la traccia FireDAC su file. Il collegamento al monitor sta qui, e per
+  // cambiare MonitorBy serve la riconnessione, come in EditMonitorProps.
+  SessioneLog.OnMonitorFireDAC := MonitorFireDACPerRegistrazione;
 
   zStoredProc.InitStoredProc := InitStoredProc;
   //
@@ -2024,6 +2038,43 @@ begin
   if EditFbMonitor(MonitorBy, FDMoniRemoteClientLink, FDMoniFlatFileClientLink, FDMoniCustomClientLink) then
   begin
     Database.Params.MonitorBy := MonitorBy;
+    Login;
+  end;
+end;
+
+// Mantis #183 - 2026-10-08: traccia FireDAC su file per la registrazione per
+// l'assistenza. Rispetto a EditMonitorProps: file nella cartella della
+// sessione, non in append, e in piu' ekVendor (chiamate al client Firebird) ed
+// ekCmdDataIn (righe e tempi dei fetch), che sono i due generi che servono a
+// vedere dove passa il tempo fra l'esecuzione e l'arrivo dei record. MonitorBy
+// si legge all'apertura della connessione: serve la riconnessione, in
+// accensione e in spegnimento.
+procedure TConfig.MonitorFireDACPerRegistrazione(AAttiva: Boolean; const AFile: string);
+begin
+  if AAttiva then
+  begin
+    if FMonitorRegistrazioneAttivo then
+      Exit;
+    FMonitorByPrecedente := Database.Params.MonitorBy;
+    FEventKindsPrecedenti := FDMoniFlatFileClientLink.EventKinds;
+    FFileMonitorPrecedente := FDMoniFlatFileClientLink.FileName;
+
+    FDMoniFlatFileClientLink.FileName := AFile;
+    FDMoniFlatFileClientLink.FileAppend := False;
+    FDMoniFlatFileClientLink.EventKinds := FEventKindsPrecedenti + [ekVendor, ekCmdDataIn];
+    FDMoniFlatFileClientLink.Tracing := True;
+    Database.Params.MonitorBy := mbFlatFile;
+    FMonitorRegistrazioneAttivo := True;
+    Login;
+  end
+  else
+  begin
+    if not FMonitorRegistrazioneAttivo then
+      Exit;
+    FMonitorRegistrazioneAttivo := False;
+    Database.Params.MonitorBy := FMonitorByPrecedente;
+    FDMoniFlatFileClientLink.EventKinds := FEventKindsPrecedenti;
+    FDMoniFlatFileClientLink.FileName := FFileMonitorPrecedente;
     Login;
   end;
 end;
