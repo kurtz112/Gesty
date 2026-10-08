@@ -1,7 +1,5 @@
-// Generata il 05/10/2026 22:45:37
+// Generata il 08/10/2026 09:59:11
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
-// Mantis #183 - 2026-10-06: modificata a mano (rinomine del ciclo autorizzativo degli
-// incarichi); da rigenerare dal master dopo GESTY-183-01 e sostituire.
 unit Gesty_StoredProcs;
 
 interface
@@ -1458,7 +1456,7 @@ TSP_anagrafe_Situazione_Occupazionale_Ins_Or_Upd = class (TzStoredProc)
     fFestivo: TNullableBoolean;
     fTrasferte: TNullableBoolean;
     fTurni: TNullableBoolean;
-    fGiorni_Preavviso: TNullableInteger;
+    fGiorni_Preavviso: TNullableInt64;
     fDisponibilita_Orario_Note: TStringList;
     fCorso_Formazione_Sicurezza: TNullableBoolean;
     fAutomunito: TNullableBoolean;
@@ -1508,7 +1506,7 @@ TSP_anagrafe_Situazione_Occupazionale_Ins_Or_Upd = class (TzStoredProc)
     property Turni: TNullableBoolean read fTurni write fTurni;
     //
     [TParamAttribute('GIORNI_PREAVVISO', ptInput, False)]
-    property Giorni_Preavviso: TNullableInteger read fGiorni_Preavviso write fGiorni_Preavviso;
+    property Giorni_Preavviso: TNullableInt64 read fGiorni_Preavviso write fGiorni_Preavviso;
     //
     [TParamAttribute('DISPONIBILITA_ORARIO_NOTE', ptInput, True)]
     property Disponibilita_Orario_Note: TStringList read fDisponibilita_Orario_Note write SetDisponibilita_Orario_Note;
@@ -1698,34 +1696,34 @@ TSP_as_Interventi_Ins_Or_Upd = class (TzStoredProc)
     fData_Avvio_Intervento_2: TNullableDate;
     fData_Fine_Intervento_2: TNullableDate;
     fNote_Assegnazione_Ore: TNullableString;
-    fNumero_Settimane_Frequentate: TNullableInteger;
+    fNumero_Settimane_Frequentate: TNullableInt64;
     fOre_Assegnate_Anno_Precedente: TNullableDouble;
     fOre_Assegnate_Anno_Corrente: TNullableDouble;
     fCosto_Orario: TNullableDouble;
-    fSettembre_Numero_Settimane: TNullableInteger;
-    fSettembre_Ore_Settimanali: TNullableInteger;
-    fOttobre_Numero_Settimane: TNullableInteger;
-    fOttobre_Ore_Settimanali: TNullableInteger;
-    fNovembre_Numero_Settimane: TNullableInteger;
-    fNovembre_Ore_Settimanali: TNullableInteger;
-    fDicembre_Numero_Settimane: TNullableInteger;
-    fDicembre_Ore_Settimanali: TNullableInteger;
-    fGennaio_Numero_Settimane: TNullableInteger;
-    fGennaio_Ore_Settimanali: TNullableInteger;
-    fFebbraio_Numero_Settimane: TNullableInteger;
-    fFebbraio_Ore_Settimanali: TNullableInteger;
-    fMarzo_Numero_Settimane: TNullableInteger;
-    fMarzo_Ore_Settimanali: TNullableInteger;
-    fAprile_Numero_Settimane: TNullableInteger;
-    fAprile_Ore_Settimanali: TNullableInteger;
-    fMaggio_Numero_Settimane: TNullableInteger;
-    fMaggio_Ore_Settimanali: TNullableInteger;
-    fGiugno_Numero_Settimane: TNullableInteger;
-    fGiugno_Ore_Settimanali: TNullableInteger;
-    fLuglio_Numero_Settimane: TNullableInteger;
-    fLuglio_Ore_Settimanali: TNullableInteger;
-    fAgosto_Numero_Settimane: TNullableInteger;
-    fAgosto_Ore_Settimanali: TNullableInteger;
+    fSettembre_Numero_Settimane: TNullableInt64;
+    fSettembre_Ore_Settimanali: TNullableInt64;
+    fOttobre_Numero_Settimane: TNullableInt64;
+    fOttobre_Ore_Settimanali: TNullableInt64;
+    fNovembre_Numero_Settimane: TNullableInt64;
+    fNovembre_Ore_Settimanali: TNullableInt64;
+    fDicembre_Numero_Settimane: TNullableInt64;
+    fDicembre_Ore_Settimanali: TNullableInt64;
+    fGennaio_Numero_Settimane: TNullableInt64;
+    fGennaio_Ore_Settimanali: TNullableInt64;
+    fFebbraio_Numero_Settimane: TNullableInt64;
+    fFebbraio_Ore_Settimanali: TNullableInt64;
+    fMarzo_Numero_Settimane: TNullableInt64;
+    fMarzo_Ore_Settimanali: TNullableInt64;
+    fAprile_Numero_Settimane: TNullableInt64;
+    fAprile_Ore_Settimanali: TNullableInt64;
+    fMaggio_Numero_Settimane: TNullableInt64;
+    fMaggio_Ore_Settimanali: TNullableInt64;
+    fGiugno_Numero_Settimane: TNullableInt64;
+    fGiugno_Ore_Settimanali: TNullableInt64;
+    fLuglio_Numero_Settimane: TNullableInt64;
+    fLuglio_Ore_Settimanali: TNullableInt64;
+    fAgosto_Numero_Settimane: TNullableInt64;
+    fAgosto_Ore_Settimanali: TNullableInt64;
     fSettembre_Ore_Dirette: TNullableDouble;
     fSettembre_Ore_Dirette_In_Assenza_Minore: TNullableDouble;
     fSettembre_Ore_Indirette: TNullableDouble;
@@ -1859,7 +1857,7 @@ TSP_as_Interventi_Ins_Or_Upd = class (TzStoredProc)
     property Note_Assegnazione_Ore: TNullableString read fNote_Assegnazione_Ore write fNote_Assegnazione_Ore;
     //
     [TParamAttribute('NUMERO_SETTIMANE_FREQUENTATE', ptInput, False)]
-    property Numero_Settimane_Frequentate: TNullableInteger read fNumero_Settimane_Frequentate write fNumero_Settimane_Frequentate;
+    property Numero_Settimane_Frequentate: TNullableInt64 read fNumero_Settimane_Frequentate write fNumero_Settimane_Frequentate;
     //
     [TParamAttribute('ORE_ASSEGNATE_ANNO_PRECEDENTE', ptInput, False)]
     property Ore_Assegnate_Anno_Precedente: TNullableDouble read fOre_Assegnate_Anno_Precedente write fOre_Assegnate_Anno_Precedente;
@@ -1871,76 +1869,76 @@ TSP_as_Interventi_Ins_Or_Upd = class (TzStoredProc)
     property Costo_Orario: TNullableDouble read fCosto_Orario write fCosto_Orario;
     //
     [TParamAttribute('SETTEMBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Settembre_Numero_Settimane: TNullableInteger read fSettembre_Numero_Settimane write fSettembre_Numero_Settimane;
+    property Settembre_Numero_Settimane: TNullableInt64 read fSettembre_Numero_Settimane write fSettembre_Numero_Settimane;
     //
     [TParamAttribute('SETTEMBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Settembre_Ore_Settimanali: TNullableInteger read fSettembre_Ore_Settimanali write fSettembre_Ore_Settimanali;
+    property Settembre_Ore_Settimanali: TNullableInt64 read fSettembre_Ore_Settimanali write fSettembre_Ore_Settimanali;
     //
     [TParamAttribute('OTTOBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Ottobre_Numero_Settimane: TNullableInteger read fOttobre_Numero_Settimane write fOttobre_Numero_Settimane;
+    property Ottobre_Numero_Settimane: TNullableInt64 read fOttobre_Numero_Settimane write fOttobre_Numero_Settimane;
     //
     [TParamAttribute('OTTOBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Ottobre_Ore_Settimanali: TNullableInteger read fOttobre_Ore_Settimanali write fOttobre_Ore_Settimanali;
+    property Ottobre_Ore_Settimanali: TNullableInt64 read fOttobre_Ore_Settimanali write fOttobre_Ore_Settimanali;
     //
     [TParamAttribute('NOVEMBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Novembre_Numero_Settimane: TNullableInteger read fNovembre_Numero_Settimane write fNovembre_Numero_Settimane;
+    property Novembre_Numero_Settimane: TNullableInt64 read fNovembre_Numero_Settimane write fNovembre_Numero_Settimane;
     //
     [TParamAttribute('NOVEMBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Novembre_Ore_Settimanali: TNullableInteger read fNovembre_Ore_Settimanali write fNovembre_Ore_Settimanali;
+    property Novembre_Ore_Settimanali: TNullableInt64 read fNovembre_Ore_Settimanali write fNovembre_Ore_Settimanali;
     //
     [TParamAttribute('DICEMBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Dicembre_Numero_Settimane: TNullableInteger read fDicembre_Numero_Settimane write fDicembre_Numero_Settimane;
+    property Dicembre_Numero_Settimane: TNullableInt64 read fDicembre_Numero_Settimane write fDicembre_Numero_Settimane;
     //
     [TParamAttribute('DICEMBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Dicembre_Ore_Settimanali: TNullableInteger read fDicembre_Ore_Settimanali write fDicembre_Ore_Settimanali;
+    property Dicembre_Ore_Settimanali: TNullableInt64 read fDicembre_Ore_Settimanali write fDicembre_Ore_Settimanali;
     //
     [TParamAttribute('GENNAIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Gennaio_Numero_Settimane: TNullableInteger read fGennaio_Numero_Settimane write fGennaio_Numero_Settimane;
+    property Gennaio_Numero_Settimane: TNullableInt64 read fGennaio_Numero_Settimane write fGennaio_Numero_Settimane;
     //
     [TParamAttribute('GENNAIO_ORE_SETTIMANALI', ptInput, False)]
-    property Gennaio_Ore_Settimanali: TNullableInteger read fGennaio_Ore_Settimanali write fGennaio_Ore_Settimanali;
+    property Gennaio_Ore_Settimanali: TNullableInt64 read fGennaio_Ore_Settimanali write fGennaio_Ore_Settimanali;
     //
     [TParamAttribute('FEBBRAIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Febbraio_Numero_Settimane: TNullableInteger read fFebbraio_Numero_Settimane write fFebbraio_Numero_Settimane;
+    property Febbraio_Numero_Settimane: TNullableInt64 read fFebbraio_Numero_Settimane write fFebbraio_Numero_Settimane;
     //
     [TParamAttribute('FEBBRAIO_ORE_SETTIMANALI', ptInput, False)]
-    property Febbraio_Ore_Settimanali: TNullableInteger read fFebbraio_Ore_Settimanali write fFebbraio_Ore_Settimanali;
+    property Febbraio_Ore_Settimanali: TNullableInt64 read fFebbraio_Ore_Settimanali write fFebbraio_Ore_Settimanali;
     //
     [TParamAttribute('MARZO_NUMERO_SETTIMANE', ptInput, False)]
-    property Marzo_Numero_Settimane: TNullableInteger read fMarzo_Numero_Settimane write fMarzo_Numero_Settimane;
+    property Marzo_Numero_Settimane: TNullableInt64 read fMarzo_Numero_Settimane write fMarzo_Numero_Settimane;
     //
     [TParamAttribute('MARZO_ORE_SETTIMANALI', ptInput, False)]
-    property Marzo_Ore_Settimanali: TNullableInteger read fMarzo_Ore_Settimanali write fMarzo_Ore_Settimanali;
+    property Marzo_Ore_Settimanali: TNullableInt64 read fMarzo_Ore_Settimanali write fMarzo_Ore_Settimanali;
     //
     [TParamAttribute('APRILE_NUMERO_SETTIMANE', ptInput, False)]
-    property Aprile_Numero_Settimane: TNullableInteger read fAprile_Numero_Settimane write fAprile_Numero_Settimane;
+    property Aprile_Numero_Settimane: TNullableInt64 read fAprile_Numero_Settimane write fAprile_Numero_Settimane;
     //
     [TParamAttribute('APRILE_ORE_SETTIMANALI', ptInput, False)]
-    property Aprile_Ore_Settimanali: TNullableInteger read fAprile_Ore_Settimanali write fAprile_Ore_Settimanali;
+    property Aprile_Ore_Settimanali: TNullableInt64 read fAprile_Ore_Settimanali write fAprile_Ore_Settimanali;
     //
     [TParamAttribute('MAGGIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Maggio_Numero_Settimane: TNullableInteger read fMaggio_Numero_Settimane write fMaggio_Numero_Settimane;
+    property Maggio_Numero_Settimane: TNullableInt64 read fMaggio_Numero_Settimane write fMaggio_Numero_Settimane;
     //
     [TParamAttribute('MAGGIO_ORE_SETTIMANALI', ptInput, False)]
-    property Maggio_Ore_Settimanali: TNullableInteger read fMaggio_Ore_Settimanali write fMaggio_Ore_Settimanali;
+    property Maggio_Ore_Settimanali: TNullableInt64 read fMaggio_Ore_Settimanali write fMaggio_Ore_Settimanali;
     //
     [TParamAttribute('GIUGNO_NUMERO_SETTIMANE', ptInput, False)]
-    property Giugno_Numero_Settimane: TNullableInteger read fGiugno_Numero_Settimane write fGiugno_Numero_Settimane;
+    property Giugno_Numero_Settimane: TNullableInt64 read fGiugno_Numero_Settimane write fGiugno_Numero_Settimane;
     //
     [TParamAttribute('GIUGNO_ORE_SETTIMANALI', ptInput, False)]
-    property Giugno_Ore_Settimanali: TNullableInteger read fGiugno_Ore_Settimanali write fGiugno_Ore_Settimanali;
+    property Giugno_Ore_Settimanali: TNullableInt64 read fGiugno_Ore_Settimanali write fGiugno_Ore_Settimanali;
     //
     [TParamAttribute('LUGLIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Luglio_Numero_Settimane: TNullableInteger read fLuglio_Numero_Settimane write fLuglio_Numero_Settimane;
+    property Luglio_Numero_Settimane: TNullableInt64 read fLuglio_Numero_Settimane write fLuglio_Numero_Settimane;
     //
     [TParamAttribute('LUGLIO_ORE_SETTIMANALI', ptInput, False)]
-    property Luglio_Ore_Settimanali: TNullableInteger read fLuglio_Ore_Settimanali write fLuglio_Ore_Settimanali;
+    property Luglio_Ore_Settimanali: TNullableInt64 read fLuglio_Ore_Settimanali write fLuglio_Ore_Settimanali;
     //
     [TParamAttribute('AGOSTO_NUMERO_SETTIMANE', ptInput, False)]
-    property Agosto_Numero_Settimane: TNullableInteger read fAgosto_Numero_Settimane write fAgosto_Numero_Settimane;
+    property Agosto_Numero_Settimane: TNullableInt64 read fAgosto_Numero_Settimane write fAgosto_Numero_Settimane;
     //
     [TParamAttribute('AGOSTO_ORE_SETTIMANALI', ptInput, False)]
-    property Agosto_Ore_Settimanali: TNullableInteger read fAgosto_Ore_Settimanali write fAgosto_Ore_Settimanali;
+    property Agosto_Ore_Settimanali: TNullableInt64 read fAgosto_Ore_Settimanali write fAgosto_Ore_Settimanali;
     //
     [TParamAttribute('SETTEMBRE_ORE_DIRETTE', ptInput, False)]
     property Settembre_Ore_Dirette: TNullableDouble read fSettembre_Ore_Dirette write fSettembre_Ore_Dirette;
@@ -2225,34 +2223,34 @@ TSP_as_Interventi_P_Econ_Ins_Or_Upd = class (TzStoredProc)
     fBelfiore: TNullableString;
     fAnno_Formativo: TNullableString;
     fNote_Assegnazione_Ore: TNullableString;
-    fNumero_Settimane_Frequentate: TNullableInteger;
+    fNumero_Settimane_Frequentate: TNullableInt64;
     fOre_Assegnate_Anno_Precedente: TNullableDouble;
     fOre_Assegnate_Anno_Corrente: TNullableDouble;
     fCosto_Orario: TNullableDouble;
-    fSettembre_Numero_Settimane: TNullableInteger;
-    fSettembre_Ore_Settimanali: TNullableInteger;
-    fOttobre_Numero_Settimane: TNullableInteger;
-    fOttobre_Ore_Settimanali: TNullableInteger;
-    fNovembre_Numero_Settimane: TNullableInteger;
-    fNovembre_Ore_Settimanali: TNullableInteger;
-    fDicembre_Numero_Settimane: TNullableInteger;
-    fDicembre_Ore_Settimanali: TNullableInteger;
-    fGennaio_Numero_Settimane: TNullableInteger;
-    fGennaio_Ore_Settimanali: TNullableInteger;
-    fFebbraio_Numero_Settimane: TNullableInteger;
-    fFebbraio_Ore_Settimanali: TNullableInteger;
-    fMarzo_Numero_Settimane: TNullableInteger;
-    fMarzo_Ore_Settimanali: TNullableInteger;
-    fAprile_Numero_Settimane: TNullableInteger;
-    fAprile_Ore_Settimanali: TNullableInteger;
-    fMaggio_Numero_Settimane: TNullableInteger;
-    fMaggio_Ore_Settimanali: TNullableInteger;
-    fGiugno_Numero_Settimane: TNullableInteger;
-    fGiugno_Ore_Settimanali: TNullableInteger;
-    fLuglio_Numero_Settimane: TNullableInteger;
-    fLuglio_Ore_Settimanali: TNullableInteger;
-    fAgosto_Numero_Settimane: TNullableInteger;
-    fAgosto_Ore_Settimanali: TNullableInteger;
+    fSettembre_Numero_Settimane: TNullableInt64;
+    fSettembre_Ore_Settimanali: TNullableInt64;
+    fOttobre_Numero_Settimane: TNullableInt64;
+    fOttobre_Ore_Settimanali: TNullableInt64;
+    fNovembre_Numero_Settimane: TNullableInt64;
+    fNovembre_Ore_Settimanali: TNullableInt64;
+    fDicembre_Numero_Settimane: TNullableInt64;
+    fDicembre_Ore_Settimanali: TNullableInt64;
+    fGennaio_Numero_Settimane: TNullableInt64;
+    fGennaio_Ore_Settimanali: TNullableInt64;
+    fFebbraio_Numero_Settimane: TNullableInt64;
+    fFebbraio_Ore_Settimanali: TNullableInt64;
+    fMarzo_Numero_Settimane: TNullableInt64;
+    fMarzo_Ore_Settimanali: TNullableInt64;
+    fAprile_Numero_Settimane: TNullableInt64;
+    fAprile_Ore_Settimanali: TNullableInt64;
+    fMaggio_Numero_Settimane: TNullableInt64;
+    fMaggio_Ore_Settimanali: TNullableInt64;
+    fGiugno_Numero_Settimane: TNullableInt64;
+    fGiugno_Ore_Settimanali: TNullableInt64;
+    fLuglio_Numero_Settimane: TNullableInt64;
+    fLuglio_Ore_Settimanali: TNullableInt64;
+    fAgosto_Numero_Settimane: TNullableInt64;
+    fAgosto_Ore_Settimanali: TNullableInt64;
     fSettembre_Ore_Dirette: TNullableDouble;
     fSettembre_Ore_Dirette_In_Assenza_Minore: TNullableDouble;
     fSettembre_Ore_Indirette: TNullableDouble;
@@ -2350,7 +2348,7 @@ TSP_as_Interventi_P_Econ_Ins_Or_Upd = class (TzStoredProc)
     property Note_Assegnazione_Ore: TNullableString read fNote_Assegnazione_Ore write fNote_Assegnazione_Ore;
     //
     [TParamAttribute('NUMERO_SETTIMANE_FREQUENTATE', ptInput, False)]
-    property Numero_Settimane_Frequentate: TNullableInteger read fNumero_Settimane_Frequentate write fNumero_Settimane_Frequentate;
+    property Numero_Settimane_Frequentate: TNullableInt64 read fNumero_Settimane_Frequentate write fNumero_Settimane_Frequentate;
     //
     [TParamAttribute('ORE_ASSEGNATE_ANNO_PRECEDENTE', ptInput, False)]
     property Ore_Assegnate_Anno_Precedente: TNullableDouble read fOre_Assegnate_Anno_Precedente write fOre_Assegnate_Anno_Precedente;
@@ -2362,76 +2360,76 @@ TSP_as_Interventi_P_Econ_Ins_Or_Upd = class (TzStoredProc)
     property Costo_Orario: TNullableDouble read fCosto_Orario write fCosto_Orario;
     //
     [TParamAttribute('SETTEMBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Settembre_Numero_Settimane: TNullableInteger read fSettembre_Numero_Settimane write fSettembre_Numero_Settimane;
+    property Settembre_Numero_Settimane: TNullableInt64 read fSettembre_Numero_Settimane write fSettembre_Numero_Settimane;
     //
     [TParamAttribute('SETTEMBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Settembre_Ore_Settimanali: TNullableInteger read fSettembre_Ore_Settimanali write fSettembre_Ore_Settimanali;
+    property Settembre_Ore_Settimanali: TNullableInt64 read fSettembre_Ore_Settimanali write fSettembre_Ore_Settimanali;
     //
     [TParamAttribute('OTTOBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Ottobre_Numero_Settimane: TNullableInteger read fOttobre_Numero_Settimane write fOttobre_Numero_Settimane;
+    property Ottobre_Numero_Settimane: TNullableInt64 read fOttobre_Numero_Settimane write fOttobre_Numero_Settimane;
     //
     [TParamAttribute('OTTOBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Ottobre_Ore_Settimanali: TNullableInteger read fOttobre_Ore_Settimanali write fOttobre_Ore_Settimanali;
+    property Ottobre_Ore_Settimanali: TNullableInt64 read fOttobre_Ore_Settimanali write fOttobre_Ore_Settimanali;
     //
     [TParamAttribute('NOVEMBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Novembre_Numero_Settimane: TNullableInteger read fNovembre_Numero_Settimane write fNovembre_Numero_Settimane;
+    property Novembre_Numero_Settimane: TNullableInt64 read fNovembre_Numero_Settimane write fNovembre_Numero_Settimane;
     //
     [TParamAttribute('NOVEMBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Novembre_Ore_Settimanali: TNullableInteger read fNovembre_Ore_Settimanali write fNovembre_Ore_Settimanali;
+    property Novembre_Ore_Settimanali: TNullableInt64 read fNovembre_Ore_Settimanali write fNovembre_Ore_Settimanali;
     //
     [TParamAttribute('DICEMBRE_NUMERO_SETTIMANE', ptInput, False)]
-    property Dicembre_Numero_Settimane: TNullableInteger read fDicembre_Numero_Settimane write fDicembre_Numero_Settimane;
+    property Dicembre_Numero_Settimane: TNullableInt64 read fDicembre_Numero_Settimane write fDicembre_Numero_Settimane;
     //
     [TParamAttribute('DICEMBRE_ORE_SETTIMANALI', ptInput, False)]
-    property Dicembre_Ore_Settimanali: TNullableInteger read fDicembre_Ore_Settimanali write fDicembre_Ore_Settimanali;
+    property Dicembre_Ore_Settimanali: TNullableInt64 read fDicembre_Ore_Settimanali write fDicembre_Ore_Settimanali;
     //
     [TParamAttribute('GENNAIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Gennaio_Numero_Settimane: TNullableInteger read fGennaio_Numero_Settimane write fGennaio_Numero_Settimane;
+    property Gennaio_Numero_Settimane: TNullableInt64 read fGennaio_Numero_Settimane write fGennaio_Numero_Settimane;
     //
     [TParamAttribute('GENNAIO_ORE_SETTIMANALI', ptInput, False)]
-    property Gennaio_Ore_Settimanali: TNullableInteger read fGennaio_Ore_Settimanali write fGennaio_Ore_Settimanali;
+    property Gennaio_Ore_Settimanali: TNullableInt64 read fGennaio_Ore_Settimanali write fGennaio_Ore_Settimanali;
     //
     [TParamAttribute('FEBBRAIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Febbraio_Numero_Settimane: TNullableInteger read fFebbraio_Numero_Settimane write fFebbraio_Numero_Settimane;
+    property Febbraio_Numero_Settimane: TNullableInt64 read fFebbraio_Numero_Settimane write fFebbraio_Numero_Settimane;
     //
     [TParamAttribute('FEBBRAIO_ORE_SETTIMANALI', ptInput, False)]
-    property Febbraio_Ore_Settimanali: TNullableInteger read fFebbraio_Ore_Settimanali write fFebbraio_Ore_Settimanali;
+    property Febbraio_Ore_Settimanali: TNullableInt64 read fFebbraio_Ore_Settimanali write fFebbraio_Ore_Settimanali;
     //
     [TParamAttribute('MARZO_NUMERO_SETTIMANE', ptInput, False)]
-    property Marzo_Numero_Settimane: TNullableInteger read fMarzo_Numero_Settimane write fMarzo_Numero_Settimane;
+    property Marzo_Numero_Settimane: TNullableInt64 read fMarzo_Numero_Settimane write fMarzo_Numero_Settimane;
     //
     [TParamAttribute('MARZO_ORE_SETTIMANALI', ptInput, False)]
-    property Marzo_Ore_Settimanali: TNullableInteger read fMarzo_Ore_Settimanali write fMarzo_Ore_Settimanali;
+    property Marzo_Ore_Settimanali: TNullableInt64 read fMarzo_Ore_Settimanali write fMarzo_Ore_Settimanali;
     //
     [TParamAttribute('APRILE_NUMERO_SETTIMANE', ptInput, False)]
-    property Aprile_Numero_Settimane: TNullableInteger read fAprile_Numero_Settimane write fAprile_Numero_Settimane;
+    property Aprile_Numero_Settimane: TNullableInt64 read fAprile_Numero_Settimane write fAprile_Numero_Settimane;
     //
     [TParamAttribute('APRILE_ORE_SETTIMANALI', ptInput, False)]
-    property Aprile_Ore_Settimanali: TNullableInteger read fAprile_Ore_Settimanali write fAprile_Ore_Settimanali;
+    property Aprile_Ore_Settimanali: TNullableInt64 read fAprile_Ore_Settimanali write fAprile_Ore_Settimanali;
     //
     [TParamAttribute('MAGGIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Maggio_Numero_Settimane: TNullableInteger read fMaggio_Numero_Settimane write fMaggio_Numero_Settimane;
+    property Maggio_Numero_Settimane: TNullableInt64 read fMaggio_Numero_Settimane write fMaggio_Numero_Settimane;
     //
     [TParamAttribute('MAGGIO_ORE_SETTIMANALI', ptInput, False)]
-    property Maggio_Ore_Settimanali: TNullableInteger read fMaggio_Ore_Settimanali write fMaggio_Ore_Settimanali;
+    property Maggio_Ore_Settimanali: TNullableInt64 read fMaggio_Ore_Settimanali write fMaggio_Ore_Settimanali;
     //
     [TParamAttribute('GIUGNO_NUMERO_SETTIMANE', ptInput, False)]
-    property Giugno_Numero_Settimane: TNullableInteger read fGiugno_Numero_Settimane write fGiugno_Numero_Settimane;
+    property Giugno_Numero_Settimane: TNullableInt64 read fGiugno_Numero_Settimane write fGiugno_Numero_Settimane;
     //
     [TParamAttribute('GIUGNO_ORE_SETTIMANALI', ptInput, False)]
-    property Giugno_Ore_Settimanali: TNullableInteger read fGiugno_Ore_Settimanali write fGiugno_Ore_Settimanali;
+    property Giugno_Ore_Settimanali: TNullableInt64 read fGiugno_Ore_Settimanali write fGiugno_Ore_Settimanali;
     //
     [TParamAttribute('LUGLIO_NUMERO_SETTIMANE', ptInput, False)]
-    property Luglio_Numero_Settimane: TNullableInteger read fLuglio_Numero_Settimane write fLuglio_Numero_Settimane;
+    property Luglio_Numero_Settimane: TNullableInt64 read fLuglio_Numero_Settimane write fLuglio_Numero_Settimane;
     //
     [TParamAttribute('LUGLIO_ORE_SETTIMANALI', ptInput, False)]
-    property Luglio_Ore_Settimanali: TNullableInteger read fLuglio_Ore_Settimanali write fLuglio_Ore_Settimanali;
+    property Luglio_Ore_Settimanali: TNullableInt64 read fLuglio_Ore_Settimanali write fLuglio_Ore_Settimanali;
     //
     [TParamAttribute('AGOSTO_NUMERO_SETTIMANE', ptInput, False)]
-    property Agosto_Numero_Settimane: TNullableInteger read fAgosto_Numero_Settimane write fAgosto_Numero_Settimane;
+    property Agosto_Numero_Settimane: TNullableInt64 read fAgosto_Numero_Settimane write fAgosto_Numero_Settimane;
     //
     [TParamAttribute('AGOSTO_ORE_SETTIMANALI', ptInput, False)]
-    property Agosto_Ore_Settimanali: TNullableInteger read fAgosto_Ore_Settimanali write fAgosto_Ore_Settimanali;
+    property Agosto_Ore_Settimanali: TNullableInt64 read fAgosto_Ore_Settimanali write fAgosto_Ore_Settimanali;
     //
     [TParamAttribute('SETTEMBRE_ORE_DIRETTE', ptInput, False)]
     property Settembre_Ore_Dirette: TNullableDouble read fSettembre_Ore_Dirette write fSettembre_Ore_Dirette;
@@ -2960,8 +2958,8 @@ TSP_aule_Cerca_Slot_Liberi = class (TzStoredProc)
     fData_Fine: TNullableDate;
     fDalle_Ore: TNullableTime;
     fAlle_Ore: TNullableTime;
-    fDurata: TNullableInteger;
-    fMinuti_Incremento: TNullableInteger;
+    fDurata: TNullableInt64;
+    fMinuti_Incremento: TNullableInt64;
     fAula: TNullableString;
     fDesc_Aula: TNullableString;
     fId_Ente: TNullableInt64;
@@ -3004,10 +3002,10 @@ TSP_aule_Cerca_Slot_Liberi = class (TzStoredProc)
     property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
     //
     [TParamAttribute('DURATA', ptInput, False)]
-    property Durata: TNullableInteger read fDurata write fDurata;
+    property Durata: TNullableInt64 read fDurata write fDurata;
     //
     [TParamAttribute('MINUTI_INCREMENTO', ptInput, False)]
-    property Minuti_Incremento: TNullableInteger read fMinuti_Incremento write fMinuti_Incremento;
+    property Minuti_Incremento: TNullableInt64 read fMinuti_Incremento write fMinuti_Incremento;
     //
     [TParamAttribute('AULA', ptOutput, False)]
     property Aula: TNullableString read fAula;
@@ -3240,19 +3238,19 @@ TSP_aule_Riepilogo_Utilizzo = class (TzStoredProc)
     fEnte: TNullableString;
     fId_Sede: TNullableInt64;
     fSede: TNullableString;
-    fNumero_Postazioni: TNullableInteger;
-    fGg_Limite_Prenotazione: TNullableInteger;
-    fGiorni_Aperti: TNullableInteger;
-    fGiorni_Inagibile: TNullableInteger;
+    fNumero_Postazioni: TNullableInt64;
+    fGg_Limite_Prenotazione: TNullableInt64;
+    fGiorni_Aperti: TNullableInt64;
+    fGiorni_Inagibile: TNullableInt64;
     fOre_Disponibili: TNullableDouble;
     fOre_Lezioni: TNullableDouble;
     fOre_Prenotazioni: TNullableDouble;
     fOre_Riunioni: TNullableDouble;
     fOre_Occupate: TNullableDouble;
     fPercentuale_Occupazione: TNullableDouble;
-    fPrenotazioni: TNullableInteger;
-    fPrenotazioni_Annullate: TNullableInteger;
-    fAnnullate_Ultimo_Momento: TNullableInteger;
+    fPrenotazioni: TNullableInt64;
+    fPrenotazioni_Annullate: TNullableInt64;
+    fAnnullate_Ultimo_Momento: TNullableInt64;
   private
     property Aula_internal: TNullableString read fAula write fAula;
     property Desc_Aula_internal: TNullableString read fDesc_Aula write fDesc_Aula;
@@ -3260,19 +3258,19 @@ TSP_aule_Riepilogo_Utilizzo = class (TzStoredProc)
     property Ente_internal: TNullableString read fEnte write fEnte;
     property Id_Sede_internal: TNullableInt64 read fId_Sede write fId_Sede;
     property Sede_internal: TNullableString read fSede write fSede;
-    property Numero_Postazioni_internal: TNullableInteger read fNumero_Postazioni write fNumero_Postazioni;
-    property Gg_Limite_Prenotazione_internal: TNullableInteger read fGg_Limite_Prenotazione write fGg_Limite_Prenotazione;
-    property Giorni_Aperti_internal: TNullableInteger read fGiorni_Aperti write fGiorni_Aperti;
-    property Giorni_Inagibile_internal: TNullableInteger read fGiorni_Inagibile write fGiorni_Inagibile;
+    property Numero_Postazioni_internal: TNullableInt64 read fNumero_Postazioni write fNumero_Postazioni;
+    property Gg_Limite_Prenotazione_internal: TNullableInt64 read fGg_Limite_Prenotazione write fGg_Limite_Prenotazione;
+    property Giorni_Aperti_internal: TNullableInt64 read fGiorni_Aperti write fGiorni_Aperti;
+    property Giorni_Inagibile_internal: TNullableInt64 read fGiorni_Inagibile write fGiorni_Inagibile;
     property Ore_Disponibili_internal: TNullableDouble read fOre_Disponibili write fOre_Disponibili;
     property Ore_Lezioni_internal: TNullableDouble read fOre_Lezioni write fOre_Lezioni;
     property Ore_Prenotazioni_internal: TNullableDouble read fOre_Prenotazioni write fOre_Prenotazioni;
     property Ore_Riunioni_internal: TNullableDouble read fOre_Riunioni write fOre_Riunioni;
     property Ore_Occupate_internal: TNullableDouble read fOre_Occupate write fOre_Occupate;
     property Percentuale_Occupazione_internal: TNullableDouble read fPercentuale_Occupazione write fPercentuale_Occupazione;
-    property Prenotazioni_internal: TNullableInteger read fPrenotazioni write fPrenotazioni;
-    property Prenotazioni_Annullate_internal: TNullableInteger read fPrenotazioni_Annullate write fPrenotazioni_Annullate;
-    property Annullate_Ultimo_Momento_internal: TNullableInteger read fAnnullate_Ultimo_Momento write fAnnullate_Ultimo_Momento;
+    property Prenotazioni_internal: TNullableInt64 read fPrenotazioni write fPrenotazioni;
+    property Prenotazioni_Annullate_internal: TNullableInt64 read fPrenotazioni_Annullate write fPrenotazioni_Annullate;
+    property Annullate_Ultimo_Momento_internal: TNullableInt64 read fAnnullate_Ultimo_Momento write fAnnullate_Ultimo_Momento;
   public
     //
     [TParamAttribute('DAL_GIORNO', ptInput, False)]
@@ -3303,16 +3301,16 @@ TSP_aule_Riepilogo_Utilizzo = class (TzStoredProc)
     property Sede: TNullableString read fSede;
     //
     [TParamAttribute('NUMERO_POSTAZIONI', ptOutput, False)]
-    property Numero_Postazioni: TNullableInteger read fNumero_Postazioni;
+    property Numero_Postazioni: TNullableInt64 read fNumero_Postazioni;
     //
     [TParamAttribute('GG_LIMITE_PRENOTAZIONE', ptOutput, False)]
-    property Gg_Limite_Prenotazione: TNullableInteger read fGg_Limite_Prenotazione;
+    property Gg_Limite_Prenotazione: TNullableInt64 read fGg_Limite_Prenotazione;
     //
     [TParamAttribute('GIORNI_APERTI', ptOutput, False)]
-    property Giorni_Aperti: TNullableInteger read fGiorni_Aperti;
+    property Giorni_Aperti: TNullableInt64 read fGiorni_Aperti;
     //
     [TParamAttribute('GIORNI_INAGIBILE', ptOutput, False)]
-    property Giorni_Inagibile: TNullableInteger read fGiorni_Inagibile;
+    property Giorni_Inagibile: TNullableInt64 read fGiorni_Inagibile;
     //
     [TParamAttribute('ORE_DISPONIBILI', ptOutput, False)]
     property Ore_Disponibili: TNullableDouble read fOre_Disponibili;
@@ -3333,13 +3331,13 @@ TSP_aule_Riepilogo_Utilizzo = class (TzStoredProc)
     property Percentuale_Occupazione: TNullableDouble read fPercentuale_Occupazione;
     //
     [TParamAttribute('PRENOTAZIONI', ptOutput, False)]
-    property Prenotazioni: TNullableInteger read fPrenotazioni;
+    property Prenotazioni: TNullableInt64 read fPrenotazioni;
     //
     [TParamAttribute('PRENOTAZIONI_ANNULLATE', ptOutput, False)]
-    property Prenotazioni_Annullate: TNullableInteger read fPrenotazioni_Annullate;
+    property Prenotazioni_Annullate: TNullableInt64 read fPrenotazioni_Annullate;
     //
     [TParamAttribute('ANNULLATE_ULTIMO_MOMENTO', ptOutput, False)]
-    property Annullate_Ultimo_Momento: TNullableInteger read fAnnullate_Ultimo_Momento;
+    property Annullate_Ultimo_Momento: TNullableInt64 read fAnnullate_Ultimo_Momento;
 end;
 
 [TStoredProcedure('AUTORIZZAZIONI_PAGAMENTO_DETAILS', True)]
@@ -3347,15 +3345,15 @@ end;
 TSP_autorizzazioni_Pagamento_Details = class (TzStoredProc)
   private
     fId_Autorizzazione_Pagamento: TNullableInt64;
-    fNumero_Progetti: TNullableInteger;
-    fNumero_Incarichi: TNullableInteger;
+    fNumero_Progetti: TNullableInt64;
+    fNumero_Incarichi: TNullableInt64;
     fTotale_Ore_Autorizzate: TNullableDouble;
     fTotale_Compensi_Autorizzati: TNullableDouble;
     fTotale_Compensi_Lordi: TNullableDouble;
     fTotale_Compensi_Lordi_Iva: TNullableDouble;
   private
-    property Numero_Progetti_internal: TNullableInteger read fNumero_Progetti write fNumero_Progetti;
-    property Numero_Incarichi_internal: TNullableInteger read fNumero_Incarichi write fNumero_Incarichi;
+    property Numero_Progetti_internal: TNullableInt64 read fNumero_Progetti write fNumero_Progetti;
+    property Numero_Incarichi_internal: TNullableInt64 read fNumero_Incarichi write fNumero_Incarichi;
     property Totale_Ore_Autorizzate_internal: TNullableDouble read fTotale_Ore_Autorizzate write fTotale_Ore_Autorizzate;
     property Totale_Compensi_Autorizzati_internal: TNullableDouble read fTotale_Compensi_Autorizzati write fTotale_Compensi_Autorizzati;
     property Totale_Compensi_Lordi_internal: TNullableDouble read fTotale_Compensi_Lordi write fTotale_Compensi_Lordi;
@@ -3366,10 +3364,10 @@ TSP_autorizzazioni_Pagamento_Details = class (TzStoredProc)
     property Id_Autorizzazione_Pagamento: TNullableInt64 read fId_Autorizzazione_Pagamento write fId_Autorizzazione_Pagamento;
     //
     [TParamAttribute('NUMERO_PROGETTI', ptOutput, False)]
-    property Numero_Progetti: TNullableInteger read fNumero_Progetti;
+    property Numero_Progetti: TNullableInt64 read fNumero_Progetti;
     //
     [TParamAttribute('NUMERO_INCARICHI', ptOutput, False)]
-    property Numero_Incarichi: TNullableInteger read fNumero_Incarichi;
+    property Numero_Incarichi: TNullableInt64 read fNumero_Incarichi;
     //
     [TParamAttribute('TOTALE_ORE_AUTORIZZATE', ptOutput, False)]
     property Totale_Ore_Autorizzate: TNullableDouble read fTotale_Ore_Autorizzate;
@@ -3538,14 +3536,14 @@ TSP_aziende_Convenzionate_Get = class (TzStoredProc)
     fRagione_Sociale: TNullableString;
     fAttiva: TNullableBoolean;
     fConvenzionata: TNullableBoolean;
-    fOrdinamento: TNullableInteger;
+    fOrdinamento: TNullableInt64;
   private
     property Id_Azienda_internal: TNullableInt64 read fId_Azienda write fId_Azienda;
     property Azienda_internal: TNullableString read fAzienda write fAzienda;
     property Ragione_Sociale_internal: TNullableString read fRagione_Sociale write fRagione_Sociale;
     property Attiva_internal: TNullableBoolean read fAttiva write fAttiva;
     property Convenzionata_internal: TNullableBoolean read fConvenzionata write fConvenzionata;
-    property Ordinamento_internal: TNullableInteger read fOrdinamento write fOrdinamento;
+    property Ordinamento_internal: TNullableInt64 read fOrdinamento write fOrdinamento;
   public
     //
     [TParamAttribute('ID_ENTE', ptInput, False)]
@@ -3567,7 +3565,7 @@ TSP_aziende_Convenzionate_Get = class (TzStoredProc)
     property Convenzionata: TNullableBoolean read fConvenzionata;
     //
     [TParamAttribute('ORDINAMENTO', ptOutput, False)]
-    property Ordinamento: TNullableInteger read fOrdinamento;
+    property Ordinamento: TNullableInt64 read fOrdinamento;
 end;
 
 [TStoredProcedure('AZIENDE_CONVENZIONI_DETAIL', True)]
@@ -3575,16 +3573,16 @@ end;
 TSP_aziende_Convenzioni_Detail = class (TzStoredProc)
   private
     fId_Convenzione: TNullableInt64;
-    fNumero_Tirocini_Attivati: TNullableInteger;
+    fNumero_Tirocini_Attivati: TNullableInt64;
   private
-    property Numero_Tirocini_Attivati_internal: TNullableInteger read fNumero_Tirocini_Attivati write fNumero_Tirocini_Attivati;
+    property Numero_Tirocini_Attivati_internal: TNullableInt64 read fNumero_Tirocini_Attivati write fNumero_Tirocini_Attivati;
   public
     //
     [TParamAttribute('ID_CONVENZIONE', ptInput, False)]
     property Id_Convenzione: TNullableInt64 read fId_Convenzione write fId_Convenzione;
     //
     [TParamAttribute('NUMERO_TIROCINI_ATTIVATI', ptOutput, False)]
-    property Numero_Tirocini_Attivati: TNullableInteger read fNumero_Tirocini_Attivati;
+    property Numero_Tirocini_Attivati: TNullableInt64 read fNumero_Tirocini_Attivati;
 end;
 
 [TStoredProcedure('AZIENDE_DISPONIBILITA_FILL')]
@@ -3699,7 +3697,7 @@ TSP_aziende_Import_Parse_Riga = class (TzStoredProc)
     fReferente_Telefono: TNullableString;
     fReferente_E_Mail: TNullableString;
     fCategoria_Azienda: TNullableString;
-    fNumero_Dipendenti: TNullableInteger;
+    fNumero_Dipendenti: TNullableInt64;
     fLatitudine_Dec: TNullableDouble;
     fLongitudine_Dec: TNullableDouble;
     fLatitudine_Rad: TNullableDouble;
@@ -3754,8 +3752,8 @@ TSP_aziende_Import_Parse_Riga = class (TzStoredProc)
     fConvenz_Data_Inizio: TNullableDate;
     fConvenz_Data_Fine: TNullableDate;
     fConvenz_Anno_Convenzione: TNullableInteger;
-    fConvenz_Numero_Convenzione: TNullableInteger;
-    fConvenz_Numero_Soggetti: TNullableInteger;
+    fConvenz_Numero_Convenzione: TNullableInt64;
+    fConvenz_Numero_Soggetti: TNullableInt64;
   private
     property Tipo_Risorsa_internal: TNullableString read fTipo_Risorsa write fTipo_Risorsa;
     property Azienda_internal: TNullableString read fAzienda write fAzienda;
@@ -3795,7 +3793,7 @@ TSP_aziende_Import_Parse_Riga = class (TzStoredProc)
     property Referente_Telefono_internal: TNullableString read fReferente_Telefono write fReferente_Telefono;
     property Referente_E_Mail_internal: TNullableString read fReferente_E_Mail write fReferente_E_Mail;
     property Categoria_Azienda_internal: TNullableString read fCategoria_Azienda write fCategoria_Azienda;
-    property Numero_Dipendenti_internal: TNullableInteger read fNumero_Dipendenti write fNumero_Dipendenti;
+    property Numero_Dipendenti_internal: TNullableInt64 read fNumero_Dipendenti write fNumero_Dipendenti;
     property Latitudine_Dec_internal: TNullableDouble read fLatitudine_Dec write fLatitudine_Dec;
     property Longitudine_Dec_internal: TNullableDouble read fLongitudine_Dec write fLongitudine_Dec;
     property Latitudine_Rad_internal: TNullableDouble read fLatitudine_Rad write fLatitudine_Rad;
@@ -3849,8 +3847,8 @@ TSP_aziende_Import_Parse_Riga = class (TzStoredProc)
     property Convenz_Data_Inizio_internal: TNullableDate read fConvenz_Data_Inizio write fConvenz_Data_Inizio;
     property Convenz_Data_Fine_internal: TNullableDate read fConvenz_Data_Fine write fConvenz_Data_Fine;
     property Convenz_Anno_Convenzione_internal: TNullableInteger read fConvenz_Anno_Convenzione write fConvenz_Anno_Convenzione;
-    property Convenz_Numero_Convenzione_internal: TNullableInteger read fConvenz_Numero_Convenzione write fConvenz_Numero_Convenzione;
-    property Convenz_Numero_Soggetti_internal: TNullableInteger read fConvenz_Numero_Soggetti write fConvenz_Numero_Soggetti;
+    property Convenz_Numero_Convenzione_internal: TNullableInt64 read fConvenz_Numero_Convenzione write fConvenz_Numero_Convenzione;
+    property Convenz_Numero_Soggetti_internal: TNullableInt64 read fConvenz_Numero_Soggetti write fConvenz_Numero_Soggetti;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -3974,7 +3972,7 @@ TSP_aziende_Import_Parse_Riga = class (TzStoredProc)
     property Categoria_Azienda: TNullableString read fCategoria_Azienda;
     //
     [TParamAttribute('NUMERO_DIPENDENTI', ptOutput, False)]
-    property Numero_Dipendenti: TNullableInteger read fNumero_Dipendenti;
+    property Numero_Dipendenti: TNullableInt64 read fNumero_Dipendenti;
     //
     [TParamAttribute('LATITUDINE_DEC', ptOutput, False)]
     property Latitudine_Dec: TNullableDouble read fLatitudine_Dec;
@@ -4139,10 +4137,10 @@ TSP_aziende_Import_Parse_Riga = class (TzStoredProc)
     property Convenz_Anno_Convenzione: TNullableInteger read fConvenz_Anno_Convenzione;
     //
     [TParamAttribute('CONVENZ_NUMERO_CONVENZIONE', ptOutput, False)]
-    property Convenz_Numero_Convenzione: TNullableInteger read fConvenz_Numero_Convenzione;
+    property Convenz_Numero_Convenzione: TNullableInt64 read fConvenz_Numero_Convenzione;
     //
     [TParamAttribute('CONVENZ_NUMERO_SOGGETTI', ptOutput, False)]
-    property Convenz_Numero_Soggetti: TNullableInteger read fConvenz_Numero_Soggetti;
+    property Convenz_Numero_Soggetti: TNullableInt64 read fConvenz_Numero_Soggetti;
 end;
 
 [TStoredProcedure('AZIENDE_STORICO_ADD')]
@@ -4265,10 +4263,10 @@ end;
 TSP_blob_Split_Lines = class (TzStoredProc)
   private
     fParam_Blob: TStringList;
-    fLine_Num: TNullableInteger;
+    fLine_Num: TNullableInt64;
     fLine_Text: TNullableString;
   private
-    property Line_Num_internal: TNullableInteger read fLine_Num write fLine_Num;
+    property Line_Num_internal: TNullableInt64 read fLine_Num write fLine_Num;
     property Line_Text_internal: TNullableString read fLine_Text write fLine_Text;
   private
     procedure SetParam_Blob(const Value: TStringList);
@@ -4281,7 +4279,7 @@ TSP_blob_Split_Lines = class (TzStoredProc)
     property Param_Blob: TStringList read fParam_Blob write SetParam_Blob;
     //
     [TParamAttribute('LINE_NUM', ptOutput, False)]
-    property Line_Num: TNullableInteger read fLine_Num;
+    property Line_Num: TNullableInt64 read fLine_Num;
     //
     [TParamAttribute('LINE_TEXT', ptOutput, False)]
     property Line_Text: TNullableString read fLine_Text;
@@ -4470,7 +4468,7 @@ TSP_calendario_Aule = class (TzStoredProc)
     fId_Sede: TNullableInt64;
     fDalle_Ore: TNullableTime;
     fAlle_Ore: TNullableTime;
-    fIntervallo: TNullableInteger;
+    fIntervallo: TNullableInt64;
     fMostra_Aule_Libere: TNullableBoolean;
     fId: TNullableInt64;
     fTipo_Evento: TNullableInteger;
@@ -4546,7 +4544,7 @@ TSP_calendario_Aule = class (TzStoredProc)
     property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
     //
     [TParamAttribute('INTERVALLO', ptInput, False)]
-    property Intervallo: TNullableInteger read fIntervallo write fIntervallo;
+    property Intervallo: TNullableInt64 read fIntervallo write fIntervallo;
     //
     [TParamAttribute('MOSTRA_AULE_LIBERE', ptInput, False)]
     property Mostra_Aule_Libere: TNullableBoolean read fMostra_Aule_Libere write fMostra_Aule_Libere;
@@ -5013,18 +5011,18 @@ TSP_calendario_Corsi_Materie_Free = class (TzStoredProc)
     fAlle_Ore: TNullableTime;
     fMateria: TNullableString;
     fMonte_Ore: TNullableDouble;
-    fOre_Settimanali: TNullableInteger;
-    fOre_Pianificate: TNullableInteger;
-    fOre_Da_Pianificare: TNullableInteger;
+    fOre_Settimanali: TNullableInt64;
+    fOre_Pianificate: TNullableInt64;
+    fOre_Da_Pianificare: TNullableInt64;
     fId_Docente: TNullableInt64;
     fNominativo_O_Ragione_Sociale: TNullableString;
     fDocente_Libero: TNullableBoolean;
   private
     property Materia_internal: TNullableString read fMateria write fMateria;
     property Monte_Ore_internal: TNullableDouble read fMonte_Ore write fMonte_Ore;
-    property Ore_Settimanali_internal: TNullableInteger read fOre_Settimanali write fOre_Settimanali;
-    property Ore_Pianificate_internal: TNullableInteger read fOre_Pianificate write fOre_Pianificate;
-    property Ore_Da_Pianificare_internal: TNullableInteger read fOre_Da_Pianificare write fOre_Da_Pianificare;
+    property Ore_Settimanali_internal: TNullableInt64 read fOre_Settimanali write fOre_Settimanali;
+    property Ore_Pianificate_internal: TNullableInt64 read fOre_Pianificate write fOre_Pianificate;
+    property Ore_Da_Pianificare_internal: TNullableInt64 read fOre_Da_Pianificare write fOre_Da_Pianificare;
     property Id_Docente_internal: TNullableInt64 read fId_Docente write fId_Docente;
     property Nominativo_O_Ragione_Sociale_internal: TNullableString read fNominativo_O_Ragione_Sociale write fNominativo_O_Ragione_Sociale;
     property Docente_Libero_internal: TNullableBoolean read fDocente_Libero write fDocente_Libero;
@@ -5049,13 +5047,13 @@ TSP_calendario_Corsi_Materie_Free = class (TzStoredProc)
     property Monte_Ore: TNullableDouble read fMonte_Ore;
     //
     [TParamAttribute('ORE_SETTIMANALI', ptOutput, False)]
-    property Ore_Settimanali: TNullableInteger read fOre_Settimanali;
+    property Ore_Settimanali: TNullableInt64 read fOre_Settimanali;
     //
     [TParamAttribute('ORE_PIANIFICATE', ptOutput, False)]
-    property Ore_Pianificate: TNullableInteger read fOre_Pianificate;
+    property Ore_Pianificate: TNullableInt64 read fOre_Pianificate;
     //
     [TParamAttribute('ORE_DA_PIANIFICARE', ptOutput, False)]
-    property Ore_Da_Pianificare: TNullableInteger read fOre_Da_Pianificare;
+    property Ore_Da_Pianificare: TNullableInt64 read fOre_Da_Pianificare;
     //
     [TParamAttribute('ID_DOCENTE', ptOutput, False)]
     property Id_Docente: TNullableInt64 read fId_Docente;
@@ -6566,7 +6564,7 @@ end;
 TSP_coge_Fatture_Elettroniche_Xml_Bene_Servizio_Add = class (TzStoredProc)
   private
     fId_Corpo: TNullableInt64;
-    fNumero_Linea: TNullableInteger;
+    fNumero_Linea: TNullableInt64;
     fTipo_Cessione: TNullableString;
     fCodice_Tipo: TNullableString;
     fCodice_Valore: TNullableString;
@@ -6594,7 +6592,7 @@ TSP_coge_Fatture_Elettroniche_Xml_Bene_Servizio_Add = class (TzStoredProc)
     property Id_Corpo: TNullableInt64 read fId_Corpo write fId_Corpo;
     //
     [TParamAttribute('NUMERO_LINEA', ptInput, False)]
-    property Numero_Linea: TNullableInteger read fNumero_Linea write fNumero_Linea;
+    property Numero_Linea: TNullableInt64 read fNumero_Linea write fNumero_Linea;
     //
     [TParamAttribute('TIPO_CESSIONE', ptInput, False)]
     property Tipo_Cessione: TNullableString read fTipo_Cessione write fTipo_Cessione;
@@ -6967,7 +6965,7 @@ end;
 TSP_coge_Fatture_Elettroniche_Xml_Corpo_Add = class (TzStoredProc)
   private
     fId_Contenitore: TNullableInt64;
-    fProgressivo: TNullableInteger;
+    fProgressivo: TNullableInt64;
     fId_Corpo: TNullableInt64;
   private
     property Id_Corpo_internal: TNullableInt64 read fId_Corpo write fId_Corpo;
@@ -6977,7 +6975,7 @@ TSP_coge_Fatture_Elettroniche_Xml_Corpo_Add = class (TzStoredProc)
     property Id_Contenitore: TNullableInt64 read fId_Contenitore write fId_Contenitore;
     //
     [TParamAttribute('PROGRESSIVO', ptInput, False)]
-    property Progressivo: TNullableInteger read fProgressivo write fProgressivo;
+    property Progressivo: TNullableInt64 read fProgressivo write fProgressivo;
     //
     [TParamAttribute('ID_CORPO', ptOutput, False)]
     property Id_Corpo: TNullableInt64 read fId_Corpo;
@@ -7122,8 +7120,8 @@ TSP_coge_Fatture_Elettroniche_Xml_Dettaglio_Pagamento_Add = class (TzStoredProc)
     fBeneficiario: TNullableString;
     fModalita: TNullableString;
     fData_Scadenza: TNullableDate;
-    fGiorni_Termine_Pagamento: TNullableInteger;
-    fGiorno_Fine_Mese: TNullableInteger;
+    fGiorni_Termine_Pagamento: TNullableInt64;
+    fGiorno_Fine_Mese: TNullableInt64;
     fImporto: TNullableDouble;
     fCodice_Ufficio_Postale: TNullableString;
     fCognome_Quietanzante: TNullableString;
@@ -7158,10 +7156,10 @@ TSP_coge_Fatture_Elettroniche_Xml_Dettaglio_Pagamento_Add = class (TzStoredProc)
     property Data_Scadenza: TNullableDate read fData_Scadenza write fData_Scadenza;
     //
     [TParamAttribute('GIORNI_TERMINE_PAGAMENTO', ptInput, False)]
-    property Giorni_Termine_Pagamento: TNullableInteger read fGiorni_Termine_Pagamento write fGiorni_Termine_Pagamento;
+    property Giorni_Termine_Pagamento: TNullableInt64 read fGiorni_Termine_Pagamento write fGiorni_Termine_Pagamento;
     //
     [TParamAttribute('GIORNO_FINE_MESE', ptInput, False)]
-    property Giorno_Fine_Mese: TNullableInteger read fGiorno_Fine_Mese write fGiorno_Fine_Mese;
+    property Giorno_Fine_Mese: TNullableInt64 read fGiorno_Fine_Mese write fGiorno_Fine_Mese;
     //
     [TParamAttribute('IMPORTO', ptInput, False)]
     property Importo: TNullableDouble read fImporto write fImporto;
@@ -7221,14 +7219,14 @@ TSP_coge_Fatture_Elettroniche_Xml_Documento_Correlato_Add = class (TzStoredProc)
   private
     fId_Dati_Generali: TNullableInt64;
     fTipo: TNullableString;
-    fRif_Numero_Linea: TNullableInteger;
+    fRif_Numero_Linea: TNullableInt64;
     fId_Documento: TNullableString;
     fData: TNullableDate;
     fNum_Item: TNullableString;
     fCodice_Commessa: TNullableString;
     fCodice_Cup: TNullableString;
     fCodice_Cig: TNullableString;
-    fSal_Riferimento: TNullableInteger;
+    fSal_Riferimento: TNullableInt64;
     fId_Documento_Correlato: TNullableInt64;
   private
     property Id_Documento_Correlato_internal: TNullableInt64 read fId_Documento_Correlato write fId_Documento_Correlato;
@@ -7241,7 +7239,7 @@ TSP_coge_Fatture_Elettroniche_Xml_Documento_Correlato_Add = class (TzStoredProc)
     property Tipo: TNullableString read fTipo write fTipo;
     //
     [TParamAttribute('RIF_NUMERO_LINEA', ptInput, False)]
-    property Rif_Numero_Linea: TNullableInteger read fRif_Numero_Linea write fRif_Numero_Linea;
+    property Rif_Numero_Linea: TNullableInt64 read fRif_Numero_Linea write fRif_Numero_Linea;
     //
     [TParamAttribute('ID_DOCUMENTO', ptInput, False)]
     property Id_Documento: TNullableString read fId_Documento write fId_Documento;
@@ -7262,7 +7260,7 @@ TSP_coge_Fatture_Elettroniche_Xml_Documento_Correlato_Add = class (TzStoredProc)
     property Codice_Cig: TNullableString read fCodice_Cig write fCodice_Cig;
     //
     [TParamAttribute('SAL_RIFERIMENTO', ptInput, False)]
-    property Sal_Riferimento: TNullableInteger read fSal_Riferimento write fSal_Riferimento;
+    property Sal_Riferimento: TNullableInt64 read fSal_Riferimento write fSal_Riferimento;
     //
     [TParamAttribute('ID_DOCUMENTO_CORRELATO', ptOutput, False)]
     property Id_Documento_Correlato: TNullableInt64 read fId_Documento_Correlato;
@@ -7565,7 +7563,7 @@ end;
 TSP_coge_Inizializza_Causale_Riga = class (TzStoredProc)
   private
     fId_Causale: TNullableInt64;
-    fOrdine: TNullableInteger;
+    fOrdine: TNullableInt64;
     fSezione: TNullableString;
     fOrigine_Importo: TNullableString;
     fOrigine_Conto: TNullableString;
@@ -7577,7 +7575,7 @@ TSP_coge_Inizializza_Causale_Riga = class (TzStoredProc)
     property Id_Causale: TNullableInt64 read fId_Causale write fId_Causale;
     //
     [TParamAttribute('ORDINE', ptInput, False)]
-    property Ordine: TNullableInteger read fOrdine write fOrdine;
+    property Ordine: TNullableInt64 read fOrdine write fOrdine;
     //
     [TParamAttribute('SEZIONE', ptInput, False)]
     property Sezione: TNullableString read fSezione write fSezione;
@@ -7796,8 +7794,8 @@ TSP_coge_Interscambio_Lotto_File_Add = class (TzStoredProc)
     fId_Lotto: TNullableInt64;
     fRuolo_File: TNullableString;
     fNome_File: TNullableString;
-    fDimensione_File: TNullableInteger;
-    fNumero_Righe: TNullableInteger;
+    fDimensione_File: TNullableInt64;
+    fNumero_Righe: TNullableInt64;
     fId_Lotto_File: TNullableInt64;
   private
     property Id_Lotto_File_internal: TNullableInt64 read fId_Lotto_File write fId_Lotto_File;
@@ -7813,10 +7811,10 @@ TSP_coge_Interscambio_Lotto_File_Add = class (TzStoredProc)
     property Nome_File: TNullableString read fNome_File write fNome_File;
     //
     [TParamAttribute('DIMENSIONE_FILE', ptInput, False)]
-    property Dimensione_File: TNullableInteger read fDimensione_File write fDimensione_File;
+    property Dimensione_File: TNullableInt64 read fDimensione_File write fDimensione_File;
     //
     [TParamAttribute('NUMERO_RIGHE', ptInput, False)]
-    property Numero_Righe: TNullableInteger read fNumero_Righe write fNumero_Righe;
+    property Numero_Righe: TNullableInt64 read fNumero_Righe write fNumero_Righe;
     //
     [TParamAttribute('ID_LOTTO_FILE', ptOutput, False)]
     property Id_Lotto_File: TNullableInt64 read fId_Lotto_File;
@@ -7865,7 +7863,7 @@ TSP_coge_Interscambio_Prima_Nota_Da_Esportare = class (TzStoredProc)
     fData_A: TNullableDate;
     fAggrega_Per_Conto: TNullableBoolean;
     fId_Registrazione: TNullableInt64;
-    fNumero_Registrazione: TNullableInteger;
+    fNumero_Registrazione: TNullableInt64;
     fData_Registrazione: TNullableDate;
     fCodice_Causale: TNullableString;
     fDescrizione_Testata: TNullableString;
@@ -7874,7 +7872,7 @@ TSP_coge_Interscambio_Prima_Nota_Da_Esportare = class (TzStoredProc)
     fCodice_Soggetto: TNullableString;
     fTotale_Documento: TNullableDouble;
     fOid_Origine: TNullableInt64;
-    fNumero_Movimento: TNullableInteger;
+    fNumero_Movimento: TNullableInt64;
     fTipo_Conto: TNullableString;
     fCodice_Conto: TNullableString;
     fImporto_Dare: TNullableDouble;
@@ -7886,7 +7884,7 @@ TSP_coge_Interscambio_Prima_Nota_Da_Esportare = class (TzStoredProc)
     fCentro_Di_Costo: TNullableString;
   private
     property Id_Registrazione_internal: TNullableInt64 read fId_Registrazione write fId_Registrazione;
-    property Numero_Registrazione_internal: TNullableInteger read fNumero_Registrazione write fNumero_Registrazione;
+    property Numero_Registrazione_internal: TNullableInt64 read fNumero_Registrazione write fNumero_Registrazione;
     property Data_Registrazione_internal: TNullableDate read fData_Registrazione write fData_Registrazione;
     property Codice_Causale_internal: TNullableString read fCodice_Causale write fCodice_Causale;
     property Descrizione_Testata_internal: TNullableString read fDescrizione_Testata write fDescrizione_Testata;
@@ -7895,7 +7893,7 @@ TSP_coge_Interscambio_Prima_Nota_Da_Esportare = class (TzStoredProc)
     property Codice_Soggetto_internal: TNullableString read fCodice_Soggetto write fCodice_Soggetto;
     property Totale_Documento_internal: TNullableDouble read fTotale_Documento write fTotale_Documento;
     property Oid_Origine_internal: TNullableInt64 read fOid_Origine write fOid_Origine;
-    property Numero_Movimento_internal: TNullableInteger read fNumero_Movimento write fNumero_Movimento;
+    property Numero_Movimento_internal: TNullableInt64 read fNumero_Movimento write fNumero_Movimento;
     property Tipo_Conto_internal: TNullableString read fTipo_Conto write fTipo_Conto;
     property Codice_Conto_internal: TNullableString read fCodice_Conto write fCodice_Conto;
     property Importo_Dare_internal: TNullableDouble read fImporto_Dare write fImporto_Dare;
@@ -7926,7 +7924,7 @@ TSP_coge_Interscambio_Prima_Nota_Da_Esportare = class (TzStoredProc)
     property Id_Registrazione: TNullableInt64 read fId_Registrazione;
     //
     [TParamAttribute('NUMERO_REGISTRAZIONE', ptOutput, False)]
-    property Numero_Registrazione: TNullableInteger read fNumero_Registrazione;
+    property Numero_Registrazione: TNullableInt64 read fNumero_Registrazione;
     //
     [TParamAttribute('DATA_REGISTRAZIONE', ptOutput, False)]
     property Data_Registrazione: TNullableDate read fData_Registrazione;
@@ -7953,7 +7951,7 @@ TSP_coge_Interscambio_Prima_Nota_Da_Esportare = class (TzStoredProc)
     property Oid_Origine: TNullableInt64 read fOid_Origine;
     //
     [TParamAttribute('NUMERO_MOVIMENTO', ptOutput, False)]
-    property Numero_Movimento: TNullableInteger read fNumero_Movimento;
+    property Numero_Movimento: TNullableInt64 read fNumero_Movimento;
     //
     [TParamAttribute('TIPO_CONTO', ptOutput, False)]
     property Tipo_Conto: TNullableString read fTipo_Conto;
@@ -8000,9 +7998,9 @@ TSP_coge_Numero_Registrazione_Get = class (TzStoredProc)
   private
     fId_Ente: TNullableInt64;
     fAnno_Esercizio: TNullableString;
-    fNumero_Registrazione: TNullableInteger;
+    fNumero_Registrazione: TNullableInt64;
   private
-    property Numero_Registrazione_internal: TNullableInteger read fNumero_Registrazione write fNumero_Registrazione;
+    property Numero_Registrazione_internal: TNullableInt64 read fNumero_Registrazione write fNumero_Registrazione;
   public
     //
     [TParamAttribute('ID_ENTE', ptInput, False)]
@@ -8012,7 +8010,7 @@ TSP_coge_Numero_Registrazione_Get = class (TzStoredProc)
     property Anno_Esercizio: TNullableString read fAnno_Esercizio write fAnno_Esercizio;
     //
     [TParamAttribute('NUMERO_REGISTRAZIONE', ptOutput, False)]
-    property Numero_Registrazione: TNullableInteger read fNumero_Registrazione;
+    property Numero_Registrazione: TNullableInt64 read fNumero_Registrazione;
 end;
 
 [TStoredProcedure('COGE_PROTOCOLLO_IVA_GET')]
@@ -8021,9 +8019,9 @@ TSP_coge_Protocollo_Iva_Get = class (TzStoredProc)
   private
     fId_Registro_Iva: TNullableInt64;
     fAnno_Iva: TNullableInteger;
-    fProtocollo_Iva: TNullableInteger;
+    fProtocollo_Iva: TNullableInt64;
   private
-    property Protocollo_Iva_internal: TNullableInteger read fProtocollo_Iva write fProtocollo_Iva;
+    property Protocollo_Iva_internal: TNullableInt64 read fProtocollo_Iva write fProtocollo_Iva;
   public
     //
     [TParamAttribute('ID_REGISTRO_IVA', ptInput, False)]
@@ -8033,7 +8031,7 @@ TSP_coge_Protocollo_Iva_Get = class (TzStoredProc)
     property Anno_Iva: TNullableInteger read fAnno_Iva write fAnno_Iva;
     //
     [TParamAttribute('PROTOCOLLO_IVA', ptOutput, False)]
-    property Protocollo_Iva: TNullableInteger read fProtocollo_Iva;
+    property Protocollo_Iva: TNullableInt64 read fProtocollo_Iva;
 end;
 
 [TStoredProcedure('COGE_QUOTA_GENERA_RATE')]
@@ -8268,7 +8266,7 @@ TSP_coge_Saldo_Registrazione = class (TzStoredProc)
     fId_Ente: TNullableInt64;
     fAnno_Esercizio: TNullableString;
     fMese: TNullableInteger;
-    fVerso: TNullableInteger;
+    fVerso: TNullableInt64;
   public
     //
     [TParamAttribute('ID_REGISTRAZIONE', ptInput, False)]
@@ -8284,7 +8282,7 @@ TSP_coge_Saldo_Registrazione = class (TzStoredProc)
     property Mese: TNullableInteger read fMese write fMese;
     //
     [TParamAttribute('VERSO', ptInput, False)]
-    property Verso: TNullableInteger read fVerso write fVerso;
+    property Verso: TNullableInt64 read fVerso write fVerso;
 end;
 
 [TStoredProcedure('COGE_SCADENZA_AGGIORNA_INCASSATO')]
@@ -8378,11 +8376,11 @@ TSP_coge_Verifica_Configurazione = class (TzStoredProc)
   private
     fId_Ente: TNullableInt64;
     fVoce: TNullableString;
-    fQuanti: TNullableInteger;
+    fQuanti: TNullableInt64;
     fEsito: TNullableString;
   private
     property Voce_internal: TNullableString read fVoce write fVoce;
-    property Quanti_internal: TNullableInteger read fQuanti write fQuanti;
+    property Quanti_internal: TNullableInt64 read fQuanti write fQuanti;
     property Esito_internal: TNullableString read fEsito write fEsito;
   public
     //
@@ -8393,7 +8391,7 @@ TSP_coge_Verifica_Configurazione = class (TzStoredProc)
     property Voce: TNullableString read fVoce;
     //
     [TParamAttribute('QUANTI', ptOutput, False)]
-    property Quanti: TNullableInteger read fQuanti;
+    property Quanti: TNullableInt64 read fQuanti;
     //
     [TParamAttribute('ESITO', ptOutput, False)]
     property Esito: TNullableString read fEsito;
@@ -8641,7 +8639,7 @@ TSP_elenco_Fornitori_Con_Incarichi = class (TzStoredProc)
     fNominativo_O_Ragione_Sociale: TNullableString;
     fData_Attivazione: TNullableDate;
     fTipologia_Fornitore: TNullableString;
-    fNumero_Incarichi: TNullableInteger;
+    fNumero_Incarichi: TNullableInt64;
     fResponsabili_Progetti: TNullableString;
     fData_Valutazione_Precedente: TNullableDate;
     fCod_Valutazione_Precedente: TNullableString;
@@ -8655,7 +8653,7 @@ TSP_elenco_Fornitori_Con_Incarichi = class (TzStoredProc)
     property Nominativo_O_Ragione_Sociale_internal: TNullableString read fNominativo_O_Ragione_Sociale write fNominativo_O_Ragione_Sociale;
     property Data_Attivazione_internal: TNullableDate read fData_Attivazione write fData_Attivazione;
     property Tipologia_Fornitore_internal: TNullableString read fTipologia_Fornitore write fTipologia_Fornitore;
-    property Numero_Incarichi_internal: TNullableInteger read fNumero_Incarichi write fNumero_Incarichi;
+    property Numero_Incarichi_internal: TNullableInt64 read fNumero_Incarichi write fNumero_Incarichi;
     property Responsabili_Progetti_internal: TNullableString read fResponsabili_Progetti write fResponsabili_Progetti;
     property Data_Valutazione_Precedente_internal: TNullableDate read fData_Valutazione_Precedente write fData_Valutazione_Precedente;
     property Cod_Valutazione_Precedente_internal: TNullableString read fCod_Valutazione_Precedente write fCod_Valutazione_Precedente;
@@ -8687,7 +8685,7 @@ TSP_elenco_Fornitori_Con_Incarichi = class (TzStoredProc)
     property Tipologia_Fornitore: TNullableString read fTipologia_Fornitore;
     //
     [TParamAttribute('NUMERO_INCARICHI', ptOutput, False)]
-    property Numero_Incarichi: TNullableInteger read fNumero_Incarichi;
+    property Numero_Incarichi: TNullableInt64 read fNumero_Incarichi;
     //
     [TParamAttribute('RESPONSABILI_PROGETTI', ptOutput, False)]
     property Responsabili_Progetti: TNullableString read fResponsabili_Progetti;
@@ -9084,7 +9082,7 @@ TSP_ftp_Get_Config = class (TzStoredProc)
   private
     fFtp: TNullableString;
     fHost: TNullableString;
-    fPort: TNullableInteger;
+    fPort: TNullableInt64;
     fTls_Esplicito: TNullableBoolean;
     fPassivo: TNullableBoolean;
     fBinario: TNullableBoolean;
@@ -9093,7 +9091,7 @@ TSP_ftp_Get_Config = class (TzStoredProc)
     fFolder: TNullableString;
   private
     property Host_internal: TNullableString read fHost write fHost;
-    property Port_internal: TNullableInteger read fPort write fPort;
+    property Port_internal: TNullableInt64 read fPort write fPort;
     property Tls_Esplicito_internal: TNullableBoolean read fTls_Esplicito write fTls_Esplicito;
     property Passivo_internal: TNullableBoolean read fPassivo write fPassivo;
     property Binario_internal: TNullableBoolean read fBinario write fBinario;
@@ -9109,7 +9107,7 @@ TSP_ftp_Get_Config = class (TzStoredProc)
     property Host: TNullableString read fHost;
     //
     [TParamAttribute('PORT', ptOutput, False)]
-    property Port: TNullableInteger read fPort;
+    property Port: TNullableInt64 read fPort;
     //
     [TParamAttribute('TLS_ESPLICITO', ptOutput, False)]
     property Tls_Esplicito: TNullableBoolean read fTls_Esplicito;
@@ -10145,7 +10143,7 @@ TSP_get_Tipologie_Incarico = class (TzStoredProc)
     fEsiste_Incarico: TNullableBoolean;
     fTipo_Rilevamento_Ore: TNullableString;
     fValido: TNullableBoolean;
-    fOrdinamento: TNullableInteger;
+    fOrdinamento: TNullableInt64;
     fDisabled: TNullableBoolean;
   private
     property Tipo_Incarico_internal: TNullableString read fTipo_Incarico write fTipo_Incarico;
@@ -10155,7 +10153,7 @@ TSP_get_Tipologie_Incarico = class (TzStoredProc)
     property Esiste_Incarico_internal: TNullableBoolean read fEsiste_Incarico write fEsiste_Incarico;
     property Tipo_Rilevamento_Ore_internal: TNullableString read fTipo_Rilevamento_Ore write fTipo_Rilevamento_Ore;
     property Valido_internal: TNullableBoolean read fValido write fValido;
-    property Ordinamento_internal: TNullableInteger read fOrdinamento write fOrdinamento;
+    property Ordinamento_internal: TNullableInt64 read fOrdinamento write fOrdinamento;
     property Disabled_internal: TNullableBoolean read fDisabled write fDisabled;
   public
     //
@@ -10193,7 +10191,7 @@ TSP_get_Tipologie_Incarico = class (TzStoredProc)
     property Valido: TNullableBoolean read fValido;
     //
     [TParamAttribute('ORDINAMENTO', ptOutput, False)]
-    property Ordinamento: TNullableInteger read fOrdinamento;
+    property Ordinamento: TNullableInt64 read fOrdinamento;
     //
     [TParamAttribute('DISABLED', ptOutput, False)]
     property Disabled: TNullableBoolean read fDisabled;
@@ -11874,7 +11872,7 @@ TSP_grs_Import_Add_Presenza_Interventi_Integrativi = class (TzStoredProc)
     fData_Lezione: TNullableDate;
     fOra_Inizio: TNullableTime;
     fDurata: TNullableInteger;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
     fStato_Presenza: TNullableString;
   public
     //
@@ -11915,7 +11913,7 @@ TSP_grs_Import_Add_Presenza_Interventi_Integrativi = class (TzStoredProc)
     property Durata: TNullableInteger read fDurata write fDurata;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
     //
     [TParamAttribute('STATO_PRESENZA', ptInput, False)]
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
@@ -11939,7 +11937,7 @@ TSP_grs_Import_Add_Pres_Collettiva = class (TzStoredProc)
     fData_Lezione: TNullableDate;
     fOra_Inizio: TNullableTime;
     fDurata: TNullableInteger;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
     fStato_Presenza: TNullableString;
   public
     //
@@ -11986,7 +11984,7 @@ TSP_grs_Import_Add_Pres_Collettiva = class (TzStoredProc)
     property Durata: TNullableInteger read fDurata write fDurata;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
     //
     [TParamAttribute('STATO_PRESENZA', ptInput, False)]
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
@@ -12010,7 +12008,7 @@ TSP_grs_Import_Add_Pres_Collettiva_Old = class (TzStoredProc)
     fData_Lezione: TNullableDate;
     fOra_Inizio: TNullableTime;
     fDurata: TNullableInteger;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
     fStato_Presenza: TNullableString;
   public
     //
@@ -12057,7 +12055,7 @@ TSP_grs_Import_Add_Pres_Collettiva_Old = class (TzStoredProc)
     property Durata: TNullableInteger read fDurata write fDurata;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
     //
     [TParamAttribute('STATO_PRESENZA', ptInput, False)]
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
@@ -12080,7 +12078,7 @@ TSP_grs_Import_Add_Pres_Formazione_Interna = class (TzStoredProc)
     fData_Lezione: TNullableDate;
     fOra_Inizio: TNullableTime;
     fDurata: TNullableInteger;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
     fStato_Presenza: TNullableString;
   public
     //
@@ -12124,7 +12122,7 @@ TSP_grs_Import_Add_Pres_Formazione_Interna = class (TzStoredProc)
     property Durata: TNullableInteger read fDurata write fDurata;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
     //
     [TParamAttribute('STATO_PRESENZA', ptInput, False)]
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
@@ -12146,7 +12144,7 @@ TSP_grs_Import_Add_Pres_Sostegno = class (TzStoredProc)
     fData_Lezione: TNullableDate;
     fOra_Inizio: TNullableTime;
     fDurata: TNullableInteger;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
     fStato_Presenza: TNullableString;
   public
     //
@@ -12187,7 +12185,7 @@ TSP_grs_Import_Add_Pres_Sostegno = class (TzStoredProc)
     property Durata: TNullableInteger read fDurata write fDurata;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
     //
     [TParamAttribute('STATO_PRESENZA', ptInput, False)]
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
@@ -12533,10 +12531,10 @@ TSP_inail_Presenze_Studenti = class (TzStoredProc)
     fId_Studente: TNullableInt64;
     fNominativo_Studente: TNullableString;
     fOre_Frequenza: TNullableDouble;
-    fGiorni_Frequenza: TNullableInteger;
+    fGiorni_Frequenza: TNullableInt64;
     fVoce_Rischio_Inail: TNullableString;
     fOre_Frequenza_Stage: TNullableDouble;
-    fGiorni_Stage: TNullableInteger;
+    fGiorni_Stage: TNullableInt64;
     fVoce_Rischio_Inail_Stage: TNullableString;
   private
     property Id_Ente_internal: TNullableInt64 read fId_Ente write fId_Ente;
@@ -12550,10 +12548,10 @@ TSP_inail_Presenze_Studenti = class (TzStoredProc)
     property Id_Studente_internal: TNullableInt64 read fId_Studente write fId_Studente;
     property Nominativo_Studente_internal: TNullableString read fNominativo_Studente write fNominativo_Studente;
     property Ore_Frequenza_internal: TNullableDouble read fOre_Frequenza write fOre_Frequenza;
-    property Giorni_Frequenza_internal: TNullableInteger read fGiorni_Frequenza write fGiorni_Frequenza;
+    property Giorni_Frequenza_internal: TNullableInt64 read fGiorni_Frequenza write fGiorni_Frequenza;
     property Voce_Rischio_Inail_internal: TNullableString read fVoce_Rischio_Inail write fVoce_Rischio_Inail;
     property Ore_Frequenza_Stage_internal: TNullableDouble read fOre_Frequenza_Stage write fOre_Frequenza_Stage;
-    property Giorni_Stage_internal: TNullableInteger read fGiorni_Stage write fGiorni_Stage;
+    property Giorni_Stage_internal: TNullableInt64 read fGiorni_Stage write fGiorni_Stage;
     property Voce_Rischio_Inail_Stage_internal: TNullableString read fVoce_Rischio_Inail_Stage write fVoce_Rischio_Inail_Stage;
   public
     //
@@ -12597,7 +12595,7 @@ TSP_inail_Presenze_Studenti = class (TzStoredProc)
     property Ore_Frequenza: TNullableDouble read fOre_Frequenza;
     //
     [TParamAttribute('GIORNI_FREQUENZA', ptOutput, False)]
-    property Giorni_Frequenza: TNullableInteger read fGiorni_Frequenza;
+    property Giorni_Frequenza: TNullableInt64 read fGiorni_Frequenza;
     //
     [TParamAttribute('VOCE_RISCHIO_INAIL', ptOutput, False)]
     property Voce_Rischio_Inail: TNullableString read fVoce_Rischio_Inail;
@@ -12606,7 +12604,7 @@ TSP_inail_Presenze_Studenti = class (TzStoredProc)
     property Ore_Frequenza_Stage: TNullableDouble read fOre_Frequenza_Stage;
     //
     [TParamAttribute('GIORNI_STAGE', ptOutput, False)]
-    property Giorni_Stage: TNullableInteger read fGiorni_Stage;
+    property Giorni_Stage: TNullableInt64 read fGiorni_Stage;
     //
     [TParamAttribute('VOCE_RISCHIO_INAIL_STAGE', ptOutput, False)]
     property Voce_Rischio_Inail_Stage: TNullableString read fVoce_Rischio_Inail_Stage;
@@ -12644,7 +12642,7 @@ TSP_inail_Tirocini_Extra_Curr = class (TzStoredProc)
     fAnno: TNullableInteger;
     fMese: TNullableInteger;
     fMese_Str: TNullableString;
-    fNumero_Giorni_Stage: TNullableInteger;
+    fNumero_Giorni_Stage: TNullableInt64;
   private
     property Id_Tirocinio_internal: TNullableInt64 read fId_Tirocinio write fId_Tirocinio;
     property Id_Ente_internal: TNullableInt64 read fId_Ente write fId_Ente;
@@ -12671,7 +12669,7 @@ TSP_inail_Tirocini_Extra_Curr = class (TzStoredProc)
     property Anno_internal: TNullableInteger read fAnno write fAnno;
     property Mese_internal: TNullableInteger read fMese write fMese;
     property Mese_Str_internal: TNullableString read fMese_Str write fMese_Str;
-    property Numero_Giorni_Stage_internal: TNullableInteger read fNumero_Giorni_Stage write fNumero_Giorni_Stage;
+    property Numero_Giorni_Stage_internal: TNullableInt64 read fNumero_Giorni_Stage write fNumero_Giorni_Stage;
   public
     //
     [TParamAttribute('PARAM_ID_ENTE', ptInput, False)]
@@ -12759,7 +12757,7 @@ TSP_inail_Tirocini_Extra_Curr = class (TzStoredProc)
     property Mese_Str: TNullableString read fMese_Str;
     //
     [TParamAttribute('NUMERO_GIORNI_STAGE', ptOutput, False)]
-    property Numero_Giorni_Stage: TNullableInteger read fNumero_Giorni_Stage;
+    property Numero_Giorni_Stage: TNullableInt64 read fNumero_Giorni_Stage;
 end;
 
 [TStoredProcedure('INAIL_TIROCINI_INDENNITA_ENUM', True)]
@@ -12772,12 +12770,12 @@ TSP_inail_Tirocini_Indennita_Enum = class (TzStoredProc)
     fAnno: TNullableInteger;
     fMese: TNullableInteger;
     fMese_Str: TNullableString;
-    fNumero_Giorni_Stage: TNullableInteger;
+    fNumero_Giorni_Stage: TNullableInt64;
   private
     property Anno_internal: TNullableInteger read fAnno write fAnno;
     property Mese_internal: TNullableInteger read fMese write fMese;
     property Mese_Str_internal: TNullableString read fMese_Str write fMese_Str;
-    property Numero_Giorni_Stage_internal: TNullableInteger read fNumero_Giorni_Stage write fNumero_Giorni_Stage;
+    property Numero_Giorni_Stage_internal: TNullableInt64 read fNumero_Giorni_Stage write fNumero_Giorni_Stage;
   public
     //
     [TParamAttribute('ID_TIROCINIO', ptInput, False)]
@@ -12799,7 +12797,7 @@ TSP_inail_Tirocini_Indennita_Enum = class (TzStoredProc)
     property Mese_Str: TNullableString read fMese_Str;
     //
     [TParamAttribute('NUMERO_GIORNI_STAGE', ptOutput, False)]
-    property Numero_Giorni_Stage: TNullableInteger read fNumero_Giorni_Stage;
+    property Numero_Giorni_Stage: TNullableInt64 read fNumero_Giorni_Stage;
 end;
 
 [TStoredProcedure('INAIL_TIROCINI_PRESENZE_ENUM', True)]
@@ -12812,12 +12810,12 @@ TSP_inail_Tirocini_Presenze_Enum = class (TzStoredProc)
     fAnno: TNullableInteger;
     fMese: TNullableInteger;
     fMese_Str: TNullableString;
-    fNumero_Giorni_Stage: TNullableInteger;
+    fNumero_Giorni_Stage: TNullableInt64;
   private
     property Anno_internal: TNullableInteger read fAnno write fAnno;
     property Mese_internal: TNullableInteger read fMese write fMese;
     property Mese_Str_internal: TNullableString read fMese_Str write fMese_Str;
-    property Numero_Giorni_Stage_internal: TNullableInteger read fNumero_Giorni_Stage write fNumero_Giorni_Stage;
+    property Numero_Giorni_Stage_internal: TNullableInt64 read fNumero_Giorni_Stage write fNumero_Giorni_Stage;
   public
     //
     [TParamAttribute('ID_TIROCINIO', ptInput, False)]
@@ -12839,7 +12837,7 @@ TSP_inail_Tirocini_Presenze_Enum = class (TzStoredProc)
     property Mese_Str: TNullableString read fMese_Str;
     //
     [TParamAttribute('NUMERO_GIORNI_STAGE', ptOutput, False)]
-    property Numero_Giorni_Stage: TNullableInteger read fNumero_Giorni_Stage;
+    property Numero_Giorni_Stage: TNullableInt64 read fNumero_Giorni_Stage;
 end;
 
 [TStoredProcedure('INCARICHI_CORSI_RIEPILOGO_ORE', True)]
@@ -13583,6 +13581,26 @@ TSP_incarichi_Integrazioni_Add = class (TzStoredProc)
     property Note: TNullableString read fNote write fNote;
 end;
 
+[TStoredProcedure('INCARICHI_MOTIVAZIONE_GET')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarichi_Motivazione_Get = class (TzStoredProc)
+  private
+    fVisibile: TNullableBoolean;
+    fTesto_Default: TStringList;
+  private
+    property Visibile_internal: TNullableBoolean read fVisibile write fVisibile;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('VISIBILE', ptOutput, False)]
+    property Visibile: TNullableBoolean read fVisibile;
+    //
+    [TParamAttribute('TESTO_DEFAULT', ptOutput, True)]
+    property Testo_Default: TStringList read fTesto_Default;
+end;
+
 [TStoredProcedure('INCARICHI_PIANI_PERSONALIZZATI_ADD')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_incarichi_Piani_Personalizzati_Add = class (TzStoredProc)
@@ -13819,7 +13837,16 @@ TSP_incarichi_Sync_Ore_Rilevate_Old = class (TzStoredProc)
     property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
 end;
 
-// Mantis #183 - 2026-10-06: era la procedura INCARICO_ANNULLA_AUTORIZZAZIONE
+[TStoredProcedure('INCARICO_ACCETTA_ORE_RESIDUE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Accetta_Ore_Residue = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
 
 [TStoredProcedure('INCARICO_ANNULLA_ATTIVAZIONE')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
@@ -13831,8 +13858,6 @@ TSP_incarico_Annulla_Attivazione = class (TzStoredProc)
     [TParamAttribute('ID_INCARICO', ptInput, False)]
     property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
 end;
-
-// Mantis #183 - 2026-10-06: era la procedura INCARICO_AUTORIZZA
 
 [TStoredProcedure('INCARICO_ATTIVA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
@@ -13861,6 +13886,28 @@ TSP_incarico_Attiva = class (TzStoredProc)
     property Parametro_Ricavo_Specifico: TNullableDouble read fParametro_Ricavo_Specifico write fParametro_Ricavo_Specifico;
 end;
 
+[TStoredProcedure('INCARICO_AUTORIZZAZIONE_DIREZIONE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Autorizzazione_Direzione = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
+[TStoredProcedure('INCARICO_AUTORIZZAZIONE_FINANZIARIA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Autorizzazione_Finanziaria = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
 [TStoredProcedure('INCARICO_DETAIL', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_incarico_Detail = class (TzStoredProc)
@@ -13869,7 +13916,7 @@ TSP_incarico_Detail = class (TzStoredProc)
     fDal_Giorno: TNullableDate;
     fAl_Giorno: TNullableDate;
     fTotale_Ore_Attribuite: TNullableDouble;
-    fTotale_Minuti_Rilevate: TNullableInteger;
+    fTotale_Minuti_Rilevate: TNullableInt64;
     fTotale_Ore_Rilevate: TNullableDouble;
     fTotale_Ore_Sostituzione: TNullableDouble;
     fTotale_Ore_Non_Svolte: TNullableDouble;
@@ -13884,7 +13931,7 @@ TSP_incarico_Detail = class (TzStoredProc)
     fPercentuale_Completamento: TNullableDouble;
   private
     property Totale_Ore_Attribuite_internal: TNullableDouble read fTotale_Ore_Attribuite write fTotale_Ore_Attribuite;
-    property Totale_Minuti_Rilevate_internal: TNullableInteger read fTotale_Minuti_Rilevate write fTotale_Minuti_Rilevate;
+    property Totale_Minuti_Rilevate_internal: TNullableInt64 read fTotale_Minuti_Rilevate write fTotale_Minuti_Rilevate;
     property Totale_Ore_Rilevate_internal: TNullableDouble read fTotale_Ore_Rilevate write fTotale_Ore_Rilevate;
     property Totale_Ore_Sostituzione_internal: TNullableDouble read fTotale_Ore_Sostituzione write fTotale_Ore_Sostituzione;
     property Totale_Ore_Non_Svolte_internal: TNullableDouble read fTotale_Ore_Non_Svolte write fTotale_Ore_Non_Svolte;
@@ -13912,7 +13959,7 @@ TSP_incarico_Detail = class (TzStoredProc)
     property Totale_Ore_Attribuite: TNullableDouble read fTotale_Ore_Attribuite;
     //
     [TParamAttribute('TOTALE_MINUTI_RILEVATE', ptOutput, False)]
-    property Totale_Minuti_Rilevate: TNullableInteger read fTotale_Minuti_Rilevate;
+    property Totale_Minuti_Rilevate: TNullableInt64 read fTotale_Minuti_Rilevate;
     //
     [TParamAttribute('TOTALE_ORE_RILEVATE', ptOutput, False)]
     property Totale_Ore_Rilevate: TNullableDouble read fTotale_Ore_Rilevate;
@@ -14139,18 +14186,6 @@ TSP_incarico_Genera_Supplenza = class (TzStoredProc)
     property Id_Incarico_Supplenza: TNullableInt64 read fId_Incarico_Supplenza;
 end;
 
-// Mantis #183 - 2026-10-02: era la procedura INCARICO_SET_CONGRUO
-[TStoredProcedure('INCARICO_ACCETTA_ORE_RESIDUE')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarico_Accetta_Ore_Residue = class (TzStoredProc)
-  private
-    fId_Incarico: TNullableInt64;
-  public
-    //
-    [TParamAttribute('ID_INCARICO', ptInput, False)]
-    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
-end;
-
 [TStoredProcedure('INCARICO_SET_ESTENSORE')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_incarico_Set_Estensore = class (TzStoredProc)
@@ -14179,51 +14214,6 @@ TSP_incarico_Verifica = class (TzStoredProc)
     //
     [TParamAttribute('VERIFICA_CORSI', ptInput, False)]
     property Verifica_Corsi: TNullableBoolean read fVerifica_Corsi write fVerifica_Corsi;
-end;
-
-// Mantis #183 - 2026-10-02: era la procedura INCARICO_VERIFICATO
-[TStoredProcedure('INCARICO_AUTORIZZAZIONE_DIREZIONE')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarico_Autorizzazione_Direzione = class (TzStoredProc)
-  private
-    fId_Incarico: TNullableInt64;
-  public
-    //
-    [TParamAttribute('ID_INCARICO', ptInput, False)]
-    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
-end;
-
-// Mantis #183 - 2026-10-02: wrapper scritto a mano nello stile del generatore
-[TStoredProcedure('INCARICO_AUTORIZZAZIONE_FINANZIARIA')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarico_Autorizzazione_Finanziaria = class (TzStoredProc)
-  private
-    fId_Incarico: TNullableInt64;
-  public
-    //
-    [TParamAttribute('ID_INCARICO', ptInput, False)]
-    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
-end;
-
-// Mantis #183 - 2026-10-01: wrapper scritto a mano nello stile del generatore
-[TStoredProcedure('INCARICHI_MOTIVAZIONE_GET')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarichi_Motivazione_Get = class (TzStoredProc)
-  private
-    fVisibile: TNullableBoolean;
-    fTesto_Default: TStringList;
-  private
-    property Visibile_internal: TNullableBoolean read fVisibile write fVisibile;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-  public
-    //
-    [TParamAttribute('VISIBILE', ptOutput, False)]
-    property Visibile: TNullableBoolean read fVisibile;
-    //
-    [TParamAttribute('TESTO_DEFAULT', ptOutput, True)]
-    property Testo_Default: TStringList read fTesto_Default;
 end;
 
 [TStoredProcedure('INTERVENTI_INTEGRATIVI_GET_PROGETTO', True)]
@@ -14572,7 +14562,7 @@ end;
 TSP_mantis_Segnalazioni_Add = class (TzStoredProc)
   private
     fUser_Id: TNullableInt64;
-    fId_Ticket: TNullableInteger;
+    fId_Ticket: TNullableInt64;
     fOggetto: TNullableString;
   public
     //
@@ -14580,7 +14570,7 @@ TSP_mantis_Segnalazioni_Add = class (TzStoredProc)
     property User_Id: TNullableInt64 read fUser_Id write fUser_Id;
     //
     [TParamAttribute('ID_TICKET', ptInput, False)]
-    property Id_Ticket: TNullableInteger read fId_Ticket write fId_Ticket;
+    property Id_Ticket: TNullableInt64 read fId_Ticket write fId_Ticket;
     //
     [TParamAttribute('OGGETTO', ptInput, False)]
     property Oggetto: TNullableString read fOggetto write fOggetto;
@@ -14590,14 +14580,14 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_mantis_Segnalazioni_Aggiorna = class (TzStoredProc)
   private
-    fId_Ticket: TNullableInteger;
+    fId_Ticket: TNullableInt64;
     fStato: TNullableString;
     fAssegnato_A: TNullableString;
     fAggiornato_Il: TNullableDateTime;
   public
     //
     [TParamAttribute('ID_TICKET', ptInput, False)]
-    property Id_Ticket: TNullableInteger read fId_Ticket write fId_Ticket;
+    property Id_Ticket: TNullableInt64 read fId_Ticket write fId_Ticket;
     //
     [TParamAttribute('STATO', ptInput, False)]
     property Stato: TNullableString read fStato write fStato;
@@ -14613,11 +14603,11 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_mantis_Segnalazioni_Visto = class (TzStoredProc)
   private
-    fId_Ticket: TNullableInteger;
+    fId_Ticket: TNullableInt64;
   public
     //
     [TParamAttribute('ID_TICKET', ptInput, False)]
-    property Id_Ticket: TNullableInteger read fId_Ticket write fId_Ticket;
+    property Id_Ticket: TNullableInt64 read fId_Ticket write fId_Ticket;
 end;
 
 [TStoredProcedure('NOTIFICHE_ADD')]
@@ -14713,13 +14703,13 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_notifiche_Numero_Notifiche_Da_Leggere = class (TzStoredProc)
   private
-    fNumero_Notifiche_Da_Leggere: TNullableInteger;
+    fNumero_Notifiche_Da_Leggere: TNullableInt64;
   private
-    property Numero_Notifiche_Da_Leggere_internal: TNullableInteger read fNumero_Notifiche_Da_Leggere write fNumero_Notifiche_Da_Leggere;
+    property Numero_Notifiche_Da_Leggere_internal: TNullableInt64 read fNumero_Notifiche_Da_Leggere write fNumero_Notifiche_Da_Leggere;
   public
     //
     [TParamAttribute('NUMERO_NOTIFICHE_DA_LEGGERE', ptOutput, False)]
-    property Numero_Notifiche_Da_Leggere: TNullableInteger read fNumero_Notifiche_Da_Leggere;
+    property Numero_Notifiche_Da_Leggere: TNullableInt64 read fNumero_Notifiche_Da_Leggere;
 end;
 
 [TStoredProcedure('NOTIFICHE_SEGNA_TUTTE_COME_LETTA')]
@@ -14904,7 +14894,7 @@ TSP_obj_Files_Add = class (TzStoredProc)
     fFile_Type: TNullableString;
     fNome_File_Originale: TNullableString;
     fTesto: TStringList;
-    fFile_Size: TNullableInteger;
+    fFile_Size: TNullableInt64;
     fSha256: TNullableString;
     fStato: TNullableString;
     fOid_Ref_1: TNullableInt64;
@@ -14948,7 +14938,7 @@ TSP_obj_Files_Add = class (TzStoredProc)
     property Testo: TStringList read fTesto write SetTesto;
     //
     [TParamAttribute('FILE_SIZE', ptInput, False)]
-    property File_Size: TNullableInteger read fFile_Size write fFile_Size;
+    property File_Size: TNullableInt64 read fFile_Size write fFile_Size;
     //
     [TParamAttribute('SHA256', ptInput, False)]
     property Sha256: TNullableString read fSha256 write fSha256;
@@ -15317,7 +15307,7 @@ end;
 TSP_obj_Files_Conservazione_Log_Response_Add = class (TzStoredProc)
   private
     fId_Conservazione_Log_Request: TNullableInt64;
-    fHttp_Status: TNullableInteger;
+    fHttp_Status: TNullableInt64;
     fRisposta: TStringList;
     fErrore: TStringList;
   private
@@ -15332,7 +15322,7 @@ TSP_obj_Files_Conservazione_Log_Response_Add = class (TzStoredProc)
     property Id_Conservazione_Log_Request: TNullableInt64 read fId_Conservazione_Log_Request write fId_Conservazione_Log_Request;
     //
     [TParamAttribute('HTTP_STATUS', ptInput, False)]
-    property Http_Status: TNullableInteger read fHttp_Status write fHttp_Status;
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
     //
     [TParamAttribute('RISPOSTA', ptInput, True)]
     property Risposta: TStringList read fRisposta write SetRisposta;
@@ -15515,8 +15505,8 @@ TSP_obj_Files_Conservazione_Pacchetto_Generato = class (TzStoredProc)
   private
     fId_Conservazione_Pacchetto: TNullableInt64;
     fId_Object_File_Pacchetto: TNullableInt64;
-    fNumero_Documenti: TNullableInteger;
-    fNumero_Pagine: TNullableInteger;
+    fNumero_Documenti: TNullableInt64;
+    fNumero_Pagine: TNullableInt64;
   public
     //
     [TParamAttribute('ID_CONSERVAZIONE_PACCHETTO', ptInput, False)]
@@ -15526,10 +15516,10 @@ TSP_obj_Files_Conservazione_Pacchetto_Generato = class (TzStoredProc)
     property Id_Object_File_Pacchetto: TNullableInt64 read fId_Object_File_Pacchetto write fId_Object_File_Pacchetto;
     //
     [TParamAttribute('NUMERO_DOCUMENTI', ptInput, False)]
-    property Numero_Documenti: TNullableInteger read fNumero_Documenti write fNumero_Documenti;
+    property Numero_Documenti: TNullableInt64 read fNumero_Documenti write fNumero_Documenti;
     //
     [TParamAttribute('NUMERO_PAGINE', ptInput, False)]
-    property Numero_Pagine: TNullableInteger read fNumero_Pagine write fNumero_Pagine;
+    property Numero_Pagine: TNullableInt64 read fNumero_Pagine write fNumero_Pagine;
 end;
 
 [TStoredProcedure('OBJ_FILES_CONSERVAZIONE_PACCHETTO_GET')]
@@ -15543,8 +15533,8 @@ TSP_obj_Files_Conservazione_Pacchetto_Get = class (TzStoredProc)
     fStato: TNullableString;
     fStato_Esterno: TNullableString;
     fCod_Classe_Documentale: TNullableString;
-    fNumero_Documenti: TNullableInteger;
-    fNumero_Pagine: TNullableInteger;
+    fNumero_Documenti: TNullableInt64;
+    fNumero_Pagine: TNullableInt64;
     fId_Object_File_Pacchetto: TNullableInt64;
     fId_Object_File_Rapporto: TNullableInt64;
     fId_Pacchetto_Esterno: TNullableString;
@@ -15556,8 +15546,8 @@ TSP_obj_Files_Conservazione_Pacchetto_Get = class (TzStoredProc)
     property Stato_internal: TNullableString read fStato write fStato;
     property Stato_Esterno_internal: TNullableString read fStato_Esterno write fStato_Esterno;
     property Cod_Classe_Documentale_internal: TNullableString read fCod_Classe_Documentale write fCod_Classe_Documentale;
-    property Numero_Documenti_internal: TNullableInteger read fNumero_Documenti write fNumero_Documenti;
-    property Numero_Pagine_internal: TNullableInteger read fNumero_Pagine write fNumero_Pagine;
+    property Numero_Documenti_internal: TNullableInt64 read fNumero_Documenti write fNumero_Documenti;
+    property Numero_Pagine_internal: TNullableInt64 read fNumero_Pagine write fNumero_Pagine;
     property Id_Object_File_Pacchetto_internal: TNullableInt64 read fId_Object_File_Pacchetto write fId_Object_File_Pacchetto;
     property Id_Object_File_Rapporto_internal: TNullableInt64 read fId_Object_File_Rapporto write fId_Object_File_Rapporto;
     property Id_Pacchetto_Esterno_internal: TNullableString read fId_Pacchetto_Esterno write fId_Pacchetto_Esterno;
@@ -15588,10 +15578,10 @@ TSP_obj_Files_Conservazione_Pacchetto_Get = class (TzStoredProc)
     property Cod_Classe_Documentale: TNullableString read fCod_Classe_Documentale;
     //
     [TParamAttribute('NUMERO_DOCUMENTI', ptOutput, False)]
-    property Numero_Documenti: TNullableInteger read fNumero_Documenti;
+    property Numero_Documenti: TNullableInt64 read fNumero_Documenti;
     //
     [TParamAttribute('NUMERO_PAGINE', ptOutput, False)]
-    property Numero_Pagine: TNullableInteger read fNumero_Pagine;
+    property Numero_Pagine: TNullableInt64 read fNumero_Pagine;
     //
     [TParamAttribute('ID_OBJECT_FILE_PACCHETTO', ptOutput, False)]
     property Id_Object_File_Pacchetto: TNullableInt64 read fId_Object_File_Pacchetto;
@@ -15902,7 +15892,7 @@ end;
 TSP_obj_Files_Firma_Contratti_Firmatari = class (TzStoredProc)
   private
     fId_Firma_Registrazione: TNullableInt64;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
     fRuolo: TNullableString;
     fPlaceholder: TNullableString;
     fCognome: TNullableString;
@@ -15911,7 +15901,7 @@ TSP_obj_Files_Firma_Contratti_Firmatari = class (TzStoredProc)
     fTelefono: TNullableString;
     fIdentificativo_Esterno: TNullableString;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
     property Ruolo_internal: TNullableString read fRuolo write fRuolo;
     property Placeholder_internal: TNullableString read fPlaceholder write fPlaceholder;
     property Cognome_internal: TNullableString read fCognome write fCognome;
@@ -15925,7 +15915,7 @@ TSP_obj_Files_Firma_Contratti_Firmatari = class (TzStoredProc)
     property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
     //
     [TParamAttribute('RUOLO', ptOutput, False)]
     property Ruolo: TNullableString read fRuolo;
@@ -15954,7 +15944,7 @@ end;
 TSP_obj_Files_Firma_Firmatari = class (TzStoredProc)
   private
     fId_Firma_Registrazione: TNullableInt64;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
     fRuolo: TNullableString;
     fCognome: TNullableString;
     fNome: TNullableString;
@@ -15962,7 +15952,7 @@ TSP_obj_Files_Firma_Firmatari = class (TzStoredProc)
     fTelefono: TNullableString;
     fIdentificativo_Esterno: TNullableString;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
     property Ruolo_internal: TNullableString read fRuolo write fRuolo;
     property Cognome_internal: TNullableString read fCognome write fCognome;
     property Nome_internal: TNullableString read fNome write fNome;
@@ -15975,7 +15965,7 @@ TSP_obj_Files_Firma_Firmatari = class (TzStoredProc)
     property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
     //
     [TParamAttribute('RUOLO', ptOutput, False)]
     property Ruolo: TNullableString read fRuolo;
@@ -16006,9 +15996,9 @@ TSP_obj_Files_Firma_Firmatario_Add = class (TzStoredProc)
     fNome: TNullableString;
     fEmail: TNullableString;
     fTelefono: TNullableString;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
   public
     //
     [TParamAttribute('ID_FIRMA_REGISTRAZIONE', ptInput, False)]
@@ -16030,7 +16020,7 @@ TSP_obj_Files_Firma_Firmatario_Add = class (TzStoredProc)
     property Telefono: TNullableString read fTelefono write fTelefono;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
 end;
 
 [TStoredProcedure('OBJ_FILES_FIRMA_FIRMATARIO_ESTERNO')]
@@ -16038,7 +16028,7 @@ end;
 TSP_obj_Files_Firma_Firmatario_Esterno = class (TzStoredProc)
   private
     fId_Firma_Registrazione: TNullableInt64;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
     fIdentificativo_Esterno: TNullableString;
   public
     //
@@ -16046,7 +16036,7 @@ TSP_obj_Files_Firma_Firmatario_Esterno = class (TzStoredProc)
     property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
     //
     [TParamAttribute('RIGA', ptInput, False)]
-    property Riga: TNullableInteger read fRiga write fRiga;
+    property Riga: TNullableInt64 read fRiga write fRiga;
     //
     [TParamAttribute('IDENTIFICATIVO_ESTERNO', ptInput, False)]
     property Identificativo_Esterno: TNullableString read fIdentificativo_Esterno write fIdentificativo_Esterno;
@@ -16188,12 +16178,54 @@ TSP_obj_Files_Firma_Log_Request_Add = class (TzStoredProc)
     property Id_Firma_Log_Request: TNullableInt64 read fId_Firma_Log_Request;
 end;
 
+[TStoredProcedure('OBJ_FILES_FIRMA_LOG_REQUEST_ADD_AUTONOMA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Log_Request_Add_Autonoma = class (TzStoredProc)
+  private
+    fId_Firma_Registrazione: TNullableInt64;
+    fId_Tenant: TNullableInt64;
+    fFornitore: TNullableString;
+    fOperazione: TNullableString;
+    fEndpoint: TNullableString;
+    fRichiesta: TStringList;
+    fId_Firma_Log_Request: TNullableInt64;
+  private
+    property Id_Firma_Log_Request_internal: TNullableInt64 read fId_Firma_Log_Request write fId_Firma_Log_Request;
+  private
+    procedure SetRichiesta(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('ID_FIRMA_REGISTRAZIONE', ptInput, False)]
+    property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
+    //
+    [TParamAttribute('ID_TENANT', ptInput, False)]
+    property Id_Tenant: TNullableInt64 read fId_Tenant write fId_Tenant;
+    //
+    [TParamAttribute('FORNITORE', ptInput, False)]
+    property Fornitore: TNullableString read fFornitore write fFornitore;
+    //
+    [TParamAttribute('OPERAZIONE', ptInput, False)]
+    property Operazione: TNullableString read fOperazione write fOperazione;
+    //
+    [TParamAttribute('ENDPOINT', ptInput, False)]
+    property Endpoint: TNullableString read fEndpoint write fEndpoint;
+    //
+    [TParamAttribute('RICHIESTA', ptInput, True)]
+    property Richiesta: TStringList read fRichiesta write SetRichiesta;
+    //
+    [TParamAttribute('ID_FIRMA_LOG_REQUEST', ptOutput, False)]
+    property Id_Firma_Log_Request: TNullableInt64 read fId_Firma_Log_Request;
+end;
+
 [TStoredProcedure('OBJ_FILES_FIRMA_LOG_RESPONSE_ADD')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_obj_Files_Firma_Log_Response_Add = class (TzStoredProc)
   private
     fId_Firma_Log_Request: TNullableInt64;
-    fHttp_Status: TNullableInteger;
+    fHttp_Status: TNullableInt64;
     fRisposta: TStringList;
     fErrore: TStringList;
     fId_Firma_Log_Response: TNullableInt64;
@@ -16211,7 +16243,42 @@ TSP_obj_Files_Firma_Log_Response_Add = class (TzStoredProc)
     property Id_Firma_Log_Request: TNullableInt64 read fId_Firma_Log_Request write fId_Firma_Log_Request;
     //
     [TParamAttribute('HTTP_STATUS', ptInput, False)]
-    property Http_Status: TNullableInteger read fHttp_Status write fHttp_Status;
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
+    //
+    [TParamAttribute('RISPOSTA', ptInput, True)]
+    property Risposta: TStringList read fRisposta write SetRisposta;
+    //
+    [TParamAttribute('ERRORE', ptInput, True)]
+    property Errore: TStringList read fErrore write SetErrore;
+    //
+    [TParamAttribute('ID_FIRMA_LOG_RESPONSE', ptOutput, False)]
+    property Id_Firma_Log_Response: TNullableInt64 read fId_Firma_Log_Response;
+end;
+
+[TStoredProcedure('OBJ_FILES_FIRMA_LOG_RESPONSE_ADD_AUTONOMA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Log_Response_Add_Autonoma = class (TzStoredProc)
+  private
+    fId_Firma_Log_Request: TNullableInt64;
+    fHttp_Status: TNullableInt64;
+    fRisposta: TStringList;
+    fErrore: TStringList;
+    fId_Firma_Log_Response: TNullableInt64;
+  private
+    property Id_Firma_Log_Response_internal: TNullableInt64 read fId_Firma_Log_Response write fId_Firma_Log_Response;
+  private
+    procedure SetRisposta(const Value: TStringList);
+    procedure SetErrore(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('ID_FIRMA_LOG_REQUEST', ptInput, False)]
+    property Id_Firma_Log_Request: TNullableInt64 read fId_Firma_Log_Request write fId_Firma_Log_Request;
+    //
+    [TParamAttribute('HTTP_STATUS', ptInput, False)]
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
     //
     [TParamAttribute('RISPOSTA', ptInput, True)]
     property Risposta: TStringList read fRisposta write SetRisposta;
@@ -16346,7 +16413,7 @@ TSP_obj_Files_Firma_Registrazione_Get = class (TzStoredProc)
     fId_Documento_Esterno: TNullableString;
     fId_Firma_Credenziale: TNullableInt64;
     fMessaggio: TStringList;
-    fTentativi: TNullableInteger;
+    fTentativi: TNullableInt64;
   private
     property Id_Tenant_internal: TNullableInt64 read fId_Tenant write fId_Tenant;
     property Fornitore_internal: TNullableString read fFornitore write fFornitore;
@@ -16358,7 +16425,7 @@ TSP_obj_Files_Firma_Registrazione_Get = class (TzStoredProc)
     property Id_Object_File_Audit_internal: TNullableInt64 read fId_Object_File_Audit write fId_Object_File_Audit;
     property Id_Documento_Esterno_internal: TNullableString read fId_Documento_Esterno write fId_Documento_Esterno;
     property Id_Firma_Credenziale_internal: TNullableInt64 read fId_Firma_Credenziale write fId_Firma_Credenziale;
-    property Tentativi_internal: TNullableInteger read fTentativi write fTentativi;
+    property Tentativi_internal: TNullableInt64 read fTentativi write fTentativi;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -16401,7 +16468,7 @@ TSP_obj_Files_Firma_Registrazione_Get = class (TzStoredProc)
     property Messaggio: TStringList read fMessaggio;
     //
     [TParamAttribute('TENTATIVI', ptOutput, False)]
-    property Tentativi: TNullableInteger read fTentativi;
+    property Tentativi: TNullableInt64 read fTentativi;
 end;
 
 [TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_GET_BY_OBJ_FILE')]
@@ -16537,6 +16604,17 @@ TSP_obj_Files_Firma_Registrazione_Stato_Esterno = class (TzStoredProc)
     //
     [TParamAttribute('STATO_ESTERNO', ptInput, False)]
     property Stato_Esterno: TNullableString read fStato_Esterno write fStato_Esterno;
+end;
+
+[TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONI_ELIMINA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Registrazioni_Elimina = class (TzStoredProc)
+  private
+    fOid: TNullableInt64;
+  public
+    //
+    [TParamAttribute('OID', ptInput, False)]
+    property Oid: TNullableInt64 read fOid write fOid;
 end;
 
 [TStoredProcedure('OBJ_FILES_GENERAZIONE_ADD')]
@@ -16781,9 +16859,9 @@ TSP_obj_Files_Mail_E_Messaggi_Destinatario_Add = class (TzStoredProc)
     fId_Messaggio: TNullableInt64;
     fIndirizzo: TNullableString;
     fTipo: TNullableString;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
   public
     //
     [TParamAttribute('ID_MESSAGGIO', ptInput, False)]
@@ -16796,7 +16874,7 @@ TSP_obj_Files_Mail_E_Messaggi_Destinatario_Add = class (TzStoredProc)
     property Tipo: TNullableString read fTipo write fTipo;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
 end;
 
 [TStoredProcedure('OBJ_FILES_MAIL_E_MESSAGGI_DESTINATARI_GET', True)]
@@ -16804,13 +16882,13 @@ end;
 TSP_obj_Files_Mail_E_Messaggi_Destinatari_Get = class (TzStoredProc)
   private
     fId_Messaggio: TNullableInt64;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
     fIndirizzo: TNullableString;
     fTipo: TNullableString;
     fConsegnato: TNullableBoolean;
     fData_Ora_Consegna: TNullableDateTime;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
     property Indirizzo_internal: TNullableString read fIndirizzo write fIndirizzo;
     property Tipo_internal: TNullableString read fTipo write fTipo;
     property Consegnato_internal: TNullableBoolean read fConsegnato write fConsegnato;
@@ -16821,7 +16899,7 @@ TSP_obj_Files_Mail_E_Messaggi_Destinatari_Get = class (TzStoredProc)
     property Id_Messaggio: TNullableInt64 read fId_Messaggio write fId_Messaggio;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
     //
     [TParamAttribute('INDIRIZZO', ptOutput, False)]
     property Indirizzo: TNullableString read fIndirizzo;
@@ -16917,7 +16995,7 @@ TSP_obj_Files_Mail_E_Messaggi_Get = class (TzStoredProc)
     fIndirizzo_Mittente: TNullableString;
     fMessage_Id: TNullableString;
     fData_Ora_Invio: TNullableDateTime;
-    fTentativi: TNullableInteger;
+    fTentativi: TNullableInt64;
     fMessaggio_Errore: TStringList;
   private
     property Id_Tenant_internal: TNullableInt64 read fId_Tenant write fId_Tenant;
@@ -16929,7 +17007,7 @@ TSP_obj_Files_Mail_E_Messaggi_Get = class (TzStoredProc)
     property Indirizzo_Mittente_internal: TNullableString read fIndirizzo_Mittente write fIndirizzo_Mittente;
     property Message_Id_internal: TNullableString read fMessage_Id write fMessage_Id;
     property Data_Ora_Invio_internal: TNullableDateTime read fData_Ora_Invio write fData_Ora_Invio;
-    property Tentativi_internal: TNullableInteger read fTentativi write fTentativi;
+    property Tentativi_internal: TNullableInt64 read fTentativi write fTentativi;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -16969,7 +17047,7 @@ TSP_obj_Files_Mail_E_Messaggi_Get = class (TzStoredProc)
     property Data_Ora_Invio: TNullableDateTime read fData_Ora_Invio;
     //
     [TParamAttribute('TENTATIVI', ptOutput, False)]
-    property Tentativi: TNullableInteger read fTentativi;
+    property Tentativi: TNullableInt64 read fTentativi;
     //
     [TParamAttribute('MESSAGGIO_ERRORE', ptOutput, True)]
     property Messaggio_Errore: TStringList read fMessaggio_Errore;
@@ -17089,7 +17167,7 @@ end;
 TSP_obj_Files_Mail_E_Messaggi_Log_Response_Add = class (TzStoredProc)
   private
     fId_Log_Request: TNullableInt64;
-    fHttp_Status: TNullableInteger;
+    fHttp_Status: TNullableInt64;
     fRisposta: TStringList;
     fErrore: TStringList;
     fId_Log_Response: TNullableInt64;
@@ -17107,7 +17185,7 @@ TSP_obj_Files_Mail_E_Messaggi_Log_Response_Add = class (TzStoredProc)
     property Id_Log_Request: TNullableInt64 read fId_Log_Request write fId_Log_Request;
     //
     [TParamAttribute('HTTP_STATUS', ptInput, False)]
-    property Http_Status: TNullableInteger read fHttp_Status write fHttp_Status;
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
     //
     [TParamAttribute('RISPOSTA', ptInput, True)]
     property Risposta: TStringList read fRisposta write SetRisposta;
@@ -17459,14 +17537,14 @@ TSP_obj_Files_Protocollo_Get_By_Obj_File = class (TzStoredProc)
     fId_Protocollo_Registrazione: TNullableInt64;
     fStato: TNullableString;
     fAnno_Protocollo: TNullableInteger;
-    fNumero_Protocollo: TNullableInteger;
+    fNumero_Protocollo: TNullableInt64;
     fData_Protocollo: TNullableDate;
     fRegistro: TNullableString;
   private
     property Id_Protocollo_Registrazione_internal: TNullableInt64 read fId_Protocollo_Registrazione write fId_Protocollo_Registrazione;
     property Stato_internal: TNullableString read fStato write fStato;
     property Anno_Protocollo_internal: TNullableInteger read fAnno_Protocollo write fAnno_Protocollo;
-    property Numero_Protocollo_internal: TNullableInteger read fNumero_Protocollo write fNumero_Protocollo;
+    property Numero_Protocollo_internal: TNullableInt64 read fNumero_Protocollo write fNumero_Protocollo;
     property Data_Protocollo_internal: TNullableDate read fData_Protocollo write fData_Protocollo;
     property Registro_internal: TNullableString read fRegistro write fRegistro;
   public
@@ -17484,7 +17562,7 @@ TSP_obj_Files_Protocollo_Get_By_Obj_File = class (TzStoredProc)
     property Anno_Protocollo: TNullableInteger read fAnno_Protocollo;
     //
     [TParamAttribute('NUMERO_PROTOCOLLO', ptOutput, False)]
-    property Numero_Protocollo: TNullableInteger read fNumero_Protocollo;
+    property Numero_Protocollo: TNullableInt64 read fNumero_Protocollo;
     //
     [TParamAttribute('DATA_PROTOCOLLO', ptOutput, False)]
     property Data_Protocollo: TNullableDate read fData_Protocollo;
@@ -17540,7 +17618,7 @@ end;
 TSP_obj_Files_Protocollo_Log_Response_Add = class (TzStoredProc)
   private
     fId_Protocollo_Log_Request: TNullableInt64;
-    fHttp_Status: TNullableInteger;
+    fHttp_Status: TNullableInt64;
     fRisposta: TStringList;
     fErrore: TStringList;
   private
@@ -17555,7 +17633,7 @@ TSP_obj_Files_Protocollo_Log_Response_Add = class (TzStoredProc)
     property Id_Protocollo_Log_Request: TNullableInt64 read fId_Protocollo_Log_Request write fId_Protocollo_Log_Request;
     //
     [TParamAttribute('HTTP_STATUS', ptInput, False)]
-    property Http_Status: TNullableInteger read fHttp_Status write fHttp_Status;
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
     //
     [TParamAttribute('RISPOSTA', ptInput, True)]
     property Risposta: TStringList read fRisposta write SetRisposta;
@@ -17664,7 +17742,7 @@ TSP_obj_Files_Protocollo_Registrazione_Get = class (TzStoredProc)
     fStato_Esterno: TNullableString;
     fOid: TNullableInt64;
     fAnno_Protocollo: TNullableInteger;
-    fNumero_Protocollo: TNullableInteger;
+    fNumero_Protocollo: TNullableInt64;
     fData_Protocollo: TNullableDate;
     fRegistro: TNullableString;
     fId_Documento_Esterno: TNullableString;
@@ -17679,7 +17757,7 @@ TSP_obj_Files_Protocollo_Registrazione_Get = class (TzStoredProc)
     property Stato_Esterno_internal: TNullableString read fStato_Esterno write fStato_Esterno;
     property Oid_internal: TNullableInt64 read fOid write fOid;
     property Anno_Protocollo_internal: TNullableInteger read fAnno_Protocollo write fAnno_Protocollo;
-    property Numero_Protocollo_internal: TNullableInteger read fNumero_Protocollo write fNumero_Protocollo;
+    property Numero_Protocollo_internal: TNullableInt64 read fNumero_Protocollo write fNumero_Protocollo;
     property Data_Protocollo_internal: TNullableDate read fData_Protocollo write fData_Protocollo;
     property Registro_internal: TNullableString read fRegistro write fRegistro;
     property Id_Documento_Esterno_internal: TNullableString read fId_Documento_Esterno write fId_Documento_Esterno;
@@ -17715,7 +17793,7 @@ TSP_obj_Files_Protocollo_Registrazione_Get = class (TzStoredProc)
     property Anno_Protocollo: TNullableInteger read fAnno_Protocollo;
     //
     [TParamAttribute('NUMERO_PROTOCOLLO', ptOutput, False)]
-    property Numero_Protocollo: TNullableInteger read fNumero_Protocollo;
+    property Numero_Protocollo: TNullableInt64 read fNumero_Protocollo;
     //
     [TParamAttribute('DATA_PROTOCOLLO', ptOutput, False)]
     property Data_Protocollo: TNullableDate read fData_Protocollo;
@@ -17761,7 +17839,7 @@ TSP_obj_Files_Protocollo_Registrazione_Protocollata = class (TzStoredProc)
   private
     fId_Protocollo_Registrazione: TNullableInt64;
     fAnno_Protocollo: TNullableInteger;
-    fNumero_Protocollo: TNullableInteger;
+    fNumero_Protocollo: TNullableInt64;
     fData_Protocollo: TNullableDate;
     fRegistro: TNullableString;
     fId_Documento_Esterno: TNullableString;
@@ -17775,7 +17853,7 @@ TSP_obj_Files_Protocollo_Registrazione_Protocollata = class (TzStoredProc)
     property Anno_Protocollo: TNullableInteger read fAnno_Protocollo write fAnno_Protocollo;
     //
     [TParamAttribute('NUMERO_PROTOCOLLO', ptInput, False)]
-    property Numero_Protocollo: TNullableInteger read fNumero_Protocollo write fNumero_Protocollo;
+    property Numero_Protocollo: TNullableInt64 read fNumero_Protocollo write fNumero_Protocollo;
     //
     [TParamAttribute('DATA_PROTOCOLLO', ptInput, False)]
     property Data_Protocollo: TNullableDate read fData_Protocollo write fData_Protocollo;
@@ -17795,14 +17873,14 @@ end;
 TSP_obj_Files_Protocollo_Soggetti_Get = class (TzStoredProc)
   private
     fId_Protocollo_Registrazione: TNullableInt64;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
     fTipo: TNullableString;
     fNominativo: TNullableString;
     fCodice_Fiscale: TNullableString;
     fPartita_Iva: TNullableString;
     fChiave_Alternativa: TNullableString;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
     property Tipo_internal: TNullableString read fTipo write fTipo;
     property Nominativo_internal: TNullableString read fNominativo write fNominativo;
     property Codice_Fiscale_internal: TNullableString read fCodice_Fiscale write fCodice_Fiscale;
@@ -17814,7 +17892,7 @@ TSP_obj_Files_Protocollo_Soggetti_Get = class (TzStoredProc)
     property Id_Protocollo_Registrazione: TNullableInt64 read fId_Protocollo_Registrazione write fId_Protocollo_Registrazione;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
     //
     [TParamAttribute('TIPO', ptOutput, False)]
     property Tipo: TNullableString read fTipo;
@@ -17842,9 +17920,9 @@ TSP_obj_Files_Protocollo_Soggetto_Add = class (TzStoredProc)
     fCodice_Fiscale: TNullableString;
     fPartita_Iva: TNullableString;
     fChiave_Alternativa: TNullableString;
-    fRiga: TNullableInteger;
+    fRiga: TNullableInt64;
   private
-    property Riga_internal: TNullableInteger read fRiga write fRiga;
+    property Riga_internal: TNullableInt64 read fRiga write fRiga;
   public
     //
     [TParamAttribute('ID_PROTOCOLLO_REGISTRAZIONE', ptInput, False)]
@@ -17866,7 +17944,7 @@ TSP_obj_Files_Protocollo_Soggetto_Add = class (TzStoredProc)
     property Chiave_Alternativa: TNullableString read fChiave_Alternativa write fChiave_Alternativa;
     //
     [TParamAttribute('RIGA', ptOutput, False)]
-    property Riga: TNullableInteger read fRiga;
+    property Riga: TNullableInt64 read fRiga;
 end;
 
 [TStoredProcedure('OBJ_FILES_REFS_ADD')]
@@ -17892,7 +17970,7 @@ TSP_obj_Files_Versione_Add = class (TzStoredProc)
     fTipo_Versione: TNullableString;
     fNome_File_Originale: TNullableString;
     fFile_Suffix: TNullableString;
-    fFile_Size: TNullableInteger;
+    fFile_Size: TNullableInt64;
     fId_Object_File: TNullableInt64;
     fFile_Name: TNullableString;
     fFull_File_Name: TNullableString;
@@ -17915,7 +17993,7 @@ TSP_obj_Files_Versione_Add = class (TzStoredProc)
     property File_Suffix: TNullableString read fFile_Suffix write fFile_Suffix;
     //
     [TParamAttribute('FILE_SIZE', ptInput, False)]
-    property File_Size: TNullableInteger read fFile_Size write fFile_Size;
+    property File_Size: TNullableInt64 read fFile_Size write fFile_Size;
     //
     [TParamAttribute('ID_OBJECT_FILE', ptOutput, False)]
     property Id_Object_File: TNullableInt64 read fId_Object_File;
@@ -17934,13 +18012,13 @@ TSP_obj_Files_Versione_Corrente = class (TzStoredProc)
     fId_Object_File: TNullableInt64;
     fId_Object_File_Versione: TNullableInt64;
     fTipo_Versione: TNullableString;
-    fVersione: TNullableInteger;
+    fVersione: TNullableInt64;
     fFile_Name: TNullableString;
     fFull_File_Name: TNullableString;
   private
     property Id_Object_File_Versione_internal: TNullableInt64 read fId_Object_File_Versione write fId_Object_File_Versione;
     property Tipo_Versione_internal: TNullableString read fTipo_Versione write fTipo_Versione;
-    property Versione_internal: TNullableInteger read fVersione write fVersione;
+    property Versione_internal: TNullableInt64 read fVersione write fVersione;
     property File_Name_internal: TNullableString read fFile_Name write fFile_Name;
     property Full_File_Name_internal: TNullableString read fFull_File_Name write fFull_File_Name;
   public
@@ -17955,7 +18033,7 @@ TSP_obj_Files_Versione_Corrente = class (TzStoredProc)
     property Tipo_Versione: TNullableString read fTipo_Versione;
     //
     [TParamAttribute('VERSIONE', ptOutput, False)]
-    property Versione: TNullableInteger read fVersione;
+    property Versione: TNullableInt64 read fVersione;
     //
     [TParamAttribute('FILE_NAME', ptOutput, False)]
     property File_Name: TNullableString read fFile_Name;
@@ -17971,12 +18049,12 @@ TSP_obj_Files_Versione_Get = class (TzStoredProc)
     fId_Object_File: TNullableInt64;
     fTipo_Versione: TNullableString;
     fId_Object_File_Versione: TNullableInt64;
-    fVersione: TNullableInteger;
+    fVersione: TNullableInt64;
     fFile_Name: TNullableString;
     fFull_File_Name: TNullableString;
   private
     property Id_Object_File_Versione_internal: TNullableInt64 read fId_Object_File_Versione write fId_Object_File_Versione;
-    property Versione_internal: TNullableInteger read fVersione write fVersione;
+    property Versione_internal: TNullableInt64 read fVersione write fVersione;
     property File_Name_internal: TNullableString read fFile_Name write fFile_Name;
     property Full_File_Name_internal: TNullableString read fFull_File_Name write fFull_File_Name;
   public
@@ -17991,7 +18069,7 @@ TSP_obj_Files_Versione_Get = class (TzStoredProc)
     property Id_Object_File_Versione: TNullableInt64 read fId_Object_File_Versione;
     //
     [TParamAttribute('VERSIONE', ptOutput, False)]
-    property Versione: TNullableInteger read fVersione;
+    property Versione: TNullableInt64 read fVersione;
     //
     [TParamAttribute('FILE_NAME', ptOutput, False)]
     property File_Name: TNullableString read fFile_Name;
@@ -18007,12 +18085,12 @@ TSP_obj_Files_Versione_Get_By_Oid = class (TzStoredProc)
     fOid: TNullableInt64;
     fTipo_Versione: TNullableString;
     fId_Object_File_Versione: TNullableInt64;
-    fVersione: TNullableInteger;
+    fVersione: TNullableInt64;
     fFile_Name: TNullableString;
     fFull_File_Name: TNullableString;
   private
     property Id_Object_File_Versione_internal: TNullableInt64 read fId_Object_File_Versione write fId_Object_File_Versione;
-    property Versione_internal: TNullableInteger read fVersione write fVersione;
+    property Versione_internal: TNullableInt64 read fVersione write fVersione;
     property File_Name_internal: TNullableString read fFile_Name write fFile_Name;
     property Full_File_Name_internal: TNullableString read fFull_File_Name write fFull_File_Name;
   public
@@ -18027,7 +18105,7 @@ TSP_obj_Files_Versione_Get_By_Oid = class (TzStoredProc)
     property Id_Object_File_Versione: TNullableInt64 read fId_Object_File_Versione;
     //
     [TParamAttribute('VERSIONE', ptOutput, False)]
-    property Versione: TNullableInteger read fVersione;
+    property Versione: TNullableInt64 read fVersione;
     //
     [TParamAttribute('FILE_NAME', ptOutput, False)]
     property File_Name: TNullableString read fFile_Name;
@@ -18044,25 +18122,25 @@ TSP_obj_Files_Versioni = class (TzStoredProc)
     fId_Object_File_Versione: TNullableInt64;
     fId_Object_File_Padre: TNullableInt64;
     fTipo_Versione: TNullableString;
-    fVersione: TNullableInteger;
+    fVersione: TNullableInt64;
     fAnnullato: TNullableBoolean;
     fEliminato: TNullableBoolean;
     fData_Inserimento: TNullableDate;
     fNome_File_Originale: TNullableString;
     fFile_Name: TNullableString;
-    fFile_Size: TNullableInteger;
+    fFile_Size: TNullableInt64;
     fStato: TNullableString;
   private
     property Id_Object_File_Versione_internal: TNullableInt64 read fId_Object_File_Versione write fId_Object_File_Versione;
     property Id_Object_File_Padre_internal: TNullableInt64 read fId_Object_File_Padre write fId_Object_File_Padre;
     property Tipo_Versione_internal: TNullableString read fTipo_Versione write fTipo_Versione;
-    property Versione_internal: TNullableInteger read fVersione write fVersione;
+    property Versione_internal: TNullableInt64 read fVersione write fVersione;
     property Annullato_internal: TNullableBoolean read fAnnullato write fAnnullato;
     property Eliminato_internal: TNullableBoolean read fEliminato write fEliminato;
     property Data_Inserimento_internal: TNullableDate read fData_Inserimento write fData_Inserimento;
     property Nome_File_Originale_internal: TNullableString read fNome_File_Originale write fNome_File_Originale;
     property File_Name_internal: TNullableString read fFile_Name write fFile_Name;
-    property File_Size_internal: TNullableInteger read fFile_Size write fFile_Size;
+    property File_Size_internal: TNullableInt64 read fFile_Size write fFile_Size;
     property Stato_internal: TNullableString read fStato write fStato;
   public
     //
@@ -18079,7 +18157,7 @@ TSP_obj_Files_Versioni = class (TzStoredProc)
     property Tipo_Versione: TNullableString read fTipo_Versione;
     //
     [TParamAttribute('VERSIONE', ptOutput, False)]
-    property Versione: TNullableInteger read fVersione;
+    property Versione: TNullableInt64 read fVersione;
     //
     [TParamAttribute('ANNULLATO', ptOutput, False)]
     property Annullato: TNullableBoolean read fAnnullato;
@@ -18097,7 +18175,7 @@ TSP_obj_Files_Versioni = class (TzStoredProc)
     property File_Name: TNullableString read fFile_Name;
     //
     [TParamAttribute('FILE_SIZE', ptOutput, False)]
-    property File_Size: TNullableInteger read fFile_Size;
+    property File_Size: TNullableInt64 read fFile_Size;
     //
     [TParamAttribute('STATO', ptOutput, False)]
     property Stato: TNullableString read fStato;
@@ -18376,10 +18454,10 @@ TSP_obj_Firme_Elettroniche_Get = class (TzStoredProc)
     fAdd_Document_Timestamp: TNullableBoolean;
     fShare_With_Team: TNullableBoolean;
     fReminder: TNullableBoolean;
-    fFirst_Reminder_In_Days: TNullableInteger;
-    fReminder_Resend_Interval_In_Days: TNullableInteger;
-    fBefore_Expiration_In_Days: TNullableInteger;
-    fExpiration_In_Seconds_After_Sending: TNullableInteger;
+    fFirst_Reminder_In_Days: TNullableInt64;
+    fReminder_Resend_Interval_In_Days: TNullableInt64;
+    fBefore_Expiration_In_Days: TNullableInt64;
+    fExpiration_In_Seconds_After_Sending: TNullableInt64;
     fEmail_Configuration_Subject: TNullableString;
     fEmail_Configuration_Message: TNullableString;
     fEnvelope_Name: TNullableString;
@@ -18407,10 +18485,10 @@ TSP_obj_Firme_Elettroniche_Get = class (TzStoredProc)
     property Add_Document_Timestamp_internal: TNullableBoolean read fAdd_Document_Timestamp write fAdd_Document_Timestamp;
     property Share_With_Team_internal: TNullableBoolean read fShare_With_Team write fShare_With_Team;
     property Reminder_internal: TNullableBoolean read fReminder write fReminder;
-    property First_Reminder_In_Days_internal: TNullableInteger read fFirst_Reminder_In_Days write fFirst_Reminder_In_Days;
-    property Reminder_Resend_Interval_In_Days_internal: TNullableInteger read fReminder_Resend_Interval_In_Days write fReminder_Resend_Interval_In_Days;
-    property Before_Expiration_In_Days_internal: TNullableInteger read fBefore_Expiration_In_Days write fBefore_Expiration_In_Days;
-    property Expiration_In_Seconds_After_Sending_internal: TNullableInteger read fExpiration_In_Seconds_After_Sending write fExpiration_In_Seconds_After_Sending;
+    property First_Reminder_In_Days_internal: TNullableInt64 read fFirst_Reminder_In_Days write fFirst_Reminder_In_Days;
+    property Reminder_Resend_Interval_In_Days_internal: TNullableInt64 read fReminder_Resend_Interval_In_Days write fReminder_Resend_Interval_In_Days;
+    property Before_Expiration_In_Days_internal: TNullableInt64 read fBefore_Expiration_In_Days write fBefore_Expiration_In_Days;
+    property Expiration_In_Seconds_After_Sending_internal: TNullableInt64 read fExpiration_In_Seconds_After_Sending write fExpiration_In_Seconds_After_Sending;
     property Email_Configuration_Subject_internal: TNullableString read fEmail_Configuration_Subject write fEmail_Configuration_Subject;
     property Email_Configuration_Message_internal: TNullableString read fEmail_Configuration_Message write fEmail_Configuration_Message;
     property Envelope_Name_internal: TNullableString read fEnvelope_Name write fEnvelope_Name;
@@ -18451,16 +18529,16 @@ TSP_obj_Firme_Elettroniche_Get = class (TzStoredProc)
     property Reminder: TNullableBoolean read fReminder;
     //
     [TParamAttribute('FIRST_REMINDER_IN_DAYS', ptOutput, False)]
-    property First_Reminder_In_Days: TNullableInteger read fFirst_Reminder_In_Days;
+    property First_Reminder_In_Days: TNullableInt64 read fFirst_Reminder_In_Days;
     //
     [TParamAttribute('REMINDER_RESEND_INTERVAL_IN_DAYS', ptOutput, False)]
-    property Reminder_Resend_Interval_In_Days: TNullableInteger read fReminder_Resend_Interval_In_Days;
+    property Reminder_Resend_Interval_In_Days: TNullableInt64 read fReminder_Resend_Interval_In_Days;
     //
     [TParamAttribute('BEFORE_EXPIRATION_IN_DAYS', ptOutput, False)]
-    property Before_Expiration_In_Days: TNullableInteger read fBefore_Expiration_In_Days;
+    property Before_Expiration_In_Days: TNullableInt64 read fBefore_Expiration_In_Days;
     //
     [TParamAttribute('EXPIRATION_IN_SECONDS_AFTER_SENDING', ptOutput, False)]
-    property Expiration_In_Seconds_After_Sending: TNullableInteger read fExpiration_In_Seconds_After_Sending;
+    property Expiration_In_Seconds_After_Sending: TNullableInt64 read fExpiration_In_Seconds_After_Sending;
     //
     [TParamAttribute('EMAIL_CONFIGURATION_SUBJECT', ptOutput, False)]
     property Email_Configuration_Subject: TNullableString read fEmail_Configuration_Subject;
@@ -19624,17 +19702,17 @@ end;
 TSP_orario_Dati_Untis_Da_Transcodif = class (TzStoredProc)
   private
     fTabella: TNullableString;
-    fElementi: TNullableInteger;
+    fElementi: TNullableInt64;
   private
     property Tabella_internal: TNullableString read fTabella write fTabella;
-    property Elementi_internal: TNullableInteger read fElementi write fElementi;
+    property Elementi_internal: TNullableInt64 read fElementi write fElementi;
   public
     //
     [TParamAttribute('TABELLA', ptOutput, False)]
     property Tabella: TNullableString read fTabella;
     //
     [TParamAttribute('ELEMENTI', ptOutput, False)]
-    property Elementi: TNullableInteger read fElementi;
+    property Elementi: TNullableInt64 read fElementi;
 end;
 
 [TStoredProcedure('ORARIO_ELABORA_FASCE_ORARIE')]
@@ -19929,12 +20007,12 @@ TSP_orario_Imp_Files_Untis_Anomalie = class (TzStoredProc)
     fAnomalia: TNullableString;
     fCodice_Untis: TNullableString;
     fAnno_Formativo: TNullableString;
-    fRighe: TNullableInteger;
+    fRighe: TNullableInt64;
   private
     property Anomalia_internal: TNullableString read fAnomalia write fAnomalia;
     property Codice_Untis_internal: TNullableString read fCodice_Untis write fCodice_Untis;
     property Anno_Formativo_internal: TNullableString read fAnno_Formativo write fAnno_Formativo;
-    property Righe_internal: TNullableInteger read fRighe write fRighe;
+    property Righe_internal: TNullableInt64 read fRighe write fRighe;
   public
     //
     [TParamAttribute('ID_ORARIO_IMPORT_FILE_UNTIS', ptInput, False)]
@@ -19950,7 +20028,7 @@ TSP_orario_Imp_Files_Untis_Anomalie = class (TzStoredProc)
     property Anno_Formativo: TNullableString read fAnno_Formativo;
     //
     [TParamAttribute('RIGHE', ptOutput, False)]
-    property Righe: TNullableInteger read fRighe;
+    property Righe: TNullableInt64 read fRighe;
 end;
 
 [TStoredProcedure('ORARIO_IMP_FILES_UNTIS_ELABORA')]
@@ -20083,6 +20161,8 @@ TSP_ore_Rilevate_Genera_Rilevamento = class (TzStoredProc)
     fMateria: TNullableString;
     fContenuti: TNullableString;
     fRaise_Errors: TNullableBoolean;
+    fId_Piano_Personalizzato: TNullableInt64;
+    fServizio_Erogato: TNullableString;
     fId_Rilevamento_Ore: TNullableInt64;
   private
     property Id_Rilevamento_Ore_internal: TNullableInt64 read fId_Rilevamento_Ore write fId_Rilevamento_Ore;
@@ -20117,6 +20197,12 @@ TSP_ore_Rilevate_Genera_Rilevamento = class (TzStoredProc)
     //
     [TParamAttribute('RAISE_ERRORS', ptInput, False)]
     property Raise_Errors: TNullableBoolean read fRaise_Errors write fRaise_Errors;
+    //
+    [TParamAttribute('ID_PIANO_PERSONALIZZATO', ptInput, False)]
+    property Id_Piano_Personalizzato: TNullableInt64 read fId_Piano_Personalizzato write fId_Piano_Personalizzato;
+    //
+    [TParamAttribute('SERVIZIO_EROGATO', ptInput, False)]
+    property Servizio_Erogato: TNullableString read fServizio_Erogato write fServizio_Erogato;
     //
     [TParamAttribute('ID_RILEVAMENTO_ORE', ptOutput, False)]
     property Id_Rilevamento_Ore: TNullableInt64 read fId_Rilevamento_Ore;
@@ -20295,7 +20381,7 @@ TSP_orientamento_Comunicazioni_Destinatari = class (TzStoredProc)
     fDenominazione_Progetto: TNullableString;
     fAnno_Formativo: TNullableString;
     fConsenso_Promozionale: TNullableBoolean;
-    fScadenze_Non_Rispettate: TNullableInteger;
+    fScadenze_Non_Rispettate: TNullableInt64;
     fSpedibile: TNullableBoolean;
     fMotivo_Esclusione: TNullableString;
   private
@@ -20309,7 +20395,7 @@ TSP_orientamento_Comunicazioni_Destinatari = class (TzStoredProc)
     property Denominazione_Progetto_internal: TNullableString read fDenominazione_Progetto write fDenominazione_Progetto;
     property Anno_Formativo_internal: TNullableString read fAnno_Formativo write fAnno_Formativo;
     property Consenso_Promozionale_internal: TNullableBoolean read fConsenso_Promozionale write fConsenso_Promozionale;
-    property Scadenze_Non_Rispettate_internal: TNullableInteger read fScadenze_Non_Rispettate write fScadenze_Non_Rispettate;
+    property Scadenze_Non_Rispettate_internal: TNullableInt64 read fScadenze_Non_Rispettate write fScadenze_Non_Rispettate;
     property Spedibile_internal: TNullableBoolean read fSpedibile write fSpedibile;
     property Motivo_Esclusione_internal: TNullableString read fMotivo_Esclusione write fMotivo_Esclusione;
   public
@@ -20366,7 +20452,7 @@ TSP_orientamento_Comunicazioni_Destinatari = class (TzStoredProc)
     property Consenso_Promozionale: TNullableBoolean read fConsenso_Promozionale;
     //
     [TParamAttribute('SCADENZE_NON_RISPETTATE', ptOutput, False)]
-    property Scadenze_Non_Rispettate: TNullableInteger read fScadenze_Non_Rispettate;
+    property Scadenze_Non_Rispettate: TNullableInt64 read fScadenze_Non_Rispettate;
     //
     [TParamAttribute('SPEDIBILE', ptOutput, False)]
     property Spedibile: TNullableBoolean read fSpedibile;
@@ -20875,11 +20961,11 @@ TSP_personale_Ore_Per_Tipologia = class (TzStoredProc)
   private
     fId_Risorsa: TNullableInt64;
     fTipologia_Incarico: TNullableString;
-    fNumero_Incarichi: TNullableInteger;
+    fNumero_Incarichi: TNullableInt64;
     fTotale_Ore_Attribuite: TNullableDouble;
   private
     property Tipologia_Incarico_internal: TNullableString read fTipologia_Incarico write fTipologia_Incarico;
-    property Numero_Incarichi_internal: TNullableInteger read fNumero_Incarichi write fNumero_Incarichi;
+    property Numero_Incarichi_internal: TNullableInt64 read fNumero_Incarichi write fNumero_Incarichi;
     property Totale_Ore_Attribuite_internal: TNullableDouble read fTotale_Ore_Attribuite write fTotale_Ore_Attribuite;
   public
     //
@@ -20890,7 +20976,7 @@ TSP_personale_Ore_Per_Tipologia = class (TzStoredProc)
     property Tipologia_Incarico: TNullableString read fTipologia_Incarico;
     //
     [TParamAttribute('NUMERO_INCARICHI', ptOutput, False)]
-    property Numero_Incarichi: TNullableInteger read fNumero_Incarichi;
+    property Numero_Incarichi: TNullableInt64 read fNumero_Incarichi;
     //
     [TParamAttribute('TOTALE_ORE_ATTRIBUITE', ptOutput, False)]
     property Totale_Ore_Attribuite: TNullableDouble read fTotale_Ore_Attribuite;
@@ -22087,9 +22173,9 @@ TSP_questionari_Analisi_Result_Get = class (TzStoredProc)
     fRisposta: TNullableString;
     fId_Docente: TNullableInt64;
     fNominativo_O_Ragione_Sociale: TNullableString;
-    fRisposte_Attese: TNullableInteger;
-    fRisposte_Ricevute: TNullableInteger;
-    fValore_Totale: TNullableInteger;
+    fRisposte_Attese: TNullableInt64;
+    fRisposte_Ricevute: TNullableInt64;
+    fValore_Totale: TNullableInt64;
     fValore_Medio: TNullableDouble;
   private
     property Id_Questionario_internal: TNullableInt64 read fId_Questionario write fId_Questionario;
@@ -22118,9 +22204,9 @@ TSP_questionari_Analisi_Result_Get = class (TzStoredProc)
     property Risposta_internal: TNullableString read fRisposta write fRisposta;
     property Id_Docente_internal: TNullableInt64 read fId_Docente write fId_Docente;
     property Nominativo_O_Ragione_Sociale_internal: TNullableString read fNominativo_O_Ragione_Sociale write fNominativo_O_Ragione_Sociale;
-    property Risposte_Attese_internal: TNullableInteger read fRisposte_Attese write fRisposte_Attese;
-    property Risposte_Ricevute_internal: TNullableInteger read fRisposte_Ricevute write fRisposte_Ricevute;
-    property Valore_Totale_internal: TNullableInteger read fValore_Totale write fValore_Totale;
+    property Risposte_Attese_internal: TNullableInt64 read fRisposte_Attese write fRisposte_Attese;
+    property Risposte_Ricevute_internal: TNullableInt64 read fRisposte_Ricevute write fRisposte_Ricevute;
+    property Valore_Totale_internal: TNullableInt64 read fValore_Totale write fValore_Totale;
     property Valore_Medio_internal: TNullableDouble read fValore_Medio write fValore_Medio;
   public
     //
@@ -22233,13 +22319,13 @@ TSP_questionari_Analisi_Result_Get = class (TzStoredProc)
     property Nominativo_O_Ragione_Sociale: TNullableString read fNominativo_O_Ragione_Sociale;
     //
     [TParamAttribute('RISPOSTE_ATTESE', ptOutput, False)]
-    property Risposte_Attese: TNullableInteger read fRisposte_Attese;
+    property Risposte_Attese: TNullableInt64 read fRisposte_Attese;
     //
     [TParamAttribute('RISPOSTE_RICEVUTE', ptOutput, False)]
-    property Risposte_Ricevute: TNullableInteger read fRisposte_Ricevute;
+    property Risposte_Ricevute: TNullableInt64 read fRisposte_Ricevute;
     //
     [TParamAttribute('VALORE_TOTALE', ptOutput, False)]
-    property Valore_Totale: TNullableInteger read fValore_Totale;
+    property Valore_Totale: TNullableInt64 read fValore_Totale;
     //
     [TParamAttribute('VALORE_MEDIO', ptOutput, False)]
     property Valore_Medio: TNullableDouble read fValore_Medio;
@@ -22273,9 +22359,9 @@ TSP_questionari_Analizza_Docenti = class (TzStoredProc)
     fId_Docente: TNullableInt64;
     fNominativo_O_Ragione_Sociale: TNullableString;
     fVoce: TNullableString;
-    fRisposte_Attese: TNullableInteger;
-    fRisposta_Ricevute: TNullableInteger;
-    fValore_Totale: TNullableInteger;
+    fRisposte_Attese: TNullableInt64;
+    fRisposta_Ricevute: TNullableInt64;
+    fValore_Totale: TNullableInt64;
     fValore_Medio: TNullableDouble;
   private
     property Id_Questionario_internal: TNullableInt64 read fId_Questionario write fId_Questionario;
@@ -22292,9 +22378,9 @@ TSP_questionari_Analizza_Docenti = class (TzStoredProc)
     property Id_Docente_internal: TNullableInt64 read fId_Docente write fId_Docente;
     property Nominativo_O_Ragione_Sociale_internal: TNullableString read fNominativo_O_Ragione_Sociale write fNominativo_O_Ragione_Sociale;
     property Voce_internal: TNullableString read fVoce write fVoce;
-    property Risposte_Attese_internal: TNullableInteger read fRisposte_Attese write fRisposte_Attese;
-    property Risposta_Ricevute_internal: TNullableInteger read fRisposta_Ricevute write fRisposta_Ricevute;
-    property Valore_Totale_internal: TNullableInteger read fValore_Totale write fValore_Totale;
+    property Risposte_Attese_internal: TNullableInt64 read fRisposte_Attese write fRisposte_Attese;
+    property Risposta_Ricevute_internal: TNullableInt64 read fRisposta_Ricevute write fRisposta_Ricevute;
+    property Valore_Totale_internal: TNullableInt64 read fValore_Totale write fValore_Totale;
     property Valore_Medio_internal: TNullableDouble read fValore_Medio write fValore_Medio;
   public
     //
@@ -22371,13 +22457,13 @@ TSP_questionari_Analizza_Docenti = class (TzStoredProc)
     property Voce: TNullableString read fVoce;
     //
     [TParamAttribute('RISPOSTE_ATTESE', ptOutput, False)]
-    property Risposte_Attese: TNullableInteger read fRisposte_Attese;
+    property Risposte_Attese: TNullableInt64 read fRisposte_Attese;
     //
     [TParamAttribute('RISPOSTA_RICEVUTE', ptOutput, False)]
-    property Risposta_Ricevute: TNullableInteger read fRisposta_Ricevute;
+    property Risposta_Ricevute: TNullableInt64 read fRisposta_Ricevute;
     //
     [TParamAttribute('VALORE_TOTALE', ptOutput, False)]
-    property Valore_Totale: TNullableInteger read fValore_Totale;
+    property Valore_Totale: TNullableInt64 read fValore_Totale;
     //
     [TParamAttribute('VALORE_MEDIO', ptOutput, False)]
     property Valore_Medio: TNullableDouble read fValore_Medio;
@@ -22411,8 +22497,8 @@ TSP_questionari_Analizza_Risposte = class (TzStoredProc)
     fIdentificativo_Corso: TNullableString;
     fSettore_Corso: TNullableString;
     fRisposta: TNullableString;
-    fRisposte_Attese: TNullableInteger;
-    fRisposta_Ricevute: TNullableInteger;
+    fRisposte_Attese: TNullableInt64;
+    fRisposta_Ricevute: TNullableInt64;
     fPercentuale_Risposte: TNullableDouble;
   private
     property Id_Questionario_internal: TNullableInt64 read fId_Questionario write fId_Questionario;
@@ -22430,8 +22516,8 @@ TSP_questionari_Analizza_Risposte = class (TzStoredProc)
     property Identificativo_Corso_internal: TNullableString read fIdentificativo_Corso write fIdentificativo_Corso;
     property Settore_Corso_internal: TNullableString read fSettore_Corso write fSettore_Corso;
     property Risposta_internal: TNullableString read fRisposta write fRisposta;
-    property Risposte_Attese_internal: TNullableInteger read fRisposte_Attese write fRisposte_Attese;
-    property Risposta_Ricevute_internal: TNullableInteger read fRisposta_Ricevute write fRisposta_Ricevute;
+    property Risposte_Attese_internal: TNullableInt64 read fRisposte_Attese write fRisposte_Attese;
+    property Risposta_Ricevute_internal: TNullableInt64 read fRisposta_Ricevute write fRisposta_Ricevute;
     property Percentuale_Risposte_internal: TNullableDouble read fPercentuale_Risposte write fPercentuale_Risposte;
   public
     //
@@ -22508,10 +22594,10 @@ TSP_questionari_Analizza_Risposte = class (TzStoredProc)
     property Risposta: TNullableString read fRisposta;
     //
     [TParamAttribute('RISPOSTE_ATTESE', ptOutput, False)]
-    property Risposte_Attese: TNullableInteger read fRisposte_Attese;
+    property Risposte_Attese: TNullableInt64 read fRisposte_Attese;
     //
     [TParamAttribute('RISPOSTA_RICEVUTE', ptOutput, False)]
-    property Risposta_Ricevute: TNullableInteger read fRisposta_Ricevute;
+    property Risposta_Ricevute: TNullableInt64 read fRisposta_Ricevute;
     //
     [TParamAttribute('PERCENTUALE_RISPOSTE', ptOutput, False)]
     property Percentuale_Risposte: TNullableDouble read fPercentuale_Risposte;
@@ -22661,10 +22747,10 @@ TSP_questionari_Analizza_Valori = class (TzStoredProc)
     fSettore_Corso: TNullableString;
     fTitolo_Sezione: TNullableString;
     fVoce: TNullableString;
-    fRisposte_Attese: TNullableInteger;
-    fRisposta_Ricevute: TNullableInteger;
+    fRisposte_Attese: TNullableInt64;
+    fRisposta_Ricevute: TNullableInt64;
     fPercentuale_Risposte: TNullableDouble;
-    fValore_Totale: TNullableInteger;
+    fValore_Totale: TNullableInt64;
     fValore_Medio: TNullableDouble;
   private
     property Id_Questionario_internal: TNullableInt64 read fId_Questionario write fId_Questionario;
@@ -22680,10 +22766,10 @@ TSP_questionari_Analizza_Valori = class (TzStoredProc)
     property Settore_Corso_internal: TNullableString read fSettore_Corso write fSettore_Corso;
     property Titolo_Sezione_internal: TNullableString read fTitolo_Sezione write fTitolo_Sezione;
     property Voce_internal: TNullableString read fVoce write fVoce;
-    property Risposte_Attese_internal: TNullableInteger read fRisposte_Attese write fRisposte_Attese;
-    property Risposta_Ricevute_internal: TNullableInteger read fRisposta_Ricevute write fRisposta_Ricevute;
+    property Risposte_Attese_internal: TNullableInt64 read fRisposte_Attese write fRisposte_Attese;
+    property Risposta_Ricevute_internal: TNullableInt64 read fRisposta_Ricevute write fRisposta_Ricevute;
     property Percentuale_Risposte_internal: TNullableDouble read fPercentuale_Risposte write fPercentuale_Risposte;
-    property Valore_Totale_internal: TNullableInteger read fValore_Totale write fValore_Totale;
+    property Valore_Totale_internal: TNullableInt64 read fValore_Totale write fValore_Totale;
     property Valore_Medio_internal: TNullableDouble read fValore_Medio write fValore_Medio;
   public
     //
@@ -22754,16 +22840,16 @@ TSP_questionari_Analizza_Valori = class (TzStoredProc)
     property Voce: TNullableString read fVoce;
     //
     [TParamAttribute('RISPOSTE_ATTESE', ptOutput, False)]
-    property Risposte_Attese: TNullableInteger read fRisposte_Attese;
+    property Risposte_Attese: TNullableInt64 read fRisposte_Attese;
     //
     [TParamAttribute('RISPOSTA_RICEVUTE', ptOutput, False)]
-    property Risposta_Ricevute: TNullableInteger read fRisposta_Ricevute;
+    property Risposta_Ricevute: TNullableInt64 read fRisposta_Ricevute;
     //
     [TParamAttribute('PERCENTUALE_RISPOSTE', ptOutput, False)]
     property Percentuale_Risposte: TNullableDouble read fPercentuale_Risposte;
     //
     [TParamAttribute('VALORE_TOTALE', ptOutput, False)]
-    property Valore_Totale: TNullableInteger read fValore_Totale;
+    property Valore_Totale: TNullableInt64 read fValore_Totale;
     //
     [TParamAttribute('VALORE_MEDIO', ptOutput, False)]
     property Valore_Medio: TNullableDouble read fValore_Medio;
@@ -22964,9 +23050,9 @@ TSP_questionari_Risposte_Attese = class (TzStoredProc)
   private
     fId_Progetto: TNullableInt64;
     fId_Corso: TNullableInt64;
-    fRisposte_Attese: TNullableInteger;
+    fRisposte_Attese: TNullableInt64;
   private
-    property Risposte_Attese_internal: TNullableInteger read fRisposte_Attese write fRisposte_Attese;
+    property Risposte_Attese_internal: TNullableInt64 read fRisposte_Attese write fRisposte_Attese;
   public
     //
     [TParamAttribute('ID_PROGETTO', ptInput, False)]
@@ -22976,7 +23062,7 @@ TSP_questionari_Risposte_Attese = class (TzStoredProc)
     property Id_Corso: TNullableInt64 read fId_Corso write fId_Corso;
     //
     [TParamAttribute('RISPOSTE_ATTESE', ptOutput, False)]
-    property Risposte_Attese: TNullableInteger read fRisposte_Attese;
+    property Risposte_Attese: TNullableInt64 read fRisposte_Attese;
 end;
 
 [TStoredProcedure('QUESTIONARI_RISPOSTE_ERRATE_ADD')]
@@ -23009,11 +23095,11 @@ TSP_questionari_Risposte_Ricevute = class (TzStoredProc)
     fId_Voce: TNullableInt64;
     fRisposta: TNullableString;
     fTipo_Risposta: TNullableString;
-    fRisposte_Ricevute: TNullableInteger;
-    fValutazione_Totale: TNullableInteger;
+    fRisposte_Ricevute: TNullableInt64;
+    fValutazione_Totale: TNullableInt64;
   private
-    property Risposte_Ricevute_internal: TNullableInteger read fRisposte_Ricevute write fRisposte_Ricevute;
-    property Valutazione_Totale_internal: TNullableInteger read fValutazione_Totale write fValutazione_Totale;
+    property Risposte_Ricevute_internal: TNullableInt64 read fRisposte_Ricevute write fRisposte_Ricevute;
+    property Valutazione_Totale_internal: TNullableInt64 read fValutazione_Totale write fValutazione_Totale;
   public
     //
     [TParamAttribute('ID_PROGETTO', ptInput, False)]
@@ -23035,10 +23121,10 @@ TSP_questionari_Risposte_Ricevute = class (TzStoredProc)
     property Tipo_Risposta: TNullableString read fTipo_Risposta write fTipo_Risposta;
     //
     [TParamAttribute('RISPOSTE_RICEVUTE', ptOutput, False)]
-    property Risposte_Ricevute: TNullableInteger read fRisposte_Ricevute;
+    property Risposte_Ricevute: TNullableInt64 read fRisposte_Ricevute;
     //
     [TParamAttribute('VALUTAZIONE_TOTALE', ptOutput, False)]
-    property Valutazione_Totale: TNullableInteger read fValutazione_Totale;
+    property Valutazione_Totale: TNullableInt64 read fValutazione_Totale;
 end;
 
 [TStoredProcedure('QUESTIONARI_RISPOSTE_SAVE')]
@@ -24383,14 +24469,14 @@ TSP_sal_Ricerca_Profili = class (TzStoredProc)
     fId_Anagrafica: TNullableInt64;
     fCap: TNullableString;
     fComune: TNullableString;
-    fDistanza: TNullableInteger;
+    fDistanza: TNullableInt64;
     fCorsi_Frequentati: TNullableString;
     fData_Ultimo_Colloquio: TNullableDate;
   private
     property Id_Anagrafica_internal: TNullableInt64 read fId_Anagrafica write fId_Anagrafica;
     property Cap_internal: TNullableString read fCap write fCap;
     property Comune_internal: TNullableString read fComune write fComune;
-    property Distanza_internal: TNullableInteger read fDistanza write fDistanza;
+    property Distanza_internal: TNullableInt64 read fDistanza write fDistanza;
     property Corsi_Frequentati_internal: TNullableString read fCorsi_Frequentati write fCorsi_Frequentati;
     property Data_Ultimo_Colloquio_internal: TNullableDate read fData_Ultimo_Colloquio write fData_Ultimo_Colloquio;
   public
@@ -24408,7 +24494,7 @@ TSP_sal_Ricerca_Profili = class (TzStoredProc)
     property Comune: TNullableString read fComune;
     //
     [TParamAttribute('DISTANZA', ptOutput, False)]
-    property Distanza: TNullableInteger read fDistanza;
+    property Distanza: TNullableInt64 read fDistanza;
     //
     [TParamAttribute('CORSI_FREQUENTATI', ptOutput, False)]
     property Corsi_Frequentati: TNullableString read fCorsi_Frequentati;
@@ -24664,8 +24750,8 @@ TSP_sia_Interventi_Detail = class (TzStoredProc)
     fId_Intervento_Sia: TNullableInt64;
     fTipologia_Intervento: TNullableString;
     fData_Inizio_Intervento: TNullableDate;
-    fNumero_Settimane: TNullableInteger;
-    fNumero_Ore_Totali: TNullableInteger;
+    fNumero_Settimane: TNullableInt64;
+    fNumero_Ore_Totali: TNullableInt64;
     fImporto_Nominale_Iva_Inclusa_Forzato: TNullableDouble;
     fImporto_Nominale_Iva_Esclusa_Forzato: TNullableDouble;
     fTariffa_Oraria_Iva_Inclusa: TNullableDouble;
@@ -24701,10 +24787,10 @@ TSP_sia_Interventi_Detail = class (TzStoredProc)
     property Data_Inizio_Intervento: TNullableDate read fData_Inizio_Intervento write fData_Inizio_Intervento;
     //
     [TParamAttribute('NUMERO_SETTIMANE', ptInput, False)]
-    property Numero_Settimane: TNullableInteger read fNumero_Settimane write fNumero_Settimane;
+    property Numero_Settimane: TNullableInt64 read fNumero_Settimane write fNumero_Settimane;
     //
     [TParamAttribute('NUMERO_ORE_TOTALI', ptInput, False)]
-    property Numero_Ore_Totali: TNullableInteger read fNumero_Ore_Totali write fNumero_Ore_Totali;
+    property Numero_Ore_Totali: TNullableInt64 read fNumero_Ore_Totali write fNumero_Ore_Totali;
     //
     [TParamAttribute('IMPORTO_NOMINALE_IVA_INCLUSA_FORZATO', ptInput, False)]
     property Importo_Nominale_Iva_Inclusa_Forzato: TNullableDouble read fImporto_Nominale_Iva_Inclusa_Forzato write fImporto_Nominale_Iva_Inclusa_Forzato;
@@ -24867,9 +24953,9 @@ TSP_siuf_Cooperazione_Applicativa_Invii_Add = class (TzStoredProc)
     fId_Sezione: TNullableString;
     fData_Inizio: TNullableDate;
     fData_Fine: TNullableDate;
-    fNumero_Studenti: TNullableInteger;
+    fNumero_Studenti: TNullableInt64;
     fEsito_Caricamento: TNullableBoolean;
-    fHttp_Status: TNullableInteger;
+    fHttp_Status: TNullableInt64;
     fTipo_Errore: TNullableString;
     fMessaggio: TStringList;
     fErr_Studente: TNullableString;
@@ -24912,13 +24998,13 @@ TSP_siuf_Cooperazione_Applicativa_Invii_Add = class (TzStoredProc)
     property Data_Fine: TNullableDate read fData_Fine write fData_Fine;
     //
     [TParamAttribute('NUMERO_STUDENTI', ptInput, False)]
-    property Numero_Studenti: TNullableInteger read fNumero_Studenti write fNumero_Studenti;
+    property Numero_Studenti: TNullableInt64 read fNumero_Studenti write fNumero_Studenti;
     //
     [TParamAttribute('ESITO_CARICAMENTO', ptInput, False)]
     property Esito_Caricamento: TNullableBoolean read fEsito_Caricamento write fEsito_Caricamento;
     //
     [TParamAttribute('HTTP_STATUS', ptInput, False)]
-    property Http_Status: TNullableInteger read fHttp_Status write fHttp_Status;
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
     //
     [TParamAttribute('TIPO_ERRORE', ptInput, False)]
     property Tipo_Errore: TNullableString read fTipo_Errore write fTipo_Errore;
@@ -25101,7 +25187,7 @@ TSP_sostegno_Trasversale_Studenti_Idonei_Siuf = class (TzStoredProc)
     fSoglia_Ore_Effettiva: TNullableDouble;
     fOre_Residue: TNullableDouble;
     fIdoneo: TNullableBoolean;
-    fNumero_Gruppo_Invio: TNullableInteger;
+    fNumero_Gruppo_Invio: TNullableInt64;
   private
     property Id_Studente_internal: TNullableInt64 read fId_Studente write fId_Studente;
     property Nominativo_Studente_internal: TNullableString read fNominativo_Studente write fNominativo_Studente;
@@ -25109,7 +25195,7 @@ TSP_sostegno_Trasversale_Studenti_Idonei_Siuf = class (TzStoredProc)
     property Soglia_Ore_Effettiva_internal: TNullableDouble read fSoglia_Ore_Effettiva write fSoglia_Ore_Effettiva;
     property Ore_Residue_internal: TNullableDouble read fOre_Residue write fOre_Residue;
     property Idoneo_internal: TNullableBoolean read fIdoneo write fIdoneo;
-    property Numero_Gruppo_Invio_internal: TNullableInteger read fNumero_Gruppo_Invio write fNumero_Gruppo_Invio;
+    property Numero_Gruppo_Invio_internal: TNullableInt64 read fNumero_Gruppo_Invio write fNumero_Gruppo_Invio;
   public
     //
     [TParamAttribute('ID_PROGETTO', ptInput, False)]
@@ -25140,7 +25226,7 @@ TSP_sostegno_Trasversale_Studenti_Idonei_Siuf = class (TzStoredProc)
     property Idoneo: TNullableBoolean read fIdoneo;
     //
     [TParamAttribute('NUMERO_GRUPPO_INVIO', ptOutput, False)]
-    property Numero_Gruppo_Invio: TNullableInteger read fNumero_Gruppo_Invio;
+    property Numero_Gruppo_Invio: TNullableInt64 read fNumero_Gruppo_Invio;
 end;
 
 [TStoredProcedure('STUDENTE_CHECK_CODICE_FISCALE')]
@@ -25216,7 +25302,7 @@ end;
 TSP_studenti_Domande_Iscrizione_Files_Elabora_Riga = class (TzStoredProc)
   private
     fId_File_Import_Domande_Iscrizione: TNullableInt64;
-    fNumero_Riga: TNullableInteger;
+    fNumero_Riga: TNullableInt64;
     fRiga: TNullableString;
   public
     //
@@ -25224,7 +25310,7 @@ TSP_studenti_Domande_Iscrizione_Files_Elabora_Riga = class (TzStoredProc)
     property Id_File_Import_Domande_Iscrizione: TNullableInt64 read fId_File_Import_Domande_Iscrizione write fId_File_Import_Domande_Iscrizione;
     //
     [TParamAttribute('NUMERO_RIGA', ptInput, False)]
-    property Numero_Riga: TNullableInteger read fNumero_Riga write fNumero_Riga;
+    property Numero_Riga: TNullableInt64 read fNumero_Riga write fNumero_Riga;
     //
     [TParamAttribute('RIGA', ptInput, False)]
     property Riga: TNullableString read fRiga write fRiga;
@@ -25246,7 +25332,7 @@ end;
 TSP_studenti_Domande_Iscrizione_Files_Parse_Riga = class (TzStoredProc)
   private
     fId_File_Import_Domande_Iscrizione: TNullableInt64;
-    fNumero_Riga: TNullableInteger;
+    fNumero_Riga: TNullableInt64;
     fRiga: TNullableString;
   public
     //
@@ -25254,7 +25340,7 @@ TSP_studenti_Domande_Iscrizione_Files_Parse_Riga = class (TzStoredProc)
     property Id_File_Import_Domande_Iscrizione: TNullableInt64 read fId_File_Import_Domande_Iscrizione write fId_File_Import_Domande_Iscrizione;
     //
     [TParamAttribute('NUMERO_RIGA', ptInput, False)]
-    property Numero_Riga: TNullableInteger read fNumero_Riga write fNumero_Riga;
+    property Numero_Riga: TNullableInt64 read fNumero_Riga write fNumero_Riga;
     //
     [TParamAttribute('RIGA', ptInput, False)]
     property Riga: TNullableString read fRiga write fRiga;
@@ -25545,7 +25631,7 @@ TSP_studenti_Presenze_Collettiv_Add = class (TzStoredProc)
     fId_Studente: TNullableInt64;
     fOverride_Tipologia_Formazione: TNullableString;
     fStato_Presenza: TNullableString;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
     fId_Presenza_Collettiva: TNullableInt64;
   private
     property Id_Presenza_Collettiva_internal: TNullableInt64 read fId_Presenza_Collettiva write fId_Presenza_Collettiva;
@@ -25564,7 +25650,7 @@ TSP_studenti_Presenze_Collettiv_Add = class (TzStoredProc)
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
     //
     [TParamAttribute('ID_PRESENZA_COLLETTIVA', ptOutput, False)]
     property Id_Presenza_Collettiva: TNullableInt64 read fId_Presenza_Collettiva;
@@ -25716,7 +25802,7 @@ TSP_studenti_Presenze_Coll_Tmp_Upd = class (TzStoredProc)
     fId_Presenza_Collettiva: TNullableInt64;
     fOverride_Tipologia_Formazione: TNullableString;
     fStato_Presenza: TNullableString;
-    fMinuti_Assenza: TNullableInteger;
+    fMinuti_Assenza: TNullableInt64;
   public
     //
     [TParamAttribute('ID_PRESENZA_COLLETTIVA', ptInput, False)]
@@ -25729,7 +25815,7 @@ TSP_studenti_Presenze_Coll_Tmp_Upd = class (TzStoredProc)
     property Stato_Presenza: TNullableString read fStato_Presenza write fStato_Presenza;
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
-    property Minuti_Assenza: TNullableInteger read fMinuti_Assenza write fMinuti_Assenza;
+    property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
 end;
 
 [TStoredProcedure('STUDENTI_PROGETTI_ADD')]
@@ -25898,9 +25984,9 @@ TSP_studenti_Tabulato_Presenze = class (TzStoredProc)
     fAnno_Formativo: TNullableString;
     fData_Inizio_Progetto: TNullableDate;
     fData_Fine_Progetto: TNullableDate;
-    fNumero_Studenti: TNullableInteger;
+    fNumero_Studenti: TNullableInt64;
     fOre_Presenza: TNullableDouble;
-    fGiorni_Presenza: TNullableInteger;
+    fGiorni_Presenza: TNullableInt64;
   private
     property Id_Progetto_internal: TNullableInt64 read fId_Progetto write fId_Progetto;
     property Desc_Completa_Progetto_internal: TNullableString read fDesc_Completa_Progetto write fDesc_Completa_Progetto;
@@ -25908,9 +25994,9 @@ TSP_studenti_Tabulato_Presenze = class (TzStoredProc)
     property Anno_Formativo_internal: TNullableString read fAnno_Formativo write fAnno_Formativo;
     property Data_Inizio_Progetto_internal: TNullableDate read fData_Inizio_Progetto write fData_Inizio_Progetto;
     property Data_Fine_Progetto_internal: TNullableDate read fData_Fine_Progetto write fData_Fine_Progetto;
-    property Numero_Studenti_internal: TNullableInteger read fNumero_Studenti write fNumero_Studenti;
+    property Numero_Studenti_internal: TNullableInt64 read fNumero_Studenti write fNumero_Studenti;
     property Ore_Presenza_internal: TNullableDouble read fOre_Presenza write fOre_Presenza;
-    property Giorni_Presenza_internal: TNullableInteger read fGiorni_Presenza write fGiorni_Presenza;
+    property Giorni_Presenza_internal: TNullableInt64 read fGiorni_Presenza write fGiorni_Presenza;
   public
     //
     [TParamAttribute('DAL_GIORNO', ptInput, False)]
@@ -25938,13 +26024,13 @@ TSP_studenti_Tabulato_Presenze = class (TzStoredProc)
     property Data_Fine_Progetto: TNullableDate read fData_Fine_Progetto;
     //
     [TParamAttribute('NUMERO_STUDENTI', ptOutput, False)]
-    property Numero_Studenti: TNullableInteger read fNumero_Studenti;
+    property Numero_Studenti: TNullableInt64 read fNumero_Studenti;
     //
     [TParamAttribute('ORE_PRESENZA', ptOutput, False)]
     property Ore_Presenza: TNullableDouble read fOre_Presenza;
     //
     [TParamAttribute('GIORNI_PRESENZA', ptOutput, False)]
-    property Giorni_Presenza: TNullableInteger read fGiorni_Presenza;
+    property Giorni_Presenza: TNullableInt64 read fGiorni_Presenza;
 end;
 
 [TStoredProcedure('STUDENTI_TABULATO_PRESENZE_ASS', True)]
@@ -25961,9 +26047,9 @@ TSP_studenti_Tabulato_Presenze_Ass = class (TzStoredProc)
     fPerc_Assenze_Avviso: TNullableDouble;
     fPerc_Assenze_Max: TNullableDouble;
     fOre_Precedenti_Iscrizione: TNullableDouble;
-    fGiorni_Presenza_Aula: TNullableInteger;
-    fGiorni_Assenza_Aula: TNullableInteger;
-    fGiorni_Tirocinio: TNullableInteger;
+    fGiorni_Presenza_Aula: TNullableInt64;
+    fGiorni_Assenza_Aula: TNullableInt64;
+    fGiorni_Tirocinio: TNullableInt64;
     fOre_Lezione: TNullableDouble;
     fOre_Lezione_Presenza: TNullableDouble;
     fLezioni_Percentuale_Presenze: TNullableDouble;
@@ -25988,9 +26074,9 @@ TSP_studenti_Tabulato_Presenze_Ass = class (TzStoredProc)
     property Perc_Assenze_Avviso_internal: TNullableDouble read fPerc_Assenze_Avviso write fPerc_Assenze_Avviso;
     property Perc_Assenze_Max_internal: TNullableDouble read fPerc_Assenze_Max write fPerc_Assenze_Max;
     property Ore_Precedenti_Iscrizione_internal: TNullableDouble read fOre_Precedenti_Iscrizione write fOre_Precedenti_Iscrizione;
-    property Giorni_Presenza_Aula_internal: TNullableInteger read fGiorni_Presenza_Aula write fGiorni_Presenza_Aula;
-    property Giorni_Assenza_Aula_internal: TNullableInteger read fGiorni_Assenza_Aula write fGiorni_Assenza_Aula;
-    property Giorni_Tirocinio_internal: TNullableInteger read fGiorni_Tirocinio write fGiorni_Tirocinio;
+    property Giorni_Presenza_Aula_internal: TNullableInt64 read fGiorni_Presenza_Aula write fGiorni_Presenza_Aula;
+    property Giorni_Assenza_Aula_internal: TNullableInt64 read fGiorni_Assenza_Aula write fGiorni_Assenza_Aula;
+    property Giorni_Tirocinio_internal: TNullableInt64 read fGiorni_Tirocinio write fGiorni_Tirocinio;
     property Ore_Lezione_internal: TNullableDouble read fOre_Lezione write fOre_Lezione;
     property Ore_Lezione_Presenza_internal: TNullableDouble read fOre_Lezione_Presenza write fOre_Lezione_Presenza;
     property Lezioni_Percentuale_Presenze_internal: TNullableDouble read fLezioni_Percentuale_Presenze write fLezioni_Percentuale_Presenze;
@@ -26040,13 +26126,13 @@ TSP_studenti_Tabulato_Presenze_Ass = class (TzStoredProc)
     property Ore_Precedenti_Iscrizione: TNullableDouble read fOre_Precedenti_Iscrizione;
     //
     [TParamAttribute('GIORNI_PRESENZA_AULA', ptOutput, False)]
-    property Giorni_Presenza_Aula: TNullableInteger read fGiorni_Presenza_Aula;
+    property Giorni_Presenza_Aula: TNullableInt64 read fGiorni_Presenza_Aula;
     //
     [TParamAttribute('GIORNI_ASSENZA_AULA', ptOutput, False)]
-    property Giorni_Assenza_Aula: TNullableInteger read fGiorni_Assenza_Aula;
+    property Giorni_Assenza_Aula: TNullableInt64 read fGiorni_Assenza_Aula;
     //
     [TParamAttribute('GIORNI_TIROCINIO', ptOutput, False)]
-    property Giorni_Tirocinio: TNullableInteger read fGiorni_Tirocinio;
+    property Giorni_Tirocinio: TNullableInt64 read fGiorni_Tirocinio;
     //
     [TParamAttribute('ORE_LEZIONE', ptOutput, False)]
     property Ore_Lezione: TNullableDouble read fOre_Lezione;
@@ -26111,8 +26197,8 @@ TSP_studenti_Tabulato_Pres_Ass = class (TzStoredProc)
     fPerc_Assenze_Avviso: TNullableDouble;
     fPerc_Assenze_Max: TNullableDouble;
     fOre_Precedenti_Iscrizione: TNullableDouble;
-    fGiorni_Presenza: TNullableInteger;
-    fGiorni_Assenza: TNullableInteger;
+    fGiorni_Presenza: TNullableInt64;
+    fGiorni_Assenza: TNullableInt64;
     fOre_Lezione: TNullableDouble;
     fOre_Presenza: TNullableDouble;
     fPercentuale_Presenze: TNullableDouble;
@@ -26128,8 +26214,8 @@ TSP_studenti_Tabulato_Pres_Ass = class (TzStoredProc)
     property Perc_Assenze_Avviso_internal: TNullableDouble read fPerc_Assenze_Avviso write fPerc_Assenze_Avviso;
     property Perc_Assenze_Max_internal: TNullableDouble read fPerc_Assenze_Max write fPerc_Assenze_Max;
     property Ore_Precedenti_Iscrizione_internal: TNullableDouble read fOre_Precedenti_Iscrizione write fOre_Precedenti_Iscrizione;
-    property Giorni_Presenza_internal: TNullableInteger read fGiorni_Presenza write fGiorni_Presenza;
-    property Giorni_Assenza_internal: TNullableInteger read fGiorni_Assenza write fGiorni_Assenza;
+    property Giorni_Presenza_internal: TNullableInt64 read fGiorni_Presenza write fGiorni_Presenza;
+    property Giorni_Assenza_internal: TNullableInt64 read fGiorni_Assenza write fGiorni_Assenza;
     property Ore_Lezione_internal: TNullableDouble read fOre_Lezione write fOre_Lezione;
     property Ore_Presenza_internal: TNullableDouble read fOre_Presenza write fOre_Presenza;
     property Percentuale_Presenze_internal: TNullableDouble read fPercentuale_Presenze write fPercentuale_Presenze;
@@ -26170,10 +26256,10 @@ TSP_studenti_Tabulato_Pres_Ass = class (TzStoredProc)
     property Ore_Precedenti_Iscrizione: TNullableDouble read fOre_Precedenti_Iscrizione;
     //
     [TParamAttribute('GIORNI_PRESENZA', ptOutput, False)]
-    property Giorni_Presenza: TNullableInteger read fGiorni_Presenza;
+    property Giorni_Presenza: TNullableInt64 read fGiorni_Presenza;
     //
     [TParamAttribute('GIORNI_ASSENZA', ptOutput, False)]
-    property Giorni_Assenza: TNullableInteger read fGiorni_Assenza;
+    property Giorni_Assenza: TNullableInt64 read fGiorni_Assenza;
     //
     [TParamAttribute('ORE_LEZIONE', ptOutput, False)]
     property Ore_Lezione: TNullableDouble read fOre_Lezione;
@@ -26656,7 +26742,7 @@ TSP_studenti_Tirocini_Pagam_Mese = class (TzStoredProc)
     fCompenso: TNullableDouble;
     fCodice_Iban: TNullableString;
     fIntestatario_Conto_Corrente: TNullableString;
-    fGiorni_Inail: TNullableInteger;
+    fGiorni_Inail: TNullableInt64;
     fVoce_Rischio_Inail: TNullableString;
   private
     property Id_Tirocinio_internal: TNullableInt64 read fId_Tirocinio write fId_Tirocinio;
@@ -26680,7 +26766,7 @@ TSP_studenti_Tirocini_Pagam_Mese = class (TzStoredProc)
     property Compenso_internal: TNullableDouble read fCompenso write fCompenso;
     property Codice_Iban_internal: TNullableString read fCodice_Iban write fCodice_Iban;
     property Intestatario_Conto_Corrente_internal: TNullableString read fIntestatario_Conto_Corrente write fIntestatario_Conto_Corrente;
-    property Giorni_Inail_internal: TNullableInteger read fGiorni_Inail write fGiorni_Inail;
+    property Giorni_Inail_internal: TNullableInt64 read fGiorni_Inail write fGiorni_Inail;
     property Voce_Rischio_Inail_internal: TNullableString read fVoce_Rischio_Inail write fVoce_Rischio_Inail;
   public
     //
@@ -26757,7 +26843,7 @@ TSP_studenti_Tirocini_Pagam_Mese = class (TzStoredProc)
     property Intestatario_Conto_Corrente: TNullableString read fIntestatario_Conto_Corrente;
     //
     [TParamAttribute('GIORNI_INAIL', ptOutput, False)]
-    property Giorni_Inail: TNullableInteger read fGiorni_Inail;
+    property Giorni_Inail: TNullableInt64 read fGiorni_Inail;
     //
     [TParamAttribute('VOCE_RISCHIO_INAIL', ptOutput, False)]
     property Voce_Rischio_Inail: TNullableString read fVoce_Rischio_Inail;
@@ -26811,7 +26897,7 @@ TSP_studenti_Tirocini_Riepilogo_Ore = class (TzStoredProc)
     fOre_Residue: TNullableDouble;
     fOre_Presenza_60: TNullableDouble;
     fOre_Assenza_60: TNullableDouble;
-    fGiorni_Presenza: TNullableInteger;
+    fGiorni_Presenza: TNullableInt64;
   private
     property Data_Inizio_Tirocinio_internal: TNullableDate read fData_Inizio_Tirocinio write fData_Inizio_Tirocinio;
     property Data_Fine_Tirocinio_internal: TNullableDate read fData_Fine_Tirocinio write fData_Fine_Tirocinio;
@@ -26822,7 +26908,7 @@ TSP_studenti_Tirocini_Riepilogo_Ore = class (TzStoredProc)
     property Ore_Residue_internal: TNullableDouble read fOre_Residue write fOre_Residue;
     property Ore_Presenza_60_internal: TNullableDouble read fOre_Presenza_60 write fOre_Presenza_60;
     property Ore_Assenza_60_internal: TNullableDouble read fOre_Assenza_60 write fOre_Assenza_60;
-    property Giorni_Presenza_internal: TNullableInteger read fGiorni_Presenza write fGiorni_Presenza;
+    property Giorni_Presenza_internal: TNullableInt64 read fGiorni_Presenza write fGiorni_Presenza;
   public
     //
     [TParamAttribute('ID_TIROCINIO', ptInput, False)]
@@ -26856,7 +26942,7 @@ TSP_studenti_Tirocini_Riepilogo_Ore = class (TzStoredProc)
     property Ore_Assenza_60: TNullableDouble read fOre_Assenza_60;
     //
     [TParamAttribute('GIORNI_PRESENZA', ptOutput, False)]
-    property Giorni_Presenza: TNullableInteger read fGiorni_Presenza;
+    property Giorni_Presenza: TNullableInt64 read fGiorni_Presenza;
 end;
 
 [TStoredProcedure('TIMESHEET_ATTIVITA_X_GIORNO', True)]
@@ -28829,6 +28915,13 @@ TSP_usr_Config_Settings_Set_Value = class (TzStoredProc)
     property Valore: TNullableString read fValore write fValore;
 end;
 
+[TStoredProcedure('USR_CONTEXT_CLEAR')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Context_Clear = class (TzStoredProc)
+  private
+  public
+end;
+
 [TStoredProcedure('USR_CONTEXT_SET')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Context_Set = class (TzStoredProc)
@@ -28873,10 +28966,10 @@ TSP_usr_Fascia_Accesso_Check = class (TzStoredProc)
     fUser_Id: TNullableInt64;
     fOrario_Accesso: TNullableDateTime;
     fAccesso_Autorizzato: TNullableBoolean;
-    fSecondi_Alla_Prossima_Verifica: TNullableInteger;
+    fSecondi_Alla_Prossima_Verifica: TNullableInt64;
   private
     property Accesso_Autorizzato_internal: TNullableBoolean read fAccesso_Autorizzato write fAccesso_Autorizzato;
-    property Secondi_Alla_Prossima_Verifica_internal: TNullableInteger read fSecondi_Alla_Prossima_Verifica write fSecondi_Alla_Prossima_Verifica;
+    property Secondi_Alla_Prossima_Verifica_internal: TNullableInt64 read fSecondi_Alla_Prossima_Verifica write fSecondi_Alla_Prossima_Verifica;
   public
     //
     [TParamAttribute('APP', ptInput, False)]
@@ -28892,7 +28985,7 @@ TSP_usr_Fascia_Accesso_Check = class (TzStoredProc)
     property Accesso_Autorizzato: TNullableBoolean read fAccesso_Autorizzato;
     //
     [TParamAttribute('SECONDI_ALLA_PROSSIMA_VERIFICA', ptOutput, False)]
-    property Secondi_Alla_Prossima_Verifica: TNullableInteger read fSecondi_Alla_Prossima_Verifica;
+    property Secondi_Alla_Prossima_Verifica: TNullableInt64 read fSecondi_Alla_Prossima_Verifica;
 end;
 
 [TStoredProcedure('USR_FASCIA_ACCESSO_UTENTE', True)]
@@ -29125,18 +29218,18 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Get_Max_Minuti_Inattivita = class (TzStoredProc)
   private
-    fMinuti: TNullableInteger;
-    fMillisecondi: TNullableInteger;
+    fMinuti: TNullableInt64;
+    fMillisecondi: TNullableInt64;
   private
-    property Minuti_internal: TNullableInteger read fMinuti write fMinuti;
-    property Millisecondi_internal: TNullableInteger read fMillisecondi write fMillisecondi;
+    property Minuti_internal: TNullableInt64 read fMinuti write fMinuti;
+    property Millisecondi_internal: TNullableInt64 read fMillisecondi write fMillisecondi;
   public
     //
     [TParamAttribute('MINUTI', ptOutput, False)]
-    property Minuti: TNullableInteger read fMinuti;
+    property Minuti: TNullableInt64 read fMinuti;
     //
     [TParamAttribute('MILLISECONDI', ptOutput, False)]
-    property Millisecondi: TNullableInteger read fMillisecondi;
+    property Millisecondi: TNullableInt64 read fMillisecondi;
 end;
 
 [TStoredProcedure('USR_GET_USER_HYPERLINKS', True)]
@@ -29779,7 +29872,8 @@ TSP_usr_Refresh_Tokens_Crea = class (TzStoredProc)
     fToken_Hash: TNullableString;
     fDevice_Info: TNullableString;
     fIp_Address: TNullableString;
-    fGiorni_Max: TNullableInteger;
+    fGiorni_Max: TNullableInt64;
+    fId_Sessione: TNullableInt64;
     fId_Token: TNullableInt64;
     fScade_Il: TNullableDateTime;
   private
@@ -29800,7 +29894,10 @@ TSP_usr_Refresh_Tokens_Crea = class (TzStoredProc)
     property Ip_Address: TNullableString read fIp_Address write fIp_Address;
     //
     [TParamAttribute('GIORNI_MAX', ptInput, False)]
-    property Giorni_Max: TNullableInteger read fGiorni_Max write fGiorni_Max;
+    property Giorni_Max: TNullableInt64 read fGiorni_Max write fGiorni_Max;
+    //
+    [TParamAttribute('ID_SESSIONE', ptInput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
     //
     [TParamAttribute('ID_TOKEN', ptOutput, False)]
     property Id_Token: TNullableInt64 read fId_Token;
@@ -29850,13 +29947,15 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     fNew_Token_Hash: TNullableString;
     fDevice_Info: TNullableString;
     fIp_Address: TNullableString;
-    fGiorni_Max: TNullableInteger;
+    fGiorni_Max: TNullableInt64;
     fResult: TNullableString;
     fNuova_Scadenza: TNullableDateTime;
     fUser_Id: TNullableInt64;
     fUser_Name: TNullableString;
     fNominativo: TNullableString;
     fRuolo: TNullableString;
+    fId_Sessione: TNullableInt64;
+    fAdmin_User: TNullableBoolean;
   private
     property Result_internal: TNullableString read fResult write fResult;
     property Nuova_Scadenza_internal: TNullableDateTime read fNuova_Scadenza write fNuova_Scadenza;
@@ -29864,6 +29963,8 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     property User_Name_internal: TNullableString read fUser_Name write fUser_Name;
     property Nominativo_internal: TNullableString read fNominativo write fNominativo;
     property Ruolo_internal: TNullableString read fRuolo write fRuolo;
+    property Id_Sessione_internal: TNullableInt64 read fId_Sessione write fId_Sessione;
+    property Admin_User_internal: TNullableBoolean read fAdmin_User write fAdmin_User;
   public
     //
     [TParamAttribute('TOKEN_HASH', ptInput, False)]
@@ -29879,7 +29980,7 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     property Ip_Address: TNullableString read fIp_Address write fIp_Address;
     //
     [TParamAttribute('GIORNI_MAX', ptInput, False)]
-    property Giorni_Max: TNullableInteger read fGiorni_Max write fGiorni_Max;
+    property Giorni_Max: TNullableInt64 read fGiorni_Max write fGiorni_Max;
     //
     [TParamAttribute('RESULT', ptOutput, False)]
     property Result: TNullableString read fResult;
@@ -29898,6 +29999,12 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     //
     [TParamAttribute('RUOLO', ptOutput, False)]
     property Ruolo: TNullableString read fRuolo;
+    //
+    [TParamAttribute('ID_SESSIONE', ptOutput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione;
+    //
+    [TParamAttribute('ADMIN_USER', ptOutput, False)]
+    property Admin_User: TNullableBoolean read fAdmin_User;
 end;
 
 [TStoredProcedure('USR_RICHIESTA_REGISTRAZIONE', True)]
@@ -29995,11 +30102,11 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Sessioni_Chiudi_Pendenti = class (TzStoredProc)
   private
-    fGiorni_Connessione_Max: TNullableInteger;
+    fGiorni_Connessione_Max: TNullableInt64;
   public
     //
     [TParamAttribute('GIORNI_CONNESSIONE_MAX', ptInput, False)]
-    property Giorni_Connessione_Max: TNullableInteger read fGiorni_Connessione_Max write fGiorni_Connessione_Max;
+    property Giorni_Connessione_Max: TNullableInt64 read fGiorni_Connessione_Max write fGiorni_Connessione_Max;
 end;
 
 [TStoredProcedure('USR_SETTINGS_INIT')]
@@ -30091,8 +30198,8 @@ TSP_usr_Utenti_Add = class (TzStoredProc)
     fAttivo: TNullableBoolean;
     fDba_User: TNullableBoolean;
     fE_Mail: TNullableString;
-    fColore: TNullableInteger;
-    fImage_Index: TNullableInteger;
+    fColore: TNullableInt64;
+    fImage_Index: TNullableInt64;
     fUser_Id: TNullableInt64;
   private
     property User_Id_internal: TNullableInt64 read fUser_Id write fUser_Id;
@@ -30132,10 +30239,10 @@ TSP_usr_Utenti_Add = class (TzStoredProc)
     property E_Mail: TNullableString read fE_Mail write fE_Mail;
     //
     [TParamAttribute('COLORE', ptInput, False)]
-    property Colore: TNullableInteger read fColore write fColore;
+    property Colore: TNullableInt64 read fColore write fColore;
     //
     [TParamAttribute('IMAGE_INDEX', ptInput, False)]
-    property Image_Index: TNullableInteger read fImage_Index write fImage_Index;
+    property Image_Index: TNullableInt64 read fImage_Index write fImage_Index;
     //
     [TParamAttribute('USER_ID', ptOutput, False)]
     property User_Id: TNullableInt64 read fUser_Id;
@@ -30416,26 +30523,26 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_ver_Verifica_Versione_Exe = class (TzStoredProc)
   private
-    fExe_Ver_1_Major: TNullableInteger;
-    fExe_Ver_2_Minor: TNullableInteger;
-    fExe_Ver_3_Release: TNullableInteger;
-    fExe_Ver_4_Build: TNullableInteger;
+    fExe_Ver_1_Major: TNullableInt64;
+    fExe_Ver_2_Minor: TNullableInt64;
+    fExe_Ver_3_Release: TNullableInt64;
+    fExe_Ver_4_Build: TNullableInt64;
     fVersione_Errata: TNullableBoolean;
   private
     property Versione_Errata_internal: TNullableBoolean read fVersione_Errata write fVersione_Errata;
   public
     //
     [TParamAttribute('EXE_VER_1_MAJOR', ptInput, False)]
-    property Exe_Ver_1_Major: TNullableInteger read fExe_Ver_1_Major write fExe_Ver_1_Major;
+    property Exe_Ver_1_Major: TNullableInt64 read fExe_Ver_1_Major write fExe_Ver_1_Major;
     //
     [TParamAttribute('EXE_VER_2_MINOR', ptInput, False)]
-    property Exe_Ver_2_Minor: TNullableInteger read fExe_Ver_2_Minor write fExe_Ver_2_Minor;
+    property Exe_Ver_2_Minor: TNullableInt64 read fExe_Ver_2_Minor write fExe_Ver_2_Minor;
     //
     [TParamAttribute('EXE_VER_3_RELEASE', ptInput, False)]
-    property Exe_Ver_3_Release: TNullableInteger read fExe_Ver_3_Release write fExe_Ver_3_Release;
+    property Exe_Ver_3_Release: TNullableInt64 read fExe_Ver_3_Release write fExe_Ver_3_Release;
     //
     [TParamAttribute('EXE_VER_4_BUILD', ptInput, False)]
-    property Exe_Ver_4_Build: TNullableInteger read fExe_Ver_4_Build write fExe_Ver_4_Build;
+    property Exe_Ver_4_Build: TNullableInt64 read fExe_Ver_4_Build write fExe_Ver_4_Build;
     //
     [TParamAttribute('VERSIONE_ERRATA', ptOutput, False)]
     property Versione_Errata: TNullableBoolean read fVersione_Errata;
@@ -32542,11 +32649,11 @@ TSP_web_Stage_Elenco_Tirocini = class (TzStoredProc)
     fId_Tirocinio: TNullableInt64;
     fDesc_Tirocinio: TNullableString;
     fNominativo: TNullableString;
-    fDurata_Ore: TNullableInteger;
+    fDurata_Ore: TNullableInt64;
     fData_Inizio: TNullableDate;
     fData_Fine: TNullableDate;
-    fMax_Ore_Giornaliere: TNullableInteger;
-    fMax_Ore_Settimanali: TNullableInteger;
+    fMax_Ore_Giornaliere: TNullableInt64;
+    fMax_Ore_Settimanali: TNullableInt64;
     fOra_Min: TNullableInteger;
     fOra_Max: TNullableInteger;
     fIntervallo_Orario: TNullableInteger;
@@ -32556,11 +32663,11 @@ TSP_web_Stage_Elenco_Tirocini = class (TzStoredProc)
     property Id_Tirocinio_internal: TNullableInt64 read fId_Tirocinio write fId_Tirocinio;
     property Desc_Tirocinio_internal: TNullableString read fDesc_Tirocinio write fDesc_Tirocinio;
     property Nominativo_internal: TNullableString read fNominativo write fNominativo;
-    property Durata_Ore_internal: TNullableInteger read fDurata_Ore write fDurata_Ore;
+    property Durata_Ore_internal: TNullableInt64 read fDurata_Ore write fDurata_Ore;
     property Data_Inizio_internal: TNullableDate read fData_Inizio write fData_Inizio;
     property Data_Fine_internal: TNullableDate read fData_Fine write fData_Fine;
-    property Max_Ore_Giornaliere_internal: TNullableInteger read fMax_Ore_Giornaliere write fMax_Ore_Giornaliere;
-    property Max_Ore_Settimanali_internal: TNullableInteger read fMax_Ore_Settimanali write fMax_Ore_Settimanali;
+    property Max_Ore_Giornaliere_internal: TNullableInt64 read fMax_Ore_Giornaliere write fMax_Ore_Giornaliere;
+    property Max_Ore_Settimanali_internal: TNullableInt64 read fMax_Ore_Settimanali write fMax_Ore_Settimanali;
     property Ora_Min_internal: TNullableInteger read fOra_Min write fOra_Min;
     property Ora_Max_internal: TNullableInteger read fOra_Max write fOra_Max;
     property Intervallo_Orario_internal: TNullableInteger read fIntervallo_Orario write fIntervallo_Orario;
@@ -32583,7 +32690,7 @@ TSP_web_Stage_Elenco_Tirocini = class (TzStoredProc)
     property Nominativo: TNullableString read fNominativo;
     //
     [TParamAttribute('DURATA_ORE', ptOutput, False)]
-    property Durata_Ore: TNullableInteger read fDurata_Ore;
+    property Durata_Ore: TNullableInt64 read fDurata_Ore;
     //
     [TParamAttribute('DATA_INIZIO', ptOutput, False)]
     property Data_Inizio: TNullableDate read fData_Inizio;
@@ -32592,10 +32699,10 @@ TSP_web_Stage_Elenco_Tirocini = class (TzStoredProc)
     property Data_Fine: TNullableDate read fData_Fine;
     //
     [TParamAttribute('MAX_ORE_GIORNALIERE', ptOutput, False)]
-    property Max_Ore_Giornaliere: TNullableInteger read fMax_Ore_Giornaliere;
+    property Max_Ore_Giornaliere: TNullableInt64 read fMax_Ore_Giornaliere;
     //
     [TParamAttribute('MAX_ORE_SETTIMANALI', ptOutput, False)]
-    property Max_Ore_Settimanali: TNullableInteger read fMax_Ore_Settimanali;
+    property Max_Ore_Settimanali: TNullableInt64 read fMax_Ore_Settimanali;
     //
     [TParamAttribute('ORA_MIN', ptOutput, False)]
     property Ora_Min: TNullableInteger read fOra_Min;
@@ -32897,11 +33004,11 @@ TSP_zzz_Fk_Field_Dependencies = class (TzStoredProc)
     fFk: TNullableString;
     fMaster_Table: TNullableString;
     fMaster_Field: TNullableString;
-    fMaster_Fields_Count: TNullableInteger;
+    fMaster_Fields_Count: TNullableInt64;
     fMaster_Fields: TStringList;
     fDetail_Table: TNullableString;
     fDetail_Field: TNullableString;
-    fDetail_Fields_Count: TNullableInteger;
+    fDetail_Fields_Count: TNullableInt64;
     fDetail_Fields: TStringList;
     fIs_Cascade: TNullableBoolean;
   private
@@ -32909,10 +33016,10 @@ TSP_zzz_Fk_Field_Dependencies = class (TzStoredProc)
     property Fk_internal: TNullableString read fFk write fFk;
     property Master_Table_internal: TNullableString read fMaster_Table write fMaster_Table;
     property Master_Field_internal: TNullableString read fMaster_Field write fMaster_Field;
-    property Master_Fields_Count_internal: TNullableInteger read fMaster_Fields_Count write fMaster_Fields_Count;
+    property Master_Fields_Count_internal: TNullableInt64 read fMaster_Fields_Count write fMaster_Fields_Count;
     property Detail_Table_internal: TNullableString read fDetail_Table write fDetail_Table;
     property Detail_Field_internal: TNullableString read fDetail_Field write fDetail_Field;
-    property Detail_Fields_Count_internal: TNullableInteger read fDetail_Fields_Count write fDetail_Fields_Count;
+    property Detail_Fields_Count_internal: TNullableInt64 read fDetail_Fields_Count write fDetail_Fields_Count;
     property Is_Cascade_internal: TNullableBoolean read fIs_Cascade write fIs_Cascade;
   public
     constructor Create; override;
@@ -32941,7 +33048,7 @@ TSP_zzz_Fk_Field_Dependencies = class (TzStoredProc)
     property Master_Field: TNullableString read fMaster_Field;
     //
     [TParamAttribute('MASTER_FIELDS_COUNT', ptOutput, False)]
-    property Master_Fields_Count: TNullableInteger read fMaster_Fields_Count;
+    property Master_Fields_Count: TNullableInt64 read fMaster_Fields_Count;
     //
     [TParamAttribute('MASTER_FIELDS', ptOutput, True)]
     property Master_Fields: TStringList read fMaster_Fields;
@@ -32953,7 +33060,7 @@ TSP_zzz_Fk_Field_Dependencies = class (TzStoredProc)
     property Detail_Field: TNullableString read fDetail_Field;
     //
     [TParamAttribute('DETAIL_FIELDS_COUNT', ptOutput, False)]
-    property Detail_Fields_Count: TNullableInteger read fDetail_Fields_Count;
+    property Detail_Fields_Count: TNullableInt64 read fDetail_Fields_Count;
     //
     [TParamAttribute('DETAIL_FIELDS', ptOutput, True)]
     property Detail_Fields: TStringList read fDetail_Fields;
@@ -32996,6 +33103,109 @@ end;
 TSP_zz_Aggiorna_Valori_Generatori = class (TzStoredProc)
   private
   public
+end;
+
+[TStoredProcedure('ZZ_CODA_ADD')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_zz_Coda_Add = class (TzStoredProc)
+  private
+    fTipo: TNullableString;
+    fContenuto: TStringList;
+    fTentativi_Massimi: TNullableInt64;
+    fAttesa_Secondi: TNullableInt64;
+    fId_Coda: TNullableInt64;
+  private
+    property Id_Coda_internal: TNullableInt64 read fId_Coda write fId_Coda;
+  private
+    procedure SetContenuto(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('TIPO', ptInput, False)]
+    property Tipo: TNullableString read fTipo write fTipo;
+    //
+    [TParamAttribute('CONTENUTO', ptInput, True)]
+    property Contenuto: TStringList read fContenuto write SetContenuto;
+    //
+    [TParamAttribute('TENTATIVI_MASSIMI', ptInput, False)]
+    property Tentativi_Massimi: TNullableInt64 read fTentativi_Massimi write fTentativi_Massimi;
+    //
+    [TParamAttribute('ATTESA_SECONDI', ptInput, False)]
+    property Attesa_Secondi: TNullableInt64 read fAttesa_Secondi write fAttesa_Secondi;
+    //
+    [TParamAttribute('ID_CODA', ptOutput, False)]
+    property Id_Coda: TNullableInt64 read fId_Coda;
+end;
+
+[TStoredProcedure('ZZ_CODA_ESITO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_zz_Coda_Esito = class (TzStoredProc)
+  private
+    fId_Coda: TNullableInt64;
+    fRiuscito: TNullableBoolean;
+    fMessaggio: TNullableString;
+    fAttesa_Secondi: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_CODA', ptInput, False)]
+    property Id_Coda: TNullableInt64 read fId_Coda write fId_Coda;
+    //
+    [TParamAttribute('RIUSCITO', ptInput, False)]
+    property Riuscito: TNullableBoolean read fRiuscito write fRiuscito;
+    //
+    [TParamAttribute('MESSAGGIO', ptInput, False)]
+    property Messaggio: TNullableString read fMessaggio write fMessaggio;
+    //
+    [TParamAttribute('ATTESA_SECONDI', ptInput, False)]
+    property Attesa_Secondi: TNullableInt64 read fAttesa_Secondi write fAttesa_Secondi;
+end;
+
+[TStoredProcedure('ZZ_CODA_PRELEVA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_zz_Coda_Preleva = class (TzStoredProc)
+  private
+    fTipo: TNullableString;
+    fId_Coda: TNullableInt64;
+    fContenuto: TStringList;
+    fTentativi: TNullableInt64;
+  private
+    property Id_Coda_internal: TNullableInt64 read fId_Coda write fId_Coda;
+    property Tentativi_internal: TNullableInt64 read fTentativi write fTentativi;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('TIPO', ptInput, False)]
+    property Tipo: TNullableString read fTipo write fTipo;
+    //
+    [TParamAttribute('ID_CODA', ptOutput, False)]
+    property Id_Coda: TNullableInt64 read fId_Coda;
+    //
+    [TParamAttribute('CONTENUTO', ptOutput, True)]
+    property Contenuto: TStringList read fContenuto;
+    //
+    [TParamAttribute('TENTATIVI', ptOutput, False)]
+    property Tentativi: TNullableInt64 read fTentativi;
+end;
+
+[TStoredProcedure('ZZ_CODA_RIPRENDI_BLOCCATI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_zz_Coda_Riprendi_Bloccati = class (TzStoredProc)
+  private
+    fMinuti: TNullableInt64;
+    fRipresi: TNullableInt64;
+  private
+    property Ripresi_internal: TNullableInt64 read fRipresi write fRipresi;
+  public
+    //
+    [TParamAttribute('MINUTI', ptInput, False)]
+    property Minuti: TNullableInt64 read fMinuti write fMinuti;
+    //
+    [TParamAttribute('RIPRESI', ptOutput, False)]
+    property Ripresi: TNullableInt64 read fRipresi;
 end;
 
 [TStoredProcedure('ZZ_CODICE_FISCALE_ESTRAI_DATI', True)]
@@ -33347,18 +33557,18 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_zz_Echo = class (TzStoredProc)
   private
-    fIn_Int: TNullableInteger;
+    fIn_Int: TNullableInt64;
     fIn_Str: TNullableString;
     fIn_Data: TNullableDate;
     fIn_Curr: TNullableDouble;
     fIn_Memo: TStringList;
-    fOut_Int: TNullableInteger;
+    fOut_Int: TNullableInt64;
     fOut_Str: TNullableString;
     fOut_Data: TNullableDate;
     fOut_Curr: TNullableDouble;
     fOut_Memo: TStringList;
   private
-    property Out_Int_internal: TNullableInteger read fOut_Int write fOut_Int;
+    property Out_Int_internal: TNullableInt64 read fOut_Int write fOut_Int;
     property Out_Str_internal: TNullableString read fOut_Str write fOut_Str;
     property Out_Data_internal: TNullableDate read fOut_Data write fOut_Data;
     property Out_Curr_internal: TNullableDouble read fOut_Curr write fOut_Curr;
@@ -33370,7 +33580,7 @@ TSP_zz_Echo = class (TzStoredProc)
   public
     //
     [TParamAttribute('IN_INT', ptInput, False)]
-    property In_Int: TNullableInteger read fIn_Int write fIn_Int;
+    property In_Int: TNullableInt64 read fIn_Int write fIn_Int;
     //
     [TParamAttribute('IN_STR', ptInput, False)]
     property In_Str: TNullableString read fIn_Str write fIn_Str;
@@ -33385,7 +33595,7 @@ TSP_zz_Echo = class (TzStoredProc)
     property In_Memo: TStringList read fIn_Memo write SetIn_Memo;
     //
     [TParamAttribute('OUT_INT', ptOutput, False)]
-    property Out_Int: TNullableInteger read fOut_Int;
+    property Out_Int: TNullableInt64 read fOut_Int;
     //
     [TParamAttribute('OUT_STR', ptOutput, False)]
     property Out_Str: TNullableString read fOut_Str;
@@ -33566,7 +33776,7 @@ TSP_zz_Range_Date_Ore = class (TzStoredProc)
     fAl_Giorno: TNullableDate;
     fDalle_Ore: TNullableTime;
     fAlle_Ore: TNullableTime;
-    fMinuti_Incremento: TNullableInteger;
+    fMinuti_Incremento: TNullableInt64;
     fData: TNullableDate;
     fOra: TNullableTime;
     fData_Ora_Inizio: TNullableDateTime;
@@ -33595,7 +33805,7 @@ TSP_zz_Range_Date_Ore = class (TzStoredProc)
     property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
     //
     [TParamAttribute('MINUTI_INCREMENTO', ptInput, False)]
-    property Minuti_Incremento: TNullableInteger read fMinuti_Incremento write fMinuti_Incremento;
+    property Minuti_Incremento: TNullableInt64 read fMinuti_Incremento write fMinuti_Incremento;
     //
     [TParamAttribute('DATA', ptOutput, False)]
     property Data: TNullableDate read fData;
@@ -33696,7 +33906,7 @@ TSP_zz_Range_Ore = class (TzStoredProc)
   private
     fDalle_Ore: TNullableTime;
     fAlle_Ore: TNullableTime;
-    fMinuti_Incremento: TNullableInteger;
+    fMinuti_Incremento: TNullableInt64;
     fOra_Inizio: TNullableTime;
     fOra_Fine: TNullableTime;
     fDurata: TNullableInteger;
@@ -33713,7 +33923,7 @@ TSP_zz_Range_Ore = class (TzStoredProc)
     property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
     //
     [TParamAttribute('MINUTI_INCREMENTO', ptInput, False)]
-    property Minuti_Incremento: TNullableInteger read fMinuti_Incremento write fMinuti_Incremento;
+    property Minuti_Incremento: TNullableInt64 read fMinuti_Incremento write fMinuti_Incremento;
     //
     [TParamAttribute('ORA_INIZIO', ptOutput, False)]
     property Ora_Inizio: TNullableTime read fOra_Inizio;
@@ -33912,31 +34122,31 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Applica_Campi_Aggiunti_Manualmente = class (TzStoredProc)
   private
-    fApplicate: TNullableInteger;
-    fSaltate: TNullableInteger;
+    fApplicate: TNullableInt64;
+    fSaltate: TNullableInt64;
   private
-    property Applicate_internal: TNullableInteger read fApplicate write fApplicate;
-    property Saltate_internal: TNullableInteger read fSaltate write fSaltate;
+    property Applicate_internal: TNullableInt64 read fApplicate write fApplicate;
+    property Saltate_internal: TNullableInt64 read fSaltate write fSaltate;
   public
     //
     [TParamAttribute('APPLICATE', ptOutput, False)]
-    property Applicate: TNullableInteger read fApplicate;
+    property Applicate: TNullableInt64 read fApplicate;
     //
     [TParamAttribute('SALTATE', ptOutput, False)]
-    property Saltate: TNullableInteger read fSaltate;
+    property Saltate: TNullableInt64 read fSaltate;
 end;
 
 [TStoredProcedure('ANONYMIZER.APPROVA_CONFIGURAZIONE', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Approva_Configurazione = class (TzStoredProc)
   private
-    fCampi_Approvati: TNullableInteger;
+    fCampi_Approvati: TNullableInt64;
   private
-    property Campi_Approvati_internal: TNullableInteger read fCampi_Approvati write fCampi_Approvati;
+    property Campi_Approvati_internal: TNullableInt64 read fCampi_Approvati write fCampi_Approvati;
   public
     //
     [TParamAttribute('CAMPI_APPROVATI', ptOutput, False)]
-    property Campi_Approvati: TNullableInteger read fCampi_Approvati;
+    property Campi_Approvati: TNullableInt64 read fCampi_Approvati;
 end;
 
 [TStoredProcedure('ANONYMIZER.CAMPI_AGGIUNTI_MANUALMENTE', True)]
@@ -33987,14 +34197,14 @@ TSP_anonymizer__Esegui = class (TzStoredProc)
     fConferma: TNullableString;
     fSimulazione: TNullableBoolean;
     fId_Esecuzione: TNullableInt64;
-    fTabelle_Elaborate: TNullableInteger;
+    fTabelle_Elaborate: TNullableInt64;
     fRighe_Elaborate: TNullableInt64;
-    fDuplicati_Risolti: TNullableInteger;
+    fDuplicati_Risolti: TNullableInt64;
   private
     property Id_Esecuzione_internal: TNullableInt64 read fId_Esecuzione write fId_Esecuzione;
-    property Tabelle_Elaborate_internal: TNullableInteger read fTabelle_Elaborate write fTabelle_Elaborate;
+    property Tabelle_Elaborate_internal: TNullableInt64 read fTabelle_Elaborate write fTabelle_Elaborate;
     property Righe_Elaborate_internal: TNullableInt64 read fRighe_Elaborate write fRighe_Elaborate;
-    property Duplicati_Risolti_internal: TNullableInteger read fDuplicati_Risolti write fDuplicati_Risolti;
+    property Duplicati_Risolti_internal: TNullableInt64 read fDuplicati_Risolti write fDuplicati_Risolti;
   public
     //
     [TParamAttribute('NOME_DATABASE', ptInput, False)]
@@ -34010,13 +34220,13 @@ TSP_anonymizer__Esegui = class (TzStoredProc)
     property Id_Esecuzione: TNullableInt64 read fId_Esecuzione;
     //
     [TParamAttribute('TABELLE_ELABORATE', ptOutput, False)]
-    property Tabelle_Elaborate: TNullableInteger read fTabelle_Elaborate;
+    property Tabelle_Elaborate: TNullableInt64 read fTabelle_Elaborate;
     //
     [TParamAttribute('RIGHE_ELABORATE', ptOutput, False)]
     property Righe_Elaborate: TNullableInt64 read fRighe_Elaborate;
     //
     [TParamAttribute('DUPLICATI_RISOLTI', ptOutput, False)]
-    property Duplicati_Risolti: TNullableInteger read fDuplicati_Risolti;
+    property Duplicati_Risolti: TNullableInt64 read fDuplicati_Risolti;
 end;
 
 [TStoredProcedure('ANONYMIZER.ESEGUI_CICLO')]
@@ -34090,26 +34300,26 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Normalizza_Ordini = class (TzStoredProc)
   private
-    fCampi_Promossi: TNullableInteger;
+    fCampi_Promossi: TNullableInt64;
   private
-    property Campi_Promossi_internal: TNullableInteger read fCampi_Promossi write fCampi_Promossi;
+    property Campi_Promossi_internal: TNullableInt64 read fCampi_Promossi write fCampi_Promossi;
   public
     //
     [TParamAttribute('CAMPI_PROMOSSI', ptOutput, False)]
-    property Campi_Promossi: TNullableInteger read fCampi_Promossi;
+    property Campi_Promossi: TNullableInt64 read fCampi_Promossi;
 end;
 
 [TStoredProcedure('ANONYMIZER.OSCURA_CUSTOM_NON_CLASSIFICATE', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Oscura_Custom_Non_Classificate = class (TzStoredProc)
   private
-    fOscurate: TNullableInteger;
+    fOscurate: TNullableInt64;
   private
-    property Oscurate_internal: TNullableInteger read fOscurate write fOscurate;
+    property Oscurate_internal: TNullableInt64 read fOscurate write fOscurate;
   public
     //
     [TParamAttribute('OSCURATE', ptOutput, False)]
-    property Oscurate: TNullableInteger read fOscurate;
+    property Oscurate: TNullableInt64 read fOscurate;
 end;
 
 [TStoredProcedure('ANONYMIZER.RILEVA_CAMPI', True)]
@@ -34117,29 +34327,29 @@ end;
 TSP_anonymizer__Rileva_Campi = class (TzStoredProc)
   private
     fSovrascrivi_Esistenti: TNullableBoolean;
-    fCampi_Rilevati: TNullableInteger;
+    fCampi_Rilevati: TNullableInt64;
   private
-    property Campi_Rilevati_internal: TNullableInteger read fCampi_Rilevati write fCampi_Rilevati;
+    property Campi_Rilevati_internal: TNullableInt64 read fCampi_Rilevati write fCampi_Rilevati;
   public
     //
     [TParamAttribute('SOVRASCRIVI_ESISTENTI', ptInput, False)]
     property Sovrascrivi_Esistenti: TNullableBoolean read fSovrascrivi_Esistenti write fSovrascrivi_Esistenti;
     //
     [TParamAttribute('CAMPI_RILEVATI', ptOutput, False)]
-    property Campi_Rilevati: TNullableInteger read fCampi_Rilevati;
+    property Campi_Rilevati: TNullableInt64 read fCampi_Rilevati;
 end;
 
 [TStoredProcedure('ANONYMIZER.RIPRISTINA_TRIGGER', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Ripristina_Trigger = class (TzStoredProc)
   private
-    fTrigger_Ripristinati: TNullableInteger;
+    fTrigger_Ripristinati: TNullableInt64;
   private
-    property Trigger_Ripristinati_internal: TNullableInteger read fTrigger_Ripristinati write fTrigger_Ripristinati;
+    property Trigger_Ripristinati_internal: TNullableInt64 read fTrigger_Ripristinati write fTrigger_Ripristinati;
   public
     //
     [TParamAttribute('TRIGGER_RIPRISTINATI', ptOutput, False)]
-    property Trigger_Ripristinati: TNullableInteger read fTrigger_Ripristinati;
+    property Trigger_Ripristinati: TNullableInt64 read fTrigger_Ripristinati;
 end;
 
 [TStoredProcedure('ANONYMIZER.RIPRISTINA_VINCOLI_UNIVOCI', True)]
@@ -34171,10 +34381,10 @@ TSP_anonymizer__Risolvi_Duplicati = class (TzStoredProc)
   private
     fRelation_Name: TNullableString;
     fField_Name: TNullableString;
-    fRighe_Corrette: TNullableInteger;
+    fRighe_Corrette: TNullableInt64;
     fPassaggi: TNullableInteger;
   private
-    property Righe_Corrette_internal: TNullableInteger read fRighe_Corrette write fRighe_Corrette;
+    property Righe_Corrette_internal: TNullableInt64 read fRighe_Corrette write fRighe_Corrette;
     property Passaggi_internal: TNullableInteger read fPassaggi write fPassaggi;
   public
     //
@@ -34185,7 +34395,7 @@ TSP_anonymizer__Risolvi_Duplicati = class (TzStoredProc)
     property Field_Name: TNullableString read fField_Name write fField_Name;
     //
     [TParamAttribute('RIGHE_CORRETTE', ptOutput, False)]
-    property Righe_Corrette: TNullableInteger read fRighe_Corrette;
+    property Righe_Corrette: TNullableInt64 read fRighe_Corrette;
     //
     [TParamAttribute('PASSAGGI', ptOutput, False)]
     property Passaggi: TNullableInteger read fPassaggi;
@@ -34195,13 +34405,13 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Sospendi_Trigger = class (TzStoredProc)
   private
-    fTrigger_Sospesi: TNullableInteger;
+    fTrigger_Sospesi: TNullableInt64;
   private
-    property Trigger_Sospesi_internal: TNullableInteger read fTrigger_Sospesi write fTrigger_Sospesi;
+    property Trigger_Sospesi_internal: TNullableInt64 read fTrigger_Sospesi write fTrigger_Sospesi;
   public
     //
     [TParamAttribute('TRIGGER_SOSPESI', ptOutput, False)]
-    property Trigger_Sospesi: TNullableInteger read fTrigger_Sospesi;
+    property Trigger_Sospesi: TNullableInt64 read fTrigger_Sospesi;
 end;
 
 [TStoredProcedure('ANONYMIZER.SOSPENDI_VINCOLI_UNIVOCI', True)]
@@ -34231,26 +34441,26 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Spegni_Colonne_Di_Chiave = class (TzStoredProc)
   private
-    fSpente: TNullableInteger;
+    fSpente: TNullableInt64;
   private
-    property Spente_internal: TNullableInteger read fSpente write fSpente;
+    property Spente_internal: TNullableInt64 read fSpente write fSpente;
   public
     //
     [TParamAttribute('SPENTE', ptOutput, False)]
-    property Spente: TNullableInteger read fSpente;
+    property Spente: TNullableInt64 read fSpente;
 end;
 
 [TStoredProcedure('ANONYMIZER.SVUOTA_TABELLE_TEMPORANEE', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer__Svuota_Tabelle_Temporanee = class (TzStoredProc)
   private
-    fSvuotate: TNullableInteger;
+    fSvuotate: TNullableInt64;
   private
-    property Svuotate_internal: TNullableInteger read fSvuotate write fSvuotate;
+    property Svuotate_internal: TNullableInt64 read fSvuotate write fSvuotate;
   public
     //
     [TParamAttribute('SVUOTATE', ptOutput, False)]
-    property Svuotate: TNullableInteger read fSvuotate;
+    property Svuotate: TNullableInt64 read fSvuotate;
 end;
 
 [TStoredProcedure('ANONYMIZER.VERIFICA', True)]
@@ -34280,13 +34490,13 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer_Gesty__Configura = class (TzStoredProc)
   private
-    fCampi_Configurati: TNullableInteger;
+    fCampi_Configurati: TNullableInt64;
   private
-    property Campi_Configurati_internal: TNullableInteger read fCampi_Configurati write fCampi_Configurati;
+    property Campi_Configurati_internal: TNullableInt64 read fCampi_Configurati write fCampi_Configurati;
   public
     //
     [TParamAttribute('CAMPI_CONFIGURATI', ptOutput, False)]
-    property Campi_Configurati: TNullableInteger read fCampi_Configurati;
+    property Campi_Configurati: TNullableInt64 read fCampi_Configurati;
 end;
 
 [TStoredProcedure('ANONYMIZER_GESTY.ESEGUI_ANONIMIZZAZIONE')]
@@ -34305,21 +34515,21 @@ end;
 TSP_anonymizer_Gesty__Inizializza = class (TzStoredProc)
   private
     fParola_Ordine: TNullableString;
-    fCampi_Configurati: TNullableInteger;
-    fCampi_Approvati: TNullableInteger;
+    fCampi_Configurati: TNullableInt64;
+    fCampi_Approvati: TNullableInt64;
   private
-    property Campi_Configurati_internal: TNullableInteger read fCampi_Configurati write fCampi_Configurati;
-    property Campi_Approvati_internal: TNullableInteger read fCampi_Approvati write fCampi_Approvati;
+    property Campi_Configurati_internal: TNullableInt64 read fCampi_Configurati write fCampi_Configurati;
+    property Campi_Approvati_internal: TNullableInt64 read fCampi_Approvati write fCampi_Approvati;
   public
     //
     [TParamAttribute('PAROLA_ORDINE', ptInput, False)]
     property Parola_Ordine: TNullableString read fParola_Ordine write fParola_Ordine;
     //
     [TParamAttribute('CAMPI_CONFIGURATI', ptOutput, False)]
-    property Campi_Configurati: TNullableInteger read fCampi_Configurati;
+    property Campi_Configurati: TNullableInt64 read fCampi_Configurati;
     //
     [TParamAttribute('CAMPI_APPROVATI', ptOutput, False)]
-    property Campi_Approvati: TNullableInteger read fCampi_Approvati;
+    property Campi_Approvati: TNullableInt64 read fCampi_Approvati;
 end;
 
 [TStoredProcedure('ANONYMIZER_GESTY.PREPARA')]
@@ -34411,13 +34621,13 @@ TSP_base__Data_Dictionary = class (TzStoredProc)
     fOrigin_Relation_Type: TNullableString;
     fOrigin_Relation_Name: TNullableString;
     fOrigin_Field_Name: TNullableString;
-    fField_Position: TNullableInteger;
+    fField_Position: TNullableInt64;
     fField_Domain: TNullableString;
-    fField_Type: TNullableInteger;
-    fField_Sub_Type: TNullableInteger;
+    fField_Type: TNullableInt64;
+    fField_Sub_Type: TNullableInt64;
     fField_Type_Str: TNullableString;
-    fField_Size: TNullableInteger;
-    fField_Decimals: TNullableInteger;
+    fField_Size: TNullableInt64;
+    fField_Decimals: TNullableInt64;
     fCalculated: TNullableBoolean;
     fIdentity_: TNullableBoolean;
     fReadonly: TNullableBoolean;
@@ -34426,7 +34636,7 @@ TSP_base__Data_Dictionary = class (TzStoredProc)
     fCaption: TNullableString;
     fAlign: TNullableString;
     fEditor_Type: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fLookup: TNullableString;
     fPicklist: TNullableString;
     fSensitivity: TNullableInteger;
@@ -34439,13 +34649,13 @@ TSP_base__Data_Dictionary = class (TzStoredProc)
     property Origin_Relation_Type_internal: TNullableString read fOrigin_Relation_Type write fOrigin_Relation_Type;
     property Origin_Relation_Name_internal: TNullableString read fOrigin_Relation_Name write fOrigin_Relation_Name;
     property Origin_Field_Name_internal: TNullableString read fOrigin_Field_Name write fOrigin_Field_Name;
-    property Field_Position_internal: TNullableInteger read fField_Position write fField_Position;
+    property Field_Position_internal: TNullableInt64 read fField_Position write fField_Position;
     property Field_Domain_internal: TNullableString read fField_Domain write fField_Domain;
-    property Field_Type_internal: TNullableInteger read fField_Type write fField_Type;
-    property Field_Sub_Type_internal: TNullableInteger read fField_Sub_Type write fField_Sub_Type;
+    property Field_Type_internal: TNullableInt64 read fField_Type write fField_Type;
+    property Field_Sub_Type_internal: TNullableInt64 read fField_Sub_Type write fField_Sub_Type;
     property Field_Type_Str_internal: TNullableString read fField_Type_Str write fField_Type_Str;
-    property Field_Size_internal: TNullableInteger read fField_Size write fField_Size;
-    property Field_Decimals_internal: TNullableInteger read fField_Decimals write fField_Decimals;
+    property Field_Size_internal: TNullableInt64 read fField_Size write fField_Size;
+    property Field_Decimals_internal: TNullableInt64 read fField_Decimals write fField_Decimals;
     property Calculated_internal: TNullableBoolean read fCalculated write fCalculated;
     property Identity__internal: TNullableBoolean read fIdentity_ write fIdentity_;
     property Readonly_internal: TNullableBoolean read fReadonly write fReadonly;
@@ -34453,7 +34663,7 @@ TSP_base__Data_Dictionary = class (TzStoredProc)
     property Caption_internal: TNullableString read fCaption write fCaption;
     property Align_internal: TNullableString read fAlign write fAlign;
     property Editor_Type_internal: TNullableString read fEditor_Type write fEditor_Type;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Lookup_internal: TNullableString read fLookup write fLookup;
     property Picklist_internal: TNullableString read fPicklist write fPicklist;
     property Sensitivity_internal: TNullableInteger read fSensitivity write fSensitivity;
@@ -34493,25 +34703,25 @@ TSP_base__Data_Dictionary = class (TzStoredProc)
     property Origin_Field_Name: TNullableString read fOrigin_Field_Name;
     //
     [TParamAttribute('FIELD_POSITION', ptOutput, False)]
-    property Field_Position: TNullableInteger read fField_Position;
+    property Field_Position: TNullableInt64 read fField_Position;
     //
     [TParamAttribute('FIELD_DOMAIN', ptOutput, False)]
     property Field_Domain: TNullableString read fField_Domain;
     //
     [TParamAttribute('FIELD_TYPE', ptOutput, False)]
-    property Field_Type: TNullableInteger read fField_Type;
+    property Field_Type: TNullableInt64 read fField_Type;
     //
     [TParamAttribute('FIELD_SUB_TYPE', ptOutput, False)]
-    property Field_Sub_Type: TNullableInteger read fField_Sub_Type;
+    property Field_Sub_Type: TNullableInt64 read fField_Sub_Type;
     //
     [TParamAttribute('FIELD_TYPE_STR', ptOutput, False)]
     property Field_Type_Str: TNullableString read fField_Type_Str;
     //
     [TParamAttribute('FIELD_SIZE', ptOutput, False)]
-    property Field_Size: TNullableInteger read fField_Size;
+    property Field_Size: TNullableInt64 read fField_Size;
     //
     [TParamAttribute('FIELD_DECIMALS', ptOutput, False)]
-    property Field_Decimals: TNullableInteger read fField_Decimals;
+    property Field_Decimals: TNullableInt64 read fField_Decimals;
     //
     [TParamAttribute('CALCULATED', ptOutput, False)]
     property Calculated: TNullableBoolean read fCalculated;
@@ -34538,7 +34748,7 @@ TSP_base__Data_Dictionary = class (TzStoredProc)
     property Editor_Type: TNullableString read fEditor_Type;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('LOOKUP', ptOutput, False)]
     property Lookup: TNullableString read fLookup;
@@ -34742,14 +34952,14 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Load = class (TzStoredProc)
     fGrid_Export_Selected: TNullableBoolean;
     fGrid_Export_Filename: TNullableString;
     fGrid_Export_Formats: TNullableString;
-    fGrid_Page_Size: TNullableInteger;
+    fGrid_Page_Size: TNullableInt64;
     fGrid_Page_Sizes: TNullableString;
-    fForm_Col_Count: TNullableInteger;
+    fForm_Col_Count: TNullableInt64;
     fForm_Label_Loc: TNullableString;
     fForm_Label_Colon: TNullableBoolean;
     fForm_Layout: TNullableString;
-    fForm_Width: TNullableInteger;
-    fForm_Height: TNullableInteger;
+    fForm_Width: TNullableInt64;
+    fForm_Height: TNullableInt64;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Pk_Fields_internal: TNullableString read fPk_Fields write fPk_Fields;
@@ -34770,14 +34980,14 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Load = class (TzStoredProc)
     property Grid_Export_Selected_internal: TNullableBoolean read fGrid_Export_Selected write fGrid_Export_Selected;
     property Grid_Export_Filename_internal: TNullableString read fGrid_Export_Filename write fGrid_Export_Filename;
     property Grid_Export_Formats_internal: TNullableString read fGrid_Export_Formats write fGrid_Export_Formats;
-    property Grid_Page_Size_internal: TNullableInteger read fGrid_Page_Size write fGrid_Page_Size;
+    property Grid_Page_Size_internal: TNullableInt64 read fGrid_Page_Size write fGrid_Page_Size;
     property Grid_Page_Sizes_internal: TNullableString read fGrid_Page_Sizes write fGrid_Page_Sizes;
-    property Form_Col_Count_internal: TNullableInteger read fForm_Col_Count write fForm_Col_Count;
+    property Form_Col_Count_internal: TNullableInt64 read fForm_Col_Count write fForm_Col_Count;
     property Form_Label_Loc_internal: TNullableString read fForm_Label_Loc write fForm_Label_Loc;
     property Form_Label_Colon_internal: TNullableBoolean read fForm_Label_Colon write fForm_Label_Colon;
     property Form_Layout_internal: TNullableString read fForm_Layout write fForm_Layout;
-    property Form_Width_internal: TNullableInteger read fForm_Width write fForm_Width;
-    property Form_Height_internal: TNullableInteger read fForm_Height write fForm_Height;
+    property Form_Width_internal: TNullableInt64 read fForm_Width write fForm_Width;
+    property Form_Height_internal: TNullableInt64 read fForm_Height write fForm_Height;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -34862,13 +35072,13 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Load = class (TzStoredProc)
     property Grid_Export_Formats: TNullableString read fGrid_Export_Formats;
     //
     [TParamAttribute('GRID_PAGE_SIZE', ptOutput, False)]
-    property Grid_Page_Size: TNullableInteger read fGrid_Page_Size;
+    property Grid_Page_Size: TNullableInt64 read fGrid_Page_Size;
     //
     [TParamAttribute('GRID_PAGE_SIZES', ptOutput, False)]
     property Grid_Page_Sizes: TNullableString read fGrid_Page_Sizes;
     //
     [TParamAttribute('FORM_COL_COUNT', ptOutput, False)]
-    property Form_Col_Count: TNullableInteger read fForm_Col_Count;
+    property Form_Col_Count: TNullableInt64 read fForm_Col_Count;
     //
     [TParamAttribute('FORM_LABEL_LOC', ptOutput, False)]
     property Form_Label_Loc: TNullableString read fForm_Label_Loc;
@@ -34880,10 +35090,10 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Load = class (TzStoredProc)
     property Form_Layout: TNullableString read fForm_Layout;
     //
     [TParamAttribute('FORM_WIDTH', ptOutput, False)]
-    property Form_Width: TNullableInteger read fForm_Width;
+    property Form_Width: TNullableInt64 read fForm_Width;
     //
     [TParamAttribute('FORM_HEIGHT', ptOutput, False)]
-    property Form_Height: TNullableInteger read fForm_Height;
+    property Form_Height: TNullableInt64 read fForm_Height;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_CUSTOM_SAVE')]
@@ -34915,14 +35125,14 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Save = class (TzStoredProc)
     fGrid_Export_Selected: TNullableBoolean;
     fGrid_Export_Filename: TNullableString;
     fGrid_Export_Formats: TNullableString;
-    fGrid_Page_Size: TNullableInteger;
+    fGrid_Page_Size: TNullableInt64;
     fGrid_Page_Sizes: TNullableString;
-    fForm_Col_Count: TNullableInteger;
+    fForm_Col_Count: TNullableInt64;
     fForm_Label_Loc: TNullableString;
     fForm_Label_Colon: TNullableBoolean;
     fForm_Layout: TNullableString;
-    fForm_Width: TNullableInteger;
-    fForm_Height: TNullableInteger;
+    fForm_Width: TNullableInt64;
+    fForm_Height: TNullableInt64;
   private
     procedure SetSql_Select(const Value: TStringList);
     procedure SetSql_Count(const Value: TStringList);
@@ -35011,13 +35221,13 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Save = class (TzStoredProc)
     property Grid_Export_Formats: TNullableString read fGrid_Export_Formats write fGrid_Export_Formats;
     //
     [TParamAttribute('GRID_PAGE_SIZE', ptInput, False)]
-    property Grid_Page_Size: TNullableInteger read fGrid_Page_Size write fGrid_Page_Size;
+    property Grid_Page_Size: TNullableInt64 read fGrid_Page_Size write fGrid_Page_Size;
     //
     [TParamAttribute('GRID_PAGE_SIZES', ptInput, False)]
     property Grid_Page_Sizes: TNullableString read fGrid_Page_Sizes write fGrid_Page_Sizes;
     //
     [TParamAttribute('FORM_COL_COUNT', ptInput, False)]
-    property Form_Col_Count: TNullableInteger read fForm_Col_Count write fForm_Col_Count;
+    property Form_Col_Count: TNullableInt64 read fForm_Col_Count write fForm_Col_Count;
     //
     [TParamAttribute('FORM_LABEL_LOC', ptInput, False)]
     property Form_Label_Loc: TNullableString read fForm_Label_Loc write fForm_Label_Loc;
@@ -35029,10 +35239,10 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Save = class (TzStoredProc)
     property Form_Layout: TNullableString read fForm_Layout write fForm_Layout;
     //
     [TParamAttribute('FORM_WIDTH', ptInput, False)]
-    property Form_Width: TNullableInteger read fForm_Width write fForm_Width;
+    property Form_Width: TNullableInt64 read fForm_Width write fForm_Width;
     //
     [TParamAttribute('FORM_HEIGHT', ptInput, False)]
-    property Form_Height: TNullableInteger read fForm_Height write fForm_Height;
+    property Form_Height: TNullableInt64 read fForm_Height write fForm_Height;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_FIELDS_CUSTOM_DELETE_CUSTOM')]
@@ -35385,14 +35595,14 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     fGrid_Export_Selected: TNullableBoolean;
     fGrid_Export_Filename: TNullableString;
     fGrid_Export_Formats: TNullableString;
-    fGrid_Page_Size: TNullableInteger;
+    fGrid_Page_Size: TNullableInt64;
     fGrid_Page_Sizes: TNullableString;
-    fForm_Col_Count: TNullableInteger;
+    fForm_Col_Count: TNullableInt64;
     fForm_Label_Loc: TNullableString;
     fForm_Label_Colon: TNullableBoolean;
     fForm_Layout: TNullableString;
-    fForm_Width: TNullableInteger;
-    fForm_Height: TNullableInteger;
+    fForm_Width: TNullableInt64;
+    fForm_Height: TNullableInt64;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Dm_internal: TNullableString read fDm write fDm;
@@ -35415,14 +35625,14 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     property Grid_Export_Selected_internal: TNullableBoolean read fGrid_Export_Selected write fGrid_Export_Selected;
     property Grid_Export_Filename_internal: TNullableString read fGrid_Export_Filename write fGrid_Export_Filename;
     property Grid_Export_Formats_internal: TNullableString read fGrid_Export_Formats write fGrid_Export_Formats;
-    property Grid_Page_Size_internal: TNullableInteger read fGrid_Page_Size write fGrid_Page_Size;
+    property Grid_Page_Size_internal: TNullableInt64 read fGrid_Page_Size write fGrid_Page_Size;
     property Grid_Page_Sizes_internal: TNullableString read fGrid_Page_Sizes write fGrid_Page_Sizes;
-    property Form_Col_Count_internal: TNullableInteger read fForm_Col_Count write fForm_Col_Count;
+    property Form_Col_Count_internal: TNullableInt64 read fForm_Col_Count write fForm_Col_Count;
     property Form_Label_Loc_internal: TNullableString read fForm_Label_Loc write fForm_Label_Loc;
     property Form_Label_Colon_internal: TNullableBoolean read fForm_Label_Colon write fForm_Label_Colon;
     property Form_Layout_internal: TNullableString read fForm_Layout write fForm_Layout;
-    property Form_Width_internal: TNullableInteger read fForm_Width write fForm_Width;
-    property Form_Height_internal: TNullableInteger read fForm_Height write fForm_Height;
+    property Form_Width_internal: TNullableInt64 read fForm_Width write fForm_Width;
+    property Form_Height_internal: TNullableInt64 read fForm_Height write fForm_Height;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -35513,13 +35723,13 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     property Grid_Export_Formats: TNullableString read fGrid_Export_Formats;
     //
     [TParamAttribute('GRID_PAGE_SIZE', ptOutput, False)]
-    property Grid_Page_Size: TNullableInteger read fGrid_Page_Size;
+    property Grid_Page_Size: TNullableInt64 read fGrid_Page_Size;
     //
     [TParamAttribute('GRID_PAGE_SIZES', ptOutput, False)]
     property Grid_Page_Sizes: TNullableString read fGrid_Page_Sizes;
     //
     [TParamAttribute('FORM_COL_COUNT', ptOutput, False)]
-    property Form_Col_Count: TNullableInteger read fForm_Col_Count;
+    property Form_Col_Count: TNullableInt64 read fForm_Col_Count;
     //
     [TParamAttribute('FORM_LABEL_LOC', ptOutput, False)]
     property Form_Label_Loc: TNullableString read fForm_Label_Loc;
@@ -35531,10 +35741,10 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     property Form_Layout: TNullableString read fForm_Layout;
     //
     [TParamAttribute('FORM_WIDTH', ptOutput, False)]
-    property Form_Width: TNullableInteger read fForm_Width;
+    property Form_Width: TNullableInt64 read fForm_Width;
     //
     [TParamAttribute('FORM_HEIGHT', ptOutput, False)]
-    property Form_Height: TNullableInteger read fForm_Height;
+    property Form_Height: TNullableInt64 read fForm_Height;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_META_LOAD', True)]
@@ -35610,14 +35820,14 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Save = class (TzStoredProc)
     fGrid_Export_Selected: TNullableBoolean;
     fGrid_Export_Filename: TNullableString;
     fGrid_Export_Formats: TNullableString;
-    fGrid_Page_Size: TNullableInteger;
+    fGrid_Page_Size: TNullableInt64;
     fGrid_Page_Sizes: TNullableString;
-    fForm_Col_Count: TNullableInteger;
+    fForm_Col_Count: TNullableInt64;
     fForm_Label_Loc: TNullableString;
     fForm_Label_Colon: TNullableBoolean;
     fForm_Layout: TNullableString;
-    fForm_Width: TNullableInteger;
-    fForm_Height: TNullableInteger;
+    fForm_Width: TNullableInt64;
+    fForm_Height: TNullableInt64;
   private
     procedure SetSql_Select(const Value: TStringList);
     procedure SetSql_Count(const Value: TStringList);
@@ -35706,13 +35916,13 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Save = class (TzStoredProc)
     property Grid_Export_Formats: TNullableString read fGrid_Export_Formats write fGrid_Export_Formats;
     //
     [TParamAttribute('GRID_PAGE_SIZE', ptInput, False)]
-    property Grid_Page_Size: TNullableInteger read fGrid_Page_Size write fGrid_Page_Size;
+    property Grid_Page_Size: TNullableInt64 read fGrid_Page_Size write fGrid_Page_Size;
     //
     [TParamAttribute('GRID_PAGE_SIZES', ptInput, False)]
     property Grid_Page_Sizes: TNullableString read fGrid_Page_Sizes write fGrid_Page_Sizes;
     //
     [TParamAttribute('FORM_COL_COUNT', ptInput, False)]
-    property Form_Col_Count: TNullableInteger read fForm_Col_Count write fForm_Col_Count;
+    property Form_Col_Count: TNullableInt64 read fForm_Col_Count write fForm_Col_Count;
     //
     [TParamAttribute('FORM_LABEL_LOC', ptInput, False)]
     property Form_Label_Loc: TNullableString read fForm_Label_Loc write fForm_Label_Loc;
@@ -35724,10 +35934,10 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Save = class (TzStoredProc)
     property Form_Layout: TNullableString read fForm_Layout write fForm_Layout;
     //
     [TParamAttribute('FORM_WIDTH', ptInput, False)]
-    property Form_Width: TNullableInteger read fForm_Width write fForm_Width;
+    property Form_Width: TNullableInt64 read fForm_Width write fForm_Width;
     //
     [TParamAttribute('FORM_HEIGHT', ptInput, False)]
-    property Form_Height: TNullableInteger read fForm_Height write fForm_Height;
+    property Form_Height: TNullableInt64 read fForm_Height write fForm_Height;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_BUTTONS_CUSTOM_DELETE_CUSTOM')]
@@ -35755,9 +35965,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Load = class (TzStoredProc)
     fButton_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fBtn_Text: TNullableString;
     fBtn_Type: TNullableString;
     fBtn_Icon: TNullableString;
@@ -35772,9 +35982,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Load = class (TzStoredProc)
     property Button_Name_internal: TNullableString read fButton_Name write fButton_Name;
     property Container_Name_internal: TNullableString read fContainer_Name write fContainer_Name;
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Btn_Text_internal: TNullableString read fBtn_Text write fBtn_Text;
     property Btn_Type_internal: TNullableString read fBtn_Type write fBtn_Type;
     property Btn_Icon_internal: TNullableString read fBtn_Icon write fBtn_Icon;
@@ -35805,13 +36015,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Load = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('BTN_TEXT', ptOutput, False)]
     property Btn_Text: TNullableString read fBtn_Text;
@@ -35849,9 +36059,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Save = class (TzStoredProc)
     fButton_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fBtn_Text: TNullableString;
     fBtn_Type: TNullableString;
     fBtn_Icon: TNullableString;
@@ -35876,13 +36086,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Save = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('BTN_TEXT', ptInput, False)]
     property Btn_Text: TNullableString read fBtn_Text write fBtn_Text;
@@ -35922,9 +36132,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Load = class (TzStoredProc)
     fButton_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fBtn_Text: TNullableString;
     fBtn_Type: TNullableString;
     fBtn_Icon: TNullableString;
@@ -35939,9 +36149,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Load = class (TzStoredProc)
     property Button_Name_internal: TNullableString read fButton_Name write fButton_Name;
     property Container_Name_internal: TNullableString read fContainer_Name write fContainer_Name;
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Btn_Text_internal: TNullableString read fBtn_Text write fBtn_Text;
     property Btn_Type_internal: TNullableString read fBtn_Type write fBtn_Type;
     property Btn_Icon_internal: TNullableString read fBtn_Icon write fBtn_Icon;
@@ -35972,13 +36182,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Load = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('BTN_TEXT', ptOutput, False)]
     property Btn_Text: TNullableString read fBtn_Text;
@@ -36016,9 +36226,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Save = class (TzStoredProc)
     fButton_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fBtn_Text: TNullableString;
     fBtn_Type: TNullableString;
     fBtn_Icon: TNullableString;
@@ -36043,13 +36253,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Save = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('BTN_TEXT', ptInput, False)]
     property Btn_Text: TNullableString read fBtn_Text write fBtn_Text;
@@ -36110,10 +36320,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Load = class (TzStoredProc)
     fContainer_Type: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
@@ -36121,10 +36331,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Load = class (TzStoredProc)
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
     property Parent_Container_Name_internal: TNullableString read fParent_Container_Name write fParent_Container_Name;
     property Parent_Container_Type_internal: TNullableString read fParent_Container_Type write fParent_Container_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Caption_internal: TNullableString read fCaption write fCaption;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Css_Class_internal: TNullableString read fCss_Class write fCss_Class;
   public
     //
@@ -36153,7 +36363,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Load = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -36162,7 +36372,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Load = class (TzStoredProc)
     property Caption: TNullableString read fCaption;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptOutput, False)]
     property Css_Class: TNullableString read fCss_Class;
@@ -36177,10 +36387,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Save = class (TzStoredProc)
     fContainer_Type: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
   public
     //
@@ -36200,7 +36410,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Save = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type write fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -36209,7 +36419,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Container_Save = class (TzStoredProc)
     property Caption: TNullableString read fCaption write fCaption;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptInput, False)]
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
@@ -36240,17 +36450,17 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Custom_Load = class (TzStoredProc)
     fEmpty_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Empty_Name_internal: TNullableString read fEmpty_Name write fEmpty_Name;
     property Container_Name_internal: TNullableString read fContainer_Name write fContainer_Name;
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
   public
     //
     [TParamAttribute('PARAM_DATASET', ptInput, False)]
@@ -36272,13 +36482,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Custom_Load = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_EMPTY_CUSTOM_SAVE')]
@@ -36289,9 +36499,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Custom_Save = class (TzStoredProc)
     fEmpty_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
   public
     //
     [TParamAttribute('DATASET', ptInput, False)]
@@ -36307,13 +36517,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Custom_Save = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_EMPTY_LOAD', True)]
@@ -36326,17 +36536,17 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Load = class (TzStoredProc)
     fEmpty_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Empty_Name_internal: TNullableString read fEmpty_Name write fEmpty_Name;
     property Container_Name_internal: TNullableString read fContainer_Name write fContainer_Name;
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
   public
     //
     [TParamAttribute('PARAM_DATASET', ptInput, False)]
@@ -36358,13 +36568,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Load = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_EMPTY_SAVE')]
@@ -36375,9 +36585,9 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Save = class (TzStoredProc)
     fEmpty_Name: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
   public
     //
     [TParamAttribute('DATASET', ptInput, False)]
@@ -36393,13 +36603,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Save = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_FIELDS_CUSTOM_DELETE_CUSTOM')]
@@ -36427,10 +36637,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Load = class (TzStoredProc)
     fField: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fLabel_Text: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fLinebreak: TNullableBoolean;
     fPlaceholder: TNullableString;
     fHelp_Text: TNullableString;
@@ -36442,10 +36652,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Load = class (TzStoredProc)
     property Field_internal: TNullableString read fField write fField;
     property Container_Name_internal: TNullableString read fContainer_Name write fContainer_Name;
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Label_Text_internal: TNullableString read fLabel_Text write fLabel_Text;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Linebreak_internal: TNullableBoolean read fLinebreak write fLinebreak;
     property Placeholder_internal: TNullableString read fPlaceholder write fPlaceholder;
     property Help_Text_internal: TNullableString read fHelp_Text write fHelp_Text;
@@ -36475,7 +36685,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Load = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -36484,7 +36694,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Load = class (TzStoredProc)
     property Label_Text: TNullableString read fLabel_Text;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('LINEBREAK', ptOutput, False)]
     property Linebreak: TNullableBoolean read fLinebreak;
@@ -36513,10 +36723,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Save = class (TzStoredProc)
     fField: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fLabel_Text: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fLinebreak: TNullableBoolean;
     fPlaceholder: TNullableString;
     fHelp_Text: TNullableString;
@@ -36543,7 +36753,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Save = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -36552,7 +36762,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Save = class (TzStoredProc)
     property Label_Text: TNullableString read fLabel_Text write fLabel_Text;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('LINEBREAK', ptInput, False)]
     property Linebreak: TNullableBoolean read fLinebreak write fLinebreak;
@@ -36583,10 +36793,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Load = class (TzStoredProc)
     fField: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fLabel_Text: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fLinebreak: TNullableBoolean;
     fPlaceholder: TNullableString;
     fHelp_Text: TNullableString;
@@ -36598,10 +36808,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Load = class (TzStoredProc)
     property Field_internal: TNullableString read fField write fField;
     property Container_Name_internal: TNullableString read fContainer_Name write fContainer_Name;
     property Container_Type_internal: TNullableString read fContainer_Type write fContainer_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Label_Text_internal: TNullableString read fLabel_Text write fLabel_Text;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Linebreak_internal: TNullableBoolean read fLinebreak write fLinebreak;
     property Placeholder_internal: TNullableString read fPlaceholder write fPlaceholder;
     property Help_Text_internal: TNullableString read fHelp_Text write fHelp_Text;
@@ -36631,7 +36841,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Load = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -36640,7 +36850,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Load = class (TzStoredProc)
     property Label_Text: TNullableString read fLabel_Text;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('LINEBREAK', ptOutput, False)]
     property Linebreak: TNullableBoolean read fLinebreak;
@@ -36669,10 +36879,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Save = class (TzStoredProc)
     fField: TNullableString;
     fContainer_Name: TNullableString;
     fContainer_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fLabel_Text: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fLinebreak: TNullableBoolean;
     fPlaceholder: TNullableString;
     fHelp_Text: TNullableString;
@@ -36699,7 +36909,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Save = class (TzStoredProc)
     property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -36708,7 +36918,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Save = class (TzStoredProc)
     property Label_Text: TNullableString read fLabel_Text write fLabel_Text;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('LINEBREAK', ptInput, False)]
     property Linebreak: TNullableBoolean read fLinebreak write fLinebreak;
@@ -36752,11 +36962,11 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Custom_Load = class (TzStoredProc)
     fParam_Group_Name: TNullableString;
     fDataset: TNullableString;
     fGroup_Name: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Group_Name_internal: TNullableString read fGroup_Name write fGroup_Name;
-    property Col_Count_internal: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count_internal: TNullableInt64 read fCol_Count write fCol_Count;
   public
     //
     [TParamAttribute('PARAM_DATASET', ptInput, False)]
@@ -36772,7 +36982,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Custom_Load = class (TzStoredProc)
     property Group_Name: TNullableString read fGroup_Name;
     //
     [TParamAttribute('COL_COUNT', ptOutput, False)]
-    property Col_Count: TNullableInteger read fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_GROUPS_CUSTOM_SAVE')]
@@ -36781,7 +36991,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Custom_Save = class (TzStoredProc)
   private
     fDataset: TNullableString;
     fGroup_Name: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
   public
     //
     [TParamAttribute('DATASET', ptInput, False)]
@@ -36791,7 +37001,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Custom_Save = class (TzStoredProc)
     property Group_Name: TNullableString read fGroup_Name write fGroup_Name;
     //
     [TParamAttribute('COL_COUNT', ptInput, False)]
-    property Col_Count: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count write fCol_Count;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_GROUPS_LOAD', True)]
@@ -36804,23 +37014,23 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Load = class (TzStoredProc)
     fGroup_Name: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Group_Name_internal: TNullableString read fGroup_Name write fGroup_Name;
     property Parent_Container_Name_internal: TNullableString read fParent_Container_Name write fParent_Container_Name;
     property Parent_Container_Type_internal: TNullableString read fParent_Container_Type write fParent_Container_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Caption_internal: TNullableString read fCaption write fCaption;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Css_Class_internal: TNullableString read fCss_Class write fCss_Class;
-    property Col_Count_internal: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count_internal: TNullableInt64 read fCol_Count write fCol_Count;
   public
     //
     [TParamAttribute('PARAM_DATASET', ptInput, False)]
@@ -36842,7 +37052,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Load = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -36851,13 +37061,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Load = class (TzStoredProc)
     property Caption: TNullableString read fCaption;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptOutput, False)]
     property Css_Class: TNullableString read fCss_Class;
     //
     [TParamAttribute('COL_COUNT', ptOutput, False)]
-    property Col_Count: TNullableInteger read fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_GROUPS_SAVE')]
@@ -36868,12 +37078,12 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Save = class (TzStoredProc)
     fGroup_Name: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
   public
     //
     [TParamAttribute('DATASET', ptInput, False)]
@@ -36889,7 +37099,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Save = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type write fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -36898,13 +37108,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Save = class (TzStoredProc)
     property Caption: TNullableString read fCaption write fCaption;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptInput, False)]
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
     //
     [TParamAttribute('COL_COUNT', ptInput, False)]
-    property Col_Count: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count write fCol_Count;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_TABBED_CUSTOM_DELETE_CUSTOM')]
@@ -36939,8 +37149,8 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Custom_Load = class (TzStoredProc)
     fScrolling_Enabled: TNullableBoolean;
     fShow_Nav_Buttons: TNullableBoolean;
     fIcon_Position: TNullableString;
-    fSelected_Index: TNullableInteger;
-    fHeight: TNullableInteger;
+    fSelected_Index: TNullableInt64;
+    fHeight: TNullableInt64;
     fTab_Panel_Options: TStringList;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
@@ -36954,8 +37164,8 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Custom_Load = class (TzStoredProc)
     property Scrolling_Enabled_internal: TNullableBoolean read fScrolling_Enabled write fScrolling_Enabled;
     property Show_Nav_Buttons_internal: TNullableBoolean read fShow_Nav_Buttons write fShow_Nav_Buttons;
     property Icon_Position_internal: TNullableString read fIcon_Position write fIcon_Position;
-    property Selected_Index_internal: TNullableInteger read fSelected_Index write fSelected_Index;
-    property Height_internal: TNullableInteger read fHeight write fHeight;
+    property Selected_Index_internal: TNullableInt64 read fSelected_Index write fSelected_Index;
+    property Height_internal: TNullableInt64 read fHeight write fHeight;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -37001,10 +37211,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Custom_Load = class (TzStoredProc)
     property Icon_Position: TNullableString read fIcon_Position;
     //
     [TParamAttribute('SELECTED_INDEX', ptOutput, False)]
-    property Selected_Index: TNullableInteger read fSelected_Index;
+    property Selected_Index: TNullableInt64 read fSelected_Index;
     //
     [TParamAttribute('HEIGHT', ptOutput, False)]
-    property Height: TNullableInteger read fHeight;
+    property Height: TNullableInt64 read fHeight;
     //
     [TParamAttribute('TAB_PANEL_OPTIONS', ptOutput, True)]
     property Tab_Panel_Options: TStringList read fTab_Panel_Options;
@@ -37025,8 +37235,8 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Custom_Save = class (TzStoredProc)
     fScrolling_Enabled: TNullableBoolean;
     fShow_Nav_Buttons: TNullableBoolean;
     fIcon_Position: TNullableString;
-    fSelected_Index: TNullableInteger;
-    fHeight: TNullableInteger;
+    fSelected_Index: TNullableInt64;
+    fHeight: TNullableInt64;
     fTab_Panel_Options: TStringList;
   private
     procedure SetTab_Panel_Options(const Value: TStringList);
@@ -37069,10 +37279,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Custom_Save = class (TzStoredProc)
     property Icon_Position: TNullableString read fIcon_Position write fIcon_Position;
     //
     [TParamAttribute('SELECTED_INDEX', ptInput, False)]
-    property Selected_Index: TNullableInteger read fSelected_Index write fSelected_Index;
+    property Selected_Index: TNullableInt64 read fSelected_Index write fSelected_Index;
     //
     [TParamAttribute('HEIGHT', ptInput, False)]
-    property Height: TNullableInteger read fHeight write fHeight;
+    property Height: TNullableInt64 read fHeight write fHeight;
     //
     [TParamAttribute('TAB_PANEL_OPTIONS', ptInput, True)]
     property Tab_Panel_Options: TStringList read fTab_Panel_Options write SetTab_Panel_Options;
@@ -37088,10 +37298,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Load = class (TzStoredProc)
     fTabbed_Name: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
     fAnimation_Enabled: TNullableBoolean;
     fSwipe_Enabled: TNullableBoolean;
@@ -37102,18 +37312,18 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Load = class (TzStoredProc)
     fScrolling_Enabled: TNullableBoolean;
     fShow_Nav_Buttons: TNullableBoolean;
     fIcon_Position: TNullableString;
-    fSelected_Index: TNullableInteger;
-    fHeight: TNullableInteger;
+    fSelected_Index: TNullableInt64;
+    fHeight: TNullableInt64;
     fTab_Panel_Options: TStringList;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Tabbed_Name_internal: TNullableString read fTabbed_Name write fTabbed_Name;
     property Parent_Container_Name_internal: TNullableString read fParent_Container_Name write fParent_Container_Name;
     property Parent_Container_Type_internal: TNullableString read fParent_Container_Type write fParent_Container_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Caption_internal: TNullableString read fCaption write fCaption;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Css_Class_internal: TNullableString read fCss_Class write fCss_Class;
     property Animation_Enabled_internal: TNullableBoolean read fAnimation_Enabled write fAnimation_Enabled;
     property Swipe_Enabled_internal: TNullableBoolean read fSwipe_Enabled write fSwipe_Enabled;
@@ -37124,8 +37334,8 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Load = class (TzStoredProc)
     property Scrolling_Enabled_internal: TNullableBoolean read fScrolling_Enabled write fScrolling_Enabled;
     property Show_Nav_Buttons_internal: TNullableBoolean read fShow_Nav_Buttons write fShow_Nav_Buttons;
     property Icon_Position_internal: TNullableString read fIcon_Position write fIcon_Position;
-    property Selected_Index_internal: TNullableInteger read fSelected_Index write fSelected_Index;
-    property Height_internal: TNullableInteger read fHeight write fHeight;
+    property Selected_Index_internal: TNullableInt64 read fSelected_Index write fSelected_Index;
+    property Height_internal: TNullableInt64 read fHeight write fHeight;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -37150,7 +37360,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Load = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -37159,7 +37369,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Load = class (TzStoredProc)
     property Caption: TNullableString read fCaption;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptOutput, False)]
     property Css_Class: TNullableString read fCss_Class;
@@ -37192,10 +37402,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Load = class (TzStoredProc)
     property Icon_Position: TNullableString read fIcon_Position;
     //
     [TParamAttribute('SELECTED_INDEX', ptOutput, False)]
-    property Selected_Index: TNullableInteger read fSelected_Index;
+    property Selected_Index: TNullableInt64 read fSelected_Index;
     //
     [TParamAttribute('HEIGHT', ptOutput, False)]
-    property Height: TNullableInteger read fHeight;
+    property Height: TNullableInt64 read fHeight;
     //
     [TParamAttribute('TAB_PANEL_OPTIONS', ptOutput, True)]
     property Tab_Panel_Options: TStringList read fTab_Panel_Options;
@@ -37209,10 +37419,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Save = class (TzStoredProc)
     fTabbed_Name: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
     fAnimation_Enabled: TNullableBoolean;
     fSwipe_Enabled: TNullableBoolean;
@@ -37223,8 +37433,8 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Save = class (TzStoredProc)
     fScrolling_Enabled: TNullableBoolean;
     fShow_Nav_Buttons: TNullableBoolean;
     fIcon_Position: TNullableString;
-    fSelected_Index: TNullableInteger;
-    fHeight: TNullableInteger;
+    fSelected_Index: TNullableInt64;
+    fHeight: TNullableInt64;
     fTab_Panel_Options: TStringList;
   private
     procedure SetTab_Panel_Options(const Value: TStringList);
@@ -37246,7 +37456,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Save = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type write fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -37255,7 +37465,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Save = class (TzStoredProc)
     property Caption: TNullableString read fCaption write fCaption;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptInput, False)]
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
@@ -37288,10 +37498,10 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Save = class (TzStoredProc)
     property Icon_Position: TNullableString read fIcon_Position write fIcon_Position;
     //
     [TParamAttribute('SELECTED_INDEX', ptInput, False)]
-    property Selected_Index: TNullableInteger read fSelected_Index write fSelected_Index;
+    property Selected_Index: TNullableInt64 read fSelected_Index write fSelected_Index;
     //
     [TParamAttribute('HEIGHT', ptInput, False)]
-    property Height: TNullableInteger read fHeight write fHeight;
+    property Height: TNullableInt64 read fHeight write fHeight;
     //
     [TParamAttribute('TAB_PANEL_OPTIONS', ptInput, True)]
     property Tab_Panel_Options: TStringList read fTab_Panel_Options write SetTab_Panel_Options;
@@ -37320,7 +37530,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Custom_Load = class (TzStoredProc)
     fParam_Tab_Name: TNullableString;
     fDataset: TNullableString;
     fTab_Name: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
     fDisabled: TNullableBoolean;
     fIcon: TNullableString;
     fBadge: TNullableString;
@@ -37328,7 +37538,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Custom_Load = class (TzStoredProc)
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Tab_Name_internal: TNullableString read fTab_Name write fTab_Name;
-    property Col_Count_internal: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count_internal: TNullableInt64 read fCol_Count write fCol_Count;
     property Disabled_internal: TNullableBoolean read fDisabled write fDisabled;
     property Icon_internal: TNullableString read fIcon write fIcon;
     property Badge_internal: TNullableString read fBadge write fBadge;
@@ -37348,7 +37558,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Custom_Load = class (TzStoredProc)
     property Tab_Name: TNullableString read fTab_Name;
     //
     [TParamAttribute('COL_COUNT', ptOutput, False)]
-    property Col_Count: TNullableInteger read fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count;
     //
     [TParamAttribute('DISABLED', ptOutput, False)]
     property Disabled: TNullableBoolean read fDisabled;
@@ -37369,7 +37579,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Custom_Save = class (TzStoredProc)
   private
     fDataset: TNullableString;
     fTab_Name: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
     fDisabled: TNullableBoolean;
     fIcon: TNullableString;
     fBadge: TNullableString;
@@ -37383,7 +37593,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Custom_Save = class (TzStoredProc)
     property Tab_Name: TNullableString read fTab_Name write fTab_Name;
     //
     [TParamAttribute('COL_COUNT', ptInput, False)]
-    property Col_Count: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count write fCol_Count;
     //
     [TParamAttribute('DISABLED', ptInput, False)]
     property Disabled: TNullableBoolean read fDisabled write fDisabled;
@@ -37409,12 +37619,12 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Load = class (TzStoredProc)
     fTabbed_Name: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
     fDisabled: TNullableBoolean;
     fIcon: TNullableString;
     fBadge: TNullableString;
@@ -37425,12 +37635,12 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Load = class (TzStoredProc)
     property Tabbed_Name_internal: TNullableString read fTabbed_Name write fTabbed_Name;
     property Parent_Container_Name_internal: TNullableString read fParent_Container_Name write fParent_Container_Name;
     property Parent_Container_Type_internal: TNullableString read fParent_Container_Type write fParent_Container_Type;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Caption_internal: TNullableString read fCaption write fCaption;
-    property Col_Span_internal: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span_internal: TNullableInt64 read fCol_Span write fCol_Span;
     property Css_Class_internal: TNullableString read fCss_Class write fCss_Class;
-    property Col_Count_internal: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count_internal: TNullableInt64 read fCol_Count write fCol_Count;
     property Disabled_internal: TNullableBoolean read fDisabled write fDisabled;
     property Icon_internal: TNullableString read fIcon write fIcon;
     property Badge_internal: TNullableString read fBadge write fBadge;
@@ -37459,7 +37669,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Load = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -37468,13 +37678,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Load = class (TzStoredProc)
     property Caption: TNullableString read fCaption;
     //
     [TParamAttribute('COL_SPAN', ptOutput, False)]
-    property Col_Span: TNullableInteger read fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptOutput, False)]
     property Css_Class: TNullableString read fCss_Class;
     //
     [TParamAttribute('COL_COUNT', ptOutput, False)]
-    property Col_Count: TNullableInteger read fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count;
     //
     [TParamAttribute('DISABLED', ptOutput, False)]
     property Disabled: TNullableBoolean read fDisabled;
@@ -37498,12 +37708,12 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Save = class (TzStoredProc)
     fTabbed_Name: TNullableString;
     fParent_Container_Name: TNullableString;
     fParent_Container_Type: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fCaption: TNullableString;
-    fCol_Span: TNullableInteger;
+    fCol_Span: TNullableInt64;
     fCss_Class: TNullableString;
-    fCol_Count: TNullableInteger;
+    fCol_Count: TNullableInt64;
     fDisabled: TNullableBoolean;
     fIcon: TNullableString;
     fBadge: TNullableString;
@@ -37526,7 +37736,7 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Save = class (TzStoredProc)
     property Parent_Container_Type: TNullableString read fParent_Container_Type write fParent_Container_Type;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -37535,13 +37745,13 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Save = class (TzStoredProc)
     property Caption: TNullableString read fCaption write fCaption;
     //
     [TParamAttribute('COL_SPAN', ptInput, False)]
-    property Col_Span: TNullableInteger read fCol_Span write fCol_Span;
+    property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
     //
     [TParamAttribute('CSS_CLASS', ptInput, False)]
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
     //
     [TParamAttribute('COL_COUNT', ptInput, False)]
-    property Col_Count: TNullableInteger read fCol_Count write fCol_Count;
+    property Col_Count: TNullableInt64 read fCol_Count write fCol_Count;
     //
     [TParamAttribute('DISABLED', ptInput, False)]
     property Disabled: TNullableBoolean read fDisabled write fDisabled;
@@ -37566,7 +37776,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Bands_Load = class (TzStoredProc)
     fBand_Name: TNullableString;
     fParent_Band: TNullableString;
     fCaption: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fAlignment: TNullableString;
     fCss_Class: TNullableString;
@@ -37575,7 +37785,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Bands_Load = class (TzStoredProc)
     property Band_Name_internal: TNullableString read fBand_Name write fBand_Name;
     property Parent_Band_internal: TNullableString read fParent_Band write fParent_Band;
     property Caption_internal: TNullableString read fCaption write fCaption;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
     property Alignment_internal: TNullableString read fAlignment write fAlignment;
     property Css_Class_internal: TNullableString read fCss_Class write fCss_Class;
@@ -37600,7 +37810,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Bands_Load = class (TzStoredProc)
     property Caption: TNullableString read fCaption;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptOutput, False)]
     property Visible: TNullableBoolean read fVisible;
@@ -37620,7 +37830,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Bands_Save = class (TzStoredProc)
     fBand_Name: TNullableString;
     fParent_Band: TNullableString;
     fCaption: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fVisible: TNullableBoolean;
     fAlignment: TNullableString;
     fCss_Class: TNullableString;
@@ -37639,7 +37849,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Bands_Save = class (TzStoredProc)
     property Caption: TNullableString read fCaption write fCaption;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('VISIBLE', ptInput, False)]
     property Visible: TNullableBoolean read fVisible write fVisible;
@@ -37677,15 +37887,15 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Load = class (TzStoredProc)
     fCaption: TNullableString;
     fData_Type: TNullableString;
     fBand_Name: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fFixed: TNullableBoolean;
     fFixed_Position: TNullableString;
     fVisible: TNullableBoolean;
-    fWidth: TNullableInteger;
-    fMin_Width: TNullableInteger;
+    fWidth: TNullableInt64;
+    fMin_Width: TNullableInt64;
     fAlignment: TNullableString;
     fFormat_Str: TNullableString;
-    fGroup_Index: TNullableInteger;
+    fGroup_Index: TNullableInt64;
     fSummary_Type: TNullableString;
     fAllow_Filter: TNullableBoolean;
     fAllow_Sort: TNullableBoolean;
@@ -37703,15 +37913,15 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Load = class (TzStoredProc)
     property Caption_internal: TNullableString read fCaption write fCaption;
     property Data_Type_internal: TNullableString read fData_Type write fData_Type;
     property Band_Name_internal: TNullableString read fBand_Name write fBand_Name;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Fixed_internal: TNullableBoolean read fFixed write fFixed;
     property Fixed_Position_internal: TNullableString read fFixed_Position write fFixed_Position;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
-    property Width_internal: TNullableInteger read fWidth write fWidth;
-    property Min_Width_internal: TNullableInteger read fMin_Width write fMin_Width;
+    property Width_internal: TNullableInt64 read fWidth write fWidth;
+    property Min_Width_internal: TNullableInt64 read fMin_Width write fMin_Width;
     property Alignment_internal: TNullableString read fAlignment write fAlignment;
     property Format_Str_internal: TNullableString read fFormat_Str write fFormat_Str;
-    property Group_Index_internal: TNullableInteger read fGroup_Index write fGroup_Index;
+    property Group_Index_internal: TNullableInt64 read fGroup_Index write fGroup_Index;
     property Summary_Type_internal: TNullableString read fSummary_Type write fSummary_Type;
     property Allow_Filter_internal: TNullableBoolean read fAllow_Filter write fAllow_Filter;
     property Allow_Sort_internal: TNullableBoolean read fAllow_Sort write fAllow_Sort;
@@ -37747,7 +37957,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Load = class (TzStoredProc)
     property Band_Name: TNullableString read fBand_Name;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('FIXED', ptOutput, False)]
     property Fixed: TNullableBoolean read fFixed;
@@ -37759,10 +37969,10 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Load = class (TzStoredProc)
     property Visible: TNullableBoolean read fVisible;
     //
     [TParamAttribute('WIDTH', ptOutput, False)]
-    property Width: TNullableInteger read fWidth;
+    property Width: TNullableInt64 read fWidth;
     //
     [TParamAttribute('MIN_WIDTH', ptOutput, False)]
-    property Min_Width: TNullableInteger read fMin_Width;
+    property Min_Width: TNullableInt64 read fMin_Width;
     //
     [TParamAttribute('ALIGNMENT', ptOutput, False)]
     property Alignment: TNullableString read fAlignment;
@@ -37771,7 +37981,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Load = class (TzStoredProc)
     property Format_Str: TNullableString read fFormat_Str;
     //
     [TParamAttribute('GROUP_INDEX', ptOutput, False)]
-    property Group_Index: TNullableInteger read fGroup_Index;
+    property Group_Index: TNullableInt64 read fGroup_Index;
     //
     [TParamAttribute('SUMMARY_TYPE', ptOutput, False)]
     property Summary_Type: TNullableString read fSummary_Type;
@@ -37816,15 +38026,15 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Save = class (TzStoredProc)
     fCaption: TNullableString;
     fData_Type: TNullableString;
     fBand_Name: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fFixed: TNullableBoolean;
     fFixed_Position: TNullableString;
     fVisible: TNullableBoolean;
-    fWidth: TNullableInteger;
-    fMin_Width: TNullableInteger;
+    fWidth: TNullableInt64;
+    fMin_Width: TNullableInt64;
     fAlignment: TNullableString;
     fFormat_Str: TNullableString;
-    fGroup_Index: TNullableInteger;
+    fGroup_Index: TNullableInt64;
     fSummary_Type: TNullableString;
     fAllow_Filter: TNullableBoolean;
     fAllow_Sort: TNullableBoolean;
@@ -37854,7 +38064,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Save = class (TzStoredProc)
     property Band_Name: TNullableString read fBand_Name write fBand_Name;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('FIXED', ptInput, False)]
     property Fixed: TNullableBoolean read fFixed write fFixed;
@@ -37866,10 +38076,10 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Save = class (TzStoredProc)
     property Visible: TNullableBoolean read fVisible write fVisible;
     //
     [TParamAttribute('WIDTH', ptInput, False)]
-    property Width: TNullableInteger read fWidth write fWidth;
+    property Width: TNullableInt64 read fWidth write fWidth;
     //
     [TParamAttribute('MIN_WIDTH', ptInput, False)]
-    property Min_Width: TNullableInteger read fMin_Width write fMin_Width;
+    property Min_Width: TNullableInt64 read fMin_Width write fMin_Width;
     //
     [TParamAttribute('ALIGNMENT', ptInput, False)]
     property Alignment: TNullableString read fAlignment write fAlignment;
@@ -37878,7 +38088,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Save = class (TzStoredProc)
     property Format_Str: TNullableString read fFormat_Str write fFormat_Str;
     //
     [TParamAttribute('GROUP_INDEX', ptInput, False)]
-    property Group_Index: TNullableInteger read fGroup_Index write fGroup_Index;
+    property Group_Index: TNullableInt64 read fGroup_Index write fGroup_Index;
     //
     [TParamAttribute('SUMMARY_TYPE', ptInput, False)]
     property Summary_Type: TNullableString read fSummary_Type write fSummary_Type;
@@ -37925,15 +38135,15 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Load = class (TzStoredProc)
     fCaption: TNullableString;
     fData_Type: TNullableString;
     fBand_Name: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fFixed: TNullableBoolean;
     fFixed_Position: TNullableString;
     fVisible: TNullableBoolean;
-    fWidth: TNullableInteger;
-    fMin_Width: TNullableInteger;
+    fWidth: TNullableInt64;
+    fMin_Width: TNullableInt64;
     fAlignment: TNullableString;
     fFormat_Str: TNullableString;
-    fGroup_Index: TNullableInteger;
+    fGroup_Index: TNullableInt64;
     fSummary_Type: TNullableString;
     fAllow_Filter: TNullableBoolean;
     fAllow_Sort: TNullableBoolean;
@@ -37951,15 +38161,15 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Load = class (TzStoredProc)
     property Caption_internal: TNullableString read fCaption write fCaption;
     property Data_Type_internal: TNullableString read fData_Type write fData_Type;
     property Band_Name_internal: TNullableString read fBand_Name write fBand_Name;
-    property Sort_Order_internal: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order_internal: TNullableInt64 read fSort_Order write fSort_Order;
     property Fixed_internal: TNullableBoolean read fFixed write fFixed;
     property Fixed_Position_internal: TNullableString read fFixed_Position write fFixed_Position;
     property Visible_internal: TNullableBoolean read fVisible write fVisible;
-    property Width_internal: TNullableInteger read fWidth write fWidth;
-    property Min_Width_internal: TNullableInteger read fMin_Width write fMin_Width;
+    property Width_internal: TNullableInt64 read fWidth write fWidth;
+    property Min_Width_internal: TNullableInt64 read fMin_Width write fMin_Width;
     property Alignment_internal: TNullableString read fAlignment write fAlignment;
     property Format_Str_internal: TNullableString read fFormat_Str write fFormat_Str;
-    property Group_Index_internal: TNullableInteger read fGroup_Index write fGroup_Index;
+    property Group_Index_internal: TNullableInt64 read fGroup_Index write fGroup_Index;
     property Summary_Type_internal: TNullableString read fSummary_Type write fSummary_Type;
     property Allow_Filter_internal: TNullableBoolean read fAllow_Filter write fAllow_Filter;
     property Allow_Sort_internal: TNullableBoolean read fAllow_Sort write fAllow_Sort;
@@ -37995,7 +38205,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Load = class (TzStoredProc)
     property Band_Name: TNullableString read fBand_Name;
     //
     [TParamAttribute('SORT_ORDER', ptOutput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order;
     //
     [TParamAttribute('FIXED', ptOutput, False)]
     property Fixed: TNullableBoolean read fFixed;
@@ -38007,10 +38217,10 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Load = class (TzStoredProc)
     property Visible: TNullableBoolean read fVisible;
     //
     [TParamAttribute('WIDTH', ptOutput, False)]
-    property Width: TNullableInteger read fWidth;
+    property Width: TNullableInt64 read fWidth;
     //
     [TParamAttribute('MIN_WIDTH', ptOutput, False)]
-    property Min_Width: TNullableInteger read fMin_Width;
+    property Min_Width: TNullableInt64 read fMin_Width;
     //
     [TParamAttribute('ALIGNMENT', ptOutput, False)]
     property Alignment: TNullableString read fAlignment;
@@ -38019,7 +38229,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Load = class (TzStoredProc)
     property Format_Str: TNullableString read fFormat_Str;
     //
     [TParamAttribute('GROUP_INDEX', ptOutput, False)]
-    property Group_Index: TNullableInteger read fGroup_Index;
+    property Group_Index: TNullableInt64 read fGroup_Index;
     //
     [TParamAttribute('SUMMARY_TYPE', ptOutput, False)]
     property Summary_Type: TNullableString read fSummary_Type;
@@ -38064,15 +38274,15 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Save = class (TzStoredProc)
     fCaption: TNullableString;
     fData_Type: TNullableString;
     fBand_Name: TNullableString;
-    fSort_Order: TNullableInteger;
+    fSort_Order: TNullableInt64;
     fFixed: TNullableBoolean;
     fFixed_Position: TNullableString;
     fVisible: TNullableBoolean;
-    fWidth: TNullableInteger;
-    fMin_Width: TNullableInteger;
+    fWidth: TNullableInt64;
+    fMin_Width: TNullableInt64;
     fAlignment: TNullableString;
     fFormat_Str: TNullableString;
-    fGroup_Index: TNullableInteger;
+    fGroup_Index: TNullableInt64;
     fSummary_Type: TNullableString;
     fAllow_Filter: TNullableBoolean;
     fAllow_Sort: TNullableBoolean;
@@ -38102,7 +38312,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Save = class (TzStoredProc)
     property Band_Name: TNullableString read fBand_Name write fBand_Name;
     //
     [TParamAttribute('SORT_ORDER', ptInput, False)]
-    property Sort_Order: TNullableInteger read fSort_Order write fSort_Order;
+    property Sort_Order: TNullableInt64 read fSort_Order write fSort_Order;
     //
     [TParamAttribute('FIXED', ptInput, False)]
     property Fixed: TNullableBoolean read fFixed write fFixed;
@@ -38114,10 +38324,10 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Save = class (TzStoredProc)
     property Visible: TNullableBoolean read fVisible write fVisible;
     //
     [TParamAttribute('WIDTH', ptInput, False)]
-    property Width: TNullableInteger read fWidth write fWidth;
+    property Width: TNullableInt64 read fWidth write fWidth;
     //
     [TParamAttribute('MIN_WIDTH', ptInput, False)]
-    property Min_Width: TNullableInteger read fMin_Width write fMin_Width;
+    property Min_Width: TNullableInt64 read fMin_Width write fMin_Width;
     //
     [TParamAttribute('ALIGNMENT', ptInput, False)]
     property Alignment: TNullableString read fAlignment write fAlignment;
@@ -38126,7 +38336,7 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Save = class (TzStoredProc)
     property Format_Str: TNullableString read fFormat_Str write fFormat_Str;
     //
     [TParamAttribute('GROUP_INDEX', ptInput, False)]
-    property Group_Index: TNullableInteger read fGroup_Index write fGroup_Index;
+    property Group_Index: TNullableInt64 read fGroup_Index write fGroup_Index;
     //
     [TParamAttribute('SUMMARY_TYPE', ptInput, False)]
     property Summary_Type: TNullableString read fSummary_Type write fSummary_Type;
@@ -38171,13 +38381,13 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Load = class (TzStoredProc)
     fLookup: TNullableString;
     fField: TNullableString;
     fCaption: TNullableString;
-    fWidth: TNullableInteger;
+    fWidth: TNullableInt64;
     fAlignment: TNullableString;
   private
     property Lookup_internal: TNullableString read fLookup write fLookup;
     property Field_internal: TNullableString read fField write fField;
     property Caption_internal: TNullableString read fCaption write fCaption;
-    property Width_internal: TNullableInteger read fWidth write fWidth;
+    property Width_internal: TNullableInt64 read fWidth write fWidth;
     property Alignment_internal: TNullableString read fAlignment write fAlignment;
   public
     //
@@ -38197,7 +38407,7 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Load = class (TzStoredProc)
     property Caption: TNullableString read fCaption;
     //
     [TParamAttribute('WIDTH', ptOutput, False)]
-    property Width: TNullableInteger read fWidth;
+    property Width: TNullableInt64 read fWidth;
     //
     [TParamAttribute('ALIGNMENT', ptOutput, False)]
     property Alignment: TNullableString read fAlignment;
@@ -38210,7 +38420,7 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Save = class (TzStoredProc)
     fLookup: TNullableString;
     fField: TNullableString;
     fCaption: TNullableString;
-    fWidth: TNullableInteger;
+    fWidth: TNullableInt64;
     fAlignment: TNullableString;
   public
     //
@@ -38224,7 +38434,7 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Save = class (TzStoredProc)
     property Caption: TNullableString read fCaption write fCaption;
     //
     [TParamAttribute('WIDTH', ptInput, False)]
-    property Width: TNullableInteger read fWidth write fWidth;
+    property Width: TNullableInt64 read fWidth write fWidth;
     //
     [TParamAttribute('ALIGNMENT', ptInput, False)]
     property Alignment: TNullableString read fAlignment write fAlignment;
@@ -38242,16 +38452,16 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Load = class (TzStoredProc)
     fDisplay_Expr: TNullableString;
     fParams: TStringList;
     fMappings: TStringList;
-    fPagesize: TNullableInteger;
-    fDropdown_Width: TNullableInteger;
+    fPagesize: TNullableInt64;
+    fDropdown_Width: TNullableInt64;
   private
     property Lookup_internal: TNullableString read fLookup write fLookup;
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Fk_Table_internal: TNullableString read fFk_Table write fFk_Table;
     property Value_Expr_internal: TNullableString read fValue_Expr write fValue_Expr;
     property Display_Expr_internal: TNullableString read fDisplay_Expr write fDisplay_Expr;
-    property Pagesize_internal: TNullableInteger read fPagesize write fPagesize;
-    property Dropdown_Width_internal: TNullableInteger read fDropdown_Width write fDropdown_Width;
+    property Pagesize_internal: TNullableInt64 read fPagesize write fPagesize;
+    property Dropdown_Width_internal: TNullableInt64 read fDropdown_Width write fDropdown_Width;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -38282,10 +38492,10 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Load = class (TzStoredProc)
     property Mappings: TStringList read fMappings;
     //
     [TParamAttribute('PAGESIZE', ptOutput, False)]
-    property Pagesize: TNullableInteger read fPagesize;
+    property Pagesize: TNullableInt64 read fPagesize;
     //
     [TParamAttribute('DROPDOWN_WIDTH', ptOutput, False)]
-    property Dropdown_Width: TNullableInteger read fDropdown_Width;
+    property Dropdown_Width: TNullableInt64 read fDropdown_Width;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_LOOKUPS_SAVE')]
@@ -38299,8 +38509,8 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Save = class (TzStoredProc)
     fDisplay_Expr: TNullableString;
     fParams: TStringList;
     fMappings: TStringList;
-    fPagesize: TNullableInteger;
-    fDropdown_Width: TNullableInteger;
+    fPagesize: TNullableInt64;
+    fDropdown_Width: TNullableInt64;
   private
     procedure SetParams(const Value: TStringList);
     procedure SetMappings(const Value: TStringList);
@@ -38331,10 +38541,10 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Save = class (TzStoredProc)
     property Mappings: TStringList read fMappings write SetMappings;
     //
     [TParamAttribute('PAGESIZE', ptInput, False)]
-    property Pagesize: TNullableInteger read fPagesize write fPagesize;
+    property Pagesize: TNullableInt64 read fPagesize write fPagesize;
     //
     [TParamAttribute('DROPDOWN_WIDTH', ptInput, False)]
-    property Dropdown_Width: TNullableInteger read fDropdown_Width write fDropdown_Width;
+    property Dropdown_Width: TNullableInt64 read fDropdown_Width write fDropdown_Width;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_PICKLISTS_ITEMS_LOAD', True)]
@@ -38477,14 +38687,14 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_csv__Test = class (TzStoredProc)
   private
-    fParam1: TNullableInteger;
+    fParam1: TNullableInt64;
     fDummy: TNullableBoolean;
   private
     property Dummy_internal: TNullableBoolean read fDummy write fDummy;
   public
     //
     [TParamAttribute('PARAM1', ptInput, False)]
-    property Param1: TNullableInteger read fParam1 write fParam1;
+    property Param1: TNullableInt64 read fParam1 write fParam1;
     //
     [TParamAttribute('DUMMY', ptOutput, False)]
     property Dummy: TNullableBoolean read fDummy;
@@ -38494,16 +38704,16 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_fb_Unit__Assert_Equals_Int = class (TzStoredProc)
   private
-    fExpected: TNullableInteger;
-    fActual: TNullableInteger;
+    fExpected: TNullableInt64;
+    fActual: TNullableInt64;
     fMsg: TNullableString;
   public
     //
     [TParamAttribute('EXPECTED', ptInput, False)]
-    property Expected: TNullableInteger read fExpected write fExpected;
+    property Expected: TNullableInt64 read fExpected write fExpected;
     //
     [TParamAttribute('ACTUAL', ptInput, False)]
-    property Actual: TNullableInteger read fActual write fActual;
+    property Actual: TNullableInt64 read fActual write fActual;
     //
     [TParamAttribute('MSG', ptInput, False)]
     property Msg: TNullableString read fMsg write fMsg;
@@ -38732,7 +38942,7 @@ TSP_meta__Functions = class (TzStoredProc)
     fFunction_Source: TStringList;
     fReturn_Sql_Data_Type: TNullableString;
     fReturn_Domain: TNullableString;
-    fReturn_Mechanism: TNullableInteger;
+    fReturn_Mechanism: TNullableInt64;
     fReturn_Type_Of_Column: TNullableString;
     fReturn_Type: TNullableInteger;
     fReturn_Sub_Type: TNullableInteger;
@@ -38744,7 +38954,7 @@ TSP_meta__Functions = class (TzStoredProc)
     property Description_internal: TNullableString read fDescription write fDescription;
     property Return_Sql_Data_Type_internal: TNullableString read fReturn_Sql_Data_Type write fReturn_Sql_Data_Type;
     property Return_Domain_internal: TNullableString read fReturn_Domain write fReturn_Domain;
-    property Return_Mechanism_internal: TNullableInteger read fReturn_Mechanism write fReturn_Mechanism;
+    property Return_Mechanism_internal: TNullableInt64 read fReturn_Mechanism write fReturn_Mechanism;
     property Return_Type_Of_Column_internal: TNullableString read fReturn_Type_Of_Column write fReturn_Type_Of_Column;
     property Return_Type_internal: TNullableInteger read fReturn_Type write fReturn_Type;
     property Return_Sub_Type_internal: TNullableInteger read fReturn_Sub_Type write fReturn_Sub_Type;
@@ -38777,7 +38987,7 @@ TSP_meta__Functions = class (TzStoredProc)
     property Return_Domain: TNullableString read fReturn_Domain;
     //
     [TParamAttribute('RETURN_MECHANISM', ptOutput, False)]
-    property Return_Mechanism: TNullableInteger read fReturn_Mechanism;
+    property Return_Mechanism: TNullableInt64 read fReturn_Mechanism;
     //
     [TParamAttribute('RETURN_TYPE_OF_COLUMN', ptOutput, False)]
     property Return_Type_Of_Column: TNullableString read fReturn_Type_Of_Column;
@@ -38807,7 +39017,7 @@ TSP_meta__Function_Params = class (TzStoredProc)
     fDescription: TNullableString;
     fParam_Sql_Data_Type: TNullableString;
     fParam_Domain: TNullableString;
-    fParam_Mechanism: TNullableInteger;
+    fParam_Mechanism: TNullableInt64;
     fParam_Type_Of_Column: TNullableString;
     fParam_Type: TNullableInteger;
     fParam_Sub_Type: TNullableInteger;
@@ -38821,7 +39031,7 @@ TSP_meta__Function_Params = class (TzStoredProc)
     property Description_internal: TNullableString read fDescription write fDescription;
     property Param_Sql_Data_Type_internal: TNullableString read fParam_Sql_Data_Type write fParam_Sql_Data_Type;
     property Param_Domain_internal: TNullableString read fParam_Domain write fParam_Domain;
-    property Param_Mechanism_internal: TNullableInteger read fParam_Mechanism write fParam_Mechanism;
+    property Param_Mechanism_internal: TNullableInt64 read fParam_Mechanism write fParam_Mechanism;
     property Param_Type_Of_Column_internal: TNullableString read fParam_Type_Of_Column write fParam_Type_Of_Column;
     property Param_Type_internal: TNullableInteger read fParam_Type write fParam_Type;
     property Param_Sub_Type_internal: TNullableInteger read fParam_Sub_Type write fParam_Sub_Type;
@@ -38855,7 +39065,7 @@ TSP_meta__Function_Params = class (TzStoredProc)
     property Param_Domain: TNullableString read fParam_Domain;
     //
     [TParamAttribute('PARAM_MECHANISM', ptOutput, False)]
-    property Param_Mechanism: TNullableInteger read fParam_Mechanism;
+    property Param_Mechanism: TNullableInt64 read fParam_Mechanism;
     //
     [TParamAttribute('PARAM_TYPE_OF_COLUMN', ptOutput, False)]
     property Param_Type_Of_Column: TNullableString read fParam_Type_Of_Column;
@@ -38991,7 +39201,7 @@ TSP_meta__Procedure_Params = class (TzStoredProc)
     fParam_Name: TNullableString;
     fParam_Type: TNullableInteger;
     fDomain_Name: TNullableString;
-    fMechanism: TNullableInteger;
+    fMechanism: TNullableInt64;
     fType_Of_Column: TNullableString;
     fField_Default: TNullableString;
     fField_Length: TNullableInteger;
@@ -39012,7 +39222,7 @@ TSP_meta__Procedure_Params = class (TzStoredProc)
     property Param_Name_internal: TNullableString read fParam_Name write fParam_Name;
     property Param_Type_internal: TNullableInteger read fParam_Type write fParam_Type;
     property Domain_Name_internal: TNullableString read fDomain_Name write fDomain_Name;
-    property Mechanism_internal: TNullableInteger read fMechanism write fMechanism;
+    property Mechanism_internal: TNullableInt64 read fMechanism write fMechanism;
     property Type_Of_Column_internal: TNullableString read fType_Of_Column write fType_Of_Column;
     property Field_Default_internal: TNullableString read fField_Default write fField_Default;
     property Field_Length_internal: TNullableInteger read fField_Length write fField_Length;
@@ -39051,7 +39261,7 @@ TSP_meta__Procedure_Params = class (TzStoredProc)
     property Domain_Name: TNullableString read fDomain_Name;
     //
     [TParamAttribute('MECHANISM', ptOutput, False)]
-    property Mechanism: TNullableInteger read fMechanism;
+    property Mechanism: TNullableInt64 read fMechanism;
     //
     [TParamAttribute('TYPE_OF_COLUMN', ptOutput, False)]
     property Type_Of_Column: TNullableString read fType_Of_Column;
@@ -39378,18 +39588,18 @@ TSP_meta__Table_Indexes = class (TzStoredProc)
     fRelation_Name: TNullableString;
     fIndex_Name: TNullableString;
     fDescription: TStringList;
-    fUnique_Flag: TNullableInteger;
-    fIndex_Inactive: TNullableInteger;
-    fIndex_Type: TNullableInteger;
+    fUnique_Flag: TNullableInt64;
+    fIndex_Inactive: TNullableInt64;
+    fIndex_Type: TNullableInt64;
     fExpression_Source: TStringList;
     fField_Name: TNullableString;
     fField_Position: TNullableInteger;
   private
     property Relation_Name_internal: TNullableString read fRelation_Name write fRelation_Name;
     property Index_Name_internal: TNullableString read fIndex_Name write fIndex_Name;
-    property Unique_Flag_internal: TNullableInteger read fUnique_Flag write fUnique_Flag;
-    property Index_Inactive_internal: TNullableInteger read fIndex_Inactive write fIndex_Inactive;
-    property Index_Type_internal: TNullableInteger read fIndex_Type write fIndex_Type;
+    property Unique_Flag_internal: TNullableInt64 read fUnique_Flag write fUnique_Flag;
+    property Index_Inactive_internal: TNullableInt64 read fIndex_Inactive write fIndex_Inactive;
+    property Index_Type_internal: TNullableInt64 read fIndex_Type write fIndex_Type;
     property Field_Name_internal: TNullableString read fField_Name write fField_Name;
     property Field_Position_internal: TNullableInteger read fField_Position write fField_Position;
   public
@@ -39410,13 +39620,13 @@ TSP_meta__Table_Indexes = class (TzStoredProc)
     property Description: TStringList read fDescription;
     //
     [TParamAttribute('UNIQUE_FLAG', ptOutput, False)]
-    property Unique_Flag: TNullableInteger read fUnique_Flag;
+    property Unique_Flag: TNullableInt64 read fUnique_Flag;
     //
     [TParamAttribute('INDEX_INACTIVE', ptOutput, False)]
-    property Index_Inactive: TNullableInteger read fIndex_Inactive;
+    property Index_Inactive: TNullableInt64 read fIndex_Inactive;
     //
     [TParamAttribute('INDEX_TYPE', ptOutput, False)]
-    property Index_Type: TNullableInteger read fIndex_Type;
+    property Index_Type: TNullableInt64 read fIndex_Type;
     //
     [TParamAttribute('EXPRESSION_SOURCE', ptOutput, True)]
     property Expression_Source: TStringList read fExpression_Source;
@@ -39436,12 +39646,12 @@ TSP_meta__Table_Primary_Keys = class (TzStoredProc)
     fTable_Name: TNullableString;
     fPrimary_Key_Name: TNullableString;
     fField_Name: TNullableString;
-    fField_Position: TNullableInteger;
+    fField_Position: TNullableInt64;
   private
     property Table_Name_internal: TNullableString read fTable_Name write fTable_Name;
     property Primary_Key_Name_internal: TNullableString read fPrimary_Key_Name write fPrimary_Key_Name;
     property Field_Name_internal: TNullableString read fField_Name write fField_Name;
-    property Field_Position_internal: TNullableInteger read fField_Position write fField_Position;
+    property Field_Position_internal: TNullableInt64 read fField_Position write fField_Position;
   public
     //
     [TParamAttribute('PARAM_TABLE_NAME', ptInput, False)]
@@ -39457,7 +39667,7 @@ TSP_meta__Table_Primary_Keys = class (TzStoredProc)
     property Field_Name: TNullableString read fField_Name;
     //
     [TParamAttribute('FIELD_POSITION', ptOutput, False)]
-    property Field_Position: TNullableInteger read fField_Position;
+    property Field_Position: TNullableInt64 read fField_Position;
 end;
 
 [TStoredProcedure('META.TABLE_UNIQUES', True)]
@@ -39591,14 +39801,14 @@ TSP_meta__Views = class (TzStoredProc)
     fTrigger_Ins: TNullableBoolean;
     fTrigger_Upd: TNullableBoolean;
     fTrigger_Del: TNullableBoolean;
-    fCreation_Order: TNullableInteger;
+    fCreation_Order: TNullableInt64;
   private
     property View_Name_internal: TNullableString read fView_Name write fView_Name;
     property View_Description_internal: TNullableString read fView_Description write fView_Description;
     property Trigger_Ins_internal: TNullableBoolean read fTrigger_Ins write fTrigger_Ins;
     property Trigger_Upd_internal: TNullableBoolean read fTrigger_Upd write fTrigger_Upd;
     property Trigger_Del_internal: TNullableBoolean read fTrigger_Del write fTrigger_Del;
-    property Creation_Order_internal: TNullableInteger read fCreation_Order write fCreation_Order;
+    property Creation_Order_internal: TNullableInt64 read fCreation_Order write fCreation_Order;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -39626,7 +39836,7 @@ TSP_meta__Views = class (TzStoredProc)
     property Trigger_Del: TNullableBoolean read fTrigger_Del;
     //
     [TParamAttribute('CREATION_ORDER', ptOutput, False)]
-    property Creation_Order: TNullableInteger read fCreation_Order;
+    property Creation_Order: TNullableInt64 read fCreation_Order;
 end;
 
 [TStoredProcedure('META.VIEW_FIELDS', True)]
@@ -40467,26 +40677,26 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_monitor__Long_Transactions = class (TzStoredProc)
   private
-    fMin_Seconds: TNullableInteger;
+    fMin_Seconds: TNullableInt64;
     fTransaction_Id: TNullableInt64;
     fAttachment_Id: TNullableInt64;
     fUser_Name: TNullableString;
     fStarted_At: TNullableDateTime;
-    fDuration_Seconds: TNullableInteger;
+    fDuration_Seconds: TNullableInt64;
     fDuration_Formatted: TNullableString;
-    fNum_Statements: TNullableInteger;
+    fNum_Statements: TNullableInt64;
   private
     property Transaction_Id_internal: TNullableInt64 read fTransaction_Id write fTransaction_Id;
     property Attachment_Id_internal: TNullableInt64 read fAttachment_Id write fAttachment_Id;
     property User_Name_internal: TNullableString read fUser_Name write fUser_Name;
     property Started_At_internal: TNullableDateTime read fStarted_At write fStarted_At;
-    property Duration_Seconds_internal: TNullableInteger read fDuration_Seconds write fDuration_Seconds;
+    property Duration_Seconds_internal: TNullableInt64 read fDuration_Seconds write fDuration_Seconds;
     property Duration_Formatted_internal: TNullableString read fDuration_Formatted write fDuration_Formatted;
-    property Num_Statements_internal: TNullableInteger read fNum_Statements write fNum_Statements;
+    property Num_Statements_internal: TNullableInt64 read fNum_Statements write fNum_Statements;
   public
     //
     [TParamAttribute('MIN_SECONDS', ptInput, False)]
-    property Min_Seconds: TNullableInteger read fMin_Seconds write fMin_Seconds;
+    property Min_Seconds: TNullableInt64 read fMin_Seconds write fMin_Seconds;
     //
     [TParamAttribute('TRANSACTION_ID', ptOutput, False)]
     property Transaction_Id: TNullableInt64 read fTransaction_Id;
@@ -40501,13 +40711,13 @@ TSP_monitor__Long_Transactions = class (TzStoredProc)
     property Started_At: TNullableDateTime read fStarted_At;
     //
     [TParamAttribute('DURATION_SECONDS', ptOutput, False)]
-    property Duration_Seconds: TNullableInteger read fDuration_Seconds;
+    property Duration_Seconds: TNullableInt64 read fDuration_Seconds;
     //
     [TParamAttribute('DURATION_FORMATTED', ptOutput, False)]
     property Duration_Formatted: TNullableString read fDuration_Formatted;
     //
     [TParamAttribute('NUM_STATEMENTS', ptOutput, False)]
-    property Num_Statements: TNullableInteger read fNum_Statements;
+    property Num_Statements: TNullableInt64 read fNum_Statements;
 end;
 
 [TStoredProcedure('MONITOR.MEMORY_BY_CONNECTION', True)]
@@ -41222,8 +41432,8 @@ TSP_profiler__Statements = class (TzStoredProc)
     fRoutine_Name: TNullableString;
     fSql_Text: TStringList;
     fRequest_Id: TNullableInt64;
-    fLine_Num: TNullableInteger;
-    fColumn_Num: TNullableInteger;
+    fLine_Num: TNullableInt64;
+    fColumn_Num: TNullableInt64;
     fCounter: TNullableInt64;
     fMin_Elapsed_Time: TNullableInt64;
     fMin_Elapsed_Time_Msec: TNullableInteger;
@@ -41248,8 +41458,8 @@ TSP_profiler__Statements = class (TzStoredProc)
     property Package_Name_internal: TNullableString read fPackage_Name write fPackage_Name;
     property Routine_Name_internal: TNullableString read fRoutine_Name write fRoutine_Name;
     property Request_Id_internal: TNullableInt64 read fRequest_Id write fRequest_Id;
-    property Line_Num_internal: TNullableInteger read fLine_Num write fLine_Num;
-    property Column_Num_internal: TNullableInteger read fColumn_Num write fColumn_Num;
+    property Line_Num_internal: TNullableInt64 read fLine_Num write fLine_Num;
+    property Column_Num_internal: TNullableInt64 read fColumn_Num write fColumn_Num;
     property Counter_internal: TNullableInt64 read fCounter write fCounter;
     property Min_Elapsed_Time_internal: TNullableInt64 read fMin_Elapsed_Time write fMin_Elapsed_Time;
     property Min_Elapsed_Time_Msec_internal: TNullableInteger read fMin_Elapsed_Time_Msec write fMin_Elapsed_Time_Msec;
@@ -41305,10 +41515,10 @@ TSP_profiler__Statements = class (TzStoredProc)
     property Request_Id: TNullableInt64 read fRequest_Id;
     //
     [TParamAttribute('LINE_NUM', ptOutput, False)]
-    property Line_Num: TNullableInteger read fLine_Num;
+    property Line_Num: TNullableInt64 read fLine_Num;
     //
     [TParamAttribute('COLUMN_NUM', ptOutput, False)]
-    property Column_Num: TNullableInteger read fColumn_Num;
+    property Column_Num: TNullableInt64 read fColumn_Num;
     //
     [TParamAttribute('COUNTER', ptOutput, False)]
     property Counter: TNullableInt64 read fCounter;
@@ -41445,7 +41655,7 @@ TSP_ranges__Range_Date_Ore = class (TzStoredProc)
     fAl_Giorno: TNullableDate;
     fDalle_Ore: TNullableTime;
     fAlle_Ore: TNullableTime;
-    fMinuti_Incremento: TNullableInteger;
+    fMinuti_Incremento: TNullableInt64;
     fData: TNullableDate;
     fOra: TNullableTime;
     fData_Ora_Inizio: TNullableDateTime;
@@ -41474,7 +41684,7 @@ TSP_ranges__Range_Date_Ore = class (TzStoredProc)
     property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
     //
     [TParamAttribute('MINUTI_INCREMENTO', ptInput, False)]
-    property Minuti_Incremento: TNullableInteger read fMinuti_Incremento write fMinuti_Incremento;
+    property Minuti_Incremento: TNullableInt64 read fMinuti_Incremento write fMinuti_Incremento;
     //
     [TParamAttribute('DATA', ptOutput, False)]
     property Data: TNullableDate read fData;
@@ -41521,21 +41731,21 @@ end;
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_ranges__Range_Interi = class (TzStoredProc)
   private
-    fDal_Numero: TNullableInteger;
-    fAl_Numero: TNullableInteger;
-    fValore: TNullableInteger;
+    fDal_Numero: TNullableInt64;
+    fAl_Numero: TNullableInt64;
+    fValore: TNullableInt64;
   private
-    property Valore_internal: TNullableInteger read fValore write fValore;
+    property Valore_internal: TNullableInt64 read fValore write fValore;
   public
     //
     [TParamAttribute('DAL_NUMERO', ptInput, False)]
-    property Dal_Numero: TNullableInteger read fDal_Numero write fDal_Numero;
+    property Dal_Numero: TNullableInt64 read fDal_Numero write fDal_Numero;
     //
     [TParamAttribute('AL_NUMERO', ptInput, False)]
-    property Al_Numero: TNullableInteger read fAl_Numero write fAl_Numero;
+    property Al_Numero: TNullableInt64 read fAl_Numero write fAl_Numero;
     //
     [TParamAttribute('VALORE', ptOutput, False)]
-    property Valore: TNullableInteger read fValore;
+    property Valore: TNullableInt64 read fValore;
 end;
 
 [TStoredProcedure('RANGES.RANGE_MESI', True)]
@@ -41596,7 +41806,7 @@ TSP_ranges__Range_Ore = class (TzStoredProc)
   private
     fDalle_Ore: TNullableTime;
     fAlle_Ore: TNullableTime;
-    fMinuti_Incremento: TNullableInteger;
+    fMinuti_Incremento: TNullableInt64;
     fOra_Inizio: TNullableTime;
     fOra_Fine: TNullableTime;
     fDurata: TNullableInteger;
@@ -41613,7 +41823,7 @@ TSP_ranges__Range_Ore = class (TzStoredProc)
     property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
     //
     [TParamAttribute('MINUTI_INCREMENTO', ptInput, False)]
-    property Minuti_Incremento: TNullableInteger read fMinuti_Incremento write fMinuti_Incremento;
+    property Minuti_Incremento: TNullableInt64 read fMinuti_Incremento write fMinuti_Incremento;
     //
     [TParamAttribute('ORA_INIZIO', ptOutput, False)]
     property Ora_Inizio: TNullableTime read fOra_Inizio;
@@ -41961,8 +42171,8 @@ TSP_web_Area_Personale__Risorsa_Autorizzazioni_Pagamento = class (TzStoredProc)
     fNumero_Autorizzazione: TNullableString;
     fCup: TNullableString;
     fStato_Autorizzazione: TNullableString;
-    fNumero_Progetti: TNullableInteger;
-    fNumero_Incarichi: TNullableInteger;
+    fNumero_Progetti: TNullableInt64;
+    fNumero_Incarichi: TNullableInt64;
     fTotale_Ore_Autorizzate: TNullableDouble;
     fTotale_Compensi_Autorizzati: TNullableDouble;
   private
@@ -41973,8 +42183,8 @@ TSP_web_Area_Personale__Risorsa_Autorizzazioni_Pagamento = class (TzStoredProc)
     property Numero_Autorizzazione_internal: TNullableString read fNumero_Autorizzazione write fNumero_Autorizzazione;
     property Cup_internal: TNullableString read fCup write fCup;
     property Stato_Autorizzazione_internal: TNullableString read fStato_Autorizzazione write fStato_Autorizzazione;
-    property Numero_Progetti_internal: TNullableInteger read fNumero_Progetti write fNumero_Progetti;
-    property Numero_Incarichi_internal: TNullableInteger read fNumero_Incarichi write fNumero_Incarichi;
+    property Numero_Progetti_internal: TNullableInt64 read fNumero_Progetti write fNumero_Progetti;
+    property Numero_Incarichi_internal: TNullableInt64 read fNumero_Incarichi write fNumero_Incarichi;
     property Totale_Ore_Autorizzate_internal: TNullableDouble read fTotale_Ore_Autorizzate write fTotale_Ore_Autorizzate;
     property Totale_Compensi_Autorizzati_internal: TNullableDouble read fTotale_Compensi_Autorizzati write fTotale_Compensi_Autorizzati;
   public
@@ -42004,10 +42214,10 @@ TSP_web_Area_Personale__Risorsa_Autorizzazioni_Pagamento = class (TzStoredProc)
     property Stato_Autorizzazione: TNullableString read fStato_Autorizzazione;
     //
     [TParamAttribute('NUMERO_PROGETTI', ptOutput, False)]
-    property Numero_Progetti: TNullableInteger read fNumero_Progetti;
+    property Numero_Progetti: TNullableInt64 read fNumero_Progetti;
     //
     [TParamAttribute('NUMERO_INCARICHI', ptOutput, False)]
-    property Numero_Incarichi: TNullableInteger read fNumero_Incarichi;
+    property Numero_Incarichi: TNullableInt64 read fNumero_Incarichi;
     //
     [TParamAttribute('TOTALE_ORE_AUTORIZZATE', ptOutput, False)]
     property Totale_Ore_Autorizzate: TNullableDouble read fTotale_Ore_Autorizzate;
@@ -43550,19 +43760,6 @@ begin
 end;
 
 
-constructor TSP_incarichi_Motivazione_Get.Create;
-begin
-  inherited;
-  fTesto_Default := CreateStringList;
-end;
-
-destructor TSP_incarichi_Motivazione_Get.Destroy;
-begin
-  FreeAndNil(fTesto_Default);
-  inherited;
-end;
-
-
 constructor TSP_get_Mail_Prenotazione_Aula.Create;
 begin
   inherited;
@@ -43616,6 +43813,19 @@ end;
 destructor TSP_inail_Comunic_Inizio_Tirocinio.Destroy;
 begin
   FreeAndNil(fInail_Sede_Indirizzo);
+  inherited;
+end;
+
+
+constructor TSP_incarichi_Motivazione_Get.Create;
+begin
+  inherited;
+  fTesto_Default := CreateStringList;
+end;
+
+destructor TSP_incarichi_Motivazione_Get.Destroy;
+begin
+  FreeAndNil(fTesto_Default);
   inherited;
 end;
 
@@ -43828,6 +44038,24 @@ begin
 end;
 
 
+constructor TSP_obj_Files_Firma_Log_Request_Add_Autonoma.Create;
+begin
+  inherited;
+  fRichiesta := CreateStringList;
+end;
+
+destructor TSP_obj_Files_Firma_Log_Request_Add_Autonoma.Destroy;
+begin
+  FreeAndNil(fRichiesta);
+  inherited;
+end;
+
+procedure TSP_obj_Files_Firma_Log_Request_Add_Autonoma.SetRichiesta(const Value: TStringList);
+begin
+  FRichiesta.Assign(Value);
+end;
+
+
 constructor TSP_obj_Files_Firma_Log_Response_Add.Create;
 begin
   inherited;
@@ -43848,6 +44076,31 @@ begin
 end;
 
 procedure TSP_obj_Files_Firma_Log_Response_Add.SetErrore(const Value: TStringList);
+begin
+  FErrore.Assign(Value);
+end;
+
+
+constructor TSP_obj_Files_Firma_Log_Response_Add_Autonoma.Create;
+begin
+  inherited;
+  fRisposta := CreateStringList;
+  fErrore := CreateStringList;
+end;
+
+destructor TSP_obj_Files_Firma_Log_Response_Add_Autonoma.Destroy;
+begin
+  FreeAndNil(fRisposta);
+  FreeAndNil(fErrore);
+  inherited;
+end;
+
+procedure TSP_obj_Files_Firma_Log_Response_Add_Autonoma.SetRisposta(const Value: TStringList);
+begin
+  FRisposta.Assign(Value);
+end;
+
+procedure TSP_obj_Files_Firma_Log_Response_Add_Autonoma.SetErrore(const Value: TStringList);
 begin
   FErrore.Assign(Value);
 end;
@@ -44714,6 +44967,37 @@ end;
 procedure TSP_zzz_Split_Memo.SetMemo(const Value: TStringList);
 begin
   FMemo.Assign(Value);
+end;
+
+
+constructor TSP_zz_Coda_Add.Create;
+begin
+  inherited;
+  fContenuto := CreateStringList;
+end;
+
+destructor TSP_zz_Coda_Add.Destroy;
+begin
+  FreeAndNil(fContenuto);
+  inherited;
+end;
+
+procedure TSP_zz_Coda_Add.SetContenuto(const Value: TStringList);
+begin
+  FContenuto.Assign(Value);
+end;
+
+
+constructor TSP_zz_Coda_Preleva.Create;
+begin
+  inherited;
+  fContenuto := CreateStringList;
+end;
+
+destructor TSP_zz_Coda_Preleva.Destroy;
+begin
+  FreeAndNil(fContenuto);
+  inherited;
 end;
 
 
