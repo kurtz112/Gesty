@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-03
+// Ultima modifica: 2026-10-08
 // ---------------------------------------------------------------------------
 
 unit Test.zAI.Tools;
@@ -41,11 +41,9 @@ type
     procedure NomeNonValido(const Nome: string);
     [Test]
     procedure Lunghezza_SessantaquattroAmmessa_SessantacinqueNo;
-    // R-038: IsLetter accetta anche le lettere accentate, che i fornitori
-    // (OpenAI, Gemini, Claude) rifiutano: lo strumento si registra e la
-    // richiesta fallisce a caldo, proprio cio' che la regola vuole evitare
+    // R-038: le lettere accentate, che i fornitori (OpenAI, Gemini, Claude)
+    // rifiutano, non devono superare il controllo del nome
     [Test]
-    [Ignore('R-038: IsValidToolName accetta lettere accentate rifiutate dai fornitori')]
     procedure NomeConLetteraAccentata_NonValido;
   end;
 
@@ -73,10 +71,9 @@ type
     procedure AddParameter_RestituisceLoStrumento;
     [Test]
     procedure AddParameter_Ridefinito_SostituisceLoSchema;
-    // R-038: un parametro obbligatorio ridefinito compare due volte in
-    // "required"; ridefinito come facoltativo resta obbligatorio
+    // R-038: un parametro obbligatorio ridefinito compare una volta sola in
+    // "required"; ridefinito come facoltativo ne esce
     [Test]
-    [Ignore('R-038: AddParameter ridefinito duplica o lascia la voce in required')]
     procedure AddParameter_Ridefinito_RequiredCoerente;
     [Test]
     procedure Declaration_SenzaParametri_NienteParameters;

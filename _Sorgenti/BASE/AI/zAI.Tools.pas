@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-09-14
+// Ultima modifica: 2026-10-08
 // ---------------------------------------------------------------------------
 
 unit zAI.Tools;
@@ -149,16 +149,13 @@ function IsValidToolName(const AName: string): Boolean;
 
 implementation
 
-uses
-  System.Character;
-
 const
   MaxToolNameLength = 64;
   ChiaveRisultato = 'risultato';
   ChiaveErrore = 'errore';
 
 resourcestring
-  MsgNomeStrumentoNonValido = 'Nome di strumento non valido: "%s". Ammessi lettere, cifre, "_" e "-", inizio con lettera o "_", massimo 64 caratteri.';
+  MsgNomeStrumentoNonValido = 'Nome di strumento non valido: "%s". Ammessi lettere non accentate, cifre, "_" e "-", inizio con lettera o "_", massimo 64 caratteri.';
   MsgStrumentoDuplicato = 'Strumento "%s" gia'' registrato.';
   MsgStrumentoSconosciuto = 'Strumento "%s" non disponibile.';
   MsgGestoreMancante = 'Strumento "%s" senza gestore.';
@@ -173,14 +170,16 @@ begin
   if (AName = '') or (Length(AName) > MaxToolNameLength) then
     Exit;
 
-  if not (AName[1].IsLetter or (AName[1] = '_')) then
+  // Solo ASCII: OpenAI, Gemini e Claude ammettono [a-zA-Z0-9_-] e
+  // rifiutano la richiesta intera se un nome contiene una lettera accentata
+  if not CharInSet(AName[1], ['a'..'z', 'A'..'Z', '_']) then
     Exit;
 
   for Index := 2 to Length(AName) do
   begin
     Carattere := AName[Index];
 
-    if not (Carattere.IsLetterOrDigit or (Carattere = '_') or (Carattere = '-')) then
+    if not CharInSet(Carattere, ['a'..'z', 'A'..'Z', '0'..'9', '_', '-']) then
       Exit;
   end;
 
@@ -229,6 +228,7 @@ var
   Schema: TJSONObject;
   Valori: TJSONArray;
   Valore: string;
+  Indice: Integer;
 begin
   Result := Self;
 
@@ -251,6 +251,12 @@ begin
   // Un parametro ridefinito sostituisce il precedente
   FProperties.RemovePair(AName).Free;
   FProperties.AddPair(AName, Schema);
+
+  // Anche in "required": un nome ripetuto rende lo schema JSON non valido,
+  // e un parametro ridefinito come facoltativo non deve restare obbligatorio
+  for Indice := FRequired.Count - 1 downto 0 do
+    if FRequired.Items[Indice].Value = AName then
+      FRequired.Remove(Indice).Free;
 
   if ARequired then
     FRequired.Add(AName);
