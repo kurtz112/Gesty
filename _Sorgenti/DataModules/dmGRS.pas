@@ -87,6 +87,9 @@ type
     procedure EliminaFileImport;
     procedure DecidiDifferenze(Lezioni: TList<integer>; const Decisione: string);
   public
+    procedure EseguiMonitoraggioSiuf;
+    procedure CambiaStatoDifformita(Righe: TList<integer>; const Stato: string);
+  public
     procedure GeneraIncaricoMancante;
     procedure GeneraRilevamentiMancanti(orari: TList<integer>);
   public
@@ -482,6 +485,110 @@ begin
   finally
     FreeAndNil(LezioniDistinte);
   end;
+end;
+
+// Mantis #228 - 2026-10-08: lo stesso controllo che GestyScript esegue ogni mattina, a richiesta.
+// Copre ieri e oggi: oggi serve quando l'operatrice ha appena importato e inviato. Non blocca
+// niente e non avvia invii; scrive una riga nel registro per ogni difformita' trovata.
+procedure TGRS.EseguiMonitoraggioSiuf;
+var
+  sp: TSP_SIUF_MONITORAGGIO_ESEGUI;
+  ClassiControllate: integer;
+  ClassiOk: integer;
+  DifformitaAperte: integer;
+begin
+  if not ConfirmYesNo('Eseguire adesso il controllo di importazioni e invii SIUF di ieri e di oggi?' + sLineBreak + sLineBreak +
+      'Il controllo non modifica le lezioni e non invia niente a SIUF.') then
+    exit;
+
+  ClassiControllate := 0;
+  ClassiOk := 0;
+  DifformitaAperte := 0;
+
+  StartWait('Controllo di importazioni e invii...', True);
+  try
+    sp := TSP_SIUF_MONITORAGGIO_ESEGUI.Create(WriteTrans);
+    try
+      sp.Data_Dal := TDate(Date - 1);
+      sp.Data_Al := TDate(Date);
+      sp.Origine := 'MAN';
+      sp.ExecuteAndCommit;
+
+      if not sp.Classi_Controllate.IsNull then
+        ClassiControllate := sp.Classi_Controllate.Value;
+
+      if not sp.Classi_Ok.IsNull then
+        ClassiOk := sp.Classi_Ok.Value;
+
+      if not sp.Difformita_Aperte.IsNull then
+        DifformitaAperte := sp.Difformita_Aperte.Value;
+    finally
+      FreeAndNil(sp);
+    end;
+  finally
+    StopWait;
+  end;
+
+  RefreshDataSet('Siuf_Monitoraggio_Esecuzioni');
+  RefreshDataSet('Siuf_Monitoraggio_Difformita');
+
+  ConfirmOk(Format('Classi controllate: %d' + sLineBreak + 'Tutto OK: %d' + sLineBreak + 'Difformit'#224' da verificare: %d',
+      [ClassiControllate, ClassiOk, DifformitaAperte]));
+end;
+
+// Mantis #228 - 2026-10-08: cambio di stato delle difformita' selezionate (G giustificata,
+// R risolta, V da verificare). Il registro non si modifica: ogni cambio e' una riga nuova, con
+// la motivazione scritta dall'operatrice (obbligatoria per la giustificazione).
+procedure TGRS.CambiaStatoDifformita(Righe: TList<integer>; const Stato: string);
+var
+  sp: TSP_SIUF_MONITORAGGIO_CAMBIA_STATO;
+  IdRegistro: integer;
+  Motivazione: string;
+  Titolo: string;
+begin
+  if Righe.Count = 0 then
+  begin
+    ConfirmOk('Nessuna difformit'#224' selezionata.');
+    exit;
+  end;
+
+  if SameText(Stato, 'G') then
+    Titolo := 'Giustifica difformit'#224
+  else
+    if SameText(Stato, 'R') then
+      Titolo := 'Difformit'#224' risolta'
+    else
+      Titolo := 'Riapri difformit'#224;
+
+  Motivazione := '';
+  if not InputQuery(Titolo, Format('Motivazione (%d difformit'#224' selezionate):', [Righe.Count]), Motivazione) then
+    exit;
+
+  if SameText(Stato, 'G') and Motivazione.Trim.IsEmpty then
+  begin
+    ConfirmOk('Per giustificare una difformit'#224' serve la motivazione.');
+    exit;
+  end;
+
+  StartWait('Attendere...', True);
+  try
+    for IdRegistro in Righe do
+    begin
+      sp := TSP_SIUF_MONITORAGGIO_CAMBIA_STATO.Create(WriteTrans);
+      try
+        sp.Id_Siuf_Monitoraggio_Registro := IdRegistro;
+        sp.Stato := Stato;
+        sp.Note := Motivazione.Trim;
+        sp.ExecuteAndCommit;
+      finally
+        FreeAndNil(sp);
+      end;
+    end;
+  finally
+    StopWait;
+  end;
+
+  RefreshDataSet('Siuf_Monitoraggio_Difformita');
 end;
 
 procedure TGRS.EliminaFileImport;

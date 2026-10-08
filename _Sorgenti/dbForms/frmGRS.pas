@@ -60,6 +60,10 @@ type
     CooperazioneApplicativa: TAction;
     DifferenzeMantieniGesty: TAction;
     DifferenzeSovrascrivi: TAction;
+    MonitoraggioEsegui: TAction;
+    DifformitaGiustifica: TAction;
+    DifformitaRisolta: TAction;
+    DifformitaRiapri: TAction;
     procedure CooperazioneApplicativaExecute(Sender: TObject);
     procedure CooperazioneApplicativaUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -74,8 +78,14 @@ type
     procedure ImportaSIUFAccept(Sender: TObject);
     procedure DifferenzeMantieniGestyExecute(Sender: TObject);
     procedure DifferenzeSovrascriviExecute(Sender: TObject);
+    procedure MonitoraggioEseguiExecute(Sender: TObject);
+    procedure DifformitaGiustificaExecute(Sender: TObject);
+    procedure DifformitaRisoltaExecute(Sender: TObject);
+    procedure DifformitaRiapriExecute(Sender: TObject);
+    procedure DifformitaUpdate(Sender: TObject);
   private
     procedure DecidiDifferenzeSelezionate(const Decisione: string);
+    procedure CambiaStatoDifformitaSelezionate(const Stato: string);
   protected
     procedure SetupComponent(const DataSetName: String; Component: TComponent); override;
     procedure CreateDataModule; override;
@@ -216,6 +226,61 @@ procedure TFormGRS.DifferenzeSovrascriviExecute(Sender: TObject);
 begin
   inherited;
   DecidiDifferenzeSelezionate('S');
+end;
+
+// Mantis #228 - 2026-10-08: controllo a richiesta di importazioni e invii SIUF, lo stesso che
+// GestyScript esegue alle 7:00. Non blocca e non avvia invii.
+procedure TFormGRS.MonitoraggioEseguiExecute(Sender: TObject);
+begin
+  inherited;
+  GRS.EseguiMonitoraggioSiuf;
+end;
+
+// Mantis #228 - 2026-10-08: cambio di stato delle difformita' selezionate. Nel registro non si
+// modifica niente: ogni cambio e' una riga nuova (G giustificata, R risolta, V da verificare)
+procedure TFormGRS.CambiaStatoDifformitaSelezionate(const Stato: string);
+var
+  Righe: TList<integer>;
+  view: TzDbView;
+begin
+  if not Config.zSystem.Authorizhed(Gesty_Authorizations.SIUF_COOPERAZIONE_APPLICATIVA) then
+  begin
+    ConfirmOk('Utente non autorizzato.');
+    Exit;
+  end;
+
+  Righe := TList<integer>.Create;
+  try
+    view := GetView('Siuf_Monitoraggio_Difformita');
+    view.GetSelectedRows('ID_SIUF_MONITORAGGIO_REGISTRO', Righe);
+    GRS.CambiaStatoDifformita(Righe, Stato);
+  finally
+    FreeAndNil(Righe);
+  end;
+end;
+
+procedure TFormGRS.DifformitaGiustificaExecute(Sender: TObject);
+begin
+  inherited;
+  CambiaStatoDifformitaSelezionate('G');
+end;
+
+procedure TFormGRS.DifformitaRisoltaExecute(Sender: TObject);
+begin
+  inherited;
+  CambiaStatoDifformitaSelezionate('R');
+end;
+
+procedure TFormGRS.DifformitaRiapriExecute(Sender: TObject);
+begin
+  inherited;
+  CambiaStatoDifformitaSelezionate('V');
+end;
+
+procedure TFormGRS.DifformitaUpdate(Sender: TObject);
+begin
+  inherited;
+  (Sender as TAction).Visible := Config.zSystem.Authorizhed(Gesty_Authorizations.SIUF_COOPERAZIONE_APPLICATIVA);
 end;
 
 procedure TFormGRS.ImportaGOLAccept(Sender: TObject);
