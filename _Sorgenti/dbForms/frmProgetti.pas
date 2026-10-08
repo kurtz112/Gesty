@@ -163,7 +163,8 @@ var
 begin
   inherited;
 
-  view := getView('IncarichiDaLavorare');
+  // Mantis #183 - 2026-10-08: l'elenco si chiama IncarichiDaGestire (prima IncarichiDaLavorare)
+  view := getView('IncarichiDaGestire');
 
   Incarichi := TList<integer>.Create;
   try
@@ -220,7 +221,7 @@ end;
 procedure TFormProgetti.ModificaEstensoreExecute(Sender: TObject);
 begin
   inherited;
-  // Mantis #183 - 2026-10-01: dall'elenco unico (IncarichiDaLavorare)
+  // Mantis #183 - 2026-10-01: dall'elenco unico (IncarichiDaGestire)
   Progetti.ModificaEstensore(SelectedDataSetName);
 end;
 

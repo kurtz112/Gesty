@@ -72,7 +72,7 @@ type
     function IdProgettoSelezionato: integer;
     // Mantis #183 - 2026-10-02: le azioni dell'iter lavorano su un elenco di
     // incarichi e sul dataset da cui arrivano: lo stesso codice serve l'elenco
-    // unico IncarichiDaLavorare e quello delle ore residue.
+    // unico IncarichiDaGestire e quello delle ore residue.
     procedure AutorizzazioneFinanziaria(Incarichi: TList<integer>; const Azione: string);
     procedure AutorizzazioneDirezione(Incarichi: TList<integer>; const Azione: string);
     procedure AttivaIncarico(const DataSetName: string; Incarichi: TList<integer>; const Azione: string);
@@ -126,8 +126,8 @@ uses
 {$R *.dfm}
 
 const
-  // Mantis #183 - 2026-10-01: elenco unico delle richieste da lavorare
-  DATASET_DA_LAVORARE = 'IncarichiDaLavorare';
+  // Mantis #183 - 2026-10-08: elenco unico degli incarichi da gestire (prima IncarichiDaLavorare)
+  DATASET_DA_GESTIRE = 'IncarichiDaGestire';
 
 procedure TProgetti.DataModuleCreate(Sender: TObject);
 begin
@@ -299,7 +299,7 @@ begin
   if (not assigned(Incarichi)) or (Incarichi.Count = 0) then
     exit;
 
-  DataSet := GetDataSet(DATASET_DA_LAVORARE);
+  DataSet := GetDataSet(DATASET_DA_GESTIRE);
   FasiDiverse := false;
 
   Segnalibro := DataSet.Bookmark;
@@ -346,10 +346,10 @@ begin
       AutorizzazioneDirezione(Incarichi, Azione)
     else
       if SameText(Fase, 'ATTIVAZIONE') then
-        AttivaIncarico(DATASET_DA_LAVORARE, Incarichi, Azione)
+        AttivaIncarico(DATASET_DA_GESTIRE, Incarichi, Azione)
       else
         if SameText(Fase, 'ORE_RESIDUE') then
-          AccettaOreResidue(DATASET_DA_LAVORARE, Incarichi)
+          AccettaOreResidue(DATASET_DA_GESTIRE, Incarichi)
         else
           if Fase <> '' then
             ConfirmOk('Per questa fase non c''' + #232 + ' un passaggio da eseguire dall''elenco.');

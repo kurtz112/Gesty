@@ -1,5 +1,7 @@
-// Generata il 07/10/2026 21:20:42
+// Generata il 05/10/2026 22:45:37
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
+// Mantis #183 - 2026-10-06: modificata a mano (rinomine del ciclo autorizzativo degli
+// incarichi); da rigenerare dal master dopo GESTY-183-01 e sostituire.
 unit Gesty_StoredProcs;
 
 interface
@@ -13581,26 +13583,6 @@ TSP_incarichi_Integrazioni_Add = class (TzStoredProc)
     property Note: TNullableString read fNote write fNote;
 end;
 
-[TStoredProcedure('INCARICHI_MOTIVAZIONE_GET')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarichi_Motivazione_Get = class (TzStoredProc)
-  private
-    fVisibile: TNullableBoolean;
-    fTesto_Default: TStringList;
-  private
-    property Visibile_internal: TNullableBoolean read fVisibile write fVisibile;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-  public
-    //
-    [TParamAttribute('VISIBILE', ptOutput, False)]
-    property Visibile: TNullableBoolean read fVisibile;
-    //
-    [TParamAttribute('TESTO_DEFAULT', ptOutput, True)]
-    property Testo_Default: TStringList read fTesto_Default;
-end;
-
 [TStoredProcedure('INCARICHI_PIANI_PERSONALIZZATI_ADD')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_incarichi_Piani_Personalizzati_Add = class (TzStoredProc)
@@ -13837,16 +13819,7 @@ TSP_incarichi_Sync_Ore_Rilevate_Old = class (TzStoredProc)
     property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
 end;
 
-[TStoredProcedure('INCARICO_ACCETTA_ORE_RESIDUE')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarico_Accetta_Ore_Residue = class (TzStoredProc)
-  private
-    fId_Incarico: TNullableInt64;
-  public
-    //
-    [TParamAttribute('ID_INCARICO', ptInput, False)]
-    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
-end;
+// Mantis #183 - 2026-10-06: era la procedura INCARICO_ANNULLA_AUTORIZZAZIONE
 
 [TStoredProcedure('INCARICO_ANNULLA_ATTIVAZIONE')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
@@ -13858,6 +13831,8 @@ TSP_incarico_Annulla_Attivazione = class (TzStoredProc)
     [TParamAttribute('ID_INCARICO', ptInput, False)]
     property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
 end;
+
+// Mantis #183 - 2026-10-06: era la procedura INCARICO_AUTORIZZA
 
 [TStoredProcedure('INCARICO_ATTIVA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
@@ -13884,28 +13859,6 @@ TSP_incarico_Attiva = class (TzStoredProc)
     //
     [TParamAttribute('PARAMETRO_RICAVO_SPECIFICO', ptInput, False)]
     property Parametro_Ricavo_Specifico: TNullableDouble read fParametro_Ricavo_Specifico write fParametro_Ricavo_Specifico;
-end;
-
-[TStoredProcedure('INCARICO_AUTORIZZAZIONE_DIREZIONE')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarico_Autorizzazione_Direzione = class (TzStoredProc)
-  private
-    fId_Incarico: TNullableInt64;
-  public
-    //
-    [TParamAttribute('ID_INCARICO', ptInput, False)]
-    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
-end;
-
-[TStoredProcedure('INCARICO_AUTORIZZAZIONE_FINANZIARIA')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_incarico_Autorizzazione_Finanziaria = class (TzStoredProc)
-  private
-    fId_Incarico: TNullableInt64;
-  public
-    //
-    [TParamAttribute('ID_INCARICO', ptInput, False)]
-    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
 end;
 
 [TStoredProcedure('INCARICO_DETAIL', True)]
@@ -14186,6 +14139,18 @@ TSP_incarico_Genera_Supplenza = class (TzStoredProc)
     property Id_Incarico_Supplenza: TNullableInt64 read fId_Incarico_Supplenza;
 end;
 
+// Mantis #183 - 2026-10-02: era la procedura INCARICO_SET_CONGRUO
+[TStoredProcedure('INCARICO_ACCETTA_ORE_RESIDUE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Accetta_Ore_Residue = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
 [TStoredProcedure('INCARICO_SET_ESTENSORE')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_incarico_Set_Estensore = class (TzStoredProc)
@@ -14214,6 +14179,51 @@ TSP_incarico_Verifica = class (TzStoredProc)
     //
     [TParamAttribute('VERIFICA_CORSI', ptInput, False)]
     property Verifica_Corsi: TNullableBoolean read fVerifica_Corsi write fVerifica_Corsi;
+end;
+
+// Mantis #183 - 2026-10-02: era la procedura INCARICO_VERIFICATO
+[TStoredProcedure('INCARICO_AUTORIZZAZIONE_DIREZIONE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Autorizzazione_Direzione = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
+// Mantis #183 - 2026-10-02: wrapper scritto a mano nello stile del generatore
+[TStoredProcedure('INCARICO_AUTORIZZAZIONE_FINANZIARIA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Autorizzazione_Finanziaria = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
+// Mantis #183 - 2026-10-01: wrapper scritto a mano nello stile del generatore
+[TStoredProcedure('INCARICHI_MOTIVAZIONE_GET')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarichi_Motivazione_Get = class (TzStoredProc)
+  private
+    fVisibile: TNullableBoolean;
+    fTesto_Default: TStringList;
+  private
+    property Visibile_internal: TNullableBoolean read fVisibile write fVisibile;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('VISIBILE', ptOutput, False)]
+    property Visibile: TNullableBoolean read fVisibile;
+    //
+    [TParamAttribute('TESTO_DEFAULT', ptOutput, True)]
+    property Testo_Default: TStringList read fTesto_Default;
 end;
 
 [TStoredProcedure('INTERVENTI_INTEGRATIVI_GET_PROGETTO', True)]
@@ -16527,17 +16537,6 @@ TSP_obj_Files_Firma_Registrazione_Stato_Esterno = class (TzStoredProc)
     //
     [TParamAttribute('STATO_ESTERNO', ptInput, False)]
     property Stato_Esterno: TNullableString read fStato_Esterno write fStato_Esterno;
-end;
-
-[TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONI_ELIMINA')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_obj_Files_Firma_Registrazioni_Elimina = class (TzStoredProc)
-  private
-    fOid: TNullableInt64;
-  public
-    //
-    [TParamAttribute('OID', ptInput, False)]
-    property Oid: TNullableInt64 read fOid write fOid;
 end;
 
 [TStoredProcedure('OBJ_FILES_GENERAZIONE_ADD')]
@@ -20084,8 +20083,6 @@ TSP_ore_Rilevate_Genera_Rilevamento = class (TzStoredProc)
     fMateria: TNullableString;
     fContenuti: TNullableString;
     fRaise_Errors: TNullableBoolean;
-    fId_Piano_Personalizzato: TNullableInt64;
-    fServizio_Erogato: TNullableString;
     fId_Rilevamento_Ore: TNullableInt64;
   private
     property Id_Rilevamento_Ore_internal: TNullableInt64 read fId_Rilevamento_Ore write fId_Rilevamento_Ore;
@@ -20120,12 +20117,6 @@ TSP_ore_Rilevate_Genera_Rilevamento = class (TzStoredProc)
     //
     [TParamAttribute('RAISE_ERRORS', ptInput, False)]
     property Raise_Errors: TNullableBoolean read fRaise_Errors write fRaise_Errors;
-    //
-    [TParamAttribute('ID_PIANO_PERSONALIZZATO', ptInput, False)]
-    property Id_Piano_Personalizzato: TNullableInt64 read fId_Piano_Personalizzato write fId_Piano_Personalizzato;
-    //
-    [TParamAttribute('SERVIZIO_EROGATO', ptInput, False)]
-    property Servizio_Erogato: TNullableString read fServizio_Erogato write fServizio_Erogato;
     //
     [TParamAttribute('ID_RILEVAMENTO_ORE', ptOutput, False)]
     property Id_Rilevamento_Ore: TNullableInt64 read fId_Rilevamento_Ore;
@@ -28838,13 +28829,6 @@ TSP_usr_Config_Settings_Set_Value = class (TzStoredProc)
     property Valore: TNullableString read fValore write fValore;
 end;
 
-[TStoredProcedure('USR_CONTEXT_CLEAR')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_usr_Context_Clear = class (TzStoredProc)
-  private
-  public
-end;
-
 [TStoredProcedure('USR_CONTEXT_SET')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Context_Set = class (TzStoredProc)
@@ -29796,7 +29780,6 @@ TSP_usr_Refresh_Tokens_Crea = class (TzStoredProc)
     fDevice_Info: TNullableString;
     fIp_Address: TNullableString;
     fGiorni_Max: TNullableInteger;
-    fId_Sessione: TNullableInt64;
     fId_Token: TNullableInt64;
     fScade_Il: TNullableDateTime;
   private
@@ -29818,9 +29801,6 @@ TSP_usr_Refresh_Tokens_Crea = class (TzStoredProc)
     //
     [TParamAttribute('GIORNI_MAX', ptInput, False)]
     property Giorni_Max: TNullableInteger read fGiorni_Max write fGiorni_Max;
-    //
-    [TParamAttribute('ID_SESSIONE', ptInput, False)]
-    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
     //
     [TParamAttribute('ID_TOKEN', ptOutput, False)]
     property Id_Token: TNullableInt64 read fId_Token;
@@ -29877,8 +29857,6 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     fUser_Name: TNullableString;
     fNominativo: TNullableString;
     fRuolo: TNullableString;
-    fId_Sessione: TNullableInt64;
-    fAdmin_User: TNullableBoolean;
   private
     property Result_internal: TNullableString read fResult write fResult;
     property Nuova_Scadenza_internal: TNullableDateTime read fNuova_Scadenza write fNuova_Scadenza;
@@ -29886,8 +29864,6 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     property User_Name_internal: TNullableString read fUser_Name write fUser_Name;
     property Nominativo_internal: TNullableString read fNominativo write fNominativo;
     property Ruolo_internal: TNullableString read fRuolo write fRuolo;
-    property Id_Sessione_internal: TNullableInt64 read fId_Sessione write fId_Sessione;
-    property Admin_User_internal: TNullableBoolean read fAdmin_User write fAdmin_User;
   public
     //
     [TParamAttribute('TOKEN_HASH', ptInput, False)]
@@ -29922,12 +29898,6 @@ TSP_usr_Refresh_Tokens_Validazione = class (TzStoredProc)
     //
     [TParamAttribute('RUOLO', ptOutput, False)]
     property Ruolo: TNullableString read fRuolo;
-    //
-    [TParamAttribute('ID_SESSIONE', ptOutput, False)]
-    property Id_Sessione: TNullableInt64 read fId_Sessione;
-    //
-    [TParamAttribute('ADMIN_USER', ptOutput, False)]
-    property Admin_User: TNullableBoolean read fAdmin_User;
 end;
 
 [TStoredProcedure('USR_RICHIESTA_REGISTRAZIONE', True)]
@@ -33026,109 +32996,6 @@ end;
 TSP_zz_Aggiorna_Valori_Generatori = class (TzStoredProc)
   private
   public
-end;
-
-[TStoredProcedure('ZZ_CODA_ADD')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_zz_Coda_Add = class (TzStoredProc)
-  private
-    fTipo: TNullableString;
-    fContenuto: TStringList;
-    fTentativi_Massimi: TNullableInteger;
-    fAttesa_Secondi: TNullableInteger;
-    fId_Coda: TNullableInt64;
-  private
-    property Id_Coda_internal: TNullableInt64 read fId_Coda write fId_Coda;
-  private
-    procedure SetContenuto(const Value: TStringList);
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-  public
-    //
-    [TParamAttribute('TIPO', ptInput, False)]
-    property Tipo: TNullableString read fTipo write fTipo;
-    //
-    [TParamAttribute('CONTENUTO', ptInput, True)]
-    property Contenuto: TStringList read fContenuto write SetContenuto;
-    //
-    [TParamAttribute('TENTATIVI_MASSIMI', ptInput, False)]
-    property Tentativi_Massimi: TNullableInteger read fTentativi_Massimi write fTentativi_Massimi;
-    //
-    [TParamAttribute('ATTESA_SECONDI', ptInput, False)]
-    property Attesa_Secondi: TNullableInteger read fAttesa_Secondi write fAttesa_Secondi;
-    //
-    [TParamAttribute('ID_CODA', ptOutput, False)]
-    property Id_Coda: TNullableInt64 read fId_Coda;
-end;
-
-[TStoredProcedure('ZZ_CODA_ESITO')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_zz_Coda_Esito = class (TzStoredProc)
-  private
-    fId_Coda: TNullableInt64;
-    fRiuscito: TNullableBoolean;
-    fMessaggio: TNullableString;
-    fAttesa_Secondi: TNullableInteger;
-  public
-    //
-    [TParamAttribute('ID_CODA', ptInput, False)]
-    property Id_Coda: TNullableInt64 read fId_Coda write fId_Coda;
-    //
-    [TParamAttribute('RIUSCITO', ptInput, False)]
-    property Riuscito: TNullableBoolean read fRiuscito write fRiuscito;
-    //
-    [TParamAttribute('MESSAGGIO', ptInput, False)]
-    property Messaggio: TNullableString read fMessaggio write fMessaggio;
-    //
-    [TParamAttribute('ATTESA_SECONDI', ptInput, False)]
-    property Attesa_Secondi: TNullableInteger read fAttesa_Secondi write fAttesa_Secondi;
-end;
-
-[TStoredProcedure('ZZ_CODA_PRELEVA')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_zz_Coda_Preleva = class (TzStoredProc)
-  private
-    fTipo: TNullableString;
-    fId_Coda: TNullableInt64;
-    fContenuto: TStringList;
-    fTentativi: TNullableInteger;
-  private
-    property Id_Coda_internal: TNullableInt64 read fId_Coda write fId_Coda;
-    property Tentativi_internal: TNullableInteger read fTentativi write fTentativi;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-  public
-    //
-    [TParamAttribute('TIPO', ptInput, False)]
-    property Tipo: TNullableString read fTipo write fTipo;
-    //
-    [TParamAttribute('ID_CODA', ptOutput, False)]
-    property Id_Coda: TNullableInt64 read fId_Coda;
-    //
-    [TParamAttribute('CONTENUTO', ptOutput, True)]
-    property Contenuto: TStringList read fContenuto;
-    //
-    [TParamAttribute('TENTATIVI', ptOutput, False)]
-    property Tentativi: TNullableInteger read fTentativi;
-end;
-
-[TStoredProcedure('ZZ_CODA_RIPRENDI_BLOCCATI')]
-{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_zz_Coda_Riprendi_Bloccati = class (TzStoredProc)
-  private
-    fMinuti: TNullableInteger;
-    fRipresi: TNullableInteger;
-  private
-    property Ripresi_internal: TNullableInteger read fRipresi write fRipresi;
-  public
-    //
-    [TParamAttribute('MINUTI', ptInput, False)]
-    property Minuti: TNullableInteger read fMinuti write fMinuti;
-    //
-    [TParamAttribute('RIPRESI', ptOutput, False)]
-    property Ripresi: TNullableInteger read fRipresi;
 end;
 
 [TStoredProcedure('ZZ_CODICE_FISCALE_ESTRAI_DATI', True)]
@@ -43683,6 +43550,19 @@ begin
 end;
 
 
+constructor TSP_incarichi_Motivazione_Get.Create;
+begin
+  inherited;
+  fTesto_Default := CreateStringList;
+end;
+
+destructor TSP_incarichi_Motivazione_Get.Destroy;
+begin
+  FreeAndNil(fTesto_Default);
+  inherited;
+end;
+
+
 constructor TSP_get_Mail_Prenotazione_Aula.Create;
 begin
   inherited;
@@ -43736,19 +43616,6 @@ end;
 destructor TSP_inail_Comunic_Inizio_Tirocinio.Destroy;
 begin
   FreeAndNil(fInail_Sede_Indirizzo);
-  inherited;
-end;
-
-
-constructor TSP_incarichi_Motivazione_Get.Create;
-begin
-  inherited;
-  fTesto_Default := CreateStringList;
-end;
-
-destructor TSP_incarichi_Motivazione_Get.Destroy;
-begin
-  FreeAndNil(fTesto_Default);
   inherited;
 end;
 
@@ -44847,37 +44714,6 @@ end;
 procedure TSP_zzz_Split_Memo.SetMemo(const Value: TStringList);
 begin
   FMemo.Assign(Value);
-end;
-
-
-constructor TSP_zz_Coda_Add.Create;
-begin
-  inherited;
-  fContenuto := CreateStringList;
-end;
-
-destructor TSP_zz_Coda_Add.Destroy;
-begin
-  FreeAndNil(fContenuto);
-  inherited;
-end;
-
-procedure TSP_zz_Coda_Add.SetContenuto(const Value: TStringList);
-begin
-  FContenuto.Assign(Value);
-end;
-
-
-constructor TSP_zz_Coda_Preleva.Create;
-begin
-  inherited;
-  fContenuto := CreateStringList;
-end;
-
-destructor TSP_zz_Coda_Preleva.Destroy;
-begin
-  FreeAndNil(fContenuto);
-  inherited;
 end;
 
 

@@ -943,6 +943,8 @@ object MainForm: TMainForm
     Lines.Strings = (
       'http://localhost:8080/login?username=softline&password=masterkey')
     TabOrder = 6
+    ExplicitWidth = 382
+    ExplicitHeight = 293
   end
   object cbLogRequest: TCheckBox
     Left = 23
