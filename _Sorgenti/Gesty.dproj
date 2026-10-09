@@ -159,9 +159,6 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="BASE\zHyperLinks.pas"/>
-        <DCCReference Include="BASE\SplashFm.PAS">
-            <Form>Splash</Form>
-        </DCCReference>
         <DCCReference Include="BASE\ConfigModule.pas">
             <Form>Config</Form>
             <DesignClass>TDataModule</DesignClass>

@@ -31,6 +31,7 @@ uses
   cxFilterControl in 'X:\Druido\LIB\Patch\cxFilterControl.pas',
   zBaseLib,
   zSystem,
+  zz.SplashWait,
   MDI_Lib in 'BASE\MDI_Lib.pas',
   Files.Lib in 'Varie\Files.Lib.pas',
   Gesty_StoredProcs in 'Gesty_StoredProcs.pas',
@@ -41,7 +42,6 @@ uses
   BaseWizrd in 'BASE\BaseWizrd.pas' {BaseWizard},
   zDm_Images in 'BASE\zDm_Images.pas' {zDmImages: TDataModule},
   zHyperLinks in 'BASE\zHyperLinks.pas',
-  SplashFm in 'BASE\SplashFm.PAS' {Splash},
   ConfigModule in 'BASE\ConfigModule.pas' {Config: TDataModule},
   zStorage in 'BASE\zStorage.pas',
   dmAgenda in 'DataModules\dmAgenda.pas' {Agenda: TDataModule},
@@ -375,10 +375,18 @@ begin
     // Schermata di avvio di DevExpress. Va mostrata qui e non dall'InitProc di
     // Gesty.dxSettings.pas: quella procedura chiama LoadAppearance, che azzera
     // lo skin (UseSkins False, SkinName vuoto), e la schermata comparirebbe coi
-    // colori predefiniti. ShowSplash riapplica lo skin dell'ultima sessione e
-    // solo dopo carica la definizione. Siamo comunque prima della creazione dei
-    // moduli dati, che e' la parte lenta dell'avvio.
-    ShowSplash;
+    // colori predefiniti. Lo skin dell'ultima sessione va quindi riapplicato
+    // prima che la definizione si carichi (BeforeFirstShow). Siamo comunque
+    // prima della creazione dei moduli dati, che e' la parte lenta dell'avvio.
+    // La schermata compare sul monitor su cui si lavorava alla chiusura
+    // precedente (TWorkingMonitor, file .login).
+    TSmartSplashForm.BeforeFirstShow(
+      procedure
+      begin
+        TzSecurity.LoadSkinFromIni;
+      end);
+    TSmartSplashForm.UseStatusText('Stato');
+    TSmartSplashForm.Show;
 
     Application.CreateForm(TzDmImages, zDmImages);
   Application.CreateForm(Tconfig, config);
@@ -394,7 +402,7 @@ begin
       Application.CreateForm(TMain, Main);
 
       // finally
-      CloseSplash; // viene chiamato anche da main, per evitare lo sfarfallio
+      TSmartSplashForm.Hide;
       // end;
     end;
 

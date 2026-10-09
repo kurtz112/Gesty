@@ -674,7 +674,7 @@ uses
   WizTirociniFrm,
   Gesty_StoredProcs,
   zDX,
-  SplashFm,
+  zz.SplashWait,
   SmartInspect.Vcl.SiAuto,
   SmartInspect.Vcl,
   frmInail,
@@ -861,9 +861,9 @@ begin
   // Sullo stesso monitor della schermata di avvio e della finestra di
   // accesso, prima di ingrandirsi: la finestra si ingrandisce sul monitor in
   // cui sta. Senza, con poDesktopCenter finiva sul monitor al centro del
-  // desktop, e alla chiusura RicordaPosizioneDiLavoro salvava quello,
+  // desktop, e alla chiusura TWorkingMonitor.Remember salvava quello,
   // trascinandoci anche la schermata dell'avvio successivo.
-  PortaSulMonitorDiLavoro(Self);
+  TWorkingMonitor.CenterForm(Self);
   WindowState := wsMaximized;
 
   ApplyModuli;
@@ -978,7 +978,7 @@ begin
   // avvio non ha altro modo di saperlo, perche' quando compare non esiste
   // ancora nessuna finestra e il puntatore del mouse dice dove si e' fatto
   // doppio clic, non dove si lavora.
-  RicordaPosizioneDiLavoro(Self);
+  TWorkingMonitor.Remember(Self);
 
   for i := FormCollection.Count - 1 downto 0 do
     FormCollection[i].Form.Close;

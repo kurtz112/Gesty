@@ -275,7 +275,7 @@ uses
   zDX,
   Gesty_StoredProcs,
   zNet.Tls,
-  SplashFm,
+  zz.SplashWait,
   dmDataSetEvents,
   zOffice.Types,
   zOffice.Mail.Utils,
@@ -409,8 +409,10 @@ begin
     procedure
     begin
       // Qui la finestra di accesso e' gia' chiusa e resta da caricare il
-      // dizionario LZ: la schermata torna a coprire la parte lenta.
-      ShowSplash;
+      // dizionario LZ: la schermata torna a coprire la parte lenta. Di norma
+      // l'ha gia' rimessa zSecurityLoginFrm, e allora questa chiamata non fa
+      // niente.
+      TSmartSplashForm.Show;
     end);
 
   if not LoggedIn then
