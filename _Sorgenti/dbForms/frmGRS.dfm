@@ -80,33 +80,39 @@ inherited FormGRS: TFormGRS
     object DifferenzeMantieniGesty: TAction
       Caption = 'Mantieni Gesty'
       Hint = 'Le lezioni selezionate restano come sono in Gesty'
+      ImageIndex = 322
       OnExecute = DifferenzeMantieniGestyExecute
     end
     object DifferenzeSovrascrivi: TAction
       Caption = 'Sovrascrivi'
       Hint = 'Le lezioni selezionate prendono i dati del file, con le supplenze'
+      ImageIndex = 397
       OnExecute = DifferenzeSovrascriviExecute
     end
     object MonitoraggioEsegui: TAction
       Caption = 'Esegui controllo'
       Hint = 'Controlla importazioni e invii SIUF di ieri e di oggi, senza inviare niente'
+      ImageIndex = 46
       OnExecute = MonitoraggioEseguiExecute
     end
     object DifformitaGiustifica: TAction
       Caption = 'Giustifica'
       Hint = 'Le difformit'#224' selezionate sono corrette: escono dalle anomalie aperte'
+      ImageIndex = 209
       OnExecute = DifformitaGiustificaExecute
       OnUpdate = DifformitaUpdate
     end
     object DifformitaRisolta: TAction
       Caption = 'Risolta'
       Hint = 'Le difformit'#224' selezionate sono state corrette'
+      ImageIndex = 384
       OnExecute = DifformitaRisoltaExecute
       OnUpdate = DifformitaUpdate
     end
     object DifformitaRiapri: TAction
       Caption = 'Riapri'
       Hint = 'Le difformit'#224' selezionate tornano da verificare'
+      ImageIndex = 39
       OnExecute = DifformitaRiapriExecute
       OnUpdate = DifformitaUpdate
     end
