@@ -72,6 +72,7 @@ type
     procedure ConfrontaFileImport(const IdFile: integer; out NumeroDifferenze, NumeroLezioni, LezioniDaDecidere: integer);
     procedure DecidiLezione(const IdFile, IdOrario: integer; const Decisione: string);
     procedure DecidiLezioniSenzaDecisione(const IdFile: integer; const Decisione: string);
+    procedure ElaboraFileSenzaConfronto(const IdFile: integer);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -85,7 +86,6 @@ type
 
     procedure ElaboraFileImport; overload;
     procedure ElaboraFileImport(const IdFile: integer); overload;
-    procedure ElaboraFileSenzaConfronto(const IdFile: integer);
     procedure EliminaFileImport;
     procedure DecidiDifferenze(Lezioni: TList<integer>; const Decisione: string);
   public
@@ -357,8 +357,8 @@ begin
 end;
 
 // Elaborazione vera e propria del file gia' registrato: GRS_IMPORT_FILES_ELABORA legge le righe del file
-// (le crea se mancano) e aggiorna lezioni e presenze. Da chiamare dopo il confronto, tranne che per
-// Importa SIUF e Importa GOL, che non lo prevedono e restano come prima.
+// (le crea se mancano) e aggiorna lezioni e presenze. Si chiama solo da ElaboraFileImport, dopo il confronto
+// e la decisione dell'operatrice: vale per Importa GRS, SIUF e GOL e per il pulsante Elabora.
 procedure TGRS.ElaboraFileSenzaConfronto(const IdFile: integer);
 var
   sp: TSP_GRS_IMPORT_FILES_ELABORA;
