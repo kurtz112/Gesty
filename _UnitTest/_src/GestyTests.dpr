@@ -15,6 +15,7 @@ program GestyTests;
 
 {$APPTYPE CONSOLE}
 {$STRONGLINKTYPES ON}
+{$R *.res}
 
 uses
   System.SysUtils,
