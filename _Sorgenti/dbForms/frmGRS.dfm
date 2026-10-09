@@ -26,7 +26,7 @@ inherited FormGRS: TFormGRS
     object ImportaGRS: TdxFileOpen
       Caption = 'Importa GRS'
       Dialog.DefaultExt = '*.xlsx'
-      Dialog.Filter =
+      Dialog.Filter = 
         'Excel|*.xlsx|File csv|*.csv|Excel 97|*.xls|File xml|*.xml|Tutti|' +
         '*.*'
       ImageIndex = 56
@@ -85,19 +85,25 @@ inherited FormGRS: TFormGRS
     end
     object DifferenzeSovrascrivi: TAction
       Caption = 'Sovrascrivi'
-      Hint = 'Le lezioni selezionate prendono i dati del file, con le supplenze'
+      Hint = 
+        'Le lezioni selezionate prendono i dati del file, con le supplenz' +
+        'e'
       ImageIndex = 397
       OnExecute = DifferenzeSovrascriviExecute
     end
     object MonitoraggioEsegui: TAction
       Caption = 'Esegui controllo'
-      Hint = 'Controlla importazioni e invii SIUF di ieri e di oggi, senza inviare niente'
-      ImageIndex = 46
+      Hint = 
+        'Controlla importazioni e invii SIUF di ieri e di oggi, senza inv' +
+        'iare niente'
+      ImageIndex = 59
       OnExecute = MonitoraggioEseguiExecute
     end
     object DifformitaGiustifica: TAction
       Caption = 'Giustifica'
-      Hint = 'Le difformit'#224' selezionate sono corrette: escono dalle anomalie aperte'
+      Hint = 
+        'Le difformit'#224' selezionate sono corrette: escono dalle anomalie a' +
+        'perte'
       ImageIndex = 209
       OnExecute = DifformitaGiustificaExecute
       OnUpdate = DifformitaUpdate
@@ -105,14 +111,14 @@ inherited FormGRS: TFormGRS
     object DifformitaRisolta: TAction
       Caption = 'Risolta'
       Hint = 'Le difformit'#224' selezionate sono state corrette'
-      ImageIndex = 384
+      ImageIndex = 107
       OnExecute = DifformitaRisoltaExecute
       OnUpdate = DifformitaUpdate
     end
     object DifformitaRiapri: TAction
       Caption = 'Riapri'
       Hint = 'Le difformit'#224' selezionate tornano da verificare'
-      ImageIndex = 39
+      ImageIndex = 106
       OnExecute = DifformitaRiapriExecute
       OnUpdate = DifformitaUpdate
     end
