@@ -83,7 +83,9 @@ type
     function ImportaSIUF(const FileName: string): integer;
     function ImportaGOL(const FileName: string): integer;
 
-    procedure ElaboraFileImport;
+    procedure ElaboraFileImport; overload;
+    procedure ElaboraFileImport(const IdFile: integer); overload;
+    procedure ElaboraFileSenzaConfronto(const IdFile: integer);
     procedure EliminaFileImport;
     procedure DecidiDifferenze(Lezioni: TList<integer>; const Decisione: string);
   public
@@ -293,13 +295,7 @@ end;
 
 procedure TGRS.ElaboraFileImport;
 var
-  sp: TSP_GRS_IMPORT_FILES_ELABORA;
   DataSet: TzFbDataSet;
-  id: integer;
-  NumeroDifferenze: integer;
-  NumeroLezioni: integer;
-  LezioniDaDecidere: integer;
-  Domanda: string;
 begin
   DataSet := GetDataSet('GRS_FILES');
 
@@ -309,12 +305,22 @@ begin
     exit;
   end;
 
-  id := DataSet.FieldByName('ID_GRS_IMPORT_FILE').AsInteger;
+  ElaboraFileImport(DataSet.FieldByName('ID_GRS_IMPORT_FILE').AsInteger);
+end;
 
+// Mantis #228 - 2026-10-09: l'importazione del file (GRS_IMPORT_FILES_ADD) registra soltanto il file;
+// l'elaborazione parte da qui, sia da "Elabora" sia subito dopo "Importa GRS", sempre dopo il confronto.
+procedure TGRS.ElaboraFileImport(const IdFile: integer);
+var
+  NumeroDifferenze: integer;
+  NumeroLezioni: integer;
+  LezioniDaDecidere: integer;
+  Domanda: string;
+begin
   // Mantis #228 - 2026-10-08: prima di scrivere, confronto in sola lettura con le lezioni gia' in Gesty.
   // Le lezioni che il file cambierebbe vanno decise una per una (mantieni Gesty o sovrascrivi)
   // oppure tutte insieme: senza decisione l'elaborazione non parte.
-  ConfrontaFileImport(id, NumeroDifferenze, NumeroLezioni, LezioniDaDecidere);
+  ConfrontaFileImport(IdFile, NumeroDifferenze, NumeroLezioni, LezioniDaDecidere);
 
   if LezioniDaDecidere > 0 then
   begin
@@ -324,7 +330,7 @@ begin
         'No: decido lezione per lezione nella scheda "Differenze con Gesty", poi rilancio Elabora.' + sLineBreak +
         'Annulla: non fare niente.', mtWarning) of
       mrYes:
-        DecidiLezioniSenzaDecisione(id, 'S');
+        DecidiLezioniSenzaDecisione(IdFile, 'S');
       mrNo:
         begin
           ConfirmOk('Le differenze sono nella scheda "Differenze con Gesty" del file selezionato.' + sLineBreak +
@@ -347,19 +353,31 @@ begin
       exit;
   end;
 
-  /// ///////
+  ElaboraFileSenzaConfronto(IdFile);
+end;
+
+// Elaborazione vera e propria del file gia' registrato: GRS_IMPORT_FILES_ELABORA legge le righe del file
+// (le crea se mancano) e aggiorna lezioni e presenze. Da chiamare dopo il confronto, tranne che per
+// Importa SIUF e Importa GOL, che non lo prevedono e restano come prima.
+procedure TGRS.ElaboraFileSenzaConfronto(const IdFile: integer);
+var
+  sp: TSP_GRS_IMPORT_FILES_ELABORA;
+  DataSet: TzFbDataSet;
+begin
+  DataSet := GetDataSet('GRS_FILES');
+
   StartWait('Attendere...', True);
   try
     sp := TSP_GRS_IMPORT_FILES_ELABORA.Create(WriteTrans);
     try
-      sp.Id_Grs_Import_File := id;
+      sp.Id_Grs_Import_File := IdFile;
       sp.ExecuteAndCommit;
     finally
       FreeAndNil(sp);
     end;
 
     RefreshDataSets;
-    DataSet.LocateNonSQL('ID_GRS_IMPORT_FILE', id, []);
+    DataSet.LocateNonSQL('ID_GRS_IMPORT_FILE', IdFile, []);
   finally
     StopWait;
   end;

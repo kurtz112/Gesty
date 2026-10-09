@@ -155,6 +155,10 @@ begin
     view.AddFilterCondition('ID_GRS_IMPORT_FILE', foEqual, id);
 
     view.ShowRecord(false);
+
+    // Mantis #228 - 2026-10-09: l'importazione registra solo il file; l'elaborazione segue come da "Elabora",
+    // quindi con il confronto con le lezioni gia' presenti in Gesty.
+    GRS.ElaboraFileImport(id);
   end;
 end;
 
@@ -294,6 +298,9 @@ begin
 
   if id <> -1 then
   begin
+    // Mantis #228 - 2026-10-09: l'elaborazione non e' piu' dentro l'importazione; qui resta immediata e senza confronto, come prima.
+    GRS.ElaboraFileSenzaConfronto(id);
+
     view := GetView('GRS_FILES');
 
     view.AddFilterCondition('ID_GRS_IMPORT_FILE', foEqual, id);
@@ -313,6 +320,9 @@ begin
 
   if id <> -1 then
   begin
+    // Mantis #228 - 2026-10-09: l'elaborazione non e' piu' dentro l'importazione; qui resta immediata e senza confronto, come prima.
+    GRS.ElaboraFileSenzaConfronto(id);
+
     view := GetView('GRS_FILES');
 
     view.AddFilterCondition('ID_GRS_IMPORT_FILE', foEqual, id);
