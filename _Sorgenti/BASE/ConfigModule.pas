@@ -292,6 +292,7 @@ uses
   dmCommon,
   HelpGen.Config,
   zOffice.Reports.Types,
+  zz.Folders,
   zz.Vcl,
   zExceptions.FireDAC,
   zSanificazione.Clipboard,
@@ -440,6 +441,8 @@ begin
     // TzFiles.AppRoot := zSystem.Root_Files;
 
     zReportConfig.ReportRoot := zSystem.Root_Files;
+    // cartella proposta dalle finestre di salvataggio di zPack (zOffice, esportazioni)
+    TFolders.UserDocumentsFolder := CartellaPersonaleUtenteCorrente;
 
     zHelpConfig.HelpFolder := Config.zSystem.rootFolder('DOCUMENTAZIONE', 'Documentazione');
     zHelpConfig.HelpGenWorkingFolder := Config.zSystem.rootFolder('HelpGenWorkingFolder', 'HelpGenWorkingFolder');
