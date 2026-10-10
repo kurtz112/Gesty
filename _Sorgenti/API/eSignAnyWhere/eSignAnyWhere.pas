@@ -109,8 +109,11 @@ var
   comp: TComponent;
 begin
   inherited;
-  BaseUrl := 'https://demo.esignanywhere.net/Api/V6/'; // props, non fields, devono inizializzare
-  AuthToken := 'wymp7uysd1jued94hhhe5jl4ly2ki5eciccwy5kzappe4gxq4ixd5su39rb9dwmg';
+  // Indirizzo e token arrivano dalla configurazione di firma dell'ente
+  // (OBJ_FILES_FIRMA_CONFIGURAZIONE.URL_BASE, parametro AUTH_TOKEN):
+  // qui niente valori di prova, che resterebbero leggibili nel sorgente
+  BaseUrl := ''; // props, non fields, devono inizializzare
+  AuthToken := '';
 
   Params.Init;
   restClient.BaseUrl := BaseUrl;

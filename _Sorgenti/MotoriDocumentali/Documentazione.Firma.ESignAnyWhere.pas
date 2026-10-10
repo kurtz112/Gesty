@@ -176,7 +176,9 @@ begin
 
   ApplicaFirmatariEngine(Documento);
 
-  IdLogRequest := LogRequest('FIRMA', eSignAnyWhereEngine.BaseUrl, Documento.FullFileName + sLineBreak + 'AUTH_TOKEN length=' + eSignAnyWhereEngine.AuthToken).ToString.ToInteger();
+  // Nel registro va la sola lunghezza del token: il token intero, scritto qui
+  // fino al 2026-10-10, finiva leggibile in OBJ_FILES_FIRMA_LOG_REQUEST.RICHIESTA
+  IdLogRequest := LogRequest('FIRMA', eSignAnyWhereEngine.BaseUrl, Documento.FullFileName + sLineBreak + 'AUTH_TOKEN length=' + Length(eSignAnyWhereEngine.AuthToken).ToString).ToString.ToInteger();
   try
     result.IdDocumentoEsterno := eSignAnyWhereEngine.Firma(Documento.FullFileName);
   except

@@ -2,7 +2,6 @@ object eSignAnyWhereEngine: TeSignAnyWhereEngine
   Height = 415
   Width = 573
   object OAuth2Authenticator: TOAuth2Authenticator
-    AccessToken = 'wymp7uysd1jued94hhhe5jl4ly2ki5eciccwy5kzappe4gxq4ixd5su39rb9dwmg'
     TokenType = ttBEARER
     Left = 64
     Top = 16
@@ -15,7 +14,6 @@ object eSignAnyWhereEngine: TeSignAnyWhereEngine
     Authenticator = OAuth2Authenticator
     Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
     AcceptCharset = 'utf-8, *;q=0.8'
-    BaseURL = 'https://demo.esignanywhere.net/Api'
     Params = <>
     SecureProtocols = [TLS11, TLS12, TLS13]
     SynchronizedEvents = False

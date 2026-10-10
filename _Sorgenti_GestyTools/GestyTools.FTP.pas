@@ -219,7 +219,7 @@ begin
 
   Files.Clear;
 
-  StartWait('Attendre...', true);
+  StartWait('Lettura dei file sul server FTP...', true);
   try
     IdFTP.List();
   finally
@@ -314,7 +314,7 @@ begin
   end
   else
   begin
-    StartWait('Attendre...', true);
+    StartWait('Invio del file...', true);
     try
       IdFTP.Put(SrcFileName, DestFileName, false);
     finally
