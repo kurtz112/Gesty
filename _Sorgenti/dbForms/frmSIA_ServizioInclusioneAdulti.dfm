@@ -21,5 +21,11 @@ inherited FormSIA_ServizioInclusioneAdulti: TFormSIA_ServizioInclusioneAdulti
       ImageIndex = 18
       OnExecute = InterventiCopertureExecute
     end
+    object RettificaAnagrafica: TAction
+      Caption = 'Rettifica Anagrafica'
+      ImageIndex = 176
+      OnExecute = RettificaAnagraficaExecute
+      OnUpdate = RettificaAnagraficaUpdate
+    end
   end
 end

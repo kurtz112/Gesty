@@ -34,8 +34,11 @@ type
     ActionList: TActionList;
     AggiungiDestinatarioEffettivo: TAction;
     InterventiCoperture: TAction;
+    RettificaAnagrafica: TAction;
     procedure AggiungiDestinatarioEffettivoExecute(Sender: TObject);
     procedure InterventiCopertureExecute(Sender: TObject);
+    procedure RettificaAnagraficaExecute(Sender: TObject);
+    procedure RettificaAnagraficaUpdate(Sender: TObject);
   protected
     procedure CreateDataModule; override;
     procedure DestroyDataModule; override;
@@ -106,6 +109,29 @@ procedure TFormSIA_ServizioInclusioneAdulti.InterventiCopertureExecute(Sender: T
 begin
   inherited;
   SIA_ServizioInclusioneAdulti.InterventiCoperture;
+end;
+
+// Azione agganciata dal dizionario LZ alla barra della griglia
+// SIA_ServizioInclusioneAdulti.Intestatari_Voucher: l'aggancio e' per nome,
+// il nome dell'azione deve restare questo.
+procedure TFormSIA_ServizioInclusioneAdulti.RettificaAnagraficaExecute(Sender: TObject);
+begin
+  inherited;
+  SIA_ServizioInclusioneAdulti.RettificaAnagrafica;
+end;
+
+procedure TFormSIA_ServizioInclusioneAdulti.RettificaAnagraficaUpdate(Sender: TObject);
+var
+  DataSet: TDataSet;
+begin
+  DataSet := nil;
+
+  // FindDataSet e non GetDataSet: l'OnUpdate scatta a ogni battito
+  // dell'ActionList, e GetDataSet crea il dataset e lo registra nei report.
+  if Assigned(SIA_ServizioInclusioneAdulti) then
+    DataSet := SIA_ServizioInclusioneAdulti.FindDataSet('Intestatari_Voucher');
+
+  TAction(Sender).Enabled := Assigned(DataSet) and DataSet.Active and (not DataSet.IsEmpty) and (DataSet.State = dsBrowse);
 end;
 
 procedure TFormSIA_ServizioInclusioneAdulti.OLD_AfterCreateComponent(const DataSetName: String; Component: TComponent);

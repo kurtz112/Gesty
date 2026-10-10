@@ -16,11 +16,13 @@ uses
   Base_DataModule,
   dbMaster,
   zFbDataSet,
-  zDbViewDlg;
+  zDbViewDlg,
+  zDbCardDlg;
 
 type
   TSIA_ServizioInclusioneAdulti = class(TBaseDataModule)
     dlgCoperture: TzDbViewDlg;
+    dlgRettificaAnagrafica: TzDbCardDlg;
   private
     // Cache dei campi dell'intervento usati dal calcolo di date e ore
     interventoDATA_INIZIO_INTERVENTO: TField;
@@ -59,6 +61,7 @@ type
   public
     procedure AggiungiDestinatarioEffettivo;
     procedure InterventiCoperture;
+    procedure RettificaAnagrafica;
   end;
 
 var
@@ -422,6 +425,62 @@ begin
   end;
 
   RefreshRecord('Sia_Interventi', false);
+end;
+
+// Rettifica dei dati anagrafici dell'intestatario selezionato.
+//
+// La griglia degli intestatari legge una vista senza trigger e resta in sola
+// lettura: la persona si corregge sulla sua riga di ANAGRAFE, attraverso il
+// dataset nascosto Intestatario_Anagrafe (vista ANAGRAFE_ELENCO, con i trigger)
+// e la scheda ridotta omonima del dizionario LZ. E' lo stesso dato che si
+// modifica da Anagrafiche, che gli utenti SIA non vedono.
+procedure TSIA_ServizioInclusioneAdulti.RettificaAnagrafica;
+var
+  Intestatari: TzFbDataSet;
+  Anagrafica: TzFbDataSet;
+  IdIntestatario: Variant;
+begin
+  Intestatari := GetDataSet('Intestatari_Voucher');
+
+  if Intestatari.IsEmpty then
+    Exit;
+
+  IdIntestatario := Intestatari.FieldByName('ID_INTESTATARIO_VOUCHER').Value;
+
+  // Chiuso prima di assegnare il parametro: su un dataset gia' aperto il nuovo
+  // valore non rileggerebbe niente e la scheda mostrerebbe la persona precedente.
+  Anagrafica := GetDataSet('Intestatario_Anagrafe');
+  Anagrafica.Active := False;
+  Anagrafica.RevertSQL(False);
+  Anagrafica.ParamByName('ID_ANAGRAFICA').Value := IdIntestatario;
+  Anagrafica.Active := True;
+  try
+    if Anagrafica.IsEmpty then
+      Exit;
+
+    // La scheda salva alla conferma e annulla all'uscita (TzDbCardForm.FormCloseQuery)
+    dlgRettificaAnagrafica.DataSet := Anagrafica;
+    try
+      if not dlgRettificaAnagrafica.Execute then
+        Exit;
+    finally
+      dlgRettificaAnagrafica.DataSet := nil;
+    end;
+  finally
+    Anagrafica.Active := False;
+  end;
+
+  // La stessa persona compare su una riga per ogni intervento di cui e'
+  // intestataria: RefreshRecord aggiornerebbe solo quella corrente. Si riapre
+  // tutto e ci si riposiziona per chiave, non per numero di riga, perche'
+  // l'elenco e' ordinato per cognome e nome e la correzione puo' spostare la riga.
+  Intestatari.DisableControls;
+  try
+    Intestatari.ReOpen;
+    Intestatari.Locate('ID_INTESTATARIO_VOUCHER', IdIntestatario, []);
+  finally
+    Intestatari.EnableControls;
+  end;
 end;
 
 procedure TSIA_ServizioInclusioneAdulti.Sia_Interventi_Destinatari_EffettiviNewRecord(DataSet: TDataSet);
