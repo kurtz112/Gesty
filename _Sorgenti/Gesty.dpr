@@ -328,7 +328,6 @@ uses
   CalcoloPeriodi.Lib in 'Varie\CalcoloPeriodi.Lib.pas';
 
 {$R *.RES}
-{$R dxItalian.res}
 {$SETPEOPTFLAGS IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE}
 // {$SETPEFLAGS IMAGE_FILE_NET_RUN_FROM_SWAP} da verificare
 {$SETPEOPTFLAGS $140}
