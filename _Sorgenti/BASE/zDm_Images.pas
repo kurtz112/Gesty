@@ -23,7 +23,6 @@ type
     ImageList24: TcxImageList;
     imagesImmobili: TImageList;
     ImagesPartitario: TImageList;
-    BaseFormImageList: TcxImageList;
   private
   public
   end;
