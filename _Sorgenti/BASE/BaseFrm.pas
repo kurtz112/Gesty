@@ -428,7 +428,7 @@ begin
   dxBarSubItemSistema.Visible := dx.Visible(Config.zSystem.IsAdmin);
 
   dxBarManager.ImageOptions.Images := ZDmImages.ImageList16;
-  dxBarManager.ImageOptions.LargeImages := ZDmImages.ImageList24;
+  dxBarManager.ImageOptions.LargeImages := ZDmImages.ImageList16;
 
   BaseActions.Images := ZDmImages.ImageList24;
 

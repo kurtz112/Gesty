@@ -21,7 +21,7 @@ object BaseFrame: TBaseFrame
       True)
     DockColor = clBtnFace
     ImageOptions.Images = zDmImages.ImageList16
-    ImageOptions.LargeImages = zDmImages.ImageList24
+    ImageOptions.LargeImages = zDmImages.ImageList16
     ImageOptions.LargeIcons = True
     ImageOptions.UseLargeImagesForLargeIcons = True
     PopupMenuLinks = <>
