@@ -3169,7 +3169,7 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonCustomMargins: TdxBarLargeButton
       Action = dxRichEditControlShowPageMarginsSetupForm
       Category = 14
-      LargeImageIndex = 57
+      LargeImageIndex = 53
       SyncImageIndex = False
       ImageIndex = 53
     end
@@ -3193,7 +3193,7 @@ object HelpGenEditor: THelpGenEditor
       Action = dxRichEditControlSetPortraitPageOrientation
       Category = 14
       ButtonStyle = bsChecked
-      LargeImageIndex = 59
+      LargeImageIndex = 55
       SyncImageIndex = False
       ImageIndex = 55
     end
@@ -3201,7 +3201,7 @@ object HelpGenEditor: THelpGenEditor
       Action = dxRichEditControlSetLandscapePageOrientation
       Category = 14
       ButtonStyle = bsChecked
-      LargeImageIndex = 60
+      LargeImageIndex = 56
       SyncImageIndex = False
       ImageIndex = 56
     end
@@ -3288,7 +3288,7 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonMorePaperSizes: TdxBarLargeButton
       Action = dxRichEditControlShowPagePaperSetupForm
       Category = 14
-      LargeImageIndex = 72
+      LargeImageIndex = 58
       SyncImageIndex = False
       ImageIndex = 58
     end
@@ -3321,7 +3321,7 @@ object HelpGenEditor: THelpGenEditor
       Action = dxRichEditControlSetSectionOneColumn
       Category = 14
       ButtonStyle = bsChecked
-      LargeImageIndex = 74
+      LargeImageIndex = 60
       SyncImageIndex = False
       ImageIndex = 60
     end
@@ -3329,7 +3329,7 @@ object HelpGenEditor: THelpGenEditor
       Action = dxRichEditControlSetSectionTwoColumns
       Category = 14
       ButtonStyle = bsChecked
-      LargeImageIndex = 75
+      LargeImageIndex = 61
       SyncImageIndex = False
       ImageIndex = 61
     end
@@ -3337,14 +3337,14 @@ object HelpGenEditor: THelpGenEditor
       Action = dxRichEditControlSetSectionThreeColumns
       Category = 14
       ButtonStyle = bsChecked
-      LargeImageIndex = 76
+      LargeImageIndex = 62
       SyncImageIndex = False
       ImageIndex = 62
     end
     object dxBarLargeButtonMoreColumns: TdxBarLargeButton
       Action = dxRichEditControlShowColumnsSetupForm
       Category = 14
-      LargeImageIndex = 77
+      LargeImageIndex = 63
       SyncImageIndex = False
       ImageIndex = 63
     end
@@ -3379,28 +3379,28 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonColumn: TdxBarLargeButton
       Action = dxRichEditControlInsertColumnBreak
       Category = 14
-      LargeImageIndex = 79
+      LargeImageIndex = 65
       SyncImageIndex = False
       ImageIndex = 65
     end
     object dxBarLargeButtonSectionNextPage: TdxBarLargeButton
       Action = dxRichEditControlInsertSectionBreakNextPage
       Category = 14
-      LargeImageIndex = 80
+      LargeImageIndex = 66
       SyncImageIndex = False
       ImageIndex = 66
     end
     object dxBarLargeButtonSectionEvenPage: TdxBarLargeButton
       Action = dxRichEditControlInsertSectionBreakEvenPage
       Category = 14
-      LargeImageIndex = 81
+      LargeImageIndex = 67
       SyncImageIndex = False
       ImageIndex = 67
     end
     object dxBarLargeButtonSectionOddPage: TdxBarLargeButton
       Action = dxRichEditControlInsertSectionBreakOddPage
       Category = 14
-      LargeImageIndex = 82
+      LargeImageIndex = 68
       SyncImageIndex = False
       ImageIndex = 68
     end
@@ -3563,21 +3563,21 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonFiguresCaption: TdxBarLargeButton
       Action = dxRichEditControlInsertFigureCaption
       Category = 17
-      LargeImageIndex = 89
+      LargeImageIndex = 75
       SyncImageIndex = False
       ImageIndex = 75
     end
     object dxBarLargeButtonTablesCaption: TdxBarLargeButton
       Action = dxRichEditControlInsertTableCaption
       Category = 17
-      LargeImageIndex = 90
+      LargeImageIndex = 76
       SyncImageIndex = False
       ImageIndex = 76
     end
     object dxBarLargeButtonEquationsCaption: TdxBarLargeButton
       Action = dxRichEditControlInsertEquationCaption
       Category = 17
-      LargeImageIndex = 91
+      LargeImageIndex = 77
       SyncImageIndex = False
       ImageIndex = 77
     end
@@ -3592,21 +3592,21 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonTableofFigures: TdxBarLargeButton
       Action = dxRichEditControlInsertTableOfFigures
       Category = 17
-      LargeImageIndex = 93
+      LargeImageIndex = 79
       SyncImageIndex = False
       ImageIndex = 79
     end
     object dxBarLargeButtonTableofTables: TdxBarLargeButton
       Action = dxRichEditControlInsertTableOfTables
       Category = 17
-      LargeImageIndex = 94
+      LargeImageIndex = 80
       SyncImageIndex = False
       ImageIndex = 80
     end
     object dxBarLargeButtonTableofEquations: TdxBarLargeButton
       Action = dxRichEditControlInsertTableOfEquations
       Category = 17
-      LargeImageIndex = 95
+      LargeImageIndex = 81
       SyncImageIndex = False
       ImageIndex = 81
     end
@@ -3623,7 +3623,7 @@ object HelpGenEditor: THelpGenEditor
         'Replaces the merge fields in your document with actual data from' +
         ' your recipient list so you can see what it looks like.'
       Visible = ivAlways
-      LargeImageIndex = 100
+      LargeImageIndex = 86
       SyncImageIndex = False
       ImageIndex = 86
     end
@@ -3792,28 +3792,28 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonDeleteCells: TdxBarLargeButton
       Action = dxRichEditControlShowDeleteTableCellsForm
       Category = 28
-      LargeImageIndex = 124
+      LargeImageIndex = 110
       SyncImageIndex = False
       ImageIndex = 110
     end
     object dxBarLargeButtonDeleteColumns: TdxBarLargeButton
       Action = dxRichEditControlDeleteTableColumns
       Category = 28
-      LargeImageIndex = 125
+      LargeImageIndex = 111
       SyncImageIndex = False
       ImageIndex = 111
     end
     object dxBarLargeButtonDeleteRows: TdxBarLargeButton
       Action = dxRichEditControlDeleteTableRows
       Category = 28
-      LargeImageIndex = 126
+      LargeImageIndex = 112
       SyncImageIndex = False
       ImageIndex = 112
     end
     object dxBarLargeButtonDeleteTable: TdxBarLargeButton
       Action = dxRichEditControlDeleteTable
       Category = 28
-      LargeImageIndex = 127
+      LargeImageIndex = 113
       SyncImageIndex = False
       ImageIndex = 113
     end
@@ -3882,68 +3882,68 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonAutoFitContents: TdxBarLargeButton
       Action = dxRichEditControlToggleTableAutoFitContents
       Category = 30
-      LargeImageIndex = 136
+      LargeImageIndex = 122
       SyncImageIndex = False
       ImageIndex = 122
     end
     object dxBarLargeButtonAutoFitWindow: TdxBarLargeButton
       Action = dxRichEditControlToggleTableAutoFitWindow
       Category = 30
-      LargeImageIndex = 137
+      LargeImageIndex = 123
       SyncImageIndex = False
       ImageIndex = 123
     end
     object dxBarLargeButtonFixedColumnWidth: TdxBarLargeButton
       Action = dxRichEditControlToggleTableFixedColumnWidth
       Category = 30
-      LargeImageIndex = 138
+      LargeImageIndex = 124
       SyncImageIndex = False
       ImageIndex = 124
     end
     object dxBarButtonAlignTopLeft: TdxBarButton
       Action = dxRichEditControlToggleTableCellsTopLeftAlignment
       Category = 31
-      LargeImageIndex = 139
+      LargeImageIndex = 125
     end
     object dxBarButtonAlignTopCenter: TdxBarButton
       Action = dxRichEditControlToggleTableCellsTopCenterAlignment
       Category = 31
-      LargeImageIndex = 140
+      LargeImageIndex = 126
     end
     object dxBarButtonAlignTopRight: TdxBarButton
       Action = dxRichEditControlToggleTableCellsTopRightAlignment
       Category = 31
-      LargeImageIndex = 141
+      LargeImageIndex = 127
     end
     object dxBarButtonAlignCenterLeft: TdxBarButton
       Action = dxRichEditControlToggleTableCellsMiddleLeftAlignment
       Category = 31
-      LargeImageIndex = 142
+      LargeImageIndex = 128
     end
     object dxBarButtonAlignCenter: TdxBarButton
       Action = dxRichEditControlToggleTableCellsMiddleCenterAlignment
       Category = 31
-      LargeImageIndex = 143
+      LargeImageIndex = 129
     end
     object dxBarButtonAlignCenterRight: TdxBarButton
       Action = dxRichEditControlToggleTableCellsMiddleRightAlignment
       Category = 31
-      LargeImageIndex = 144
+      LargeImageIndex = 130
     end
     object dxBarButtonAlignBottomLeft: TdxBarButton
       Action = dxRichEditControlToggleTableCellsBottomLeftAlignment
       Category = 31
-      LargeImageIndex = 145
+      LargeImageIndex = 131
     end
     object dxBarButtonAlignBottomCenter: TdxBarButton
       Action = dxRichEditControlToggleTableCellsBottomCenterAlignment
       Category = 31
-      LargeImageIndex = 146
+      LargeImageIndex = 132
     end
     object dxBarButtonAlignBottomRight: TdxBarButton
       Action = dxRichEditControlToggleTableCellsBottomRightAlignment
       Category = 31
-      LargeImageIndex = 147
+      LargeImageIndex = 133
     end
     object dxRibbonGalleryItemTableStyles: TdxRibbonGalleryItem
       Action = dxRichEditControlTableStylesGallery
@@ -4009,70 +4009,70 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonBottomBorder: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsBottomBorder
       Category = 32
-      LargeImageIndex = 150
+      LargeImageIndex = 136
       SyncImageIndex = False
       ImageIndex = 136
     end
     object dxBarLargeButtonTopBorder: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsTopBorder
       Category = 32
-      LargeImageIndex = 151
+      LargeImageIndex = 137
       SyncImageIndex = False
       ImageIndex = 137
     end
     object dxBarLargeButtonLeftBorder: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsLeftBorder
       Category = 32
-      LargeImageIndex = 152
+      LargeImageIndex = 138
       SyncImageIndex = False
       ImageIndex = 138
     end
     object dxBarLargeButtonRightBorder: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsRightBorder
       Category = 32
-      LargeImageIndex = 153
+      LargeImageIndex = 139
       SyncImageIndex = False
       ImageIndex = 139
     end
     object dxBarLargeButtonNoBorder: TdxBarLargeButton
       Action = dxRichEditControlResetTableCellsBorders
       Category = 32
-      LargeImageIndex = 154
+      LargeImageIndex = 140
       SyncImageIndex = False
       ImageIndex = 140
     end
     object dxBarLargeButtonAllBorders: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsAllBorders
       Category = 32
-      LargeImageIndex = 155
+      LargeImageIndex = 141
       SyncImageIndex = False
       ImageIndex = 141
     end
     object dxBarLargeButtonOutsideBorders: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsOutsideBorder
       Category = 32
-      LargeImageIndex = 156
+      LargeImageIndex = 142
       SyncImageIndex = False
       ImageIndex = 142
     end
     object dxBarLargeButtonInsideBorders: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsInsideBorder
       Category = 32
-      LargeImageIndex = 157
+      LargeImageIndex = 143
       SyncImageIndex = False
       ImageIndex = 143
     end
     object dxBarLargeButtonInsideHorizontalBorder: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsInsideHorizontalBorder
       Category = 32
-      LargeImageIndex = 158
+      LargeImageIndex = 144
       SyncImageIndex = False
       ImageIndex = 144
     end
     object dxBarLargeButtonInsideVerticalBorder: TdxBarLargeButton
       Action = dxRichEditControlToggleTableCellsInsideVerticalBorder
       Category = 32
-      LargeImageIndex = 159
+      LargeImageIndex = 145
       SyncImageIndex = False
       ImageIndex = 145
     end
@@ -4121,42 +4121,42 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonSquare: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectSquareTextWrapType
       Category = 34
-      LargeImageIndex = 163
+      LargeImageIndex = 149
       SyncImageIndex = False
       ImageIndex = 149
     end
     object dxBarLargeButtonTight: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectTightTextWrapType
       Category = 34
-      LargeImageIndex = 164
+      LargeImageIndex = 150
       SyncImageIndex = False
       ImageIndex = 150
     end
     object dxBarLargeButtonThrough: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectThroughTextWrapType
       Category = 34
-      LargeImageIndex = 165
+      LargeImageIndex = 151
       SyncImageIndex = False
       ImageIndex = 151
     end
     object dxBarLargeButtonTopandBottom: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectTopAndBottomTextWrapType
       Category = 34
-      LargeImageIndex = 166
+      LargeImageIndex = 152
       SyncImageIndex = False
       ImageIndex = 152
     end
     object dxBarLargeButtonBehindText: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectBehindTextWrapType
       Category = 34
-      LargeImageIndex = 167
+      LargeImageIndex = 153
       SyncImageIndex = False
       ImageIndex = 153
     end
     object dxBarLargeButtonInFrontofText: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectInFrontOfTextWrapType
       Category = 34
-      LargeImageIndex = 168
+      LargeImageIndex = 154
       SyncImageIndex = False
       ImageIndex = 154
     end
@@ -4207,42 +4207,42 @@ object HelpGenEditor: THelpGenEditor
     object dxBarLargeButtonTopLeft: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectTopLeftAlignment
       Category = 34
-      LargeImageIndex = 170
+      LargeImageIndex = 156
       SyncImageIndex = False
       ImageIndex = 156
     end
     object dxBarLargeButtonTopCenter: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectTopCenterAlignment
       Category = 34
-      LargeImageIndex = 171
+      LargeImageIndex = 157
       SyncImageIndex = False
       ImageIndex = 157
     end
     object dxBarLargeButtonTopRight: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectTopRightAlignment
       Category = 34
-      LargeImageIndex = 172
+      LargeImageIndex = 158
       SyncImageIndex = False
       ImageIndex = 158
     end
     object dxBarLargeButtonMiddleLeft: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectMiddleLeftAlignment
       Category = 34
-      LargeImageIndex = 173
+      LargeImageIndex = 159
       SyncImageIndex = False
       ImageIndex = 159
     end
     object dxBarLargeButtonMiddleCenter: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectMiddleCenterAlignment
       Category = 34
-      LargeImageIndex = 174
+      LargeImageIndex = 160
       SyncImageIndex = False
       ImageIndex = 160
     end
     object dxBarLargeButtonMiddleRight: TdxBarLargeButton
       Action = dxRichEditControlSetFloatingObjectMiddleRightAlignment
       Category = 34
-      LargeImageIndex = 175
+      LargeImageIndex = 161
       SyncImageIndex = False
       ImageIndex = 161
     end
