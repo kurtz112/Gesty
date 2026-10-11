@@ -372,27 +372,16 @@ type
     dxBarLargeButton15: TdxBarLargeButton;
     dxBarManagerBar17: TdxBar;
     dxBarLargeButton62: TdxBarLargeButton;
-    // --- Scheletro CRM Orientamento e motori documentali (Firma/Protocollo/Conservazione) ---
-    // Orientamento e' collegata a TFormOrientamento (modulo Orientamento ITS, 2026-09).
-    // Le altre azioni restano Visible = False finche' le rispettive form non saranno integrate.
-    tabOrientamento: TdxRibbonTab;
-    dxBarManagerBarOrientamentoProfili: TdxBar;
-    dxBarManagerBarOrientamentoWeb: TdxBar;
-    dxBarManagerBarOrientamentoCorsi: TdxBar;
+    // --- Orientamento e motori documentali (Firma/Protocollo/Conservazione) ---
+    // Orientamento e' collegata a TFormOrientamento (modulo Orientamento ITS, 2026-09):
+    // e' un gruppo del tab Accoglienza e Agende, accanto a Front Office (2026-10).
+    dxBarManagerBarOrientamento: TdxBar;
     dxBarManagerBarDocumentaliMotori: TdxBar;
     Orientamento: TAction;
-    CodaWebOrientamento: TAction;
-    CorsiOrientamento: TAction;
-    OpenDayOrientamento: TAction;
-    IstituzioniConvenzionate: TAction;
     RegistroFirma: TAction;
     RegistroProtocollo: TAction;
     RegistroConservazione: TAction;
     dxBarLargeButtonOrientamento: TdxBarLargeButton;
-    dxBarLargeButtonCodaWebOrientamento: TdxBarLargeButton;
-    dxBarLargeButtonCorsiOrientamento: TdxBarLargeButton;
-    dxBarLargeButtonOpenDayOrientamento: TdxBarLargeButton;
-    dxBarLargeButtonIstituzioniConvenzionate: TdxBarLargeButton;
     dxBarLargeButtonRegistroFirma: TdxBarLargeButton;
     dxBarLargeButtonRegistroProtocollo: TdxBarLargeButton;
     dxBarLargeButtonRegistroConservazione: TdxBarLargeButton;

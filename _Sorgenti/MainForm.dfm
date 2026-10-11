@@ -87,23 +87,6 @@ object Main: TMain
         end>
       Index = 2
     end
-    object tabOrientamento: TdxRibbonTab
-      Caption = 'Orientamento'
-      Groups = <
-        item
-          Caption = 'Contatti'
-          ToolbarName = 'dxBarManagerBarOrientamentoProfili'
-        end
-        item
-          Caption = 'Web'
-          ToolbarName = 'dxBarManagerBarOrientamentoWeb'
-        end
-        item
-          Caption = 'Corsi e Open Day'
-          ToolbarName = 'dxBarManagerBarOrientamentoCorsi'
-        end>
-      Index = 3
-    end
     object tabFormazione: TdxRibbonTab
       Caption = 'Formazione'
       Groups = <
@@ -119,7 +102,7 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBarRilevamentoAssenze'
         end>
-      Index = 4
+      Index = 3
     end
     object tabAdempimenti: TdxRibbonTab
       Caption = 'Formazione '#183' Adempimenti'
@@ -139,7 +122,7 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBarQuestionari'
         end>
-      Index = 5
+      Index = 4
     end
     object dxRibbonMainTabServiziAllaPersona: TdxRibbonTab
       Active = True
@@ -164,7 +147,7 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBarAssistentiSociali'
         end>
-      Index = 6
+      Index = 5
     end
     object tabContabilita: TdxRibbonTab
       Caption = 'Contabilit'#224
@@ -187,7 +170,7 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBarGateway_Contabile'
         end>
-      Index = 7
+      Index = 6
     end
     object tabDocumentazione: TdxRibbonTab
       Caption = 'Documentazione'
@@ -205,13 +188,16 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBar17'
         end>
-      Index = 8
+      Index = 7
     end
     object tabAccoglienza: TdxRibbonTab
       Caption = 'Accoglienza e Agende'
       Groups = <
         item
           ToolbarName = 'dxBarManagerBarFrontOffice'
+        end
+        item
+          ToolbarName = 'dxBarManagerBarOrientamento'
         end
         item
           ToolbarName = 'dxBarManagerBarPrenotazioniAule'
@@ -222,7 +208,7 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBarAgenda'
         end>
-      Index = 9
+      Index = 8
     end
     object tabVisualizza: TdxRibbonTab
       Caption = 'Visualizza'
@@ -230,7 +216,7 @@ object Main: TMain
         item
           ToolbarName = 'dxBarManagerBarVisualizza'
         end>
-      Index = 10
+      Index = 9
     end
   end
   object BaseStatusBar: TdxRibbonStatusBar
@@ -648,11 +634,6 @@ object Main: TMain
           BeginGroup = True
           Visible = True
           ItemName = 'dxBarLargeButtonTabelle'
-        end
-        item
-          BeginGroup = True
-          Visible = True
-          ItemName = 'dxBarLargeButtonIstituzioniConvenzionate'
         end
         item
           Visible = True
@@ -1456,8 +1437,8 @@ object Main: TMain
       Visible = True
       WholeRow = False
     end
-    object dxBarManagerBarOrientamentoProfili: TdxBar
-      Caption = 'Contatti'
+    object dxBarManagerBarOrientamento: TdxBar
+      Caption = 'Orientamento'
       CaptionButtons = <>
       DockedLeft = 0
       DockedTop = 0
@@ -1474,50 +1455,6 @@ object Main: TMain
       Row = 0
       UseOwnFont = False
       Visible = True
-      WholeRow = False
-    end
-    object dxBarManagerBarOrientamentoWeb: TdxBar
-      Caption = 'Web'
-      CaptionButtons = <>
-      DockedLeft = 112
-      DockedTop = 0
-      FloatLeft = 1158
-      FloatTop = 2
-      FloatClientWidth = 0
-      FloatClientHeight = 0
-      ItemLinks = <
-        item
-          Visible = True
-          ItemName = 'dxBarLargeButtonCodaWebOrientamento'
-        end>
-      OneOnRow = False
-      Row = 0
-      UseOwnFont = False
-      Visible = False
-      WholeRow = False
-    end
-    object dxBarManagerBarOrientamentoCorsi: TdxBar
-      Caption = 'Corsi e Open Day'
-      CaptionButtons = <>
-      DockedLeft = 224
-      DockedTop = 0
-      FloatLeft = 1158
-      FloatTop = 2
-      FloatClientWidth = 0
-      FloatClientHeight = 0
-      ItemLinks = <
-        item
-          Visible = True
-          ItemName = 'dxBarLargeButtonCorsiOrientamento'
-        end
-        item
-          Visible = True
-          ItemName = 'dxBarLargeButtonOpenDayOrientamento'
-        end>
-      OneOnRow = False
-      Row = 0
-      UseOwnFont = False
-      Visible = False
       WholeRow = False
     end
     object dxBarManagerBarDocumentaliMotori: TdxBar
@@ -2346,22 +2283,6 @@ object Main: TMain
       Action = Orientamento
       Category = 0
     end
-    object dxBarLargeButtonCodaWebOrientamento: TdxBarLargeButton
-      Action = CodaWebOrientamento
-      Category = 0
-    end
-    object dxBarLargeButtonCorsiOrientamento: TdxBarLargeButton
-      Action = CorsiOrientamento
-      Category = 0
-    end
-    object dxBarLargeButtonOpenDayOrientamento: TdxBarLargeButton
-      Action = OpenDayOrientamento
-      Category = 0
-    end
-    object dxBarLargeButtonIstituzioniConvenzionate: TdxBarLargeButton
-      Action = IstituzioniConvenzionate
-      Category = 0
-    end
     object dxBarLargeButtonRegistroFirma: TdxBarLargeButton
       Action = RegistroFirma
       Category = 0
@@ -2646,26 +2567,6 @@ object Main: TMain
       Caption = 'Orientamento'
       ImageIndex = 597
       OnExecute = OrientamentoExecute
-    end
-    object CodaWebOrientamento: TAction
-      Category = 'Orientamento'
-      Caption = 'Coda Web Orientamento'
-      Visible = False
-    end
-    object CorsiOrientamento: TAction
-      Category = 'Orientamento'
-      Caption = 'Corsi Orientamento'
-      Visible = False
-    end
-    object OpenDayOrientamento: TAction
-      Category = 'Orientamento'
-      Caption = 'Open Day'
-      Visible = False
-    end
-    object IstituzioniConvenzionate: TAction
-      Category = 'Enti e Progetti'
-      Caption = 'Istituzioni Convenzionate'
-      Visible = False
     end
     object FirmaDocumenti: TAction
       Category = 'Documentazione'
