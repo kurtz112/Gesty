@@ -353,7 +353,7 @@ object BaseForm: TBaseForm
       Caption = 'Novit'#224
       Category = 0
       Visible = ivAlways
-      ImageIndex = 425
+      ImageIndex = 598
     end
     object dxBarButtonSalvaComponenti: TdxBarButton
       Action = actSalvaComponenti
@@ -442,13 +442,13 @@ object BaseForm: TBaseForm
     object ControllerLoadFromIni: TAction
       Category = 'Controller'
       Caption = 'Load From Ini'
-      ImageIndex = 55
+      ImageIndex = 602
       OnExecute = ControllerLoadFromIniExecute
     end
     object ControllerSaveToIni: TAction
       Category = 'Controller'
       Caption = 'Save To Ini'
-      ImageIndex = 56
+      ImageIndex = 601
       OnExecute = ControllerSaveToIniExecute
     end
     object ControllerBuildGui: TAction
@@ -466,7 +466,7 @@ object BaseForm: TBaseForm
     object ControllerResetDimensioni: TAction
       Category = 'Controller'
       Caption = 'Reset Dimensioni'
-      ImageIndex = 11
+      ImageIndex = 599
       OnExecute = ControllerResetDimensioniExecute
     end
     object Help: TAction
@@ -491,13 +491,13 @@ object BaseForm: TBaseForm
     object actProprietaAzione: TAction
       Category = 'Sistema'
       Caption = 'Propriet'#224
-      ImageIndex = 568
+      ImageIndex = 600
       OnExecute = actProprietaAzioneExecute
     end
     object actSalvaComponenti: TAction
       Category = 'Sistema'
       Caption = 'Salva Componenti'
-      ImageIndex = 55
+      ImageIndex = 601
       OnExecute = actSalvaComponentiExecute
     end
     object AI: TAction
