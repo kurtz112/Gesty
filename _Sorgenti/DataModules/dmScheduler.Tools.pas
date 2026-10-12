@@ -184,7 +184,7 @@ implementation
 uses
   System.DateUtils, System.Variants, System.IOUtils, cxExportSchedulerLink,
     zDm_Images, zOffice, zOffice.types, Gesty_StoredProcs,
-  WizInserimentoIncaricoFrm, dmCommon, ConfigModule, zMsg;
+  WizInserimentoIncaricoFrm, dmCommon, ConfigModule, zMsg, Gesty.Authorizations;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
@@ -663,6 +663,17 @@ begin
   RilevamentoOre.ParamByName('ID_RILEVAMENTO_ORE').AsInteger := params.id;
   RilevamentoOre.Active := true;
   try
+    // Mantis #234 - 2026-10-12: il trigger ORE_RILEVATE_BD0 rifiuta la cancellazione di ore validate
+    // a chi non ha Risorse.ValidazioneOreRilevate; si avvisa prima con un messaggio comprensibile
+    // invece di lasciar arrivare l'errore grezzo del database
+    if RilevamentoOre.FieldByName('VALIDATA').AsBoolean and
+      not Config.zSystem.Authorizhed(Gesty_Authorizations.RISORSE_VALIDAZIONE_ORE_RILEVAT) then
+    begin
+      ConfirmOk('Le ore selezionate sono gia'' state validate e non si possono cancellare.' + sLineBreak + sLineBreak +
+        'Chieda a un supervisore di togliere la validazione, poi potra'' cancellarle.', mtWarning);
+      Exit;
+    end;
+
     RilevamentoOre.Delete;
   finally
     RilevamentoOre.Active := False;
