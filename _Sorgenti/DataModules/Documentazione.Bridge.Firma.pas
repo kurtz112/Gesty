@@ -14,6 +14,12 @@
 // NOTA: la registrazione degli errori di chiamata NON cambia lo stato
 // (REGISTRAZIONE_ERRORE: messaggio + tentativi, ritentabile).
 //
+// L'ente (tenant) della firma (R-058 - 2026-10-12): una pratica nasce con
+// l'ente dell'oggetto (OBJ_FILES_FIRMA_ENTE_GET, la stessa regola di zServer),
+// e invio e interrogazione della busta usano l'ente scritto sulla pratica, con
+// le sue credenziali. IdTenant, l'ente di lavoro, serve solo a dire se il
+// bottone Firma compare e al pulsante Test.
+//
 // I wrapper TSP_* vengono da Gesty_StoredProcs (generata dal tool):
 // rigenerarla dopo aver eseguito gli script 02/03 sul database, cosi' da
 // includere le famiglie OBJ_FILES_VERSIONE_* e OBJ_FILES_FIRMA_*.
@@ -45,9 +51,10 @@ type
     // rileggono sempre.
     FConfigurazioneLettaIl: TDateTime;
 
-    procedure CaricaConfigurazione;
+    procedure CaricaConfigurazione(const IdTenant: Int64);
     function ConfigurazioneRecente: Boolean;
-    function CreaProvider(IdFirmaRegistrazione: Int64): IzFirmaProvider;
+    function CreaProvider(IdFirmaRegistrazione: Int64; IdTenant: Int64): IzFirmaProvider;
+    function EnteDellOggetto(const Oid, IdObjectFile: Int64): Int64;
     procedure RegistraErrore(IdFirmaRegistrazione: Int64; E: Exception);
   public
     destructor Destroy; override;
@@ -118,6 +125,8 @@ type
     // posizione calcolata dal DB, riga OBJ_FILES_GENERAZIONI
     function PersistiDocumentoReport(const Oid: Int64; const TipoAllegato, TempFileName, TemplateNomeFile: string; const TipologiaDocumentale: string = ''; const ProfiloDocumentale: string = ''): Int64;
 
+    // ente di lavoro (CONFIG.ENTE_DEFAULT): visibilita' del bottone Firma e
+    // Test. Le pratiche usano l'ente dell'oggetto, non questo (R-058)
     property IdTenant: Int64 read FIdTenant write FIdTenant;
   end;
 
@@ -136,7 +145,7 @@ begin
   inherited;
 end;
 
-procedure TDocumentazioneBridgeFirma.CaricaConfigurazione;
+procedure TDocumentazioneBridgeFirma.CaricaConfigurazione(const IdTenant: Int64);
 var
   spConfigurazione: TSP_OBJ_FILES_FIRMA_CONFIGURAZIONE_GET;
   spParametri: TSP_OBJ_FILES_FIRMA_CONFIG_PARAMETRI_GET;
@@ -151,11 +160,11 @@ begin
 
   spConfigurazione := GetSP<TSP_OBJ_FILES_FIRMA_CONFIGURAZIONE_GET>();
   try
-    spConfigurazione.Id_Tenant := FIdTenant;
+    spConfigurazione.Id_Tenant := IdTenant;
     spConfigurazione.ExecuteWithoutCommit;
 
     FConfigurazione.Fornitore := spConfigurazione.Fornitore;
-    FConfigurazione.IdTenant := FIdTenant;
+    FConfigurazione.IdTenant := IdTenant;
     FConfigurazione.UrlBase := spConfigurazione.Url_Base;
     FConfigurazione.Utente := spConfigurazione.Utente;
     FConfigurazione.Password := spConfigurazione.Password_;
@@ -174,7 +183,7 @@ begin
 
   spParametri := GetSP<TSP_OBJ_FILES_FIRMA_CONFIG_PARAMETRI_GET>();
   try
-    spParametri.Id_Tenant := FIdTenant;
+    spParametri.Id_Tenant := IdTenant;
     spParametri.Fornitore := FConfigurazione.Fornitore;
     // Mantis #61 - 2026-08-31: procedura selezionabile, va aperta con Open;
     // con Execute il cursore non nasce e il ciclo non veniva mai eseguito,
@@ -208,8 +217,30 @@ begin
   // costava 3 procedure per chiamata. Una lettura al minuto basta per sapere
   // se il bottone Firma compare
   if not ConfigurazioneRecente then
-    CaricaConfigurazione;
+    CaricaConfigurazione(FIdTenant);
   result := FConfigurazione.Fornitore;
+end;
+
+function TDocumentazioneBridgeFirma.EnteDellOggetto(const Oid, IdObjectFile: Int64): Int64;
+var
+  sp: TSP_obj_Files_Firma_Ente_Get;
+begin
+  // R-058 - 2026-10-12: l'ente a cui appartiene la firma, con la regola di
+  // zServer (per gli incarichi l'ente del progetto); 0 = firma non disponibile
+  sp := GetSP<TSP_obj_Files_Firma_Ente_Get>();
+  try
+    if Oid <> 0 then
+      sp.Oid := Oid;
+    if IdObjectFile <> 0 then
+      sp.Id_Object_File := IdObjectFile;
+    sp.ExecuteWithoutCommit;
+    if sp.Id_Ente.IsNull then
+      result := 0
+    else
+      result := sp.Id_Ente.Value;
+  finally
+    FreeAndNil(sp);
+  end;
 end;
 
 procedure TDocumentazioneBridgeFirma.TestConnessione;
@@ -218,15 +249,15 @@ var
 begin
   // CreaProvider carica la configurazione e solleva se il fornitore manca;
   // 0 = operazione fuori pratica (nessun log legato a una registrazione)
-  provider := CreaProvider(0);
+  provider := CreaProvider(0, FIdTenant);
   provider.TestConnessione;
 end;
 
-function TDocumentazioneBridgeFirma.CreaProvider(IdFirmaRegistrazione: Int64): IzFirmaProvider;
+function TDocumentazioneBridgeFirma.CreaProvider(IdFirmaRegistrazione: Int64; IdTenant: Int64): IzFirmaProvider;
 var
   ProviderBase: TzFirmaProviderBase;
 begin
-  CaricaConfigurazione;
+  CaricaConfigurazione(IdTenant);
 
   if FConfigurazione.Fornitore.IsEmpty then
     raise EzFirmaErrore.Create('Nessun fornitore di firma configurato per l''ente');
@@ -248,7 +279,7 @@ begin
         // la colonna resta NULL
         if IdFirmaRegistrazione <> 0 then
           sp.Id_Firma_Registrazione := IdFirmaRegistrazione;
-        sp.Id_Tenant := FIdTenant;
+        sp.Id_Tenant := IdTenant;
         sp.Fornitore := FConfigurazione.Fornitore;
         sp.Operazione := Operazione;
         sp.Endpoint := Endpoint;
@@ -308,15 +339,22 @@ var
   spRegistrazione: TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_ADD;
   spFirmatario: TSP_OBJ_FILES_FIRMA_FIRMATARIO_ADD;
   firmatario: TzFirmaFirmatario;
+  Ente: Int64;
 begin
-  CaricaConfigurazione;
+  // R-058 - 2026-10-12: l'ente dell'oggetto, non quello di lavoro: un contratto
+  // di un progetto 21020 finiva sotto l'ente predefinito 1492
+  Ente := EnteDellOggetto(Oid, IdObjectFile);
+  if Ente <= 0 then
+    raise EzFirmaErrore.Create('La firma non e'' disponibile per questo documento: l''oggetto non ha un ente');
+
+  CaricaConfigurazione(Ente);
 
   if FConfigurazione.Fornitore.IsEmpty then
     raise EzFirmaErrore.Create('Nessun fornitore di firma configurato per l''ente');
 
   spRegistrazione := GetSP<TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_ADD>();
   try
-    spRegistrazione.Id_Tenant := FIdTenant;
+    spRegistrazione.Id_Tenant := Ente;
     spRegistrazione.Fornitore := FConfigurazione.Fornitore;
     spRegistrazione.Oid := Oid;
     spRegistrazione.Id_Object_File := IdObjectFile;
@@ -440,6 +478,7 @@ var
   provider: IzFirmaProvider;
   documento: TzFirmaDocumento;
   esito: TzFirmaEsito;
+  Ente: Int64;
 begin
   documento.Clear;
 
@@ -450,6 +489,8 @@ begin
 
     documento.IdObjectFile := spGet.Id_Object_File;
     documento.Oid := spGet.Oid;
+    // R-058 - 2026-10-12: la busta parte con le credenziali dell'ente della pratica
+    Ente := spGet.Id_Tenant;
   finally
     FreeAndNil(spGet);
   end;
@@ -465,7 +506,7 @@ begin
 
   documento.Firmatari := Firmatari;
 
-  provider := CreaProvider(IdFirmaRegistrazione);
+  provider := CreaProvider(IdFirmaRegistrazione, Ente);
 
   // la registrazione esiste GIA' (idempotenza): la chiamata al fornitore
   // sta fuori da ogni transazione locale
@@ -503,6 +544,7 @@ var
   IdDocumentoEsterno: string;
   statoCorrente: string;
   esito: TzFirmaEsito;
+  Ente: Int64;
 begin
   documento.Clear;
 
@@ -511,6 +553,9 @@ begin
     spGet.Id_Firma_Registrazione := IdFirmaRegistrazione;
     spGet.ExecuteWithoutCommit;
 
+    // R-058 - 2026-10-12: la busta si interroga con le credenziali dell'ente
+    // della pratica
+    Ente := spGet.Id_Tenant;
     statoCorrente := spGet.Stato;
     IdDocumentoEsterno := spGet.Id_Documento_Esterno;
     documento.IdObjectFile := spGet.Id_Object_File;
@@ -532,7 +577,7 @@ begin
     FreeAndNil(spFullFileName);
   end;
 
-  provider := CreaProvider(IdFirmaRegistrazione);
+  provider := CreaProvider(IdFirmaRegistrazione, Ente);
 
   try
     esito := provider.AggiornaEstremi(documento, IdDocumentoEsterno);
