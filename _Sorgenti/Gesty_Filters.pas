@@ -1032,7 +1032,7 @@ begin
   ComboProps := Combo.Properties as TcxImageComboBoxProperties;
 
   dx.InitPickList(ComboProps, PLName);
-  ComboProps.Images := Base.ImageList16;
+  ComboProps.Images := dx.Immagini;
 
   if FilterAllowNull(true) then
   begin
@@ -1040,7 +1040,7 @@ begin
     Item.Index := 0;
     Item.Description := FilterCaptionAll('Tutti');
     Item.Value := Null;
-    Item.ImageIndex := 46;
+    Item.ImageIndex := ImmagineVoceTutti;
   end;
 
   Combo.Tag := Integer(DataSet);
