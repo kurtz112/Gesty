@@ -218,16 +218,16 @@ procedure TEventoParams.SetDurata(const Value: integer);
 begin
   FDurata := Value;
 
-  if OraInizio <> 0 then
-    FOraFine := IncMinute(OraInizio, Durata);
+  // la mezzanotte (OraInizio = 0) e' un'ora vera: prima OraFine restava 0
+  FOraFine := IncMinute(OraInizio, FDurata);
 end;
 
 procedure TEventoParams.SetOraFine(const Value: TTime);
 begin
   FOraFine := Value;
 
-  if OraInizio <> 0 then
-    FDurata := MinutesBetween(OraInizio, OraFine);
+  // stessa regola di SetDurata: anche da mezzanotte la durata si calcola
+  FDurata := MinutesBetween(OraInizio, FOraFine);
 end;
 
 procedure TSchedulerTools.DataModuleCreate(Sender: TObject);
