@@ -266,5 +266,3 @@ begin
 end;
 
 end.
-
-zToolFilterSetup
