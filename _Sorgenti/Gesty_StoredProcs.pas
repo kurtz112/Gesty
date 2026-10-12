@@ -1,4 +1,4 @@
-// Generata il 08/10/2026 23:30:03
+// Generata il 12/10/2026 12:40:24
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
 unit Gesty_StoredProcs;
 
@@ -16041,6 +16041,27 @@ TSP_obj_Files_Firma_Contratti_Firmatari = class (TzStoredProc)
     //
     [TParamAttribute('IDENTIFICATIVO_ESTERNO', ptOutput, False)]
     property Identificativo_Esterno: TNullableString read fIdentificativo_Esterno;
+end;
+
+[TStoredProcedure('OBJ_FILES_FIRMA_ENTE_GET')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Ente_Get = class (TzStoredProc)
+  private
+    fOid: TNullableInt64;
+    fId_Object_File: TNullableInt64;
+    fId_Ente: TNullableInt64;
+  private
+    property Id_Ente_internal: TNullableInt64 read fId_Ente write fId_Ente;
+  public
+    //
+    [TParamAttribute('OID', ptInput, False)]
+    property Oid: TNullableInt64 read fOid write fOid;
+    //
+    [TParamAttribute('ID_OBJECT_FILE', ptInput, False)]
+    property Id_Object_File: TNullableInt64 read fId_Object_File write fId_Object_File;
+    //
+    [TParamAttribute('ID_ENTE', ptOutput, False)]
+    property Id_Ente: TNullableInt64 read fId_Ente;
 end;
 
 [TStoredProcedure('OBJ_FILES_FIRMA_FIRMATARI', True)]
