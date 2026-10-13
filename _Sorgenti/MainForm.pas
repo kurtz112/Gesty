@@ -1215,7 +1215,7 @@ begin
       ToolButtons.Add(btn);
       btn.Caption := FormCollection.Items[i].Form.Caption;
       btn.Tag := i;
-      btn.ImageIndex := 158;
+      btn.ImageIndex := dx.IndiceIcona('finestra_elenco');
       btn.OnClick := ToolMDIClick;
       btn.PaintStyle := psCaptionGlyph;
       dxBarSubItemElencoForm.ItemLinks.Add(btn);
@@ -2424,9 +2424,9 @@ end;
 
 procedure TMain.actAIExecute(Sender: TObject);
 const
-  // Indici nella cxImageList: 0 = scintilla monocromatica, 1 = colorata
-  ICONA_CHAT_SPENTA = 595;
-  ICONA_CHAT_ACCESA = 596;
+  // Icone in dx.Immagini: scintilla monocromatica (spento) e colorata (acceso)
+  ICONA_CHAT_SPENTA = 'assistente_ai_spento';
+  ICONA_CHAT_ACCESA = 'assistente_ai_acceso';
 begin
 
   // Creazione pigra: il pannello nasce alla prima richiesta
@@ -2435,8 +2435,8 @@ begin
     FChatAI := TzChatAIPane.Create(Self);
     FChatAI.Parent := Self;
     FChatAI.ToggleAction := actAI;   // il pannello sincronizza Checked e icona
-    FChatAI.OpenedImageIndex := ICONA_CHAT_ACCESA;
-    FChatAI.ClosedImageIndex := ICONA_CHAT_SPENTA;
+    FChatAI.OpenedImageIndex := dx.IndiceIcona(ICONA_CHAT_ACCESA);
+    FChatAI.ClosedImageIndex := dx.IndiceIcona(ICONA_CHAT_SPENTA);
   end;
 
   FChatAI.Toggle;

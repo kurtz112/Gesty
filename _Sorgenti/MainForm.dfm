@@ -310,31 +310,31 @@ object Main: TMain
     Width = 516
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     OnUpdate = ActionListUpdate
     Left = 58
     Top = 218
     object AggiornaProgressivi: TAction
       Caption = 'Aggiorna Progressivi'
-      ImageIndex = 157
+      ImageIndex = 345
       OnExecute = AggiornaProgressiviExecute
       OnUpdate = ActionUpdateAdmin
     end
     object Esci: TAction
       Caption = 'Esci'
-      ImageIndex = 13
+      ImageIndex = 954
       OnExecute = EsciExecute
     end
     object Sistema: TAction
       Caption = 'Sistema'
-      ImageIndex = 61
+      ImageIndex = 1217
       OnExecute = SistemaExecute
     end
     object WindowCloseAll: TAction
       Category = 'Window'
       Caption = 'Chiudi Tutto'
       Hint = 'chiude tutte le form'
-      ImageIndex = 560
+      ImageIndex = 1000
       OnExecute = WindowCloseAllExecute
       OnUpdate = WindowActionUpdate
     end
@@ -344,27 +344,27 @@ object Main: TMain
     end
     object LoadZip: TAction
       Caption = 'Carica impostazioni'
-      ImageIndex = 56
+      ImageIndex = 521
       OnExecute = LoadZipExecute
     end
     object SaveZip: TAction
       Caption = 'Salva Impostazioni'
-      ImageIndex = 55
+      ImageIndex = 524
       OnExecute = SaveZipExecute
     end
     object actRicaricaPolitiche: TAction
       Caption = 'Ricarica Permessi'
-      ImageIndex = 76
+      ImageIndex = 510
       OnExecute = actRicaricaPoliticheExecute
     end
     object actCambiaPassword: TAction
       Caption = 'Cambia Password'
-      ImageIndex = 377
+      ImageIndex = 955
       OnExecute = actCambiaPasswordExecute
     end
     object actGestioneUtenti: TAction
       Caption = 'Gestione Utenti'
-      ImageIndex = 376
+      ImageIndex = 973
       OnExecute = actGestioneUtentiExecute
     end
     object WindowClose: TAction
@@ -372,7 +372,7 @@ object Main: TMain
       Caption = 'Chiudi'
       Enabled = False
       Hint = 'chuidi form corrente'
-      ImageIndex = 559
+      ImageIndex = 953
       OnExecute = WindowCloseExecute
       OnUpdate = WindowActionUpdate
     end
@@ -381,7 +381,7 @@ object Main: TMain
       Caption = 'Cascata'
       Enabled = False
       Hint = 'disponi le form a cascata'
-      ImageIndex = 561
+      ImageIndex = 999
       OnExecute = WindowCascadeExecute
       OnUpdate = WindowActionUpdate
     end
@@ -390,7 +390,7 @@ object Main: TMain
       Caption = 'Aggiusta Orizzontalmente'
       Enabled = False
       Hint = 'disponi affiancate orizzontalmente'
-      ImageIndex = 562
+      ImageIndex = 997
       OnExecute = WindowTileHorizontalExecute
       OnUpdate = WindowActionUpdate
     end
@@ -399,7 +399,7 @@ object Main: TMain
       Caption = 'Aggiusta Verticalmente'
       Enabled = False
       Hint = 'disponi affiancate verticalmente'
-      ImageIndex = 563
+      ImageIndex = 998
       OnExecute = WindowTileVerticalExecute
       OnUpdate = WindowActionUpdate
     end
@@ -408,129 +408,129 @@ object Main: TMain
       Caption = 'Minimizza Tutto'
       Enabled = False
       Hint = 'minimizza tutte le finestre'
-      ImageIndex = 565
+      ImageIndex = 1002
       OnExecute = WindowMinimizeAllExecute
       OnUpdate = WindowActionUpdate
     end
     object actPoliticheAccessi: TAction
       Caption = 'Gestione Permessi'
-      ImageIndex = 184
+      ImageIndex = 1221
       OnExecute = actPoliticheAccessiExecute
     end
     object Adatta: TAction
       Category = 'Window'
       Caption = 'Adatta'
       Enabled = False
-      ImageIndex = 564
+      ImageIndex = 996
       OnExecute = AdattaExecute
       OnUpdate = WindowActionUpdate
     end
     object actPermessiAzione: TAction
       Caption = 'Permessi'
-      ImageIndex = 184
+      ImageIndex = 1221
       OnExecute = actPermessiAzioneExecute
     end
     object actStatoAttivazioneModulo: TAction
       Caption = 'Attivazione Modulo'
-      ImageIndex = 378
+      ImageIndex = 1216
       OnExecute = actStatoAttivazioneModuloExecute
     end
     object actDizionari: TAction
       Caption = 'Dizionari'
-      ImageIndex = 569
+      ImageIndex = 1218
       OnExecute = actDizionariExecute
     end
     object actDownloadAggiornamento: TAction
       Caption = 'Download Aggiornamento'
-      ImageIndex = 230
+      ImageIndex = 969
       OnExecute = actDownloadAggiornamentoExecute
     end
     object ConfigurazioneLog: TAction
       Caption = 'Configurazione Log'
-      ImageIndex = 57
+      ImageIndex = 1015
       OnExecute = ConfigurazioneLogExecute
       OnUpdate = ActionUpdateAdmin
     end
     object actPatchLzDaFile: TAction
       Caption = 'Da file...'
       Hint = 'Applica una patch JSON al dizionario LZ leggendola da un file'
-      ImageIndex = 56
+      ImageIndex = 34
       OnExecute = actPatchLzDaFileExecute
       OnUpdate = ActionUpdateAdmin
     end
     object actPatchLzDagliAppunti: TAction
       Caption = 'Dagli appunti'
       Hint = 'Applica la patch JSON del dizionario LZ copiata negli appunti'
-      ImageIndex = 56
+      ImageIndex = 1223
       OnExecute = actPatchLzDagliAppuntiExecute
       OnUpdate = ActionUpdateAdmin
     end
     object actTip: TAction
       Caption = 'Tip'
-      ImageIndex = 578
+      ImageIndex = 1229
       OnExecute = actTipExecute
     end
     object Riconnessione: TAction
       Caption = 'Riconnessione'
-      ImageIndex = 159
+      ImageIndex = 988
       OnExecute = RiconnessioneExecute
     end
     object FbExpert: TAction
       Caption = 'FbExpert'
-      ImageIndex = 53
+      ImageIndex = 1219
       OnExecute = FbExpertExecute
       OnUpdate = ActionUpdateAdmin
     end
     object MonitorFB: TAction
       Caption = 'Monitor FB'
-      ImageIndex = 552
+      ImageIndex = 1014
       OnExecute = MonitorFBExecute
       OnUpdate = ActionUpdateAdmin
     end
     object ProfilerFB: TAction
       Caption = 'Profiler FB'
-      ImageIndex = 572
+      ImageIndex = 482
       OnExecute = ProfilerFBExecute
       OnUpdate = ActionUpdateAdmin
     end
     object MonitorFireDAC: TAction
       Caption = 'Monitor FireDAC'
-      ImageIndex = 388
+      ImageIndex = 1220
       OnExecute = MonitorFireDACExecute
       OnUpdate = ActionUpdateAdmin
     end
     object BaseWeb: TAction
       Caption = 'BaseWeb'
-      ImageIndex = 585
+      ImageIndex = 877
       OnExecute = BaseWebExecute
       OnUpdate = ActionUpdateAdmin
     end
     object AttivaLog: TAction
       Caption = 'Attiva Log'
-      ImageIndex = 435
+      ImageIndex = 1017
       ShortCut = 24652
       OnExecute = AttivaLogExecute
     end
     object SegnalibroLog: TAction
       Caption = 'Segnalibro Log'
-      ImageIndex = 433
+      ImageIndex = 1018
       ShortCut = 24659
       OnExecute = SegnalibroLogExecute
     end
     object RegistraDalProssimoAvvio: TAction
       Caption = 'Registra dal prossimo avvio'
-      ImageIndex = 435
+      ImageIndex = 1016
       OnExecute = RegistraDalProssimoAvvioExecute
     end
     object TicketAssistenza: TAction
       Caption = 'Le mie segnalazioni'
       Hint = 'Stato e risposte delle richieste di assistenza inviate'
-      ImageIndex = 577
+      ImageIndex = 1222
       OnExecute = TicketAssistenzaExecute
     end
     object actAI: TAction
       Caption = 'actAI'
-      ImageIndex = 596
+      ImageIndex = 967
       OnExecute = actAIExecute
       OnUpdate = actAIUpdate
     end
@@ -549,8 +549,8 @@ object Main: TMain
       2)
     Categories.Visibles = (
       True)
-    ImageOptions.Images = zDmImages.ImageList16
-    ImageOptions.LargeImages = zDmImages.ImageList24
+    ImageOptions.Images = dx.Immagini
+    ImageOptions.LargeImages = dx.Immagini
     NotDocking = [dsNone, dsLeft, dsTop, dsRight, dsBottom]
     PopupMenuLinks = <
       item
@@ -570,7 +570,7 @@ object Main: TMain
       FloatTop = 8
       FloatClientWidth = 71
       FloatClientHeight = 24
-      Images = zDmImages.ImageList16
+      Images = dx.Immagini
       ItemLinks = <>
       OneOnRow = True
       Row = 0
@@ -1643,7 +1643,7 @@ object Main: TMain
       Caption = 'Sistema'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 61
+      ImageIndex = 1217
       ItemLinks = <
         item
           Visible = True
@@ -1677,7 +1677,7 @@ object Main: TMain
       Caption = 'Utenti e permessi'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 376
+      ImageIndex = 973
       ItemLinks = <
         item
           Visible = True
@@ -1697,7 +1697,7 @@ object Main: TMain
       Caption = 'Strumenti di sviluppo'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 53
+      ImageIndex = 515
       ItemLinks = <
         item
           Visible = True
@@ -1739,7 +1739,7 @@ object Main: TMain
       Caption = 'Applica patch dizionario LZ'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 56
+      ImageIndex = 19
       ItemLinks = <
         item
           Visible = True
@@ -1829,7 +1829,7 @@ object Main: TMain
     object dxBarButtonLogin: TdxBarButton
       Action = Login
       Category = 0
-      ImageIndex = 157
+      ImageIndex = 1215
     end
     object dxBarButtonChiudiTutto: TdxBarButton
       Action = WindowCloseAll
@@ -1858,8 +1858,8 @@ object Main: TMain
       OnSkinChanged = dxSkinChooserGalleryItemSkinChanged
       Glyph.SourceHeight = 16
       Glyph.SourceWidth = 16
-      ImageIndex = 294
-      LargeImageIndex = 294
+      ImageIndex = 952
+      LargeImageIndex = 952
       ItemLinks = <>
       ItemOptions.ShowDescriptions = True
     end
@@ -2040,7 +2040,7 @@ object Main: TMain
       Caption = '0'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 561
+      ImageIndex = 1001
       ItemLinks = <>
     end
     object dxBarLargeButton33: TdxBarLargeButton
@@ -2299,13 +2299,13 @@ object Main: TMain
       Action = CruscottoDocumentale
       Category = 0
       SyncImageIndex = False
-      ImageIndex = 594
+      ImageIndex = 971
     end
     object dxBarLargeButton63: TdxBarLargeButton
       Action = FirmaDocumenti
       Category = 0
       SyncImageIndex = False
-      ImageIndex = 589
+      ImageIndex = 1224
     end
     object dxBarButtonSegnalibroLog: TdxBarButton
       Action = SegnalibroLog
@@ -2324,7 +2324,7 @@ object Main: TMain
       Caption = 'Assistenza'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 435
+      ImageIndex = 1033
       ItemLinks = <
         item
           Visible = True
@@ -2359,13 +2359,13 @@ object Main: TMain
       Action = CoGe_FattureElettroniche
       Category = 0
       SyncImageIndex = False
-      ImageIndex = 592
+      ImageIndex = 977
     end
     object dxBarLargeButton67: TdxBarLargeButton
       Action = CoGe_Registrazioni
       Category = 0
       SyncImageIndex = False
-      ImageIndex = 592
+      ImageIndex = 981
     end
     object dxBarLargeButton68: TdxBarLargeButton
       Action = CoGe_Bilancio
@@ -2552,440 +2552,440 @@ object Main: TMain
     PixelsPerInch = 96
   end
   object ModuliActions: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     OnExecute = ModuliActionsExecute
     Left = 192
     Top = 160
     object CruscottoDocumentale: TAction
       Category = 'Documentazione'
       Caption = 'Cruscotto Documentale'
-      ImageIndex = 594
+      ImageIndex = 971
       OnExecute = CruscottoDocumentaleExecute
     end
     object Orientamento: TAction
       Category = 'Orientamento'
       Caption = 'Orientamento'
-      ImageIndex = 597
+      ImageIndex = 545
       OnExecute = OrientamentoExecute
     end
     object FirmaDocumenti: TAction
       Category = 'Documentazione'
       Caption = 'Firma Documenti'
-      ImageIndex = 589
+      ImageIndex = 1224
       OnExecute = FirmaDocumentiExecute
     end
     object RegistroFirma: TAction
       Category = 'Documentazione'
       Caption = 'Registro Firma'
-      ImageIndex = 593
+      ImageIndex = 985
       OnExecute = RegistroFirmaExecute
     end
     object RegistroProtocollo: TAction
       Category = 'Documentazione'
       Caption = 'Registro Protocollo'
-      ImageIndex = 590
+      ImageIndex = 987
       OnExecute = RegistroProtocolloExecute
     end
     object RegistroConservazione: TAction
       Category = 'Documentazione'
       Caption = 'Registro Conservazione'
-      ImageIndex = 591
+      ImageIndex = 984
       OnExecute = RegistroConservazioneExecute
     end
     object Budget: TAction
       Category = 'Enti e Progetti'
       Caption = 'Budget'
-      ImageIndex = 191
+      ImageIndex = 993
       OnExecute = BudgetExecute
     end
     object Progetti: TAction
       Category = 'Enti e Progetti'
       Caption = 'Progetti/Servizi'
-      ImageIndex = 558
+      ImageIndex = 995
       OnExecute = ProgettiExecute
     end
     object Studenti: TAction
       Category = 'Formazione'
       Caption = 'Partecipanti Corsi'
-      ImageIndex = 251
+      ImageIndex = 1005
       OnExecute = StudentiExecute
     end
     object Tabelle: TAction
       Category = 'Enti e Progetti'
       Caption = 'Tabelle'
-      ImageIndex = 243
+      ImageIndex = 1043
       OnExecute = TabelleExecute
     end
     object Agenda: TAction
       Category = 'Home'
       Caption = 'Agenda'
-      ImageIndex = 583
+      ImageIndex = 956
       OnExecute = AgendaExecute
     end
     object PersonaleScheda: TAction
       Category = 'Home'
       Caption = 'Scheda Personale'
-      ImageIndex = 580
+      ImageIndex = 989
       OnExecute = PersonaleSchedaExecute
     end
     object NuovaRichiestaAttivazione: TAction
       Category = 'Risorse'
       Caption = 'Nuova Richiesta Attivazione'
-      ImageIndex = 164
+      ImageIndex = 1027
       OnExecute = NuovaRichiestaAttivazioneExecute
     end
     object InserimentoIncarico: TAction
       Category = 'Risorse'
       Caption = 'Inserimento Incarico'
-      ImageIndex = 246
+      ImageIndex = 1026
       OnExecute = InserimentoIncaricoExecute
     end
     object RilevamentoOre: TAction
       Category = 'Risorse'
       Caption = 'Rilevamento Ore'
-      ImageIndex = 125
+      ImageIndex = 1030
       OnExecute = RilevamentoOreExecute
     end
     object PresenzePersonale: TAction
       Category = 'Risorse'
       Caption = 'Presenze Personale'
-      ImageIndex = 314
+      ImageIndex = 1028
       OnExecute = PresenzePersonaleExecute
     end
     object Risorse: TAction
       Category = 'Risorse'
       Caption = 'Elenco Risorse'
-      ImageIndex = 301
+      ImageIndex = 1025
       OnExecute = RisorseExecute
     end
     object RilevamentoAssenzeStudenti: TAction
       Category = 'Formazione'
       Caption = 'Rilevamento Presenze/Assenze (Vecchio Metodo)'
-      ImageIndex = 457
+      ImageIndex = 1010
       OnExecute = RilevamentoAssenzeStudentiExecute
     end
     object RegistrazionePagamenti: TAction
       Category = 'Formazione'
       Caption = 'Registrazione Pagamenti'
-      ImageIndex = 111
+      ImageIndex = 1008
       OnExecute = RegistrazionePagamentiExecute
     end
     object Orario: TAction
       Category = 'Formazione'
       Caption = 'Orario'
-      ImageIndex = 272
+      ImageIndex = 1004
       OnExecute = OrarioExecute
     end
     object InserimentoLavorativo: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Inserimento Lavorativo'
-      ImageIndex = 429
+      ImageIndex = 1042
       OnExecute = InserimentoLavorativoExecute
     end
     object RegistroStudenti: TAction
       Category = 'Formazione'
       Caption = 'Registro Studenti'
-      ImageIndex = 455
+      ImageIndex = 1011
       OnExecute = RegistroStudentiExecute
     end
     object Valutazioni: TAction
       Category = 'Risorse'
       Caption = 'Valutazioni'
-      ImageIndex = 302
+      ImageIndex = 1032
       OnExecute = ValutazioniExecute
     end
     object Questionari: TAction
       Category = 'Formazione '#183' Adempimenti'
       Caption = 'Questionari'
-      ImageIndex = 527
+      ImageIndex = 962
       OnExecute = QuestionariExecute
     end
     object Tirocini: TAction
       Category = 'Formazione'
       Caption = 'Tirocini Stage'
-      ImageIndex = 306
+      ImageIndex = 1013
       OnExecute = TirociniExecute
     end
     object PianiIndividuali: TAction
       Category = 'Formazione'
       Caption = 'Piani Individuali'
-      ImageIndex = 440
+      ImageIndex = 1009
       OnExecute = PianiIndividualiExecute
     end
     object ExportRegione: TAction
       Category = 'Formazione '#183' Adempimenti'
       Caption = 'Export Regione'
-      ImageIndex = 504
+      ImageIndex = 959
       OnExecute = ExportRegioneExecute
     end
     object RegistroMessaggi: TAction
       Category = 'Documentazione'
       Caption = 'Registro Messaggi'
-      ImageIndex = 592
+      ImageIndex = 986
       OnExecute = RegistroMessaggiExecute
     end
     object Allegati: TAction
       Category = 'Documentazione'
       Caption = 'Allegati'
-      ImageIndex = 556
+      ImageIndex = 983
       OnExecute = AllegatiExecute
     end
     object GRS: TAction
       Category = 'Formazione '#183' Adempimenti'
       Caption = 'GRS'
-      ImageIndex = 392
+      ImageIndex = 960
       OnExecute = GRSExecute
     end
     object Inail: TAction
       Category = 'Formazione '#183' Adempimenti'
       Caption = 'Comunicazioni INAIL'
-      ImageIndex = 523
+      ImageIndex = 961
       OnExecute = InailExecute
     end
     object Aule: TAction
       Category = 'Enti e Progetti'
       Caption = 'Aule/Spazi'
-      ImageIndex = 566
+      ImageIndex = 991
       OnExecute = AuleExecute
     end
     object PrenotazioniAule: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Prenotazioni Aule'
-      ImageIndex = 546
+      ImageIndex = 1020
       OnExecute = PrenotazioniAuleExecute
     end
     object CalendarioAule: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Calendario Aule'
-      ImageIndex = 583
+      ImageIndex = 963
       OnExecute = CalendarioAuleExecute
     end
     object CalendarioDocenti: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Calendario Docenti'
-      ImageIndex = 545
+      ImageIndex = 972
       OnExecute = CalendarioDocentiExecute
     end
     object Enti: TAction
       Category = 'Enti e Progetti'
       Caption = 'Enti Formativi'
-      ImageIndex = 567
+      ImageIndex = 994
       OnExecute = EntiExecute
     end
     object Bandi: TAction
       Category = 'Enti e Progetti'
       Caption = 'Bandi'
-      ImageIndex = 432
+      ImageIndex = 992
       OnExecute = BandiExecute
     end
     object CalendarioAvvioCorsi: TAction
       Category = 'Formazione'
       Caption = 'Calendario Avvio Corsi'
-      ImageIndex = 551
+      ImageIndex = 1003
       OnExecute = CalendarioAvvioCorsiExecute
     end
     object Riunioni: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Riunioni'
-      ImageIndex = 304
+      ImageIndex = 1019
       OnExecute = RiunioniExecute
     end
     object Scadenze: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Scadenze'
-      ImageIndex = 542
+      ImageIndex = 966
       OnExecute = ScadenzeExecute
     end
     object Attrezzature: TAction
       Category = 'Enti e Progetti'
       Caption = 'Attrezzature'
-      ImageIndex = 329
+      ImageIndex = 990
       OnExecute = AttrezzatureExecute
     end
     object RichiesteAttivazione: TAction
       Category = 'Risorse'
       Caption = 'Richieste Attivazione'
-      ImageIndex = 330
+      ImageIndex = 1029
       OnExecute = RichiesteAttivazioneExecute
     end
     object Sostegno: TAction
       Category = 'Formazione'
       Caption = 'Sostegno'
-      ImageIndex = 165
+      ImageIndex = 1012
       OnExecute = SostegnoExecute
     end
     object InterventiIntegrativi: TAction
       Category = 'Formazione'
       Caption = 'Interventi Integrativi'
-      ImageIndex = 545
+      ImageIndex = 1007
       OnExecute = InterventiIntegrativiExecute
     end
     object AssistenzaScolastica: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Assistenza Scolastica'
-      ImageIndex = 571
+      ImageIndex = 1039
       OnExecute = AssistenzaScolasticaExecute
     end
     object AS_Rendicontazione: TAction
       Category = 'Servizi alla Persona'
       Caption = 'A.S. Rendicontazione'
-      ImageIndex = 572
+      ImageIndex = 1037
       OnExecute = AS_RendicontazioneExecute
     end
     object AbitareEmergenza: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Abitare - Emergenza'
-      ImageIndex = 573
+      ImageIndex = 1034
       OnExecute = AbitareEmergenzaExecute
     end
     object AbitareSostegno: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Abitare - Sostegno'
-      ImageIndex = 468
+      ImageIndex = 1035
       OnExecute = AbitareSostegnoExecute
     end
     object DiarioSociale: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Diario Sociale'
-      ImageIndex = 574
+      ImageIndex = 1040
       OnExecute = DiarioSocialeExecute
     end
     object AnalisiRilevamenti: TAction
       Category = 'Risorse'
       Caption = 'Analisi Rilevamenti'
-      ImageIndex = 557
+      ImageIndex = 1021
       OnExecute = AnalisiRilevamentiExecute
     end
     object FrontOffice: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Front Office'
-      ImageIndex = 575
+      ImageIndex = 964
       OnExecute = FrontOfficeExecute
     end
     object Candidature: TAction
       Category = 'Risorse'
       Caption = 'Candidature'
-      ImageIndex = 576
+      ImageIndex = 1023
       OnExecute = CandidatureExecute
     end
     object ServizioInclusioneAdulti: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Servizio Inclusione Adulti'
-      ImageIndex = 166
+      ImageIndex = 1041
       OnExecute = ServizioInclusioneAdultiExecute
     end
     object AssistentiSociali: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Assistenti Sociali'
-      ImageIndex = 251
+      ImageIndex = 1038
       OnExecute = AssistentiSocialiExecute
     end
     object ServiziAlLavoro: TAction
       Category = 'Servizi alla Persona'
       Caption = 'Servizi Al Lavoro'
-      ImageIndex = 546
+      ImageIndex = 1036
       OnExecute = ServiziAlLavoroExecute
     end
     object Anagrafiche: TAction
       Category = 'Enti e Progetti'
       Caption = 'Anagrafiche'
-      ImageIndex = 251
+      ImageIndex = 970
       OnExecute = AnagraficheExecute
     end
     object Aziende: TAction
       Category = 'Risorse'
       Caption = 'Cruscotto Aziende'
-      ImageIndex = 471
+      ImageIndex = 1022
       OnExecute = AziendeExecute
     end
     object Notifiche: TAction
       Category = 'Home'
       Caption = 'Notifiche'
-      ImageIndex = 577
+      ImageIndex = 1093
       OnExecute = NotificheExecute
     end
     object Contratti: TAction
       Category = 'Risorse'
       Caption = 'Contratti'
-      ImageIndex = 107
+      ImageIndex = 1024
       OnExecute = ContrattiExecute
     end
     object Timesheet: TAction
       Category = 'Risorse'
       Caption = 'Timesheet'
-      ImageIndex = 46
+      ImageIndex = 1031
       OnExecute = TimesheetExecute
     end
     object AttivitaFuoriSede: TAction
       Category = 'Accoglienza e Agende'
       Caption = 'Attivit'#224' Fuori Sede'
-      ImageIndex = 572
+      ImageIndex = 965
       OnExecute = AttivitaFuoriSedeExecute
     end
     object FormazioneInterna: TAction
       Category = 'Formazione'
       Caption = 'Formazione Interna'
-      ImageIndex = 447
+      ImageIndex = 1006
       OnExecute = FormazioneInternaExecute
     end
     object AccordoStatoRegioni: TAction
       Category = 'Formazione '#183' Adempimenti'
       Caption = 'Accordo Stato Regioni'
-      ImageIndex = 50
+      ImageIndex = 957
       OnExecute = AccordoStatoRegioniExecute
     end
     object Attestati: TAction
       Category = 'Formazione '#183' Adempimenti'
       Caption = 'Attestati'
-      ImageIndex = 256
+      ImageIndex = 958
       OnExecute = AttestatiExecute
     end
     object CoGe_Bilancio: TAction
       Category = 'CoGe'
       Caption = 'Bilancio'
-      ImageIndex = 15
+      ImageIndex = 974
       OnExecute = CoGe_BilancioExecute
     end
     object CoGe_Configurazione: TAction
       Category = 'CoGe'
       Caption = 'Configurazione Contabilit'#224
-      ImageIndex = 568
+      ImageIndex = 975
       OnExecute = CoGe_ConfigurazioneExecute
     end
     object CoGe_Documenti: TAction
       Category = 'CoGe'
       Caption = 'Documenti'
-      ImageIndex = 591
+      ImageIndex = 976
       OnExecute = CoGe_DocumentiExecute
     end
     object CoGe_FattureElettroniche: TAction
       Category = 'CoGe'
       Caption = 'Fatture Elettroniche'
-      ImageIndex = 592
+      ImageIndex = 977
       OnExecute = CoGe_FattureElettronicheExecute
     end
     object CoGe_Incassi: TAction
       Category = 'CoGe'
       Caption = 'Incassi'
-      ImageIndex = 113
+      ImageIndex = 980
       OnExecute = CoGe_IncassiExecute
     end
     object CoGe_Registrazioni: TAction
       Category = 'CoGe'
       Caption = 'Registrazioni Contabili'
-      ImageIndex = 560
+      ImageIndex = 981
       OnExecute = CoGe_RegistrazioniExecute
     end
     object CoGe_Soggetti: TAction
       Category = 'CoGe'
       Caption = 'Soggetti Contabili'
-      ImageIndex = 581
+      ImageIndex = 982
       OnExecute = CoGe_SoggettiExecute
     end
     object CoGe_Gateway_Contabile: TAction
       Category = 'CoGe'
       Caption = 'Gateway Contabile'
-      ImageIndex = 579
+      ImageIndex = 979
       OnExecute = CoGe_Gateway_ContabileExecute
     end
   end
