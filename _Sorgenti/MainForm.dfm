@@ -550,7 +550,6 @@ object Main: TMain
     Categories.Visibles = (
       True)
     ImageOptions.Images = dx.Immagini
-    ImageOptions.LargeImages = dx.Immagini
     NotDocking = [dsNone, dsLeft, dsTop, dsRight, dsBottom]
     PopupMenuLinks = <
       item
