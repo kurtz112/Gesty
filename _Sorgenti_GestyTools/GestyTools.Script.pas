@@ -43,6 +43,22 @@ type
     procedure GDriveUpload(const ATargetPath, AFileName: string; AOverwriteIfExists: boolean = True);
   private
     function CallMethod(Instance: TObject; ClassType: TClass; const MethodName: String; var Params: Variant): Variant;
+  private
+    // Stato dell'esecuzione da RunFromFile, per la mail di errore.
+    // FPosizioneInEsecuzione e' l'ultima istruzione avviata ('riga:colonna'),
+    // presa da OnRunLine: ErrorPos di FastScript, quando l'errore nasce dentro
+    // una procedura dello script, indica la chiamata nel programma principale
+    // e non la riga che ha sbagliato. FChiamataInCorso e' la funzione di
+    // GestyScript (ImportFileCandidature, dbBackup...) con i suoi parametri,
+    // svuotata quando la funzione finisce bene.
+    FScriptFileName: string;
+    FUnitInEsecuzione: string;
+    FPosizioneInEsecuzione: string;
+    FChiamataInCorso: string;
+    procedure ScriptRunLine(Sender: TfsScript; const UnitName, SourcePos: String);
+    function DescriviChiamata(const MethodName: String; const Params: Variant): string;
+    function ContestoErrore: string;
+    procedure SegnalaErrore(e: exception);
   public
     constructor Create(aOwner: TComponent); override;
 
@@ -141,19 +157,104 @@ end;
 
 procedure TScriptModule.RunFromFile(const FileName: String);
 begin
+  FScriptFileName := FileName;
+  FUnitInEsecuzione := '';
+  FPosizioneInEsecuzione := '';
+  FChiamataInCorso := '';
+
   try
     LoadFromFile(FileName);
 
+    // solo qui e non in Init: l'editor degli script usa OnRunLine per
+    // l'esecuzione passo passo e lo imposta da se'
+    fsScript.OnRunLine := ScriptRunLine;
+
     if fsScript.Compile then
       fsScript.Execute
+    else if fsScript.ErrorUnit = '' then
+      raise exception.Create('Compilazione dello script non riuscita, posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg)
     else
-      raise exception.Create(fsScript.ErrorMsg);
+      raise exception.Create('Compilazione dello script non riuscita, ' + fsScript.ErrorUnit + ' posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg);
   except
     on e: exception do
     begin
-      Mail.SegnalaEccezione(e);
+      SegnalaErrore(e);
       raise;
     end;
+  end;
+end;
+
+procedure TScriptModule.SegnalaErrore(e: exception);
+begin
+  // un errore nell'invio della mail (SMTP irraggiungibile, TLS) non deve
+  // prendere il posto di quello dello script: prima sostituiva l'errore vero
+  // anche nel .log di GestyScript
+  try
+    Mail.SegnalaEccezione(e, ContestoErrore);
+  except
+    on ErroreMail: exception do
+    begin
+      Log.ToScreen('Invio della mail di errore non riuscito: ' + ErroreMail.ClassName + ': ' + ErroreMail.Message);
+      Log.ToFile('Invio della mail di errore non riuscito: ' + ErroreMail.ClassName + ': ' + ErroreMail.Message);
+    end;
+  end;
+end;
+
+procedure TScriptModule.ScriptRunLine(Sender: TfsScript; const UnitName, SourcePos: String);
+begin
+  FUnitInEsecuzione := UnitName;
+  FPosizioneInEsecuzione := SourcePos;
+end;
+
+function TScriptModule.DescriviChiamata(const MethodName: String; const Params: Variant): string;
+var
+  Indice: integer;
+begin
+  result := MethodName + '(';
+  try
+    if VarIsArray(Params) then
+      for Indice := VarArrayLowBound(Params, 1) to VarArrayHighBound(Params, 1) do
+      begin
+        if Indice > VarArrayLowBound(Params, 1) then
+          result := result + ', ';
+        result := result + QuotedStr(VarToStrDef(Params[Indice], ''));
+      end;
+  except
+    // solo descrittivo: un parametro non convertibile non deve fermare lo script
+    result := result + '...';
+  end;
+  result := result + ')';
+end;
+
+function TScriptModule.ContestoErrore: string;
+var
+  Righe: TStringList;
+  NumeroRiga: integer;
+begin
+  Righe := TStringList.Create;
+  try
+    Righe.Add('Script: ' + FScriptFileName);
+
+    if not FPosizioneInEsecuzione.IsEmpty then
+    begin
+      if FUnitInEsecuzione.IsEmpty then
+        Righe.Add('Ultima istruzione avviata: posizione ' + FPosizioneInEsecuzione)
+      else
+        Righe.Add('Ultima istruzione avviata: ' + FUnitInEsecuzione + ' posizione ' + FPosizioneInEsecuzione);
+
+      // il testo della riga si ha solo per il sorgente principale: per le unit
+      // incluse FastScript non espone il sorgente
+      NumeroRiga := StrToIntDef(Copy(FPosizioneInEsecuzione, 1, Pos(':', FPosizioneInEsecuzione) - 1), 0);
+      if FUnitInEsecuzione.IsEmpty and (NumeroRiga > 0) and (NumeroRiga <= fsScript.Lines.Count) then
+        Righe.Add('Testo della riga: ' + fsScript.Lines[NumeroRiga - 1].Trim);
+    end;
+
+    if not FChiamataInCorso.IsEmpty then
+      Righe.Add('Funzione in corso: ' + FChiamataInCorso);
+
+    result := Righe.Text;
+  finally
+    FreeAndNil(Righe);
   end;
 end;
 
@@ -186,6 +287,11 @@ const
     'ExtractFileName', 'Writeln', 'SP', 'ExecSP', 'LoadFile', 'dbConnect', 'dbDisconnect', 'ImportFileCandidature', 'GDriveDownload', 'GDriveUpload', 'Log', 'TestConnessione', 'FtpConnect',
     'FtpDisconnect', 'FtpRemoteFileExists', 'FtpChangeDir', 'FtpListFiles', 'FtpDownload', 'FtpUpload', 'ForceDirectories'];
 begin
+
+  // Writeln e Log sono chiamate innocue e frequentissime: non coprono la
+  // funzione che stava davvero lavorando
+  if IndexStr(MethodName, ['Writeln', 'Log']) < 0 then
+    FChiamataInCorso := DescriviChiamata(MethodName, Params);
 
   case IndexStr(MethodName, Methods) of
     0:
@@ -250,6 +356,9 @@ begin
       // crea la cartella e le intermedie mancanti; True anche se esisteva gia'
       result := ForceDirectories(Params[0]);
   end;
+
+  // finita bene: se l'errore viene dopo, non e' colpa di questa funzione
+  FChiamataInCorso := '';
 end;
 
 procedure TScriptModule.CopyFile(const SrcFileName, DestFileName: string);

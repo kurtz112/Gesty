@@ -25,7 +25,9 @@ type
     procedure InitMessage(IdMessage: TIdMessage);
     procedure SendMail(IdMessage: TIdMessage);
   public
-    procedure SegnalaEccezione(e: exception);
+    // Contesto: righe gia' pronte con cio' che sa solo il chiamante (nome
+    // dello script, riga in esecuzione); vuoto se non c'e' niente da dire
+    procedure SegnalaEccezione(e: exception; const Contesto: string = '');
     procedure InviaMail(Const Subject, Body: string);
   end;
 
@@ -35,6 +37,7 @@ var
 implementation
 
 uses
+  System.IOUtils,
   IdText,
   IdMessageParts,
   IdGlobal,
@@ -151,18 +154,53 @@ begin
   SendMail(IdMessage);
 end;
 
-procedure TMail.SegnalaEccezione(e: exception);
+procedure TMail.SegnalaEccezione(e: exception; const Contesto: string);
 var
   Body: TStringList;
+  Causa: exception;
+  DataProgramma: string;
 begin
   InitMessage(IdMessage);
+
+  try
+    DataProgramma := DateTimeToStr(TFile.GetLastWriteTime(ParamStr(0)));
+  except
+    DataProgramma := 'non leggibile';
+  end;
 
   Body := TStringList.Create;
   try
     Body.Add('Errore Script');
     Body.Add('DB: ' + Config.Ente);
+    if Config.Server.IsEmpty then
+      Body.Add('Database: ' + Config.DB)
+    else
+      Body.Add('Database: ' + Config.Server + ':' + Config.DB);
+    Body.Add('Computer: ' + GetEnvironmentVariable('COMPUTERNAME') + ', utente ' + GetEnvironmentVariable('USERNAME'));
+    Body.Add('Programma: ' + ParamStr(0) + ' del ' + DataProgramma);
+    Body.Add('Ora: ' + DateTimeToStr(Now));
+
+    if not Contesto.IsEmpty then
+    begin
+      Body.Add('');
+      Body.Add(Contesto.TrimRight);
+    end;
+
+    // classe e catena delle cause: Indy, System.Zip e il client HTTP
+    // avvolgono l'errore vero in uno generico, e il solo Message di quello
+    // esterno non basta a capire cosa e' successo
     Body.Add('');
-    Body.Add(e.Message);
+    Body.Add('Errore: ' + e.ClassName + ': ' + e.Message);
+    Causa := e.InnerException;
+    while Assigned(Causa) do
+    begin
+      Body.Add('  causa: ' + Causa.ClassName + ': ' + Causa.Message);
+      Causa := Causa.InnerException;
+    end;
+
+    Body.Add('');
+    Body.Add('Ultime righe del registro:');
+    Body.Add(TLog.UltimeRighe);
 
     InviaMail(Config.Ente + ' - Errore Script', Body.Text);
   finally

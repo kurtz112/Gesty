@@ -43,6 +43,7 @@ type
     CandidatureLines: TStringList;
 
     function DownloadFile(const url: string; const DestFileName: String): boolean;
+    function DescriviFileScaricato(const FileName, TipoContenuto: string): string;
     procedure SpostaAllegati(const IdFileCandidature: integer);
   public
     constructor Create(aOwner: TComponent); override;
@@ -59,6 +60,7 @@ implementation
 uses
   System.DateUtils,
   System.IOUtils,
+  System.Zip,
   QImport3Common,
   GestyTools.Log,
   GestyTools.Config,
@@ -67,6 +69,15 @@ uses
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 {$R *.dfm}
+
+const
+  // Tempi e tentativi dello scaricamento di file e allegati delle candidature.
+  // Fissi nel codice e non nella configurazione .lz_cfg: servono a reggere un
+  // server lento, non a essere regolati cliente per cliente
+  TempoMassimoConnessione = 30000;
+  TempoMassimoRisposta = 180000;
+  TentativiScaricamento = 3;
+  PausaFraTentativi = 5000;
 
 constructor TImportCandidature.Create(aOwner: TComponent);
 begin
@@ -86,13 +97,94 @@ end;
 function TImportCandidature.DownloadFile(const url, DestFileName: String): boolean;
 var
   FileStream: TStream;
+  Risposta: IHTTPResponse;
+  Tentativo: integer;
 begin
-  FileStream := TFileStream.Create(DestFileName, fmCreate);
-  try
-    NetHTTPClient.Get(url, FileStream);
-  finally
-    FreeAndNil(FileStream);
+  // il predefinito di 60 secondi sulla risposta non bastava: un server lento
+  // fermava tutto l'import con "Error receiving data: (12002)"
+  NetHTTPClient.ConnectionTimeout := TempoMassimoConnessione;
+  NetHTTPClient.ResponseTimeout := TempoMassimoRisposta;
+
+  Risposta := nil;
+  for Tentativo := 1 to TentativiScaricamento do
+  begin
+    Log.ToScreen(Format('Scaricamento di %s (tentativo %d di %d)', [url, Tentativo, TentativiScaricamento]));
+    try
+      FileStream := TFileStream.Create(DestFileName, fmCreate);
+      try
+        Risposta := NetHTTPClient.Get(url, FileStream);
+      finally
+        FreeAndNil(FileStream);
+      end;
+      Break;
+    except
+      // errori di rete (tempo scaduto, connessione rifiutata o interrotta):
+      // possono essere passeggeri, si riprova. Gli altri errori salgono subito
+      on E: ENetException do
+      begin
+        Log.ToScreen(Format('Scaricamento di %s non riuscito: %s: %s', [url, E.ClassName, E.Message]));
+
+        if Tentativo = TentativiScaricamento then
+          Exception.RaiseOuterException(Exception.CreateFmt('Scaricamento di %s non riuscito dopo %d tentativi (tempo massimo di risposta %d secondi)',
+            [url, TentativiScaricamento, TempoMassimoRisposta div 1000]));
+
+        Sleep(PausaFraTentativi);
+      end;
+    end;
   end;
+
+  // prima una risposta di errore (pagina di accesso, 403, 404) veniva salvata
+  // come se fosse il file, e l'import si fermava piu' avanti con un errore
+  // che non diceva cosa era arrivato ("Error reading zip file")
+  if (Risposta.StatusCode < 200) or (Risposta.StatusCode > 299) then
+    raise Exception.CreateFmt('Scaricamento di %s: il server ha risposto %d %s. %s', [url, Risposta.StatusCode, Risposta.StatusText,
+      DescriviFileScaricato(DestFileName, Risposta.MimeType)]);
+
+  Log.ToScreen(Format('Scaricato %s: %s', [url, DescriviFileScaricato(DestFileName, Risposta.MimeType)]));
+
+  result := True;
+end;
+
+function TImportCandidature.DescriviFileScaricato(const FileName, TipoContenuto: string): string;
+const
+  CaratteriMostrati = 200;
+var
+  FileStream: TFileStream;
+  Contenuto: TBytes;
+  Inizio: string;
+  Dimensione: Int64;
+  Indice: integer;
+begin
+  try
+    // i primi caratteri dicono subito cosa e' arrivato: "<!DOCTYPE html" e'
+    // una pagina web, "PK" e' uno zip (xlsx), il resto di solito testo.
+    // Letti dal flusso e non con ReadAllBytes: gli allegati possono pesare
+    FileStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+    try
+      Dimensione := FileStream.Size;
+      if Dimensione > CaratteriMostrati then
+        SetLength(Contenuto, CaratteriMostrati)
+      else
+        SetLength(Contenuto, Dimensione);
+      if Length(Contenuto) > 0 then
+        FileStream.ReadBuffer(Contenuto, Length(Contenuto));
+    finally
+      FreeAndNil(FileStream);
+    end;
+
+    Inizio := TEncoding.ANSI.GetString(Contenuto);
+    for Indice := 1 to Length(Inizio) do
+      if Inizio[Indice] < ' ' then
+        Inizio[Indice] := ' ';
+
+    result := Format('%d byte, inizio: %s', [Dimensione, Inizio.Trim]);
+  except
+    on E: Exception do
+      result := Format('File non leggibile (%s)', [E.Message]);
+  end;
+
+  if not TipoContenuto.IsEmpty then
+    result := Format('Tipo di contenuto "%s", %s', [TipoContenuto, result]);
 end;
 
 procedure TImportCandidature.QImport3XlsxUserDefinedImport(Sender: TObject; Row: TQImportRow);
@@ -162,6 +254,11 @@ begin
 
     if ImportType = icXlsx then
     begin
+      // un xlsx e' un archivio zip: se non lo e', l'import di EMS si ferma con
+      // "Error reading zip file" senza dire cosa ha ricevuto
+      if not TZipFile.IsValid(tmpFileName) then
+        raise Exception.CreateFmt('Il file delle candidature %s non e'' un xlsx valido. %s', [url, DescriviFileScaricato(tmpFileName, '')]);
+
       QImport3Xlsx.ImportDestination := qidUserDefined;
       QImport3Xlsx.SkipFirstRows := 0;
       QImport3Xlsx.SheetName := '';
@@ -198,6 +295,7 @@ procedure TImportCandidature.SpostaAllegati(const IdFileCandidature: integer);
 var
   FilesNonTrovati: TStringList;
   src, dest, folder: string;
+  MotivoMancato: string;
   idObjectFile: integer;
   idCandidatura: integer;
 begin
@@ -219,13 +317,43 @@ begin
         if not TDirectory.Exists(folder) then
           TDirectory.CreateDirectory(folder);
 
+        MotivoMancato := '';
         if src.StartsWith('http', True) or src.StartsWith('www', True) then
-          DownloadFile(src, dest)
+        begin
+          // Un allegato che non si scarica, anche dopo i tentativi, finisce
+          // nell'elenco dei file non copiati invece di fermare l'import: le
+          // candidature sono gia' registrate da CANDIDATURE_IMPORT, e
+          // fermarsi qui lasciava senza allegati anche tutte le successive
+          try
+            DownloadFile(src, dest);
+          except
+            on E: Exception do
+            begin
+              MotivoMancato := E.Message;
+              Log.ToScreen('Allegato della candidatura ' + idCandidatura.ToString + ' non scaricato: ' + E.Message);
+
+              // il file creato prima dell'errore e' vuoto o troncato: lasciarlo
+              // lo farebbe passare per copiato
+              try
+                if TFile.Exists(dest) then
+                  TFile.Delete(dest);
+              except
+                on ErroreCancellazione: Exception do
+                  MotivoMancato := MotivoMancato + ' (file parziale non cancellato: ' + ErroreCancellazione.Message + ')';
+              end;
+            end;
+          end;
+        end
         else
           TFile.Copy(src, dest);
 
         if not TFile.Exists(dest) then
-          FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src);
+        begin
+          if MotivoMancato.IsEmpty then
+            FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src)
+          else
+            FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src + ' - ' + MotivoMancato);
+        end;
 
         CandidatureAllegati.Next;
       end;
