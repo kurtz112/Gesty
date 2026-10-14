@@ -1,4 +1,4 @@
-// Generata il 12/10/2026 12:40:24
+// Generata il 13/10/2026 14:55:57
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
 unit Gesty_StoredProcs;
 
@@ -24430,6 +24430,21 @@ end;
 TSP_risorse_Totali_Ore_Ricalcola = class (TzStoredProc)
   private
   public
+end;
+
+[TStoredProcedure('RISORSE_TOTALI_ORE_RICALCOLA_RISORSA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_risorse_Totali_Ore_Ricalcola_Risorsa = class (TzStoredProc)
+  private
+    fId_Risorsa: TNullableInt64;
+    fAnno: TNullableInteger;
+  public
+    //
+    [TParamAttribute('ID_RISORSA', ptInput, False)]
+    property Id_Risorsa: TNullableInt64 read fId_Risorsa write fId_Risorsa;
+    //
+    [TParamAttribute('ANNO', ptInput, False)]
+    property Anno: TNullableInteger read fAnno write fAnno;
 end;
 
 [TStoredProcedure('RISORSE_UPD')]
