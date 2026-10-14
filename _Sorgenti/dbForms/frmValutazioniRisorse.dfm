@@ -250,12 +250,12 @@ inherited FormValutazioniRisorse: TFormValutazioniRisorse
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 32
     Top = 168
     object Esporta: TdxFileSaveAs
       Caption = 'Esporta'
-      ImageIndex = 5
+      ImageIndex = 221
       OnAccept = EsportaAccept
     end
   end

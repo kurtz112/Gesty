@@ -395,8 +395,8 @@ begin
   TzExceptionManager.MailAddress := 'assistenza@zebro.it';
 
   //
-  zSystem.ImageList16 := zDmImages.ImageList16;
-  zSystem.ImageList24 := zDmImages.ImageList24;
+  zSystem.ImageList16 := dx.Immagini;
+  zSystem.ImageList24 := dx.Immagini;
   zSystem.AppName := 'Gesty';
   zSystem.FDPhysFBDriverLink := FDPhysFBDriverLink;
 

@@ -65,22 +65,22 @@ inherited FormAllegati: TFormAllegati
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 192
     Top = 64
     object Cerca: TAction
       Caption = 'Cerca'
-      ImageIndex = 32
+      ImageIndex = 185
       OnExecute = CercaExecute
     end
     object IndicizzaAllegatiSenzaTesto: TAction
       Caption = 'Indicizza Tutti'
-      ImageIndex = 59
+      ImageIndex = 1890
       OnExecute = IndicizzaAllegatiSenzaTestoExecute
     end
     object IndicizzaAllegatoSelezionato: TAction
       Caption = 'Indicizza Selezionato'
-      ImageIndex = 18
+      ImageIndex = 1889
       OnExecute = IndicizzaAllegatoSelezionatoExecute
     end
   end

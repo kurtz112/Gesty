@@ -12,17 +12,17 @@ inherited FormServiziAlLavoro: TFormServiziAlLavoro
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 216
     Top = 88
     object NuovaAzienda: TAction
       Caption = 'Nuova Azienda'
-      ImageIndex = 473
+      ImageIndex = 1913
       OnExecute = NuovaAziendaExecute
     end
     object AggiungiServizi: TAction
       Caption = 'Aggiungi Servizi'
-      ImageIndex = 46
+      ImageIndex = 1629
       OnExecute = AggiungiServiziExecute
     end
   end

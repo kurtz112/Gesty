@@ -10,19 +10,19 @@ inherited FormCandidature: TFormCandidature
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 216
     Top = 88
     object GeneraRisorsa: TAction
       Caption = 'Genera Risorsa'
-      ImageIndex = 302
+      ImageIndex = 1349
       OnExecute = GeneraRisorsaExecute
     end
     object ImportaFile: TdxFileOpen
       Caption = 'Importa File'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 41
+      ImageIndex = 1744
       OnAccept = ImportaFileAccept
     end
   end

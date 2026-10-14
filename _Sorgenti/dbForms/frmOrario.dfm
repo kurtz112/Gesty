@@ -614,13 +614,13 @@ inherited FormOrario: TFormOrario
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 30
+      ImageIndex = 221
     end
     object dxBarLargeButton6: TdxBarLargeButton
       Caption = 'Docenti'
       Category = 0
       Visible = ivAlways
-      LargeImageIndex = 330
+      LargeImageIndex = 1344
     end
     object dxBarButton1: TdxBarButton
       Caption = 'New Button'
@@ -632,7 +632,7 @@ inherited FormOrario: TFormOrario
       Caption = 'Incolla'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 37
+      ImageIndex = 85
     end
     object dxBarButton3: TdxBarButton
       Caption = 'Copia Settimana'
@@ -643,19 +643,19 @@ inherited FormOrario: TFormOrario
       Caption = 'Elimina'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 38
+      ImageIndex = 43
     end
     object dxBarButton5: TdxBarButton
       Caption = 'Copia'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 36
+      ImageIndex = 42
     end
     object dxBarButton6: TdxBarButton
       Caption = 'Modifica'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 41
+      ImageIndex = 77
     end
     object dxBarButton7: TdxBarButton
       Caption = 'Copia Giorno'
@@ -666,42 +666,42 @@ inherited FormOrario: TFormOrario
       Caption = 'Taglia'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 35
+      ImageIndex = 65
     end
     object dxBarButton10: TdxBarButton
       Caption = 'Solo Orario Lavorativo'
       Category = 0
       Hint = 'solo orario lavorativo'
       Visible = ivAlways
-      ImageIndex = 549
+      ImageIndex = 1004
     end
     object dxBarButton13: TdxBarButton
       Caption = 'Esporta'
       Category = 0
       Visible = ivNever
-      ImageIndex = 5
+      ImageIndex = 221
     end
     object dxBarButton14: TdxBarButton
       Caption = 'Anteprima'
       Category = 0
       Hint = 'anteprima di stampa'
       Visible = ivAlways
-      ImageIndex = 554
+      ImageIndex = 169
     end
     object dxBarButtonNewEvent: TdxBarButton
       Caption = 'Nuovo'
       Category = 1
       Hint = 'nuovo'
       Visible = ivAlways
-      ImageIndex = 529
-      LargeImageIndex = 529
+      ImageIndex = 38
+      LargeImageIndex = 38
     end
     object dxBarSubItem1: TdxBarSubItem
       Caption = 'Scala'
       Category = 5
       Visible = ivAlways
-      ImageIndex = 547
-      LargeImageIndex = 547
+      ImageIndex = 480
+      LargeImageIndex = 480
       ItemLinks = <
         item
           Visible = True
@@ -779,7 +779,7 @@ inherited FormOrario: TFormOrario
     PixelsPerInch = 96
   end
   object Actions: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 201
     Top = 56
     object ImportaFileUntis: TdxFileOpen
@@ -787,40 +787,40 @@ inherited FormOrario: TFormOrario
       Dialog.DefaultExt = '*.txt'
       Dialog.Filter = 'Testo|*.txt|Tutti|*.*'
       Dialog.Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
-      ImageIndex = 56
+      ImageIndex = 1744
       OnAccept = ImportaFileUntisAccept
     end
     object ImportaFileStandard: TdxFileOpen
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 56
+      ImageIndex = 1242
       OnAccept = ImportaFileStandardAccept
     end
     object ElaboraFileUntis: TAction
       Caption = 'Elabora File'
-      ImageIndex = 4
+      ImageIndex = 1754
       OnExecute = ElaboraFileUntisExecute
     end
     object ApriGeneraCalendario: TAction
       AutoCheck = True
       Caption = 'Generazione Calendario'
-      ImageIndex = 549
+      ImageIndex = 1253
       OnExecute = ApriGeneraCalendarioExecute
     end
     object GeneraCalendario: TAction
       Caption = 'Genera'
-      ImageIndex = 547
+      ImageIndex = 1794
       OnExecute = GeneraCalendarioExecute
     end
     object AzzeraTmpOrario: TAction
       Caption = 'Azzera'
-      ImageIndex = 135
+      ImageIndex = 1792
       OnExecute = AzzeraTmpOrarioExecute
     end
     object RegistroStudenti: TAction
       Caption = 'Registro Studenti'
-      ImageIndex = 455
+      ImageIndex = 1347
       OnExecute = RegistroStudentiExecute
     end
     object EliminaCalendario: TAction

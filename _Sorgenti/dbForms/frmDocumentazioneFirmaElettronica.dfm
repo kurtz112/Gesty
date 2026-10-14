@@ -18,12 +18,12 @@ inherited FormDocumentazioneFirmaElettronica: TFormDocumentazioneFirmaElettronic
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 288
     Top = 64
     object Firma: TAction
       Caption = 'Firma'
-      ImageIndex = 189
+      ImageIndex = 985
       OnExecute = FirmaExecute
     end
   end

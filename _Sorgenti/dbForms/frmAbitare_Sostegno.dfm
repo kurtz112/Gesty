@@ -20,7 +20,7 @@ inherited FormAbitareSostegno: TFormAbitareSostegno
     object dxBarButton1: TdxBarButton
       Action = DownloadAllegati
       Category = 0
-      LargeImageIndex = 556
+      LargeImageIndex = 1035
     end
   end
   inherited popActions: TdxBarPopupMenu
@@ -31,7 +31,7 @@ inherited FormAbitareSostegno: TFormAbitareSostegno
     Top = 80
     object DownloadAllegati: TAction
       Caption = 'Download Allegati'
-      ImageIndex = 556
+      ImageIndex = 1887
       OnExecute = DownloadAllegatiExecute
       OnUpdate = DownloadAllegatiUpdate
     end

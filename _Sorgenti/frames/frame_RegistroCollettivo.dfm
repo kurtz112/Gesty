@@ -813,56 +813,56 @@ inherited FrameRegistroCollettivo: TFrameRegistroCollettivo
     PixelsPerInch = 96
   end
   object Actions: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 217
     Top = 208
     object Firma: TAction
       Caption = 'Firma'
-      ImageIndex = 384
+      ImageIndex = 985
       OnExecute = FirmaExecute
       OnUpdate = FirmaUpdate
     end
     object Precedente: TAction
       Caption = 'Precedente'
       Hint = 'settimana precedente'
-      ImageIndex = 531
+      ImageIndex = 171
       OnExecute = PrecedenteExecute
     end
     object Successiva: TAction
       Caption = 'Successiva'
       Hint = 'settimana successiva'
-      ImageIndex = 532
+      ImageIndex = 163
       OnExecute = SuccessivaExecute
     end
     object ForzaTipologiaFormazione: TAction
       Caption = 'Forza Tipologia'
-      ImageIndex = 126
+      ImageIndex = 1313
       OnExecute = ForzaTipologiaFormazioneExecute
     end
     object Salva: TAction
       Caption = 'Salva'
-      ImageIndex = 6
+      ImageIndex = 92
       OnExecute = SalvaExecute
       OnUpdate = SalvaUpdate
     end
     object Oggi: TAction
       Caption = 'Oggi'
-      ImageIndex = 533
+      ImageIndex = 483
       OnExecute = OggiExecute
     end
     object VaiAlGiorno: TAction
       Caption = 'VaiAlGiorno'
-      ImageIndex = 534
+      ImageIndex = 475
       OnExecute = VaiAlGiornoExecute
     end
     object CalendarioCorsi: TAction
       Caption = 'Calendario Corsi'
-      ImageIndex = 272
+      ImageIndex = 956
       OnExecute = CalendarioCorsiExecute
     end
     object BloccaPresenze: TAction
       Caption = 'Blocca Presenze'
-      ImageIndex = 129
+      ImageIndex = 1851
       OnExecute = BloccaPresenzeExecute
       OnUpdate = BloccaPresenzeUpdate
     end
@@ -920,7 +920,7 @@ inherited FrameRegistroCollettivo: TFrameRegistroCollettivo
       Properties.Items = <
         item
           Description = 'Presente'
-          ImageIndex = 282
+          ImageIndex = 546
         end>
       Properties.Revertable = True
       Properties.OnEditValueChanged = cxEditRepositoryStatoPresenzaPropertiesEditValueChanged

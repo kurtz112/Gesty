@@ -8,19 +8,19 @@ inherited FormAS_Rendicontazione: TFormAS_Rendicontazione
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 176
     Top = 56
     object ImportTreEffe: TdxFileOpen
       Caption = 'Importa File Rendicontazione'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 56
+      ImageIndex = 1744
       OnAccept = ImportTreEffeAccept
     end
     object ElaboraTreEffe: TAction
       Caption = 'Elabora Rendicontazioni'
-      ImageIndex = 4
+      ImageIndex = 1591
       OnExecute = ElaboraTreEffeExecute
     end
   end

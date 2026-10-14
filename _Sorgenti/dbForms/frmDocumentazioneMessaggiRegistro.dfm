@@ -18,12 +18,12 @@ inherited FormDocumentazioneMessaggiRegistro: TFormDocumentazioneMessaggiRegistr
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 392
     Top = 256
     object VerificaRicevute: TAction
       Caption = 'Verifica Ricevute'
-      ImageIndex = 126
+      ImageIndex = 1554
       OnExecute = VerificaRicevuteExecute
     end
   end

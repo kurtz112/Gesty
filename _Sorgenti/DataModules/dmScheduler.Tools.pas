@@ -184,7 +184,8 @@ implementation
 uses
   System.DateUtils, System.Variants, System.IOUtils, cxExportSchedulerLink,
     zDm_Images, zOffice, zOffice.types, Gesty_StoredProcs,
-  WizInserimentoIncaricoFrm, dmCommon, ConfigModule, zMsg, Gesty.Authorizations;
+  WizInserimentoIncaricoFrm, dmCommon, ConfigModule, zMsg, Gesty.Authorizations,
+  zDX;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
@@ -234,7 +235,7 @@ procedure TSchedulerTools.DataModuleCreate(Sender: TObject);
 begin
   inherited;
   DisableRilevamentoFieldChanged := False;
-  ActionList.Images := zDmImages.ImageList24;
+  ActionList.Images := dx.Immagini;
   dxSaveFileDialog.InitialDir := Config.CartellaPersonaleUtenteCorrente;
   // dxSaveFileDialog.FilterIndex :=
 end;
@@ -535,7 +536,7 @@ procedure TSchedulerTools.cardPrenotazioneAuleInitDialog(Dialog: TzDbCardForm);
 begin
   inherited;
   Dialog.zDbCard.ToolActions.Clear;
-  Dialog.zDbCard.AddAction(InviaMailAutorizzazioneAula, zDmImages.ImageList16);
+  Dialog.zDbCard.AddAction(InviaMailAutorizzazioneAula, dx.Immagini);
   Dialog.zDbCard.InitToolActions;
 end;
 

@@ -84,7 +84,8 @@ type
 implementation
 
 uses
-  cxScheduler;
+  cxScheduler,
+  zDX;
 
 type
   TGestySchedulerStorage = class(TInterfacedObject, IzSchedulerStorage)
@@ -303,23 +304,23 @@ begin
   // indici sono quelli della ImageList del componente
   Kind := TzSchedulerEvents.Find(teOrarioLezione.ToString);
   Kind.NewCaption := 'Nuova Lezione';
-  Kind.NewImageIndex := 120;
+  Kind.NewImageIndex := dx.IndiceIcona('bs_calendario__actions_add');
 
   Kind := TzSchedulerEvents.Find(teOreRilevamento.ToString);
   Kind.NewCaption := 'Nuovo Rilevamento';
-  Kind.NewImageIndex := 121;
+  Kind.NewImageIndex := dx.IndiceIcona('timelineview__actions_add');
 
   Kind := TzSchedulerEvents.Find(teAgendaPersonale.ToString);
   Kind.NewCaption := 'Nuovo Evento';
-  Kind.NewImageIndex := 90;
+  Kind.NewImageIndex := dx.IndiceIcona('bs_eventi__actions_add');
 
   Kind := TzSchedulerEvents.Find(tePrenotazioneAule.ToString);
   Kind.NewCaption := 'Nuova Prenotazione Aula';
-  Kind.NewImageIndex := 122;
+  Kind.NewImageIndex := dx.IndiceIcona('opencalendar__actions_add');
 
   Kind := TzSchedulerEvents.Find(teAttivitaFuoriSede.ToString);
   Kind.NewCaption := 'Nuova Attivit' + #224 + ' Fuori Sede';
-  Kind.NewImageIndex := 123;
+  Kind.NewImageIndex := dx.IndiceIcona('car__actions_add');
 
   // esportazione di Gesty: Excel o CSV per Google Calendar e Outlook
   TzSchedulerEvents.ExportProc :=

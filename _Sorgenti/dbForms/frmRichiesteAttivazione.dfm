@@ -12,42 +12,42 @@ inherited FormRichiesteAttivazione: TFormRichiesteAttivazione
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 216
     Top = 152
     object NuovaRichiestaAttivazione: TAction
       Caption = 'Nuova Richiesta Attivazione'
-      ImageIndex = 164
+      ImageIndex = 1914
       OnExecute = NuovaRichiestaAttivazioneExecute
     end
     object RicopiaAllegatiRisorsa: TAction
       Caption = 'Ricopia Allegati Risorsa'
-      ImageIndex = 8
+      ImageIndex = 983
       OnExecute = RicopiaAllegatiRisorsaExecute
     end
     object ConvalidaRichiestaAttivazione: TAction
       Caption = 'Convalida Richiesta'
-      ImageIndex = 107
+      ImageIndex = 1915
       OnExecute = ConvalidaRichiestaAttivazioneExecute
     end
     object RichiestaAttivazioneNonValida: TAction
       Caption = 'Richiesta Non Valida'
-      ImageIndex = 106
+      ImageIndex = 1023
       OnExecute = RichiestaAttivazioneNonValidaExecute
     end
     object ApprovaRichiestaAttivazione: TAction
       Caption = 'Approva Richiesta'
-      ImageIndex = 107
+      ImageIndex = 1915
       OnExecute = ApprovaRichiestaAttivazioneExecute
     end
     object RespingiRichiestaAttivazione: TAction
       Caption = 'Respingi Richiesta'
-      ImageIndex = 106
+      ImageIndex = 1918
       OnExecute = RespingiRichiestaAttivazioneExecute
     end
     object GeneraRisorsa: TAction
       Caption = 'Genera Risorsa'
-      ImageIndex = 302
+      ImageIndex = 1349
       OnExecute = GeneraRisorsaExecute
     end
   end

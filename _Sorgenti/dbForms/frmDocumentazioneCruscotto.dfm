@@ -18,12 +18,12 @@ inherited FormDocumentazioneCruscotto: TFormDocumentazioneCruscotto
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 288
     Top = 64
     object VerificaPendenti: TAction
       Caption = 'Verifica Pendenti'
-      ImageIndex = 46
+      ImageIndex = 1326
       OnExecute = VerificaPendentiExecute
     end
   end

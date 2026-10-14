@@ -129,12 +129,12 @@ inherited FormExportRegione: TFormExportRegione
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 224
     Top = 88
     object Apri: TAction
       Caption = 'Apri'
-      ImageIndex = 4
+      ImageIndex = 34
       OnExecute = ApriExecute
     end
     object Esporta: TdxFileSaveAs
@@ -142,7 +142,7 @@ inherited FormExportRegione: TFormExportRegione
       Dialog.DefaultExt = '*.xlsx'
       Dialog.Filter = 'File Excel|*.xlsx|Tutti|*.*'
       Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-      ImageIndex = 6
+      ImageIndex = 1637
       OnAccept = EsportaAccept
     end
   end

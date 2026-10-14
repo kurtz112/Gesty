@@ -11,12 +11,12 @@ inherited FormAule: TFormAule
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 144
     Top = 56
     object Autorizza: TAction
       Caption = 'Autorizza'
-      ImageIndex = 107
+      ImageIndex = 40
       OnExecute = AutorizzaExecute
     end
   end

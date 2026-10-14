@@ -20,8 +20,8 @@ object BaseFrame: TBaseFrame
     Categories.Visibles = (
       True)
     DockColor = clBtnFace
-    ImageOptions.Images = zDmImages.ImageList16
-    ImageOptions.LargeImages = zDmImages.ImageList16
+    ImageOptions.Images = dx.Immagini
+    ImageOptions.LargeImages = dx.Immagini
     ImageOptions.LargeIcons = True
     ImageOptions.UseLargeImagesForLargeIcons = True
     PopupMenuLinks = <>
@@ -36,12 +36,12 @@ object BaseFrame: TBaseFrame
     end
   end
   object BaseActions: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 36
     Top = 36
     object actPermessiAzione: TAction
       Caption = 'Permessi'
-      ImageIndex = 184
+      ImageIndex = 1221
       OnExecute = actPermessiAzioneExecute
     end
   end

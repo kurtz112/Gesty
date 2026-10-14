@@ -512,12 +512,12 @@ inherited SchedulerTools: TSchedulerTools
     Top = 8
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 88
     Top = 184
     object InviaMailAutorizzazioneAula: TAction
       Caption = 'Richiedi Autorizzazione'
-      ImageIndex = 72
+      ImageIndex = 1023
       OnExecute = InviaMailAutorizzazioneAulaExecute
     end
   end

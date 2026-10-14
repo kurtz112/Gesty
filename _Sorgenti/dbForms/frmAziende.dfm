@@ -302,12 +302,12 @@ inherited FormAziende: TFormAziende
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 208
     Top = 64
     object MostraSuMappa: TAction
       Caption = 'Mostra Su Mappa'
-      ImageIndex = 192
+      ImageIndex = 1990
       OnExecute = MostraSuMappaExecute
     end
   end

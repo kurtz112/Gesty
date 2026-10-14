@@ -10,19 +10,19 @@ inherited FormPersonalePresenze: TFormPersonalePresenze
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 160
     Top = 56
     object ImportaOmniaTime: TdxFileOpen
       Caption = 'Importa'
       Dialog.DefaultExt = '*.*'
       Dialog.Filter = 'Tutti|*.*'
-      ImageIndex = 56
+      ImageIndex = 1242
       OnAccept = ImportaOmniaTimeAccept
     end
     object ElaboraOmniaTime: TAction
       Caption = 'Elabora'
-      ImageIndex = 4
+      ImageIndex = 165
       OnExecute = ElaboraOmniaTimeExecute
     end
   end

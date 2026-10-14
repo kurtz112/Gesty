@@ -8,22 +8,22 @@ inherited FormSIA_ServizioInclusioneAdulti: TFormSIA_ServizioInclusioneAdulti
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 312
     Top = 240
     object AggiungiDestinatarioEffettivo: TAction
       Caption = 'Aggiungi Destinatario Effettivo'
-      ImageIndex = 145
+      ImageIndex = 1796
       OnExecute = AggiungiDestinatarioEffettivoExecute
     end
     object InterventiCoperture: TAction
       Caption = 'Coperture'
-      ImageIndex = 18
+      ImageIndex = 993
       OnExecute = InterventiCopertureExecute
     end
     object RettificaAnagrafica: TAction
       Caption = 'Rettifica Anagrafica'
-      ImageIndex = 176
+      ImageIndex = 2053
       OnExecute = RettificaAnagraficaExecute
       OnUpdate = RettificaAnagraficaUpdate
     end

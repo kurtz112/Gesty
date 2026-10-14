@@ -159,35 +159,35 @@ object FormRegistraPresenzeTirocini: TFormRegistraPresenzeTirocini
     LookAndFeel.NativeStyle = False
   end
   object Actions: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 96
     Top = 160
     object PrimoGiornoDaRendicontare: TAction
       Caption = 'Inizio Rendicontazione'
-      ImageIndex = 533
+      ImageIndex = 1359
       OnExecute = PrimoGiornoDaRendicontareExecute
     end
     object SelezionaGiorno: TAction
       Caption = 'Seleziona Giorno'
       Hint = 'seleziona giorno'
-      ImageIndex = 534
+      ImageIndex = 952
       OnExecute = SelezionaGiornoExecute
     end
     object Precedente: TAction
       Caption = 'Precedente'
-      ImageIndex = 531
+      ImageIndex = 171
       ShortCut = 16421
       OnExecute = PrecedenteExecute
     end
     object Successivo: TAction
       Caption = 'Successivo'
-      ImageIndex = 532
+      ImageIndex = 163
       ShortCut = 16423
       OnExecute = SuccessivoExecute
     end
     object GeneraPresenze: TAction
       Caption = 'Genera Presenze'
-      ImageIndex = 557
+      ImageIndex = 1850
       SecondaryShortCuts.Strings = (
         'F9')
       ShortCut = 16455
@@ -195,21 +195,21 @@ object FormRegistraPresenzeTirocini: TFormRegistraPresenzeTirocini
     end
     object Chiudi: TAction
       Caption = 'Chiudi'
-      ImageIndex = 12
+      ImageIndex = 60
       OnExecute = ChiudiExecute
     end
     object Giornaliera: TAction
       AutoCheck = True
       Caption = 'Giornaliera'
       GroupIndex = 1
-      ImageIndex = 536
+      ImageIndex = 1078
     end
     object Settimanale: TAction
       AutoCheck = True
       Caption = 'Settimanale'
       Checked = True
       GroupIndex = 1
-      ImageIndex = 538
+      ImageIndex = 484
     end
   end
   object dxBarManager: TdxBarManager
@@ -228,8 +228,8 @@ object FormRegistraPresenzeTirocini: TFormRegistraPresenzeTirocini
     Categories.Visibles = (
       True)
     DockColor = clBtnFace
-    ImageOptions.Images = zDmImages.ImageList16
-    ImageOptions.LargeImages = zDmImages.ImageList24
+    ImageOptions.Images = dx.Immagini
+    ImageOptions.LargeImages = dx.Immagini
     ImageOptions.LargeIcons = True
     ImageOptions.UseLargeImagesForLargeIcons = True
     PopupMenuLinks = <>
@@ -338,8 +338,8 @@ object FormRegistraPresenzeTirocini: TFormRegistraPresenzeTirocini
       Caption = 'Scala'
       Category = 5
       Visible = ivAlways
-      ImageIndex = 547
-      LargeImageIndex = 547
+      ImageIndex = 480
+      LargeImageIndex = 480
       ItemLinks = <>
     end
   end

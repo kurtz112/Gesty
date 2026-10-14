@@ -8,27 +8,27 @@ inherited FormContratti: TFormContratti
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 216
     Top = 152
     object Approva: TAction
       Caption = 'Approva Contratto'
-      ImageIndex = 107
+      ImageIndex = 1866
       OnExecute = ApprovaExecute
     end
     object Respingi: TAction
       Caption = 'Respingi Contratto'
-      ImageIndex = 106
+      ImageIndex = 1868
       OnExecute = RespingiExecute
     end
     object Invia: TAction
       Caption = 'Invia  Per Firma Docente'
-      ImageIndex = 164
+      ImageIndex = 1738
       OnExecute = InviaExecute
     end
     object AggiornaStato: TAction
       Caption = 'Aggiorna Stato'
-      ImageIndex = 159
+      ImageIndex = 1867
       OnExecute = AggiornaStatoExecute
     end
   end

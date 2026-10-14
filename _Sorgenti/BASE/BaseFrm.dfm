@@ -43,8 +43,8 @@ object BaseForm: TBaseForm
     Categories.Visibles = (
       True)
     DockColor = clBtnFace
-    ImageOptions.Images = zDmImages.ImageList16
-    ImageOptions.LargeImages = zDmImages.ImageList16
+    ImageOptions.Images = dx.Immagini
+    ImageOptions.LargeImages = dx.Immagini
     ImageOptions.LargeIcons = True
     ImageOptions.UseLargeImagesForLargeIcons = True
     PopupMenuLinks = <>
@@ -186,7 +186,7 @@ object BaseForm: TBaseForm
       Caption = 'Sistema'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 61
+      ImageIndex = 1798
       ItemLinks = <
         item
           Visible = True
@@ -228,7 +228,7 @@ object BaseForm: TBaseForm
       Caption = 'Controller'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 98
+      ImageIndex = 157
       ItemLinks = <
         item
           Visible = True
@@ -294,7 +294,7 @@ object BaseForm: TBaseForm
       Caption = 'Politiche Accessi'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 184
+      ImageIndex = 1221
       ItemLinks = <
         item
           Visible = True
@@ -353,7 +353,7 @@ object BaseForm: TBaseForm
       Caption = 'Novit'#224
       Category = 0
       Visible = ivAlways
-      ImageIndex = 598
+      ImageIndex = 1243
     end
     object dxBarButtonSalvaComponenti: TdxBarButton
       Action = actSalvaComponenti
@@ -369,7 +369,7 @@ object BaseForm: TBaseForm
     end
   end
   object BaseActions: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     OnUpdate = BaseActionsUpdate
     Left = 36
     Top = 116
@@ -382,128 +382,128 @@ object BaseForm: TBaseForm
     object actStampa: TAction
       Category = 'File'
       Caption = 'Stampa'
-      ImageIndex = 10
+      ImageIndex = 206
       ShortCut = 16468
       OnExecute = actStampaExecute
     end
     object actVisualizzaGuida: TAction
       Category = 'File'
       Caption = 'Visualizza Guida'
-      ImageIndex = 183
+      ImageIndex = 1992
     end
     object actEsci: TAction
       Category = 'File'
       Caption = 'Chiudi'
-      ImageIndex = 12
+      ImageIndex = 60
       OnExecute = actEsciExecute
     end
     object actSistema: TAction
       Category = 'Sistema'
       Caption = 'Sistema'
-      ImageIndex = 61
+      ImageIndex = 1798
       OnExecute = actSistemaExecute
     end
     object actPoliticheAccessi: TAction
       Category = 'Sistema'
       Caption = 'Politiche Accessi'
-      ImageIndex = 184
+      ImageIndex = 1221
       OnExecute = actPoliticheAccessiExecute
     end
     object actRicaricaPolitiche: TAction
       Category = 'Sistema'
       Caption = 'Ricarica Politiche'
-      ImageIndex = 76
+      ImageIndex = 1898
       OnExecute = actRicaricaPoliticheExecute
     end
     object Guide: TAction
       Category = 'File'
       Caption = 'Guide'
-      ImageIndex = 584
+      ImageIndex = 1048
       OnExecute = GuideExecute
     end
     object ControllerEditDatamodule: TAction
       Category = 'Controller'
       Caption = 'Edit Datamodule'
-      ImageIndex = 148
+      ImageIndex = 1721
       OnExecute = ControllerEditDatamoduleExecute
     end
     object ControllerEditLayout: TAction
       Category = 'Controller'
       Caption = 'Edit Layout'
-      ImageIndex = 98
+      ImageIndex = 1819
       OnExecute = ControllerEditLayoutExecute
     end
     object ControllerResetToDefault: TAction
       Category = 'Controller'
       Caption = 'Reset Default'
-      ImageIndex = 76
+      ImageIndex = 1912
       OnExecute = ControllerResetToDefaultExecute
     end
     object ControllerLoadFromIni: TAction
       Category = 'Controller'
       Caption = 'Load From Ini'
-      ImageIndex = 602
+      ImageIndex = 521
       OnExecute = ControllerLoadFromIniExecute
     end
     object ControllerSaveToIni: TAction
       Category = 'Controller'
       Caption = 'Save To Ini'
-      ImageIndex = 601
+      ImageIndex = 524
       OnExecute = ControllerSaveToIniExecute
     end
     object ControllerBuildGui: TAction
       Category = 'Controller'
       Caption = 'Build Gui'
-      ImageIndex = 288
+      ImageIndex = 1394
       OnExecute = ControllerBuildGuiExecute
     end
     object ControllerMostraDimensioni: TAction
       Category = 'Controller'
       Caption = 'Mostra Dimensioni'
-      ImageIndex = 288
+      ImageIndex = 534
       OnExecute = ControllerMostraDimensioniExecute
     end
     object ControllerResetDimensioni: TAction
       Category = 'Controller'
       Caption = 'Reset Dimensioni'
-      ImageIndex = 599
+      ImageIndex = 1806
       OnExecute = ControllerResetDimensioniExecute
     end
     object Help: TAction
       Category = 'File'
       Caption = 'Help'
-      ImageIndex = 7
+      ImageIndex = 1275
       ShortCut = 112
       OnExecute = HelpExecute
     end
     object actScreenshot: TAction
       Category = 'Sistema'
       Caption = 'Screenshot'
-      ImageIndex = 254
+      ImageIndex = 1883
       OnExecute = actScreenshotExecute
     end
     object actPermessiAzione: TAction
       Category = 'Sistema'
       Caption = 'Permessi'
-      ImageIndex = 184
+      ImageIndex = 1221
       OnExecute = actPermessiAzioneExecute
     end
     object actProprietaAzione: TAction
       Category = 'Sistema'
       Caption = 'Propriet'#224
-      ImageIndex = 600
+      ImageIndex = 28
       OnExecute = actProprietaAzioneExecute
     end
     object actSalvaComponenti: TAction
       Category = 'Sistema'
       Caption = 'Salva Componenti'
-      ImageIndex = 601
+      ImageIndex = 92
       OnExecute = actSalvaComponentiExecute
     end
     object AI: TAction
       Category = 'Sistema'
       Caption = 'AI'
-      ImageIndex = 588
+      ImageIndex = 1381
       OnExecute = AIExecute
     end
   end

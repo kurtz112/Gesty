@@ -255,22 +255,22 @@ inherited FormFbMonitor: TFormFbMonitor
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 320
     Top = 240
     object KillConnection: TAction
       Caption = 'Termina Connessione'
-      ImageIndex = 40
+      ImageIndex = 1817
       OnExecute = KillConnectionExecute
     end
     object CancelStatement: TAction
       Caption = 'Annulla Esecuzione'
-      ImageIndex = 210
+      ImageIndex = 1956
       OnExecute = CancelStatementExecute
     end
     object CancelConnectionStatement: TAction
       Caption = 'Annulla Esecuzione'
-      ImageIndex = 210
+      ImageIndex = 1956
       OnExecute = CancelConnectionStatementExecute
     end
   end

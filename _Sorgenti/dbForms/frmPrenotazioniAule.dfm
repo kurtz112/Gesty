@@ -425,13 +425,13 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 30
+      ImageIndex = 221
     end
     object dxBarLargeButton6: TdxBarLargeButton
       Caption = 'Docenti'
       Category = 0
       Visible = ivAlways
-      LargeImageIndex = 330
+      LargeImageIndex = 1344
     end
     object dxBarButton1: TdxBarButton
       Caption = 'New Button'
@@ -443,7 +443,7 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Incolla'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 37
+      ImageIndex = 85
     end
     object dxBarButton3: TdxBarButton
       Caption = 'Copia Settimana'
@@ -454,19 +454,19 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Elimina'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 38
+      ImageIndex = 43
     end
     object dxBarButton5: TdxBarButton
       Caption = 'Copia'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 36
+      ImageIndex = 42
     end
     object dxBarButton6: TdxBarButton
       Caption = 'Modifica'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 41
+      ImageIndex = 77
     end
     object dxBarButton7: TdxBarButton
       Caption = 'Copia Giorno'
@@ -477,27 +477,27 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Taglia'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 35
+      ImageIndex = 65
     end
     object dxBarButton10: TdxBarButton
       Caption = 'Solo Orario Lavorativo'
       Category = 0
       Hint = 'solo orario lavorativo'
       Visible = ivAlways
-      ImageIndex = 549
+      ImageIndex = 1004
     end
     object dxBarButton13: TdxBarButton
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 5
+      ImageIndex = 221
     end
     object dxBarButton14: TdxBarButton
       Caption = 'Anteprima'
       Category = 0
       Hint = 'anteprima di stampa'
       Visible = ivAlways
-      ImageIndex = 554
+      ImageIndex = 169
     end
     object dxBarButton17: TdxBarButton
       Caption = 'New Button'
@@ -510,28 +510,28 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Category = 0
       Hint = 'nessun raggruppamentoGroup By None'
       Visible = ivAlways
-      ImageIndex = 544
+      ImageIndex = 1807
     end
     object dxBarButton19: TdxBarButton
       Caption = 'Raggruppa Per Data'
       Category = 0
       Hint = 'raggruppa per data'
       Visible = ivAlways
-      ImageIndex = 545
+      ImageIndex = 1397
     end
     object dxBarButton20: TdxBarButton
       Caption = 'Raggruppa Per Risorsa'
       Category = 0
       Hint = 'raggruppa per risorsa'
       Visible = ivAlways
-      ImageIndex = 546
+      ImageIndex = 1025
     end
     object dxBarButton21: TdxBarButton
       Caption = 'Seleziona Aule'
       Category = 0
       Hint = 'layout risorse'
       Visible = ivAlways
-      ImageIndex = 552
+      ImageIndex = 952
     end
     object dxBarButton26: TdxBarButton
       Caption = 'Giorno'
@@ -539,28 +539,28 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Visible = ivAlways
       ButtonStyle = bsChecked
       Down = True
-      ImageIndex = 536
+      ImageIndex = 477
     end
     object dxBarButton27: TdxBarButton
       Caption = 'Settimana'
       Category = 0
       Visible = ivAlways
       ButtonStyle = bsChecked
-      ImageIndex = 538
+      ImageIndex = 484
     end
     object dxBarButton28: TdxBarButton
       Caption = 'Mese'
       Category = 0
       Visible = ivAlways
       ButtonStyle = bsChecked
-      ImageIndex = 539
+      ImageIndex = 478
     end
     object dxBarButton29: TdxBarButton
       Caption = 'Seleziona Aule'
       Category = 0
       Hint = 'layout risorse'
       Visible = ivAlways
-      ImageIndex = 552
+      ImageIndex = 952
     end
     object cxBarEditItem1: TcxBarEditItem
       Caption = 'New Item'
@@ -577,22 +577,22 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Category = 0
       Visible = ivAlways
       ButtonStyle = bsChecked
-      ImageIndex = 546
+      ImageIndex = 1020
     end
     object dxBarButtonNewEvent: TdxBarButton
       Caption = 'Nuovo'
       Category = 1
       Hint = 'nuovo'
       Visible = ivAlways
-      ImageIndex = 529
-      LargeImageIndex = 529
+      ImageIndex = 38
+      LargeImageIndex = 38
     end
     object dxBarSubItem1: TdxBarSubItem
       Caption = 'Scala'
       Category = 5
       Visible = ivAlways
-      ImageIndex = 547
-      LargeImageIndex = 547
+      ImageIndex = 480
+      LargeImageIndex = 480
       ItemLinks = <
         item
           Visible = True
@@ -672,22 +672,22 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
     PixelsPerInch = 96
   end
   object Actions: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 213
     Top = 56
     object CercaSlotLiberi: TAction
       Caption = 'Cerca'
-      ImageIndex = 551
+      ImageIndex = 185
       OnExecute = CercaSlotLiberiExecute
     end
     object PrenotaAula: TAction
       Caption = 'Prenota'
-      ImageIndex = 540
+      ImageIndex = 1020
       OnExecute = PrenotaAulaExecute
     end
     object PrenotazionePeriodo: TAction
       Caption = 'Prenota'
-      ImageIndex = 549
+      ImageIndex = 1020
       OnExecute = PrenotazionePeriodoExecute
     end
   end

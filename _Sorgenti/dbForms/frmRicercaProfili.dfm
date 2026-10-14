@@ -129,7 +129,7 @@ inherited FormRicercaProfili: TFormRicercaProfili
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 296
     Top = 160
   end

@@ -18,24 +18,24 @@ inherited FormBaseWeb: TFormBaseWeb
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 208
     Top = 64
     object VerificaDataSet: TAction
       Caption = 'Verifica DataSet'
       Hint = 'verifica i dataset selezionati'
-      ImageIndex = 18
+      ImageIndex = 1720
       OnExecute = VerificaDataSetExecute
     end
     object GeneraCampi: TAction
       Caption = 'Genera Campi'
       Hint = 'genera i fields per i dataset selezionati'
-      ImageIndex = 466
+      ImageIndex = 1399
       OnExecute = GeneraCampiExecute
     end
     object Editor: TAction
       Caption = 'Editor'
-      ImageIndex = 11
+      ImageIndex = 77
       ShortCut = 16504
       OnExecute = EditorExecute
     end

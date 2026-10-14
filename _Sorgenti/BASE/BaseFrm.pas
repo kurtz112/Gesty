@@ -427,10 +427,10 @@ begin
 
   dxBarSubItemSistema.Visible := dx.Visible(Config.zSystem.IsAdmin);
 
-  dxBarManager.ImageOptions.Images := ZDmImages.ImageList16;
-  dxBarManager.ImageOptions.LargeImages := ZDmImages.ImageList16;
+  dxBarManager.ImageOptions.Images := dx.Immagini;
+  dxBarManager.ImageOptions.LargeImages := dx.Immagini;
 
-  BaseActions.Images := ZDmImages.ImageList24;
+  BaseActions.Images := dx.Immagini;
 
   Init_Ctrls(Self);
 

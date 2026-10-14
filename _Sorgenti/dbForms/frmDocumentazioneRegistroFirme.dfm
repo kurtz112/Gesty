@@ -18,12 +18,12 @@ inherited FormDocumentazioneRegistroFirme: TFormDocumentazioneRegistroFirme
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 288
     Top = 64
     object AggiornaStato: TAction
       Caption = 'Aggiorna Stato'
-      ImageIndex = 126
+      ImageIndex = 1736
       OnExecute = AggiornaStatoExecute
     end
   end

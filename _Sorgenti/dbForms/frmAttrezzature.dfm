@@ -13,12 +13,12 @@ inherited FormAttrezzature: TFormAttrezzature
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 32
     Top = 248
     object InviaMail: TAction
       Caption = 'Invia Mail'
-      ImageIndex = 72
+      ImageIndex = 1801
       OnExecute = InviaMailExecute
     end
   end

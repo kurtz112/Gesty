@@ -358,7 +358,7 @@ inherited FrameCalendarioAule: TFrameCalendarioAule
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 200
     Top = 160
     object actEsporta: TdxFileSaveAs
@@ -366,27 +366,27 @@ inherited FrameCalendarioAule: TFrameCalendarioAule
       Dialog.DefaultExt = '*.xlsx'
       Dialog.Filter = 'Excel|*.xlsx|Tutti|*.*'
       Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-      ImageIndex = 82
+      ImageIndex = 221
       OnAccept = actEsportaAccept
     end
     object Oggi: TAction
       Caption = 'Oggi'
-      ImageIndex = 533
+      ImageIndex = 483
       OnExecute = OggiExecute
     end
     object VaiAlGiorno: TAction
       Caption = 'Seleziona Giorno'
-      ImageIndex = 534
+      ImageIndex = 952
       OnExecute = VaiAlGiornoExecute
     end
     object Precedente: TAction
       Caption = 'Precedente'
-      ImageIndex = 531
+      ImageIndex = 171
       OnExecute = PrecedenteExecute
     end
     object Successiva: TAction
       Caption = 'Successiva'
-      ImageIndex = 532
+      ImageIndex = 163
       OnExecute = SuccessivaExecute
     end
     object Giorno: TAction
@@ -394,19 +394,19 @@ inherited FrameCalendarioAule: TFrameCalendarioAule
       Caption = 'Giorno'
       Checked = True
       GroupIndex = 1
-      ImageIndex = 536
+      ImageIndex = 477
       OnExecute = GiornoExecute
     end
     object Settimana: TAction
       AutoCheck = True
       Caption = 'Settimana'
       GroupIndex = 1
-      ImageIndex = 538
+      ImageIndex = 484
       OnExecute = SettimanaExecute
     end
     object Elenco: TAction
       Caption = 'Torna all'#39'elenco aule'
-      ImageIndex = 566
+      ImageIndex = 991
       OnExecute = ElencoExecute
     end
   end

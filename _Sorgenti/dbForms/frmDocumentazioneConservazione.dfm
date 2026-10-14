@@ -24,17 +24,17 @@ inherited FormDocumentazioneConservazione: TFormDocumentazioneConservazione
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 288
     Top = 64
     object VersaPacchetto: TAction
       Caption = 'Versa Pacchetto'
-      ImageIndex = 46
+      ImageIndex = 1735
       OnExecute = VersaPacchettoExecute
     end
     object VerificaPendenti: TAction
       Caption = 'Verifica Pendenti'
-      ImageIndex = 46
+      ImageIndex = 1734
       OnExecute = VerificaPendentiExecute
     end
   end

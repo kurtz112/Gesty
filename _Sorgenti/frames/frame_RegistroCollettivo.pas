@@ -294,12 +294,12 @@ begin
 
   InitStyles;
 
-  Actions.Images := zDmImages.ImageList24;
+  Actions.Images := dx.Immagini;
   // treeRegistro.Images := zDmImages.ImageList16;
 
   InitMinuti;
 
-  cxEditRepositoryStatoPresenza.Properties.Images := zDmImages.ImageList16;
+  cxEditRepositoryStatoPresenza.Properties.Images := dx.Immagini;
 
   dx.InitLookup('', edEnte, RegistroStudenti.lkEnti, RegistroStudenti.lkEntiSrc, 'ID_ENTE', 'ID_ENTE');
   dx.InitLookup('', edProgetto, RegistroStudenti.lkProgetti, RegistroStudenti.lkProgettiSrc, 'ID_PROGETTO', 'ID_PROGETTO');
@@ -1148,12 +1148,12 @@ begin
 
   if RegistroStudenti.RegistroCollettivo.BloccaDocenti then
   begin
-    Firma.ImageIndex := 382;
+    Firma.ImageIndex := dx.IndiceIcona('bs_dichiarazione__actions_check');
     Firma.Caption := 'Firmato'
   end
   else
   begin
-    Firma.ImageIndex := 384;
+    Firma.ImageIndex := dx.IndiceIcona('bs_dichiarazione');
     Firma.Caption := 'Firma';
   end;
 end;
@@ -1182,13 +1182,13 @@ begin
 
   if RegistroStudenti.RegistroCollettivo.BloccaStudenti then
   begin
-    // TODO verificare in IDE gli ImageIndex corretti (qui riusati da Firma/Firmato)
-    BloccaPresenze.ImageIndex := 384;
+    // icone di dx.Immagini: presenze con il lucchetto chiuso o aperto
+    BloccaPresenze.ImageIndex := dx.IndiceIcona('mdi_calendar-account__security_unlock');
     BloccaPresenze.Caption := 'Sblocca Presenze';
   end
   else
   begin
-    BloccaPresenze.ImageIndex := 382;
+    BloccaPresenze.ImageIndex := dx.IndiceIcona('mdi_calendar-account__security_lock');
     BloccaPresenze.Caption := 'Blocca Presenze';
   end;
 end;

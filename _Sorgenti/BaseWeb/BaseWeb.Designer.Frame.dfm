@@ -127,7 +127,7 @@ object BaseWebDesignerFrame: TBaseWebDesignerFrame
         ClientRectTop = 26
         object abForm: TcxTabSheet
           Caption = 'Form'
-          ImageIndex = 0
+          ImageIndex = 513
           ExplicitLeft = 0
           ExplicitTop = 0
           ExplicitWidth = 0
@@ -161,7 +161,7 @@ object BaseWebDesignerFrame: TBaseWebDesignerFrame
         end
         object tabDataGrid: TcxTabSheet
           Caption = 'DataGrid'
-          ImageIndex = 1
+          ImageIndex = 234
           ExplicitLeft = 0
           ExplicitTop = 0
           ExplicitWidth = 0

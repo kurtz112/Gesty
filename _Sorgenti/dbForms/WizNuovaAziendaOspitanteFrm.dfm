@@ -364,7 +364,7 @@ inherited WizNuovaAziendaOspitanteForm: TWizNuovaAziendaOspitanteForm
     PixelsPerInch = 96
   end
   inherited ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 56
     Top = 209
     object Cerca: TAction

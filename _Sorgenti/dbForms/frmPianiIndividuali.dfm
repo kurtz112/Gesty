@@ -14,22 +14,22 @@ inherited FormPianiIndividuali: TFormPianiIndividuali
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 185
     Top = 72
     object NuovoPianoIndividuale: TAction
       Caption = 'Nuovo Piano Individuale'
-      ImageIndex = 302
+      ImageIndex = 2000
       OnExecute = NuovoPianoIndividualeExecute
     end
     object InserimentoIncarico: TAction
       Caption = 'Nuovo Incarico'
-      ImageIndex = 302
+      ImageIndex = 1496
       OnExecute = InserimentoIncaricoExecute
     end
     object GeneraDocumentazione: TAction
       Caption = 'Genera Documentazione'
-      ImageIndex = 403
+      ImageIndex = 1751
       OnExecute = GeneraDocumentazioneExecute
     end
   end

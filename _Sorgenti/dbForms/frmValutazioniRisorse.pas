@@ -157,7 +157,7 @@ begin
   ReportGroup := 'Valutazioni Risorse';
   Caption := 'Valutazioni Risorse';
 
-  ActionList.Images := zDmImages.ImageList24;
+  ActionList.Images := dx.Immagini;
 
   dx.InitTreeList(tree);
   dx.InitPrinter(dxComponentPrinter);

@@ -1585,18 +1585,18 @@
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 104
     Top = 613
     object Genera: TAction
       Caption = 'Genera'
-      ImageIndex = 59
+      ImageIndex = 1428
       ShortCut = 120
       OnExecute = GeneraExecute
     end
     object Svuota: TAction
       Caption = 'Svuota'
-      ImageIndex = 135
+      ImageIndex = 500
       OnExecute = SvuotaExecute
     end
   end

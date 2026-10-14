@@ -172,22 +172,22 @@ inherited FormBudget: TFormBudget
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 208
     Top = 56
     object ElaboraCostiRicavi: TAction
       Caption = 'Elabora Costi/Ricavi'
-      ImageIndex = 269
+      ImageIndex = 2029
       OnExecute = ElaboraCostiRicaviExecute
     end
     object CercaPerProgetto: TAction
       Caption = 'Cerca'
-      ImageIndex = 32
+      ImageIndex = 185
       OnExecute = CercaPerProgettoExecute
     end
     object CercaPerEsercizio: TAction
       Caption = 'Cerca'
-      ImageIndex = 32
+      ImageIndex = 185
       OnExecute = CercaPerEsercizioExecute
     end
   end

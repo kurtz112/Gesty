@@ -166,7 +166,7 @@ inherited FrameRiepilogoGiornalieroAule: TFrameRiepilogoGiornalieroAule
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 200
     Top = 160
     object actEsporta: TdxFileSaveAs
@@ -174,17 +174,17 @@ inherited FrameRiepilogoGiornalieroAule: TFrameRiepilogoGiornalieroAule
       Dialog.DefaultExt = '*.xslx'
       Dialog.Filter = 'Excel|*.xslx|Tutti|*.*'
       Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-      ImageIndex = 82
+      ImageIndex = 221
       OnAccept = actEsportaAccept
     end
     object Precedente: TAction
       Caption = 'Precedente'
-      ImageIndex = 423
+      ImageIndex = 171
       OnExecute = PrecedenteExecute
     end
     object Successiva: TAction
       Caption = 'Successiva'
-      ImageIndex = 424
+      ImageIndex = 163
       OnExecute = SuccessivaExecute
     end
   end

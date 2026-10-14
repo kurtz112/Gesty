@@ -21,17 +21,17 @@ inherited FormAbitareSostegnoScheda: TFormAbitareSostegnoScheda
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 256
     Top = 80
     object MostraSchedaInquilino: TAction
       Caption = 'Scheda Inquilino'
-      ImageIndex = 164
+      ImageIndex = 989
       OnExecute = MostraSchedaInquilinoExecute
     end
     object MostraSchedaProprietario: TAction
       Caption = 'Scheda Proprietario'
-      ImageIndex = 330
+      ImageIndex = 989
       OnExecute = MostraSchedaProprietarioExecute
     end
   end

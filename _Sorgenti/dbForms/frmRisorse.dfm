@@ -138,171 +138,171 @@ inherited FormRisorse: TFormRisorse
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 216
     Top = 152
     object InserimentoIncarico: TAction
       Caption = 'Nuovo'
-      ImageIndex = 302
+      ImageIndex = 38
       OnExecute = InserimentoIncaricoExecute
     end
     object RettificaIncarico: TAction
       Caption = 'Rettifica'
-      ImageIndex = 176
+      ImageIndex = 77
       OnExecute = RettificaIncaricoExecute
     end
     object GeneraCollegato: TAction
       Caption = 'Collegato'
-      ImageIndex = 118
+      ImageIndex = 525
       OnExecute = GeneraCollegatoExecute
     end
     object CreaUtenteSistema: TAction
       Caption = 'Crea Utente Sistema'
-      ImageIndex = 377
+      ImageIndex = 1827
       OnExecute = CreaUtenteSistemaExecute
     end
     object CreaUtenteSistemaTutor: TAction
       Caption = 'Crea Utente Sistema'
-      ImageIndex = 377
+      ImageIndex = 1827
       OnExecute = CreaUtenteSistemaTutorExecute
     end
     object CreaUtenteDominio: TAction
       Caption = 'Crea Utente Dominio'
-      ImageIndex = 164
+      ImageIndex = 1827
       OnExecute = CreaUtenteDominioExecute
     end
     object RettificaIndirizzoRisorse: TAction
       Caption = 'Rettifica Indirizzo'
-      ImageIndex = 176
+      ImageIndex = 1309
       OnExecute = RettificaIndirizzoRisorseExecute
     end
     object DuplicaIncarico: TAction
       Caption = 'Duplica'
-      ImageIndex = 419
+      ImageIndex = 42
       OnExecute = DuplicaIncaricoExecute
     end
     object ValidataRilevamentoOre: TAction
       Caption = 'Segna Come Valido'
-      ImageIndex = 384
+      ImageIndex = 41
       OnExecute = ValidataRilevamentoOreExecute
     end
     object AnnullaValidazione: TAction
       Caption = 'Annulla Validazione'
-      ImageIndex = 392
+      ImageIndex = 1256
       OnExecute = AnnullaValidazioneExecute
     end
     object InviaMail: TAction
       Caption = 'Invia Mail'
-      ImageIndex = 71
+      ImageIndex = 1801
       OnExecute = InviaMailExecute
     end
     object RicalcolaTotaliOreAttribuite: TAction
       Caption = 'Ricalcola Totali'
-      ImageIndex = 269
+      ImageIndex = 1965
       OnExecute = RicalcolaTotaliOreAttribuiteExecute
     end
     object RicalcolaOreRecupero: TAction
       Caption = 'Ricalcola Ore Recupero'
-      ImageIndex = 269
+      ImageIndex = 1259
       OnExecute = RicalcolaOreRecuperoExecute
     end
     object InserimentoIncaricoDaOrario: TAction
       Caption = 'Inserimento Incarico'
-      ImageIndex = 302
+      ImageIndex = 1496
       OnExecute = InserimentoIncaricoDaOrarioExecute
     end
     object GeneraRilevamentiOre: TAction
       Caption = 'Genera Rilevamenti Ore'
-      ImageIndex = 125
+      ImageIndex = 1606
       OnExecute = GeneraRilevamentiOreExecute
     end
     object GeneraTutorAziendale: TAction
       Caption = 'Genera Tutor Aziendale'
-      ImageIndex = 440
+      ImageIndex = 1666
     end
     object GeneraIncarichiMancantiDaRilevamenti: TAction
       Caption = 'Genera Incarico'
-      ImageIndex = 302
+      ImageIndex = 1498
       OnExecute = GeneraIncarichiMancantiDaRilevamentiExecute
     end
     object PersonaleImport: TdxFileOpen
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 56
+      ImageIndex = 1242
       OnAccept = PersonaleImportAccept
     end
     object PersonaleElaboraImport: TAction
       Caption = 'Elabora'
-      ImageIndex = 4
+      ImageIndex = 165
       OnExecute = PersonaleElaboraImportExecute
     end
     object AziendeImport: TdxFileOpen
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 56
+      ImageIndex = 1242
       OnAccept = AziendeImportAccept
     end
     object AziendeElaboraImport: TAction
       Caption = 'Elabora'
-      ImageIndex = 4
+      ImageIndex = 165
       OnExecute = AziendeElaboraImportExecute
     end
     object SpostaAltroProgetto: TAction
       Caption = 'Sposta Altro Progetto'
-      ImageIndex = 489
+      ImageIndex = 1633
       OnExecute = SpostaAltroProgettoExecute
     end
     object Supplenza: TAction
       Caption = 'Supplenza'
-      ImageIndex = 145
+      ImageIndex = 1331
       OnExecute = SupplenzaExecute
     end
     object EliminaIncarico: TAction
       Caption = 'Elimina Incarico'
-      ImageIndex = 43
+      ImageIndex = 1497
       OnExecute = EliminaIncaricoExecute
       OnUpdate = EliminaIncaricoUpdate
     end
     object Integrazione: TAction
       Caption = 'Integrazione'
-      ImageIndex = 425
+      ImageIndex = 1003
       OnExecute = IntegrazioneExecute
     end
     object RettificaProtocollo: TAction
       Caption = 'Rettifica Protocollo'
-      ImageIndex = 90
+      ImageIndex = 1743
       OnExecute = RettificaProtocolloExecute
     end
     object AnnullaAttivazioneIncarico: TAction
       Caption = 'Annulla Attivazione'
-      ImageIndex = 106
+      ImageIndex = 1864
       OnExecute = AnnullaAttivazioneIncaricoExecute
     end
     object ValidaOrePerSettore: TAction
       Caption = 'Valida Ore'
-      ImageIndex = 384
+      ImageIndex = 1605
       OnExecute = ValidaOrePerSettoreExecute
     end
     object AnnullaValidazionePerSettore: TAction
       Caption = 'Annulla Validazione'
-      ImageIndex = 392
+      ImageIndex = 1256
       OnExecute = AnnullaValidazionePerSettoreExecute
     end
     object RilevamentoOreFatturate: TAction
       Caption = 'Fatturate'
-      ImageIndex = 384
+      ImageIndex = 1335
       OnExecute = RilevamentoOreFatturateExecute
     end
     object RilevamentoOreTogliFatturate: TAction
       Caption = 'Non Fatturate'
-      ImageIndex = 391
+      ImageIndex = 1336
       OnExecute = RilevamentoOreTogliFatturateExecute
     end
     object GeneraAutorizzazionePagamentoXRisorsa: TAction
       Caption = 'Genera Autorizzazione Pagamento'
-      ImageIndex = 246
+      ImageIndex = 1544
       OnExecute = GeneraAutorizzazionePagamentoXRisorsaExecute
     end
   end

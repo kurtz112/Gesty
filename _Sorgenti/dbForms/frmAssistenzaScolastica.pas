@@ -117,7 +117,8 @@ uses
   dmAssistenzaScolastica,
   zFbDataSet,
   System.StrUtils,
-  zSystem;
+  zSystem,
+  zDX;
 
 {$R *.dfm}
 
@@ -698,7 +699,7 @@ begin
             // === TODO REVISIONE MANUALE (blocco non classificato automaticamente) ===
             if 'Interventi_AS_Parte_Economica;Interventi_AES_Parte_Economica;Interventi_ADH_Parte_Economica;'.ToUpper.Contains(card.CardID.ToUpper) then
             begin
-              card.AddAction(ImpostaCostoOrario, zDmImages.ImageList16);
+              card.AddAction(ImpostaCostoOrario, dx.Immagini);
               card.InitToolActions;
             end;
             // === fine TODO ===

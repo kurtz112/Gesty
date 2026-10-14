@@ -32,23 +32,23 @@ inherited FormPersonaleScheda: TFormPersonaleScheda
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 224
     Top = 56
     object RilevamentoOre: TAction
       Caption = 'Rilevamento Ore'
-      ImageIndex = 125
+      ImageIndex = 1030
       OnExecute = RilevamentoOreExecute
     end
     object GeneraRilevamento: TAction
       Caption = 'Genera Rilevamento'
-      ImageIndex = 125
+      ImageIndex = 1983
       OnExecute = GeneraRilevamentoExecute
     end
     object IsDebug: TAction
       AutoCheck = True
       Caption = 'Risorsa Per Debug'
-      ImageIndex = 440
+      ImageIndex = 1025
       OnExecute = IsDebugExecute
       OnUpdate = IsDebugUpdate
     end

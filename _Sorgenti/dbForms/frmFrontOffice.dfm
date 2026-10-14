@@ -8,28 +8,28 @@ inherited FormFrontOffice: TFormFrontOffice
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 216
     Top = 88
     object InoltraComunicazione: TAction
       Caption = 'Inoltra Comunicazione'
-      ImageIndex = 71
+      ImageIndex = 463
       OnExecute = InoltraComunicazioneExecute
     end
     object AssegnaTicket: TAction
       Caption = 'Assegna Ticket'
-      ImageIndex = 314
+      ImageIndex = 1979
       OnExecute = AssegnaTicketExecute
     end
     object ModificaTicket: TAction
       Caption = 'Modifica Ticket'
-      ImageIndex = 390
+      ImageIndex = 1980
       OnExecute = ModificaTicketExecute
     end
     object RichiedeRisposta: TAction
       AutoCheck = True
       Caption = 'Richiede Risposta'
-      ImageIndex = 392
+      ImageIndex = 1023
       OnExecute = RichiedeRispostaExecute
       OnUpdate = RichiedeRispostaUpdate
     end

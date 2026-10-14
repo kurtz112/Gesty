@@ -8,62 +8,62 @@ inherited FormAssistenzaScolastica: TFormAssistenzaScolastica
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 240
     Top = 72
     object InserimentoInterventoAS: TAction
       Caption = 'Inserimento Intervento AS'
-      ImageIndex = 164
+      ImageIndex = 1423
       OnExecute = InserimentoInterventoASExecute
     end
     object InserimentoInterventoAES: TAction
       Caption = 'Inserimento Intervento AES'
-      ImageIndex = 164
+      ImageIndex = 1423
       OnExecute = InserimentoInterventoAESExecute
     end
     object InserimentoInterventoADH: TAction
       Caption = 'Inserimento Intervento ADH'
-      ImageIndex = 164
+      ImageIndex = 1423
       OnExecute = InserimentoInterventoADHExecute
     end
     object SchedaAnagraficaUtenteAS: TAction
       Caption = 'Scheda Anagrafica Utente'
-      ImageIndex = 330
+      ImageIndex = 989
       OnExecute = SchedaAnagraficaUtenteASExecute
     end
     object SchedaAnagraficaUtenteAES: TAction
       Caption = 'Scheda Anagrafica Utente'
-      ImageIndex = 330
+      ImageIndex = 989
       OnExecute = SchedaAnagraficaUtenteAESExecute
     end
     object SchedaAnagraficaUtenteADH: TAction
       Caption = 'Scheda Anagrafica Utente'
-      ImageIndex = 330
+      ImageIndex = 989
       OnExecute = SchedaAnagraficaUtenteADHExecute
     end
     object AggiungiUtentiAGruppo: TAction
       Caption = 'Aggiungi Utenti'
-      ImageIndex = 165
+      ImageIndex = 1827
       OnExecute = AggiungiUtentiAGruppoExecute
     end
     object DuplicaAS: TAction
       Caption = 'Duplica Utente'
-      ImageIndex = 441
+      ImageIndex = 1829
       OnExecute = DuplicaASExecute
     end
     object DuplicaAES: TAction
       Caption = 'Duplica Utente'
-      ImageIndex = 441
+      ImageIndex = 1829
       OnExecute = DuplicaAESExecute
     end
     object DuplicaADH: TAction
       Caption = 'Duplica Utente'
-      ImageIndex = 441
+      ImageIndex = 1829
       OnExecute = DuplicaADHExecute
     end
     object ImpostaCostoOrario: TAction
       Caption = 'Imposta Costo Orario'
-      ImageIndex = 46
+      ImageIndex = 1793
       OnExecute = ImpostaCostoOrarioExecute
     end
   end

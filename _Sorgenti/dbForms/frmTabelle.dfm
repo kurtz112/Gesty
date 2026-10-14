@@ -12,12 +12,12 @@ inherited FormTabelle: TFormTabelle
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 240
     Top = 80
     object AggiungiContenuti: TAction
       Caption = 'Aggiungi Contenuti'
-      ImageIndex = 4
+      ImageIndex = 2088
       OnExecute = AggiungiContenutiExecute
     end
   end

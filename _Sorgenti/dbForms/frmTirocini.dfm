@@ -138,57 +138,57 @@ inherited FormTirocini: TFormTirocini
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 216
     Top = 88
     object NuovaAziendaOspitante: TAction
       Caption = 'Nuova Azienda Ospitante'
-      ImageIndex = 473
+      ImageIndex = 1913
       OnExecute = NuovaAziendaOspitanteExecute
     end
     object GeneraTutorAziendale: TAction
       Caption = 'Genera Tutor Aziendale'
-      ImageIndex = 440
+      ImageIndex = 1666
     end
     object ElaboraIndennitaMese: TAction
       Caption = 'Elabora'
-      ImageIndex = 4
+      ImageIndex = 165
       OnExecute = ElaboraIndennitaMeseExecute
     end
     object EsportaIndennitaMese: TFileSaveAs
       Caption = 'Esporta'
       Dialog.DefaultExt = '*.xlsx'
       Dialog.Filter = 'Excel|*.xlsx|Tutti|*.*'
-      ImageIndex = 55
+      ImageIndex = 221
       BeforeExecute = EsportaIndennitaMeseBeforeExecute
       OnAccept = EsportaIndennitaMeseAccept
     end
     object GeneraCalendarioStage: TAction
       Caption = 'Genera Calendario'
-      ImageIndex = 435
+      ImageIndex = 1253
       OnExecute = GeneraCalendarioStageExecute
     end
     object SettimanaPrecedente: TAction
       Caption = 'Precedente'
-      ImageIndex = 423
+      ImageIndex = 171
     end
     object SettimanaSuccessiva: TAction
       Caption = 'Successiva'
-      ImageIndex = 424
+      ImageIndex = 163
     end
     object ApriRendicontazione: TAction
       Caption = 'Apri Rendicontazione'
-      ImageIndex = 435
+      ImageIndex = 1358
       OnExecute = ApriRendicontazioneExecute
     end
     object CreaUtenteSistemaStudente: TAction
       Caption = 'Crea Utente Sistema'
-      ImageIndex = 377
+      ImageIndex = 1827
       OnExecute = CreaUtenteSistemaStudenteExecute
     end
     object CreaUtenteSistemaTutor: TAction
       Caption = 'Crea Utente Sistema'
-      ImageIndex = 377
+      ImageIndex = 1827
       OnExecute = CreaUtenteSistemaTutorExecute
     end
   end

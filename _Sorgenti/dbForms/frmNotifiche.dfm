@@ -14,12 +14,12 @@ inherited FormNotifiche: TFormNotifiche
     Top = 176
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 152
     Top = 104
     object RiassegnaTicket: TAction
       Caption = 'Riassegna Ticket'
-      ImageIndex = 314
+      ImageIndex = 946
       OnExecute = RiassegnaTicketExecute
     end
   end

@@ -264,27 +264,27 @@ inherited WizInserimentoIncaricoForm: TWizInserimentoIncaricoForm
     PixelsPerInch = 96
   end
   inherited ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 272
     Top = 216
     object InserimentoPersonale: TAction
       Caption = 'Inserimento Personale'
-      ImageIndex = 164
+      ImageIndex = 2043
       OnExecute = InserimentoPersonaleExecute
     end
     object AggiungiStudenti: TAction
       Caption = 'Aggiungi Studenti'
-      ImageIndex = 165
+      ImageIndex = 1345
       OnExecute = AggiungiStudentiExecute
     end
     object AggiungiServizi: TAction
       Caption = 'Aggiungi Servizi'
-      ImageIndex = 51
+      ImageIndex = 1629
       OnExecute = AggiungiServiziExecute
     end
     object CreaNuovoCorso: TAction
       Caption = 'Crea Nuovo Corso'
-      ImageIndex = 433
+      ImageIndex = 1790
       OnExecute = CreaNuovoCorsoExecute
     end
   end
@@ -439,7 +439,7 @@ inherited WizInserimentoIncaricoForm: TWizInserimentoIncaricoForm
     Top = 368
     object NuovoProgetto: TAction
       Caption = 'NuovoProgetto'
-      ImageIndex = 1
+      ImageIndex = 38
       OnExecute = NuovoProgettoExecute
     end
   end

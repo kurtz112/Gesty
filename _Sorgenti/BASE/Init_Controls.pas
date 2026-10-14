@@ -88,7 +88,7 @@ begin
               zSystem := Config.zSystem;
               for ii := 0 to ToolActions.Count - 1 do
                 if not Assigned(ToolActions[ii].ImageList) then
-                  ToolActions[ii].ImageList := zDmImages.ImageList16;
+                  ToolActions[ii].ImageList := dx.Immagini;
             end
           else
             if aOwner.Components[i] is TzDbCard then
@@ -97,7 +97,7 @@ begin
                 zSystem := Config.zSystem;
                 for ii := 0 to ToolActions.Count - 1 do
                   if not Assigned(ToolActions[ii].ImageList) then
-                    ToolActions[ii].ImageList := zDmImages.ImageList16;
+                    ToolActions[ii].ImageList := dx.Immagini;
               end
             else
               if aOwner.Components[i] is TzDbRecordView then
@@ -106,7 +106,7 @@ begin
                   zSystem := Config.zSystem;
                   for ii := 0 to ToolActions.Count - 1 do
                     if not Assigned(ToolActions[ii].ImageList) then
-                      ToolActions[ii].ImageList := zDmImages.ImageList16;
+                      ToolActions[ii].ImageList := dx.Immagini;
                 end
               else
               if aOwner.Components[i] is TzDbTree then
@@ -115,7 +115,7 @@ begin
                   zSystem := Config.zSystem;
                   for ii := 0 to ToolActions.Count - 1 do
                     if not Assigned(ToolActions[ii].ImageList) then
-                      ToolActions[ii].ImageList := zDmImages.ImageList16;
+                      ToolActions[ii].ImageList := dx.Immagini;
                 end
               else
               if aOwner.Components[i] is TzDbChart then
@@ -124,7 +124,7 @@ begin
                   zSystem := Config.zSystem;
                   for ii := 0 to ToolActions.Count - 1 do
                     if not Assigned(ToolActions[ii].ImageList) then
-                      ToolActions[ii].ImageList := zDmImages.ImageList16;
+                      ToolActions[ii].ImageList := dx.Immagini;
                 end
               else
               if aOwner.Components[i] is TzDbScheduler then
@@ -132,12 +132,12 @@ begin
                 begin
                   // le azioni aggiunte dalla form con AddToolbarButton usano le
                   // icone dell'applicazione, come in Frame_Scheduler
-                  FreeBarImages := zDmImages.ImageList16;
+                  FreeBarImages := dx.Immagini;
                   // dizionario LZ: senza zDataSet (frame delle form) non cambia nulla
                   zSystem := Config.zSystem;
                   for ii := 0 to ToolActions.Count - 1 do
                     if not Assigned(ToolActions[ii].ImageList) then
-                      ToolActions[ii].ImageList := zDmImages.ImageList16;
+                      ToolActions[ii].ImageList := dx.Immagini;
                 end
               else
               if aOwner.Components[i] is TdxNavBar then
@@ -157,8 +157,8 @@ begin
                 NavBar.OptionsView.NavigationPane.ShowOverflowPanel := False;
                 NavBar.OptionsStyle.DefaultStyles.GroupBackground.BackColor := clMoneyGreen;
                 NavBar.OptionsStyle.DefaultStyles.GroupBackground.BackColor2 := clMoneyGreen;
-                NavBar.LargeImages := zDmImages.ImageList24;
-                NavBar.SmallImages := zDmImages.ImageList16;
+                NavBar.LargeImages := dx.Immagini;
+                NavBar.SmallImages := dx.Immagini;
                 NavBar.ActiveGroupIndex := 0;
               end;
   end;

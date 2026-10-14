@@ -12,48 +12,48 @@ inherited FormRiunioni: TFormRiunioni
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     OnUpdate = ActionListUpdate
     Left = 192
     Top = 56
     object NuovaRiunione: TAction
       Caption = 'Nuova Riunione'
-      ImageIndex = 165
+      ImageIndex = 1838
       OnExecute = NuovaRiunioneExecute
     end
     object AggiungiPartecipanti: TAction
       Caption = 'Aggiungi Partecipanti'
-      ImageIndex = 314
+      ImageIndex = 1796
       OnExecute = AggiungiPartecipantiExecute
     end
     object InviaMail: TAction
       Caption = 'Invia Mail Partecipanti'
-      ImageIndex = 72
+      ImageIndex = 1801
       OnExecute = InviaMailExecute
     end
     object ProgrammaRiunione: TAction
       Caption = 'Programma Riunione'
-      ImageIndex = 547
+      ImageIndex = 1118
       OnExecute = ProgrammaRiunioneExecute
     end
     object AnnullaRiunione: TAction
       Caption = 'Annulla Riunione'
-      ImageIndex = 387
+      ImageIndex = 1840
       OnExecute = AnnullaRiunioneExecute
     end
     object RipristinaRiunione: TAction
       Caption = 'Ripristina Riunione'
-      ImageIndex = 92
+      ImageIndex = 1842
       OnExecute = RipristinaRiunioneExecute
     end
     object Verbalizza: TAction
       Caption = 'Verbalizza'
-      ImageIndex = 402
+      ImageIndex = 1841
       OnExecute = VerbalizzaExecute
     end
     object Contabilizza: TAction
       Caption = 'Contabilizza'
-      ImageIndex = 382
+      ImageIndex = 1236
       OnExecute = ContabilizzaExecute
     end
   end

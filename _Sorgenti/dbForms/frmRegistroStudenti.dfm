@@ -14,20 +14,20 @@ inherited FormRegistroStudenti: TFormRegistroStudenti
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 480
     Top = 80
     object InserimentoStudente: TAction
       Caption = 'Inserimento Studente'
-      ImageIndex = 164
+      ImageIndex = 1345
     end
     object RettificaDataIscrizione: TAction
       Caption = 'Rettifica Data Iscrizione'
-      ImageIndex = 48
+      ImageIndex = 1722
     end
     object RegistraRitiroStudente: TAction
       Caption = 'Registra Ritiro Studente'
-      ImageIndex = 49
+      ImageIndex = 1347
     end
   end
 end

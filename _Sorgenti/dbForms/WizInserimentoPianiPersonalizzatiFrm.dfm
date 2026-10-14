@@ -103,15 +103,15 @@ inherited WizInserimentoPianiPersonalizzatiForm: TWizInserimentoPianiPersonalizz
     PixelsPerInch = 96
   end
   inherited ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     object AggiungiStudente: TAction
       Caption = 'Aggiungi Studente'
-      ImageIndex = 441
+      ImageIndex = 1345
       OnExecute = AggiungiStudenteExecute
     end
     object AggiungiServizi: TAction
       Caption = 'Aggiungi Servizi'
-      ImageIndex = 485
+      ImageIndex = 1629
       OnExecute = AggiungiServiziExecute
     end
   end

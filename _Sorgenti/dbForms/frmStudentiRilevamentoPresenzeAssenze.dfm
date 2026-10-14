@@ -427,7 +427,7 @@ inherited FormStudentiRilevamentoPresenzeAssenze: TFormStudentiRilevamentoPresen
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 320
     Top = 384
     object AssegnaFrequenza: TAction
@@ -440,12 +440,12 @@ inherited FormStudentiRilevamentoPresenzeAssenze: TFormStudentiRilevamentoPresen
     end
     object RegistraAssenze: TAction
       Caption = 'Registra Assenze'
-      ImageIndex = 446
+      ImageIndex = 1791
       OnExecute = RegistraAssenzeExecute
     end
     object RegistraAttivitaIndividuali: TAction
       Caption = 'Registra Attivit'#224' Individuali'
-      ImageIndex = 164
+      ImageIndex = 1974
       OnExecute = RegistraAttivitaIndividualiExecute
     end
   end

@@ -9,7 +9,7 @@ inherited Tirocini: TTirocini
     Top = 72
     object actNuovaAziendaOspitante: TAction
       Caption = 'Nuova Azienda Ospitante'
-      ImageIndex = 473
+      ImageIndex = 1913
       OnExecute = actNuovaAziendaOspitanteExecute
     end
   end

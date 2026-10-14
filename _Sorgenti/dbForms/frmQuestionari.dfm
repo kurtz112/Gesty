@@ -301,44 +301,44 @@ inherited FormQuestionari: TFormQuestionari
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 336
     Top = 176
     object GeneraQuestionari: TAction
       Caption = 'Genera Questionari'
-      ImageIndex = 527
+      ImageIndex = 1573
       OnExecute = GeneraQuestionariExecute
     end
     object CopiaLinkSuClipboard: TAction
       Caption = 'Copia Link Nella Clipboard'
-      ImageIndex = 36
+      ImageIndex = 1271
       OnExecute = CopiaLinkSuClipboardExecute
     end
     object SalvaLinkSuFile: TAction
       Caption = 'Salva Link Su File'
-      ImageIndex = 5
+      ImageIndex = 1756
       OnExecute = SalvaLinkSuFileExecute
     end
     object DuplicaQuestionario: TAction
       Caption = 'Duplica Questionario'
-      ImageIndex = 118
+      ImageIndex = 1572
       OnExecute = DuplicaQuestionarioExecute
     end
     object Test_Questionario: TAction
       Caption = 'Test_Questionario'
-      ImageIndex = 527
+      ImageIndex = 1571
       OnExecute = Test_QuestionarioExecute
     end
     object Test_Progetto: TAction
       Caption = 'Test'
-      ImageIndex = 527
+      ImageIndex = 40
       OnExecute = Test_ProgettoExecute
     end
     object GeneraReport: TdxFileOpen
       Caption = 'Genera Report'
       Dialog.DefaultExt = '*.xlsx'
       Dialog.Filter = 'Excel |*.xlsx|Tutti|*.*'
-      ImageIndex = 82
+      ImageIndex = 1903
       BeforeExecute = GeneraReportBeforeExecute
       OnAccept = GeneraReportAccept
     end

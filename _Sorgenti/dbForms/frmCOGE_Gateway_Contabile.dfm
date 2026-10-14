@@ -8,22 +8,22 @@ inherited FormCOGE_Gateway_Contabile: TFormCOGE_Gateway_Contabile
     PixelsPerInch = 96
   end
   object ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 312
     Top = 240
     object actEsportaPrimaNota: TAction
       Caption = 'Esporta Prima Nota'
-      ImageIndex = 250
+      ImageIndex = 1566
       OnExecute = actEsportaPrimaNotaExecute
     end
     object actLottoConsegna: TAction
       Caption = 'Consegna Lotto'
-      ImageIndex = 248
+      ImageIndex = 1937
       OnExecute = actLottoConsegnaExecute
     end
     object actLottoAnnulla: TAction
       Caption = 'Annulla Lotto'
-      ImageIndex = 249
+      ImageIndex = 1936
       OnExecute = actLottoAnnullaExecute
     end
   end

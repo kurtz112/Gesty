@@ -544,7 +544,7 @@ inherited WizNuovaRichiestaAttivazioneForm: TWizNuovaRichiestaAttivazioneForm
     PixelsPerInch = 96
   end
   inherited ActionList: TActionList
-    Images = zDmImages.ImageList16
+    Images = dx.Immagini
     Left = 152
     Top = 161
     object Verifica: TAction
@@ -553,22 +553,22 @@ inherited WizNuovaRichiestaAttivazioneForm: TWizNuovaRichiestaAttivazioneForm
     end
     object AggiungiForniture: TAction
       Caption = 'Aggiungi Forniture'
-      ImageIndex = 119
+      ImageIndex = 2017
       OnExecute = AggiungiFornitureExecute
     end
     object AggiungiCompetenze: TAction
       Caption = 'Aggiungi Competenze'
-      ImageIndex = 119
+      ImageIndex = 1360
       OnExecute = AggiungiCompetenzeExecute
     end
     object AggiungiSettori: TAction
       Caption = 'Aggiungi Settori'
-      ImageIndex = 119
+      ImageIndex = 1327
       OnExecute = AggiungiSettoriExecute
     end
     object AggiungiTestoEsigenza: TAction
       Caption = 'Esigenze...'
-      ImageIndex = 119
+      ImageIndex = 4
       OnExecute = AggiungiTestoEsigenzaExecute
     end
   end

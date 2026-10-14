@@ -265,54 +265,54 @@ inherited FormSostegno: TFormSostegno
     PixelsPerInch = 96
   end
   object Actions: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 145
     Top = 168
     object Precedente: TAction
       Caption = 'Precedente'
       Hint = 'settimana precedente'
-      ImageIndex = 531
+      ImageIndex = 171
       OnExecute = PrecedenteExecute
     end
     object Successiva: TAction
       Caption = 'Successiva'
       Hint = 'settimana successiva'
-      ImageIndex = 532
+      ImageIndex = 163
       OnExecute = SuccessivaExecute
     end
     object Oggi: TAction
       Caption = 'Oggi'
-      ImageIndex = 533
+      ImageIndex = 483
       OnExecute = OggiExecute
     end
     object VaiAlGiorno: TAction
       Caption = 'VaiAlGiorno'
-      ImageIndex = 534
+      ImageIndex = 475
       OnExecute = VaiAlGiornoExecute
     end
     object AggiungiStudenti: TAction
       Caption = 'Aggiungi Studenti'
-      ImageIndex = 251
+      ImageIndex = 1345
       OnExecute = AggiungiStudentiExecute
     end
     object GeneraIncarico: TAction
       Caption = 'Genera Incarico'
-      ImageIndex = 246
+      ImageIndex = 1498
       OnExecute = GeneraIncaricoExecute
     end
     object GeneraRilevamento: TAction
       Caption = 'Genera Rilevamento'
-      ImageIndex = 125
+      ImageIndex = 1983
       OnExecute = GeneraRilevamentoExecute
     end
     object Salva: TAction
       Caption = 'Salva'
-      ImageIndex = 6
+      ImageIndex = 92
       Visible = False
     end
     object Firma: TAction
       Caption = 'Firma'
-      ImageIndex = 384
+      ImageIndex = 985
       Visible = False
     end
   end

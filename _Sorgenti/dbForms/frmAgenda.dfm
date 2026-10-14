@@ -89,7 +89,7 @@ inherited FormAgenda: TFormAgenda
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 30
+      ImageIndex = 221
     end
     object dxBarLargeButton2: TdxBarLargeButton
       Caption = 'Lavorativa'
@@ -114,34 +114,34 @@ inherited FormAgenda: TFormAgenda
       Category = 0
       Hint = 'visualizza agenda giornaliera'
       Visible = ivAlways
-      LargeImageIndex = 271
+      LargeImageIndex = 1078
     end
     object dxBarLargeButton6: TdxBarLargeButton
       Caption = 'Docenti'
       Category = 0
       Visible = ivAlways
-      LargeImageIndex = 330
+      LargeImageIndex = 1344
     end
     object dxBarLargeButton7: TdxBarLargeButton
       Caption = 'Lavorativa'
       Category = 0
       Hint = 'visualizza settimana lavorativa'
       Visible = ivAlways
-      LargeImageIndex = 272
+      LargeImageIndex = 485
     end
     object dxBarLargeButton8: TdxBarLargeButton
       Caption = 'Mensile'
       Category = 0
       Hint = 'visualizza agenda mensile'
       Visible = ivAlways
-      LargeImageIndex = 273
+      LargeImageIndex = 478
     end
     object dxBarLargeButton9: TdxBarLargeButton
       Caption = 'Settimanale'
       Category = 0
       Hint = 'visualizza agenda settimanale'
       Visible = ivAlways
-      LargeImageIndex = 272
+      LargeImageIndex = 484
     end
   end
   inherited BaseActions: TActionList [3]
@@ -160,7 +160,7 @@ inherited FormAgenda: TFormAgenda
       AutoCheck = True
       Caption = 'Lezioni'
       Hint = 'mostra lezioni'
-      ImageIndex = 0
+      ImageIndex = 1004
       OnExecute = MostraLezioniExecute
       OnUpdate = MostraLezioniUpdate
     end
@@ -168,63 +168,63 @@ inherited FormAgenda: TFormAgenda
       AutoCheck = True
       Caption = 'Rilevamenti'
       Hint = 'mostra rilevamenti'
-      ImageIndex = 1
+      ImageIndex = 1030
       OnExecute = MostraRilevamentiExecute
       OnUpdate = MostraRilevamentiUpdate
     end
     object MostraRiunioni: TAction
       AutoCheck = True
       Caption = 'MostraRiunioni'
-      ImageIndex = 2
+      ImageIndex = 457
       OnExecute = MostraRiunioniExecute
       OnUpdate = MostraRiunioniUpdate
     end
     object MostraAgendaPersonale: TAction
       AutoCheck = True
       Caption = 'MostraAgendaPersonale'
-      ImageIndex = 3
+      ImageIndex = 457
       OnExecute = MostraAgendaPersonaleExecute
       OnUpdate = MostraAgendaPersonaleUpdate
     end
     object MostraPrenotazioniAule: TAction
       AutoCheck = True
       Caption = 'MostraPrenotazioniAule'
-      ImageIndex = 4
+      ImageIndex = 457
       OnExecute = MostraPrenotazioniAuleExecute
       OnUpdate = MostraPrenotazioniAuleUpdate
     end
     object MostraChiusureSedi: TAction
       AutoCheck = True
       Caption = 'MostraChiusureSedi'
-      ImageIndex = 5
+      ImageIndex = 457
       OnExecute = MostraChiusureSediExecute
       OnUpdate = MostraChiusureSediUpdate
     end
     object MostraInagibilitaAule: TAction
       AutoCheck = True
       Caption = 'MostraInagibilitaAule'
-      ImageIndex = 6
+      ImageIndex = 457
       OnExecute = MostraInagibilitaAuleExecute
       OnUpdate = MostraInagibilitaAuleUpdate
     end
     object MostraPresenzePersonale: TAction
       AutoCheck = True
       Caption = 'MostraPresenzePersonale'
-      ImageIndex = 7
+      ImageIndex = 457
       OnExecute = MostraPresenzePersonaleExecute
       OnUpdate = MostraPresenzePersonaleUpdate
     end
     object MostraScadenze: TAction
       AutoCheck = True
       Caption = 'MostraScadenze'
-      ImageIndex = 8
+      ImageIndex = 457
       OnExecute = MostraScadenzeExecute
       OnUpdate = MostraScadenzeUpdate
     end
     object MostraFuoriSede: TAction
       AutoCheck = True
       Caption = 'MostraFuoriSede'
-      ImageIndex = 9
+      ImageIndex = 457
       OnExecute = MostraFuoriSedeExecute
       OnUpdate = MostraFuoriSedeUpdate
     end

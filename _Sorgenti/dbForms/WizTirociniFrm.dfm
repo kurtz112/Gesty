@@ -26,16 +26,16 @@ inherited WizTirociniForm: TWizTirociniForm
     PixelsPerInch = 96
   end
   inherited ActionList: TActionList
-    Images = zDmImages.ImageList24
+    Images = dx.Immagini
     Left = 216
     object AggiungiStudentiStage: TAction
       Caption = 'Aggiungi Studenti'
-      ImageIndex = 165
+      ImageIndex = 1345
       OnExecute = AggiungiStudentiStageExecute
     end
     object NuovaAziendaOspitante: TAction
       Caption = 'Nuova Azienda Ospitante'
-      ImageIndex = 473
+      ImageIndex = 1913
       OnExecute = NuovaAziendaOspitanteExecute
     end
   end
