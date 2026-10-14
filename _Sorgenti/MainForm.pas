@@ -1358,9 +1358,18 @@ begin
 end;
 
 procedure TMain.dxSkinChooserGalleryItemSkinChanged(Sender: TObject; const ASkinName: string);
+var
+  NomeSkin: string;
 begin
-  CaricaSkin(ASkinName);
-  dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
+  // Mantis #239 - 2026-10-14: la galleria si ricostruisce a clic concluso, altrimenti
+  // TdxCustomRibbonGalleryItem.DoClick salva in FFirstVisibleGroupItem la voce appena distrutta
+  NomeSkin := ASkinName;
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      CaricaSkin(NomeSkin);
+      dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
+    end);
 end;
 
 procedure TMain.CaricaSkin(ASkinName: string);
