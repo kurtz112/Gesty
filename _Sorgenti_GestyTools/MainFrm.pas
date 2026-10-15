@@ -170,6 +170,7 @@ type
     dxBarButton20: TdxBarButton;
     dxBarButton21: TdxBarButton;
     ExplorerDrop: TExplorerDrop;
+    dxBarSubItemAltriStrumenti: TdxBarSubItem;
     procedure FormDestroy(Sender: TObject);
     procedure AggiornaUtentiExecute(Sender: TObject);
     procedure ApplicaAggiornamentoExecute(Sender: TObject);
