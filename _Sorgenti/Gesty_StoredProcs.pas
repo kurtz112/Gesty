@@ -1,4 +1,4 @@
-// Generata il 13/10/2026 14:55:57
+// Generata il 15/10/2026 22:36:23
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
 unit Gesty_StoredProcs;
 
@@ -5630,26 +5630,26 @@ end;
 TSP_candidature_Files_Elabora_Allegati = class (TzStoredProc)
   private
     fId_Candidatura: TNullableInt64;
-    fFile_Curriculum_Vitae: TNullableString;
-    fFile_Cv_Anonimo: TNullableString;
     fFile_Carta_Identita: TNullableString;
     fFile_Codice_Fiscale: TNullableString;
+    fFile_Curriculum_Vitae: TNullableString;
+    fFile_Cv_Anonimo: TNullableString;
   public
     //
     [TParamAttribute('ID_CANDIDATURA', ptInput, False)]
     property Id_Candidatura: TNullableInt64 read fId_Candidatura write fId_Candidatura;
-    //
-    [TParamAttribute('FILE_CURRICULUM_VITAE', ptInput, False)]
-    property File_Curriculum_Vitae: TNullableString read fFile_Curriculum_Vitae write fFile_Curriculum_Vitae;
-    //
-    [TParamAttribute('FILE_CV_ANONIMO', ptInput, False)]
-    property File_Cv_Anonimo: TNullableString read fFile_Cv_Anonimo write fFile_Cv_Anonimo;
     //
     [TParamAttribute('FILE_CARTA_IDENTITA', ptInput, False)]
     property File_Carta_Identita: TNullableString read fFile_Carta_Identita write fFile_Carta_Identita;
     //
     [TParamAttribute('FILE_CODICE_FISCALE', ptInput, False)]
     property File_Codice_Fiscale: TNullableString read fFile_Codice_Fiscale write fFile_Codice_Fiscale;
+    //
+    [TParamAttribute('FILE_CURRICULUM_VITAE', ptInput, False)]
+    property File_Curriculum_Vitae: TNullableString read fFile_Curriculum_Vitae write fFile_Curriculum_Vitae;
+    //
+    [TParamAttribute('FILE_CV_ANONIMO', ptInput, False)]
+    property File_Cv_Anonimo: TNullableString read fFile_Cv_Anonimo write fFile_Cv_Anonimo;
 end;
 
 [TStoredProcedure('CANDIDATURE_FILES_ELABORA_FIGURE_INTERESSE')]
