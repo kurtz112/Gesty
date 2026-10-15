@@ -6,41 +6,49 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
-  System.Net.URLClient,
-  System.Net.HttpClient,
-  System.Net.HttpClientComponent,
+  System.Generics.Collections,
   Data.DB,
   fs_iinirtti,
   fs_iclassesrtti,
   fs_ipascal,
-  fs_iinterpreter,
-  cxClasses,
-  dxCloudStorage,
-  SmartInspect.VCL.SiAuto,
-  SmartInspect.VCL;
+  fs_iinterpreter;
 
 type
+  // compilazione dello script non riuscita: GestyScript esce con un codice
+  // diverso da quello di un errore in esecuzione
+  EScriptCompilazione = class(Exception);
+
+  TGestoreFunzione = reference to function(var Params: Variant): Variant;
+  TGestoreProcedura = reference to procedure(var Params: Variant);
+
   TScriptModule = class(TDataModule)
     fsScript: TfsScript;
     fsPascal: TfsPascal;
     fsClassesRTTI: TfsClassesRTTI;
     fsIniRTTI: TfsIniRTTI;
-    procedure FDConnectionBeforeConnect(Sender: TObject);
   private
-    FdxCloudStorageFileProgressCallback: TdxCloudStorageFileProgressCallback;
-  private
-    function ComputerName: string;
+    // Registro delle funzioni esposte agli script: dichiarazione e gestore
+    // stanno nella stessa chiamata a Registra, e CallMethod cerca il gestore
+    // per nome. Prima il collegamento passava per la posizione in un array e
+    // un case numerico: una voce inserita nel posto sbagliato spostava tutte
+    // le successive e faceva chiamare la funzione sbagliata senza errori di
+    // compilazione. Chiave in maiuscolo: FastScript passa MethodName cosi'.
+    FGestori: TDictionary<string, TGestoreFunzione>;
+    FDichiarazioni: TStringList;
+    FNonPresidiato: boolean;
+    FParametriScript: TArray<string>;
+    procedure RegistraFunzione(const Dichiarazione: string; Gestore: TGestoreFunzione);
+    procedure RegistraProcedura(const Dichiarazione: string; Gestore: TGestoreProcedura);
+    procedure RegistraFunzioni;
   private
     procedure EmptyFolder(const Folder: string);
     procedure DeleteFile(const FileName: string);
-    procedure CopyFile(const SrcFileName, DestFileName: string);
-  private
+    procedure CopyFile(const SrcFileName, DestFileName: string; Sovrascrivi: boolean);
     procedure Compress(const FileName, ZipFileName: string);
     procedure CompressFolder(const Folder, ZipFileName: string);
-  private
-  private
-    procedure GDriveDownload(const AFileName, DestFileName: string);
-    procedure GDriveUpload(const ATargetPath, AFileName: string; AOverwriteIfExists: boolean = True);
+    function ConfigValore(const Nome: string): string;
+    procedure EliminaPiuVecchiDi(const Cartella, Maschera: string; Giorni: integer);
+    procedure ConservaUltimi(const Cartella, Maschera: string; Numero: integer);
   private
     function CallMethod(Instance: TObject; ClassType: TClass; const MethodName: String; var Params: Variant): Variant;
   private
@@ -61,11 +69,16 @@ type
     procedure SegnalaErrore(e: exception);
   public
     constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
 
     procedure Init;
     procedure LoadFromFile(const FileName: string);
 
     procedure RunFromFile(const FileName: String);
+
+    // compila senza eseguire: vuoto se lo script e' corretto, altrimenti
+    // posizione e messaggio dell'errore (GestyScript /verifica)
+    function VerificaFile(const FileName: string): string;
 
     function CompileScript(const Script: string): boolean;
     procedure ExecuteScript(const Script: string); overload;
@@ -74,11 +87,25 @@ type
 
     procedure TestConnessione;
 
-    property dxCloudStorageFileProgressCallback: TdxCloudStorageFileProgressCallback read FdxCloudStorageFileProgressCallback write FdxCloudStorageFileProgressCallback;
+    // dichiarazioni delle funzioni esposte, una per riga (GestyScript /help)
+    function ElencoFunzioni: string;
+
+    // True quando lo script gira senza nessuno davanti (GestyScript, utilita'
+    // pianificate): ShowMessage scrive nel registro invece di aprire una
+    // finestra che resterebbe in attesa di un clic per sempre. L'editor degli
+    // script lo lascia False e ShowMessage resta quella di FastScript.
+    property NonPresidiato: boolean read FNonPresidiato write FNonPresidiato;
+
+    // parametri passati a GestyScript dopo il nome dello script
+    property ParametriScript: TArray<string> read FParametriScript write FParametriScript;
   end;
 
 var
   ScriptModule: TScriptModule;
+
+  // True quando l'errore e' gia' stato segnalato (mail e Mantis) da
+  // RunFromFile: GestyScript.dpr non lo segnala una seconda volta
+  ErroreScriptSegnalato: boolean = false;
 
 implementation
 
@@ -88,71 +115,388 @@ uses
   System.StrUtils,
   System.Variants,
   System.DateUtils,
+  System.TypInfo,
+  System.Generics.Defaults,
   GestyTools.Log,
   GestyTools.Config,
   GestyTools.Connection,
-  GestyTools.GDrive,
   GestyTools.Mail,
+  GestyTools.Mantis,
   GestyTools.Candidature,
   GestyTools.FTP;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
-{ TBackupModule }
+
+const
+  // Proprieta' di Config che uno script puo' leggere con ConfigValore. Elenco
+  // chiuso di proposito: lo script e' un file in chiaro sul server del
+  // cliente, e password, token e chiavi di anonimizzazione non devono poter
+  // finire in un Writeln o in una mail.
+  ConfigLeggibili: array [0 .. 14] of string = ('Ente', 'Server', 'Port', 'DB', 'DBFolder', 'DBFileName', 'FolderBin', 'FolderUpdate', 'FolderBackupDB',
+    'FolderBackupExe', 'FtpHost', 'FtpPort', 'FtpDefaultFolder', 'Remote_BackupFolder', 'Remote_UpdateZip');
 
 constructor TScriptModule.Create(aOwner: TComponent);
 begin
   inherited;
-  FdxCloudStorageFileProgressCallback := nil;
+  FGestori := TDictionary<string, TGestoreFunzione>.Create;
+  FDichiarazioni := TStringList.Create;
+  FNonPresidiato := false;
+end;
+
+destructor TScriptModule.Destroy;
+begin
+  FreeAndNil(FGestori);
+  FreeAndNil(FDichiarazioni);
+  inherited;
+end;
+
+procedure TScriptModule.RegistraFunzione(const Dichiarazione: string; Gestore: TGestoreFunzione);
+var
+  Nome: string;
+  Inizio: integer;
+  Fine: integer;
+begin
+  // nome = la parola dopo procedure/function, fino a '(' ':' ';' o spazio
+  Inizio := Pos(' ', Dichiarazione) + 1;
+  Fine := Inizio;
+  while (Fine <= Length(Dichiarazione)) and not CharInSet(Dichiarazione[Fine], ['(', ':', ';', ' ']) do
+    Inc(Fine);
+  Nome := UpperCase(Copy(Dichiarazione, Inizio, Fine - Inizio));
+
+  // due voci con lo stesso nome: FastScript le accetterebbe entrambe e ne
+  // userebbe una a caso
+  if FGestori.ContainsKey(Nome) then
+    raise Exception.Create('GestyScript: funzione registrata due volte: ' + Nome);
+
+  FGestori.Add(Nome, Gestore);
+  FDichiarazioni.Add(Dichiarazione.TrimRight([';']));
+  fsScript.AddMethod(Dichiarazione, CallMethod);
+end;
+
+procedure TScriptModule.RegistraProcedura(const Dichiarazione: string; Gestore: TGestoreProcedura);
+begin
+  RegistraFunzione(Dichiarazione,
+    function(var Params: Variant): Variant
+    begin
+      Gestore(Params);
+      result := Null;
+    end);
 end;
 
 procedure TScriptModule.Init;
 begin
   fsScript.Parent := fsGlobalUnit;
 
-  fsScript.AddMethod('procedure Writeln(s:string)', CallMethod);
-  fsScript.AddMethod('procedure Log(s:string)', CallMethod);
-  fsScript.AddMethod('function ExtractFileDir(const FileName: string): string', CallMethod);
-  fsScript.AddMethod('function ExtractFileName(const FileName: string): string', CallMethod);
-  fsScript.AddMethod('function ChangeFileExt(const FileName, Extension: string): string', CallMethod);
-  fsScript.AddMethod('function IncludeTrailingBackslash(const path:string) :string', CallMethod);
-  fsScript.AddMethod('procedure EmptyFolder(Folder: string)', CallMethod);
-  fsScript.AddMethod('function ForceDirectories(const Dir: string): boolean', CallMethod);
-  fsScript.AddMethod('procedure DeleteFile(const FileName: string)', CallMethod);
-  fsScript.AddMethod('procedure CopyFile(const SrcFileName, DestFileName: string)', CallMethod);
-  fsScript.AddMethod('procedure Compress(const FileName, ZipFileName: string)', CallMethod);
-  fsScript.AddMethod('procedure CompressFolder(const Folder, ZipFileName: string)', CallMethod);
+  FGestori.Clear;
+  FDichiarazioni.Clear;
 
-  fsScript.AddMethod('procedure dbConnect;', CallMethod);
-  fsScript.AddMethod('procedure dbDisconnect;', CallMethod);
-  fsScript.AddMethod('procedure dbBackup(const FilenameFbk: string)', CallMethod);
-  fsScript.AddMethod('procedure dbRestore(const FilenameFbk, FileNameFdb: string)', CallMethod);
+  RegistraFunzioni;
+end;
 
-  fsScript.AddMethod('function LoadFile(const FileName: string): string', CallMethod);
+procedure TScriptModule.RegistraFunzioni;
+begin
+  // ---------------------------------------------------------------------
+  // Registro e messaggi
+  RegistraProcedura('procedure Writeln(s:string)',
+    procedure(var Params: Variant)
+    begin
+      Log.ToScreen(Params[0]);
+    end);
 
-  fsScript.AddMethod
-    ('procedure SP(StoredProcName: string; param0:string=''; param1:string=''; param2:string=''; param3: string = ''; param4: string = ''; param5: string = ''; param6: string = ''; param7: string = ''; param8: string = ''; param9: string = '')',
-    CallMethod);
+  RegistraProcedura('procedure Log(s:string)',
+    procedure(var Params: Variant)
+    begin
+      Log.ToScreen(Params[0]);
+    end);
 
-  fsScript.AddMethod
-    ('procedure ExecSP(StoredProcName: string; param0:string=''; param1:string=''; param2:string=''; param3: string = ''; param4: string = ''; param5: string = ''; param6: string = ''; param7: string = ''; param8: string = ''; param9: string = '')',
-    CallMethod);
+  // sostituisce ShowMessage di FastScript solo senza nessuno davanti: la
+  // ricerca di FastScript guarda prima lo script e poi fsGlobalUnit
+  if FNonPresidiato then
+    RegistraProcedura('procedure ShowMessage(Msg: Variant)',
+      procedure(var Params: Variant)
+      begin
+        Log.ToScreen('ShowMessage: ' + VarToStr(Params[0]));
+      end);
 
-  fsScript.AddMethod('procedure GDriveDownload(const AFileName, DestFileName: string);', CallMethod);
-  fsScript.AddMethod('procedure GDriveUpload(const ATargetPath, AFileName: string; AOverwriteIfExists: boolean = True);', CallMethod);
-  fsScript.AddMethod('procedure TestConnessione;', CallMethod);
+  RegistraProcedura('procedure Notifica(const Oggetto, Testo: string)',
+    procedure(var Params: Variant)
+    begin
+      Mail.InviaMail(Config.Ente + ' - ' + VarToStr(Params[0]), VarToStr(Params[1]));
+    end);
 
-  // AddEnum('TFontPitch', 'fpDefault, fpFixed, fpVariable')
+  // ---------------------------------------------------------------------
+  // Percorsi
+  RegistraFunzione('function ExtractFileDir(const FileName: string): string',
+    function(var Params: Variant): Variant
+    begin
+      result := ExtractFileDir(Params[0]);
+    end);
+
+  RegistraFunzione('function ExtractFileName(const FileName: string): string',
+    function(var Params: Variant): Variant
+    begin
+      result := ExtractFileName(Params[0]);
+    end);
+
+  RegistraFunzione('function ChangeFileExt(const FileName, Extension: string): string',
+    function(var Params: Variant): Variant
+    begin
+      result := ChangeFileExt(Params[0], Params[1]);
+    end);
+
+  RegistraFunzione('function IncludeTrailingBackslash(const path:string) :string',
+    function(var Params: Variant): Variant
+    begin
+      result := IncludeTrailingBackslash(Params[0]);
+    end);
+
+  // ---------------------------------------------------------------------
+  // File e cartelle
+  RegistraFunzione('function FileExists(const FileName: string): boolean',
+    function(var Params: Variant): Variant
+    begin
+      result := TFile.Exists(Params[0]);
+    end);
+
+  RegistraFunzione('function DirectoryExists(const Dir: string): boolean',
+    function(var Params: Variant): Variant
+    begin
+      result := TDirectory.Exists(Params[0]);
+    end);
+
+  RegistraFunzione('function FileSize(const FileName: string): Int64',
+    function(var Params: Variant): Variant
+    begin
+      if not TFile.Exists(Params[0]) then
+        raise Exception.Create('FileSize: file non trovato: ' + VarToStr(Params[0]));
+      result := TFile.GetSize(Params[0]);
+    end);
+
+  RegistraFunzione('function FileDate(const FileName: string): TDateTime',
+    function(var Params: Variant): Variant
+    begin
+      if not TFile.Exists(Params[0]) then
+        raise Exception.Create('FileDate: file non trovato: ' + VarToStr(Params[0]));
+      result := TFile.GetLastWriteTime(Params[0]);
+    end);
+
+  RegistraFunzione('function ForceDirectories(const Dir: string): boolean',
+    function(var Params: Variant): Variant
+    begin
+      // crea la cartella e le intermedie mancanti; True anche se esisteva gia'
+      result := ForceDirectories(Params[0]);
+    end);
+
+  RegistraProcedura('procedure EmptyFolder(Folder: string)',
+    procedure(var Params: Variant)
+    begin
+      EmptyFolder(Params[0]);
+    end);
+
+  RegistraProcedura('procedure DeleteFile(const FileName: string)',
+    procedure(var Params: Variant)
+    begin
+      DeleteFile(Params[0]);
+    end);
+
+  RegistraProcedura('procedure CopyFile(const SrcFileName, DestFileName: string; Sovrascrivi: boolean = False)',
+    procedure(var Params: Variant)
+    begin
+      CopyFile(Params[0], Params[1], Params[2]);
+    end);
+
+  RegistraProcedura('procedure EliminaPiuVecchiDi(const Cartella, Maschera: string; Giorni: integer)',
+    procedure(var Params: Variant)
+    begin
+      EliminaPiuVecchiDi(Params[0], Params[1], Params[2]);
+    end);
+
+  RegistraProcedura('procedure ConservaUltimi(const Cartella, Maschera: string; Numero: integer)',
+    procedure(var Params: Variant)
+    begin
+      ConservaUltimi(Params[0], Params[1], Params[2]);
+    end);
+
+  RegistraFunzione('function LoadFile(const FileName: string): string',
+    function(var Params: Variant): Variant
+    begin
+      result := TFile.ReadAllText(Params[0]);
+    end);
+
+  RegistraProcedura('procedure Compress(const FileName, ZipFileName: string)',
+    procedure(var Params: Variant)
+    begin
+      Compress(Params[0], Params[1]);
+    end);
+
+  RegistraProcedura('procedure CompressFolder(const Folder, ZipFileName: string)',
+    procedure(var Params: Variant)
+    begin
+      CompressFolder(Params[0], Params[1]);
+    end);
+
+  // ---------------------------------------------------------------------
+  // Configurazione e parametri
+  RegistraFunzione('function ConfigValore(const Nome: string): string',
+    function(var Params: Variant): Variant
+    begin
+      result := ConfigValore(Params[0]);
+    end);
+
+  RegistraFunzione('function ParametroScript(Indice: integer): string',
+    function(var Params: Variant): Variant
+    var
+      Indice: integer;
+    begin
+      // da 1, come ParamStr; fuori dall'intervallo restituisce ''
+      Indice := Params[0];
+      if (Indice >= 1) and (Indice <= Length(FParametriScript)) then
+        result := FParametriScript[Indice - 1]
+      else
+        result := '';
+    end);
+
+  RegistraFunzione('function NumeroParametriScript: integer',
+    function(var Params: Variant): Variant
+    begin
+      result := Length(FParametriScript);
+    end);
+
+  // ---------------------------------------------------------------------
+  // Database di produzione
+  RegistraProcedura('procedure dbConnect',
+    procedure(var Params: Variant)
+    begin
+      Connection.Connect;
+    end);
+
+  RegistraProcedura('procedure dbDisconnect',
+    procedure(var Params: Variant)
+    begin
+      Connection.Disconnect;
+    end);
+
+  RegistraProcedura('procedure dbBackup(const FilenameFbk: string)',
+    procedure(var Params: Variant)
+    begin
+      Connection.Backup(Params[0]);
+    end);
+
+  RegistraProcedura('procedure dbRestore(const FilenameFbk, FileNameFdb: string)',
+    procedure(var Params: Variant)
+    begin
+      Connection.Restore(Params[0], Params[1]);
+    end);
+
+  RegistraProcedura
+    ('procedure SP(StoredProcName: string; param0:string=''''; param1:string=''''; param2:string=''''; param3: string = ''''; param4: string = ''''; param5: string = ''''; param6: string = ''''; param7: string = ''''; param8: string = ''''; param9: string = '''')',
+    procedure(var Params: Variant)
+    begin
+      Connection.ExecStoredProc(Params);
+    end);
+
+  RegistraProcedura
+    ('procedure ExecSP(StoredProcName: string; param0:string=''''; param1:string=''''; param2:string=''''; param3: string = ''''; param4: string = ''''; param5: string = ''''; param6: string = ''''; param7: string = ''''; param8: string = ''''; param9: string = '''')',
+    procedure(var Params: Variant)
+    begin
+      Connection.ExecStoredProc(Params);
+    end);
+
+  RegistraProcedura('procedure TestConnessione',
+    procedure(var Params: Variant)
+    begin
+      TestConnessione;
+    end);
+
+  // ---------------------------------------------------------------------
+  // Anonimizzazione (sbarramenti in GestyTools.Connection): erano
+  // implementate in TConnection ma non registrate qui, e SP rifiuta
+  // ANONYMIZER rimandando proprio a queste voci
+  RegistraFunzione('function AnonimizzaInizializza: string',
+    function(var Params: Variant): Variant
+    begin
+      result := Connection.AnonimizzaInizializza;
+    end);
+
+  RegistraProcedura('procedure AnonimizzaCopia(const DatabaseCopia: string)',
+    procedure(var Params: Variant)
+    begin
+      Connection.AnonimizzaCopia(Params[0]);
+    end);
+
+  RegistraProcedura('procedure HomecomingCopia(const DatabaseCopia: string)',
+    procedure(var Params: Variant)
+    begin
+      Connection.HomecomingCopia(Params[0]);
+    end);
+
+  // ---------------------------------------------------------------------
+  // Import candidature
   fsScript.AddEnum('TImportCandidatureType', 'icCSV, icXlsx');
-  fsScript.AddMethod('procedure ImportFileCandidature(const url: string; ImportType: TImportCandidatureType; const MapFileName: string = '');', CallMethod);
+  RegistraProcedura('procedure ImportFileCandidature(const url: string; ImportType: TImportCandidatureType; const MapFileName: string = '''')',
+    procedure(var Params: Variant)
+    begin
+      ImportCandidature.ImportFile(Params[0], Params[1], Params[2]);
+    end);
 
-  fsScript.AddMethod('procedure FtpConnect;', CallMethod);
-  fsScript.AddMethod('procedure FtpDisconnect;', CallMethod);
-  fsScript.AddMethod('function FtpRemoteFileExists(const FileName: string): boolean;', CallMethod);
-  fsScript.AddMethod('procedure FtpChangeDir(folder: string);', CallMethod);
-  fsScript.AddMethod('procedure FtpListFiles(Files: TStrings);', CallMethod);
-  fsScript.AddMethod('procedure FtpDownload(const SrcFileName, DestFileName: string);', CallMethod);
-  fsScript.AddMethod('procedure FtpUpload(const SrcFileName, DestFileName: string);', CallMethod);
+  // ---------------------------------------------------------------------
+  // FTP
+  RegistraProcedura('procedure FtpConnect',
+    procedure(var Params: Variant)
+    begin
+      FTP.Connect;
+    end);
+
+  RegistraProcedura('procedure FtpDisconnect',
+    procedure(var Params: Variant)
+    begin
+      FTP.Disconnect;
+    end);
+
+  RegistraFunzione('function FtpRemoteFileExists(const FileName: string): boolean',
+    function(var Params: Variant): Variant
+    begin
+      result := FTP.RemoteFileExists(Params[0]);
+    end);
+
+  RegistraProcedura('procedure FtpChangeDir(folder: string)',
+    procedure(var Params: Variant)
+    begin
+      FTP.ChangeDir(Params[0]);
+    end);
+
+  RegistraProcedura('procedure FtpListFiles(Files: TStrings)',
+    procedure(var Params: Variant)
+    begin
+      // l'oggetto creato dallo script arriva come puntatore in un intero
+      // (frInteger = NativeInt in FastScript). Prima il ramo era commentato
+      // e lo script riceveva un elenco vuoto senza nessun errore
+      FTP.ListFiles(TStrings(NativeInt(Params[0])));
+    end);
+
+  RegistraProcedura('procedure FtpDownload(const SrcFileName, DestFileName: string)',
+    procedure(var Params: Variant)
+    begin
+      FTP.Download(Params[0], Params[1]);
+    end);
+
+  RegistraProcedura('procedure FtpUpload(const SrcFileName, DestFileName: string)',
+    procedure(var Params: Variant)
+    begin
+      FTP.Upload(Params[0], Params[1]);
+    end);
+
+  RegistraProcedura('procedure FtpDelete(const FileName: string)',
+    procedure(var Params: Variant)
+    begin
+      FTP.Delete(Params[0]);
+    end);
+end;
+
+function TScriptModule.ElencoFunzioni: string;
+begin
+  result := FDichiarazioni.Text;
 end;
 
 procedure TScriptModule.RunFromFile(const FileName: String);
@@ -172,9 +516,9 @@ begin
     if fsScript.Compile then
       fsScript.Execute
     else if fsScript.ErrorUnit = '' then
-      raise exception.Create('Compilazione dello script non riuscita, posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg)
+      raise EScriptCompilazione.Create('Compilazione dello script non riuscita, posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg)
     else
-      raise exception.Create('Compilazione dello script non riuscita, ' + fsScript.ErrorUnit + ' posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg);
+      raise EScriptCompilazione.Create('Compilazione dello script non riuscita, ' + fsScript.ErrorUnit + ' posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg);
   except
     on e: exception do
     begin
@@ -184,20 +528,42 @@ begin
   end;
 end;
 
-procedure TScriptModule.SegnalaErrore(e: exception);
+function TScriptModule.VerificaFile(const FileName: string): string;
 begin
-  // un errore nell'invio della mail (SMTP irraggiungibile, TLS) non deve
-  // prendere il posto di quello dello script: prima sostituiva l'errore vero
-  // anche nel .log di GestyScript
+  LoadFromFile(FileName);
+
+  if fsScript.Compile then
+    result := ''
+  else if fsScript.ErrorUnit = '' then
+    result := 'posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg
+  else
+    result := fsScript.ErrorUnit + ' posizione ' + fsScript.ErrorPos + ': ' + fsScript.ErrorMsg;
+end;
+
+procedure TScriptModule.SegnalaErrore(e: exception);
+var
+  Contesto: string;
+begin
+  Contesto := ContestoErrore;
+
+  // Mail e Mantis indipendenti: un errore nell'invio di una delle due (SMTP
+  // irraggiungibile, token scaduto) non deve impedire l'altra, ne' prendere
+  // il posto dell'errore dello script nel .log di GestyScript
   try
-    Mail.SegnalaEccezione(e, ContestoErrore);
+    Mail.SegnalaEccezione(e, Contesto);
   except
     on ErroreMail: exception do
-    begin
-      Log.ToScreen('Invio della mail di errore non riuscito: ' + ErroreMail.ClassName + ': ' + ErroreMail.Message);
       Log.ToFile('Invio della mail di errore non riuscito: ' + ErroreMail.ClassName + ': ' + ErroreMail.Message);
-    end;
   end;
+
+  try
+    SegnalaEccezioneSuMantis(e, Contesto, FScriptFileName);
+  except
+    on ErroreMantis: exception do
+      Log.ToFile('Apertura del ticket Mantis non riuscita: ' + ErroreMantis.ClassName + ': ' + ErroreMantis.Message);
+  end;
+
+  ErroreScriptSegnalato := True;
 end;
 
 procedure TScriptModule.ScriptRunLine(Sender: TfsScript; const UnitName, SourcePos: String);
@@ -207,6 +573,20 @@ begin
 end;
 
 function TScriptModule.DescriviChiamata(const MethodName: String; const Params: Variant): string;
+
+  // un indirizzo con una query (ImportFileCandidature) puo' portare una
+  // chiave di accesso: nella mail e nel ticket resta solo la parte prima
+  // del '?'
+  function Mascherato(const Valore: string): string;
+  var
+    Domanda: integer;
+  begin
+    result := Valore;
+    Domanda := Pos('?', result);
+    if (Pos('://', result) > 0) and (Domanda > 0) then
+      result := Copy(result, 1, Domanda) + '...';
+  end;
+
 var
   Indice: integer;
 begin
@@ -217,7 +597,7 @@ begin
       begin
         if Indice > VarArrayLowBound(Params, 1) then
           result := result + ', ';
-        result := result + QuotedStr(VarToStrDef(Params[Indice], ''));
+        result := result + QuotedStr(Mascherato(VarToStrDef(Params[Indice], '')));
       end;
   except
     // solo descrittivo: un parametro non convertibile non deve fermare lo script
@@ -268,106 +648,36 @@ begin
 end;
 
 function TScriptModule.CallMethod(Instance: TObject; ClassType: TClass; const MethodName: String; var Params: Variant): Variant;
-
-  function IndexStr(const AText: string; const AValues: array of string): integer;
-  var
-    I: integer;
-  begin
-    result := -1;
-    for I := Low(AValues) to High(AValues) do
-      if SameText(AText, AValues[I]) then
-      begin
-        result := I;
-        Break;
-      end;
-  end;
-
-const
-  Methods: TArray<String> = ['EmptyFolder', 'DeleteFile', 'CopyFile', 'Compress', 'CompressFolder', 'dbBackup', 'dbRestore', 'IncludeTrailingBackslash', 'ChangeFileExt', 'ExtractFileDir',
-    'ExtractFileName', 'Writeln', 'SP', 'ExecSP', 'LoadFile', 'dbConnect', 'dbDisconnect', 'ImportFileCandidature', 'GDriveDownload', 'GDriveUpload', 'Log', 'TestConnessione', 'FtpConnect',
-    'FtpDisconnect', 'FtpRemoteFileExists', 'FtpChangeDir', 'FtpListFiles', 'FtpDownload', 'FtpUpload', 'ForceDirectories'];
+var
+  Nome: string;
+  Gestore: TGestoreFunzione;
 begin
+  Nome := UpperCase(MethodName);
 
-  // Writeln e Log sono chiamate innocue e frequentissime: non coprono la
-  // funzione che stava davvero lavorando
-  if IndexStr(MethodName, ['Writeln', 'Log']) < 0 then
+  if not FGestori.TryGetValue(Nome, Gestore) then
+    raise Exception.Create('GestyScript: funzione senza gestore: ' + MethodName);
+
+  // Writeln, Log e ShowMessage sono chiamate innocue e frequentissime: non
+  // coprono la funzione che stava davvero lavorando
+  if not MatchStr(Nome, ['WRITELN', 'LOG', 'SHOWMESSAGE']) then
     FChiamataInCorso := DescriviChiamata(MethodName, Params);
 
-  case IndexStr(MethodName, Methods) of
-    0:
-      EmptyFolder(Params[0]);
-    1:
-      DeleteFile(Params[0]);
-    2:
-      CopyFile(Params[0], Params[1]);
-    3:
-      Compress(Params[0], Params[1]);
-    4:
-      CompressFolder(Params[0], Params[1]);
-    5:
-      Connection.Backup(Params[0]);
-    6:
-      Connection.Restore(Params[0], Params[1]);
-    7:
-      result := IncludeTrailingBackslash(Params[0]);
-    8:
-      result := ChangeFileExt(Params[0], Params[1]);
-    9:
-      result := ExtractFileDir(Params[0]);
-    10:
-      result := ExtractFileName(Params[0]);
-    11:
-      Log.ToScreen(Params[0]);
-    12:
-      Connection.ExecStoredProc(Params);
-    13:
-      Connection.ExecStoredProc(Params);
-    14:
-      result := TFile.ReadAllText(Params[0]);
-    15:
-      Connection.Connect;
-    16:
-      Connection.Disconnect;
-    17:
-      ImportCandidature.ImportFile(Params[0], Params[1], Params[2]);
-    18:
-      GDriveDownload(Params[0], Params[1]);
-    19:
-      GDriveUpload(Params[0], Params[1], Params[2]);
-    20:
-      Log.ToScreen(Params[0]);
-    21:
-      TestConnessione;
-    22:
-      FTP.Connect;
-    23:
-      FTP.Disconnect;
-    24:
-      result := FTP.RemoteFileExists(Params[0]);
-    25:
-      FTP.ChangeDir(Params[0]);
-    26:
-      ; // FTP.ListFiles(Params[0]);
-    27:
-      FTP.Download(Params[0], Params[1]);
-    28:
-      FTP.Upload(Params[0], Params[1]);
-    29:
-      // crea la cartella e le intermedie mancanti; True anche se esisteva gia'
-      result := ForceDirectories(Params[0]);
-  end;
+  result := Gestore(Params);
 
   // finita bene: se l'errore viene dopo, non e' colpa di questa funzione
   FChiamataInCorso := '';
 end;
 
-procedure TScriptModule.CopyFile(const SrcFileName, DestFileName: string);
+procedure TScriptModule.CopyFile(const SrcFileName, DestFileName: string; Sovrascrivi: boolean);
 begin
 
   if not TFile.Exists(SrcFileName) then
-    raise exception.Create('CopyFile: file sorgente non trovato: ' + SrcFileName)
-  else
-    TFile.Copy(SrcFileName, DestFileName);
+    raise exception.Create('CopyFile: file sorgente non trovato: ' + SrcFileName);
+
+  if TFile.Exists(DestFileName) and not Sovrascrivi then
+    raise exception.Create('CopyFile: la destinazione esiste gia'' (usare Sovrascrivi = True): ' + DestFileName);
+
+  TFile.Copy(SrcFileName, DestFileName, Sovrascrivi);
 end;
 
 procedure TScriptModule.DeleteFile(const FileName: string);
@@ -387,6 +697,68 @@ begin
     TFile.Delete(FileName);
 end;
 
+procedure TScriptModule.EliminaPiuVecchiDi(const Cartella, Maschera: string; Giorni: integer);
+var
+  FileName: string;
+  Eliminati: integer;
+begin
+  // zero o meno cancellerebbe anche il backup appena fatto
+  if Giorni < 1 then
+    raise exception.Create('EliminaPiuVecchiDi: Giorni deve essere almeno 1.');
+
+  if not TDirectory.Exists(Cartella) then
+    raise exception.Create('EliminaPiuVecchiDi: cartella non trovata: ' + Cartella);
+
+  Eliminati := 0;
+  for FileName in TDirectory.GetFiles(Cartella, Maschera) do
+    if Now - TFile.GetLastWriteTime(FileName) > Giorni then
+    begin
+      TFile.Delete(FileName);
+      Inc(Eliminati);
+    end;
+
+  Log.ToScreen(Format('EliminaPiuVecchiDi: %d file eliminati da %s', [Eliminati, Cartella]));
+end;
+
+procedure TScriptModule.ConservaUltimi(const Cartella, Maschera: string; Numero: integer);
+var
+  Elenco: TArray<string>;
+  Indice: integer;
+begin
+  // zero o meno cancellerebbe tutti i backup
+  if Numero < 1 then
+    raise exception.Create('ConservaUltimi: Numero deve essere almeno 1.');
+
+  if not TDirectory.Exists(Cartella) then
+    raise exception.Create('ConservaUltimi: cartella non trovata: ' + Cartella);
+
+  Elenco := TDirectory.GetFiles(Cartella, Maschera);
+
+  // dal piu' recente al piu' vecchio
+  TArray.Sort<string>(Elenco, TComparer<string>.Construct(
+    function(const Sinistro, Destro: string): integer
+    begin
+      result := CompareDateTime(TFile.GetLastWriteTime(Destro), TFile.GetLastWriteTime(Sinistro));
+    end));
+
+  for Indice := Numero to High(Elenco) do
+    TFile.Delete(Elenco[Indice]);
+
+  if Length(Elenco) > Numero then
+    Log.ToScreen(Format('ConservaUltimi: %d file eliminati da %s', [Length(Elenco) - Numero, Cartella]));
+end;
+
+function TScriptModule.ConfigValore(const Nome: string): string;
+var
+  Voce: string;
+begin
+  for Voce in ConfigLeggibili do
+    if SameText(Voce, Nome) then
+      Exit(VarToStr(GetPropValue(Config, Voce)));
+
+  raise exception.Create('ConfigValore: voce non leggibile dagli script: ' + Nome);
+end;
+
 procedure TScriptModule.Compress(const FileName, ZipFileName: string);
 var
   Zip: TZipFile;
@@ -402,54 +774,8 @@ begin
 end;
 
 procedure TScriptModule.CompressFolder(const Folder, ZipFileName: string);
-var
-  Zip: TZipFile;
-  FileName: string;
 begin
-
   TZipFile.ZipDirectoryContents(ZipFileName, Folder);
-
-  Exit;
-
-  Zip := TZipFile.Create;
-  try
-    Zip.Open(ZipFileName, zmWrite);
-
-    for FileName in TDirectory.GetFiles(Folder, '*.*') do
-      Zip.Add(FileName, FileName, zcDeflate);
-    // Zip.Add(FileName, ExtractFileName(FileName), zcDeflate);
-  finally
-    FreeAndNil(Zip);
-  end;
-end;
-
-function TScriptModule.ComputerName: string;
-var
-  cresult: string;
-  pw: Pchar;
-  pwSize: cardinal;
-begin
-  GetMem(pw, 300);
-  pwSize := 300;
-  try
-    if GetComputerName(Pchar(pw), pwSize) then
-    begin
-      cresult := StrPas(pw);
-    end;
-  finally
-    FreeMem(pw, 300);
-  end;
-  result := uppercase(cresult);
-end;
-
-procedure TScriptModule.GDriveDownload(const AFileName, DestFileName: string);
-begin
-  GDrive.DownloadFile(AFileName, DestFileName, dxCloudStorageFileProgressCallback);
-end;
-
-procedure TScriptModule.GDriveUpload(const ATargetPath, AFileName: string; AOverwriteIfExists: boolean);
-begin
-  GDrive.UploadFile(ATargetPath, AFileName, dxCloudStorageFileProgressCallback, AOverwriteIfExists);
 end;
 
 procedure TScriptModule.LoadFromFile(const FileName: string);
@@ -491,15 +817,6 @@ begin
   if not VarIsNull(v) then
     if not VarIsEmpty(v) then
       result := VarToStr(v);
-end;
-
-procedure TScriptModule.FDConnectionBeforeConnect(Sender: TObject);
-begin
-  SiMain.EnterMethod(Self, 'FDConnectionBeforeConnect');
-
-  SiMain.LogVerbose('test');
-
-  SiMain.LeaveMethod(Self, 'FDConnectionBeforeConnect');
 end;
 
 end.

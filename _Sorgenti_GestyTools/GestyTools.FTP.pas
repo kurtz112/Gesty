@@ -14,7 +14,7 @@ uses
   IdFTPCommon, IdBaseComponent, IdTCPConnection, IdTCPClient;
 
 type
-  // stessa forma della callback GDrive: posizione e dimensione totale in byte
+  // posizione e dimensione totale in byte
   // (Size = 0 se il server non fornisce la dimensione)
   TFtpProgressCallback = reference to procedure(const Position: Int64; const Size: Int64);
 
@@ -62,6 +62,8 @@ type
     // non accettano RETR/SIZE con il percorso nel comando
     function ChangeDirForFile(const RemotePath: string): string;
     procedure ListFiles(Files: TStrings);
+    // nome relativo alla cartella corrente, come per RemoteFileExists
+    procedure Delete(const FileName: string);
     procedure Download(const SrcFileName, DestFileName: string; ProgressCallback: TFtpProgressCallback = nil);
     procedure Upload(const SrcFileName, DestFileName: string; ProgressCallback: TFtpProgressCallback = nil);
   end;
@@ -187,6 +189,12 @@ begin
   IdFTP.ChangeDir(folder);
 end;
 
+procedure TFTP.Delete(const FileName: string);
+begin
+  Connect;
+  IdFTP.Delete(FileName);
+end;
+
 function TFTP.ChangeDirForFile(const RemotePath: string): string;
 var
   normalized: string;
@@ -216,6 +224,9 @@ var
   i: integer;
 begin
   assert(assigned(Files));
+
+  // come Download e Upload: chiamata anche prima di un FtpConnect esplicito
+  Connect;
 
   Files.Clear;
 

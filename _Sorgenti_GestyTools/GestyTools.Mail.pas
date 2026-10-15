@@ -29,6 +29,9 @@ type
     // dello script, riga in esecuzione); vuoto se non c'e' niente da dire
     procedure SegnalaEccezione(e: exception; const Contesto: string = '');
     procedure InviaMail(Const Subject, Body: string);
+
+    // testo della segnalazione, lo stesso per la mail e per il ticket Mantis
+    class function DescriviEccezione(e: exception; const Contesto: string): string; static;
   end;
 
 var
@@ -90,9 +93,13 @@ var
   end;
 
 begin
-  // recuperare da ini info (tipo capac/codebri/altri)
-  UserName := 'zebro.it';
-  Password := 'Tala**71';
+  // credenziali dalla configurazione del cliente: scritte qui finivano
+  // dentro ogni eseguibile installato
+  UserName := Config.SmtpUtente;
+  Password := Config.SmtpPassword;
+
+  if UserName.IsEmpty or Password.IsEmpty then
+    raise Exception.Create('Mail non inviata: SmtpUtente o SmtpPassword non valorizzati nella configurazione.');
 
   // handler creato dalla fabbrica registrata in zNet.Tls: oggi OpenSSL,
   // domani SChannel, senza toccare questa unit. Stessa versione fissa
@@ -103,9 +110,10 @@ begin
 
   IdSMTP.IOHandler := SocketTls;
   IdSMTP.ConnectTimeout := 30000;
-  // IdSMTP.useTLS := ssl; // prima di settare la porta, potrebbe variarla
-  // IdSMTP.Host := Host;
-  // IdSMTP.Port := Port;
+  // UseTLS resta quello del .dfm (esplicito): va impostato prima della
+  // porta, perche' cambiarlo dopo puo' sostituirla
+  IdSMTP.Host := Config.SmtpHost;
+  IdSMTP.Port := Config.SmtpPorta;
   IdSMTP.UserName := UserName;
   IdSMTP.Password := Password;
   IdSMTP.UseEhlo := True; // (https://stackoverflow.com/questions/17734414/using-indy-10-smtp-with-office365)
@@ -142,7 +150,12 @@ begin
   IdMessage.Clear;
   IdEMailAddressItem := IdMessage.Recipients.Add;
   IdEMailAddressItem.Name := 'Assistenza';
-  IdEMailAddressItem.Address := 'assistenza@zebro.it';
+  IdEMailAddressItem.Address := Config.SmtpDestinatario;
+
+  // senza mittente in configurazione resta il comportamento di prima
+  // (mittente vuoto, lo decide il server dall'utente autenticato)
+  if not Config.SmtpMittente.IsEmpty then
+    IdMessage.From.Address := Config.SmtpMittente;
 end;
 
 procedure TMail.InviaMail(const Subject, Body: string);
@@ -155,13 +168,16 @@ begin
 end;
 
 procedure TMail.SegnalaEccezione(e: exception; const Contesto: string);
+begin
+  InviaMail(Config.Ente + ' - Errore Script', DescriviEccezione(e, Contesto));
+end;
+
+class function TMail.DescriviEccezione(e: exception; const Contesto: string): string;
 var
   Body: TStringList;
   Causa: exception;
   DataProgramma: string;
 begin
-  InitMessage(IdMessage);
-
   try
     DataProgramma := DateTimeToStr(TFile.GetLastWriteTime(ParamStr(0)));
   except
@@ -202,7 +218,7 @@ begin
     Body.Add('Ultime righe del registro:');
     Body.Add(TLog.UltimeRighe);
 
-    InviaMail(Config.Ente + ' - Errore Script', Body.Text);
+    result := Body.Text;
   finally
     FreeAndNil(Body);
   end;

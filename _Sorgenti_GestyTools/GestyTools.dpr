@@ -11,7 +11,6 @@ uses
   MainFrm in 'MainFrm.pas' {MainForm} ,
   GestyTools.Config in 'GestyTools.Config.pas',
   GestyTools.Update in 'GestyTools.Update.pas' {UpdateEngine: TDataModule} ,
-  GestyTools.GDrive in 'GestyTools.GDrive.pas' {GDrive: TDataModule} ,
   GestyTools.FTP in 'GestyTools.FTP.pas' {FTP: TDataModule} ,
   GestyTools.Script in 'GestyTools.Script.pas' {ScriptModule: TDataModule} ,
   GestyTools.Script.Editor in 'GestyTools.Script.Editor.pas' {ScriptEditor: TForm} ,
@@ -21,7 +20,9 @@ uses
   GestyTools.Connection in 'GestyTools.Connection.pas' {Connection: TDataModule} ,
   GestyTools.Log in 'GestyTools.Log.pas',
   GestyTools.Mail in 'GestyTools.Mail.pas' {Mail: TDataModule} ,
-  GestyTools.Candidature in 'GestyTools.Candidature.pas' {ImportCandidature: TDataModule};
+  GestyTools.Candidature in 'GestyTools.Candidature.pas' {ImportCandidature: TDataModule} ,
+  Mantis.Client in 'Mantis.Client.pas',
+  GestyTools.Mantis in 'GestyTools.Mantis.pas';
 
 {$R *.res}
 
@@ -40,7 +41,6 @@ begin
   Application.CreateForm(TConnection, Connection);
   Application.CreateForm(TMail, Mail);
   Application.CreateForm(TScriptModule, ScriptModule);
-  Application.CreateForm(TGDrive, GDrive);
   Application.CreateForm(TFTP, FTP);
   Application.CreateForm(TImportCandidature, ImportCandidature);
   Application.CreateForm(TMainForm, MainForm);

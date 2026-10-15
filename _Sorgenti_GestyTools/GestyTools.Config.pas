@@ -13,12 +13,8 @@ uses
 type
   TConfig = class(TPersistent)
   private
-    FClientId: string;
-    FClientSecret: string;
-    FAccessToken: string;
     FAnonimizzazioneChiaveDerivazione: string;
     FAnonimizzazioneParolaOrdine: string;
-    FBackupNoTrigger: boolean;
     FDB: string;
     FdbPassword: string;
     FdbUserName: string;
@@ -34,14 +30,22 @@ type
     FFtpPassword: string;
     FFtpPort: integer;
     FFtpUsername: string;
+    FMantisAssegnatario: string;
+    FMantisCategoria: string;
+    FMantisProgetto: string;
+    FMantisToken: string;
+    FMantisUrl: string;
     FPort: integer;
-    FProtocol: string;
-    FRefreshToken: string;
     FRemote_BackupFolder: string;
     FRemote_UpdateZip: string;
     FServer: string;
+    FSmtpDestinatario: string;
+    FSmtpHost: string;
+    FSmtpMittente: string;
+    FSmtpPassword: string;
+    FSmtpPorta: integer;
+    FSmtpUtente: string;
     FTlsProvider: string;
-    FTokenType: string;
     FVendorLib: string;
   private
     function CommandLineConfigFileName: string;
@@ -59,13 +63,7 @@ type
     procedure SaveProps(StringList: TStringList);
   published // Ente
     property Ente: string read FEnte write FEnte;
-  published // GDrive
-    property ClientId: string read FClientId write FClientId;
-    property ClientSecret: string read FClientSecret write FClientSecret;
-    property AccessToken: string read FAccessToken write FAccessToken;
-    property RefreshToken: string read FRefreshToken write FRefreshToken;
-    property TokenType: string read FTokenType write FTokenType;
-  published // GDrive Folders
+  published // Percorsi remoti sull'ftp, relativi alla cartella di default
     property Remote_UpdateZip: string read FRemote_UpdateZip write FRemote_UpdateZip;
     property Remote_BackupFolder: string read FRemote_BackupFolder write FRemote_BackupFolder;
   published // User
@@ -74,11 +72,9 @@ type
   published // DB
     property Server: string read FServer write FServer;
     property Port: integer read FPort write FPort;
-    property Protocol: string read FProtocol write FProtocol;
     property DB: string read FDB write FDB;
     property DBFolder: string read GetDBFolder;
     property DBFileName: string read GetDBFileName;
-    property BackupNoTrigger: boolean read FBackupNoTrigger write FBackupNoTrigger;
 
     property Embedded: boolean read FEmbedded write FEmbedded;
     property VendorLib: string read FVendorLib write FVendorLib;
@@ -116,7 +112,33 @@ type
     property AnonimizzazioneParolaOrdine: string read FAnonimizzazioneParolaOrdine write FAnonimizzazioneParolaOrdine;
     property AnonimizzazioneChiaveDerivazione: string read FAnonimizzazioneChiaveDerivazione write FAnonimizzazioneChiaveDerivazione;
   published
-    // SMTP
+    // SMTP, per le mail di errore e per Notifica degli script
+    //
+    // Utente e password stavano scritti in TMail.SendMail, e quindi dentro
+    // ogni eseguibile installato: chiunque li leggeva con un visualizzatore
+    // di stringhe. Qui stanno nel file di configurazione del cliente, come
+    // gli altri segreti. Host e porta hanno un predefinito, utente e
+    // password no: senza, la mail non parte e lo dice il registro.
+    property SmtpHost: string read FSmtpHost write FSmtpHost;
+    property SmtpPorta: integer read FSmtpPorta write FSmtpPorta;
+    property SmtpUtente: string read FSmtpUtente write FSmtpUtente;
+    property SmtpPassword: string read FSmtpPassword write FSmtpPassword;
+    property SmtpMittente: string read FSmtpMittente write FSmtpMittente;
+    property SmtpDestinatario: string read FSmtpDestinatario write FSmtpDestinatario;
+  published
+    // Mantis: un ticket per ogni errore di GestyScript
+    //
+    // MantisToken vuoto = invio a Mantis spento, resta la sola mail. Il token
+    // e' quello di un utente dedicato, con livello reporter sul solo progetto
+    // del cliente: se viene letto dal server del cliente, da' accesso a quel
+    // progetto e a nessun altro. MantisProgetto vuoto = Ente.
+    // MantisAssegnatario: nome utente Mantis a cui assegnare il ticket, cosi'
+    // compare fra quelli assegnati e parte la notifica di Mantis.
+    property MantisUrl: string read FMantisUrl write FMantisUrl;
+    property MantisToken: string read FMantisToken write FMantisToken;
+    property MantisProgetto: string read FMantisProgetto write FMantisProgetto;
+    property MantisCategoria: string read FMantisCategoria write FMantisCategoria;
+    property MantisAssegnatario: string read FMantisAssegnatario write FMantisAssegnatario;
   published
     // TLS: motore da passare a zNet.Tls.SelezionaProviderTls all'avvio
     // (GestyTools.dpr, subito dopo Config.load). Valori accettati oggi:
@@ -261,13 +283,6 @@ end;
 procedure TConfig.Init;
 begin
   Ente := '';
-  // GDrive
-  FClientId := '411091787928-g5e2gfb3rchvk68dmhl08cpvsi2pad93.apps.googleusercontent.com';
-  FClientSecret := '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';
-
-  FAccessToken := '';
-  FRefreshToken := '';
-  FTokenType := 'Bearer';
 
   // Percorsi remoti sull'ftp, relativi alla cartella di default
   FRemote_UpdateZip := 'File_Aggiornamento_Gesty/Aggiornamento_Gesty.zip';
@@ -280,11 +295,9 @@ begin
   // DB
   FServer := '';
   FPort := 3050;
-  FProtocol := 'TCPIP';
   FDB := '';
   FEmbedded := false;
   FVendorLib := '';
-  FBackupNoTrigger := false; // per FB5
 
   // Folder
   FolderBin := '';
@@ -299,6 +312,21 @@ begin
   FFtpUsername := 'GestyTools';
   FFtpPassword := '';
   FFtpDefaultFolder := 'FTP';
+
+  // SMTP: host e porta erano nel .dfm di TMail, destinatario in InitMessage
+  FSmtpHost := 'mail.tophost.it';
+  FSmtpPorta := 587;
+  FSmtpUtente := '';
+  FSmtpPassword := '';
+  FSmtpMittente := '';
+  FSmtpDestinatario := 'assistenza@zebro.it';
+
+  // Mantis
+  FMantisUrl := 'https://www.zebro.it/mantis';
+  FMantisToken := '';
+  FMantisProgetto := '';
+  FMantisCategoria := 'Generica';
+  FMantisAssegnatario := '';
 
   // TLS
   FTlsProvider := 'OPENSSL';
@@ -318,18 +346,24 @@ procedure TConfig.LoadProps(StringList: TStringList);
       TDirectory.CreateDirectory(Folder);
   end;
 
-var
-  tmp: string;
+  // valore letto, o il predefinito di Init se nel file manca: i file salvati
+  // prima dell'aggiunta della voce non la contengono
+  function Valore(const Nome, Predefinito: string): string;
+  begin
+    result := StringList.Values[Nome];
+    if result.IsEmpty then
+      result := Predefinito;
+  end;
+
 begin
   Init;
 
+  // Le voci di Google Drive (ClientId, ClientSecret, AccessToken,
+  // RefreshToken, TokenType), Protocol e BackupNoTrigger non si leggono
+  // piu': nessuno le usava. Un file vecchio che le contiene si apre lo
+  // stesso, e al primo salvataggio spariscono.
+
   FEnte := StringList.Values['Ente'];
-  // GDrive
-  FClientId := StringList.Values['ClientId'];
-  FClientSecret := StringList.Values['ClientSecret'];
-  FAccessToken := StringList.Values['AccessToken'];
-  FRefreshToken := StringList.Values['RefreshToken'];
-  FTokenType := StringList.Values['TokenType'];
 
   // Percorsi remoti sull'ftp
   FRemote_UpdateZip := StringList.Values['Remote_UpdateZip'];
@@ -352,11 +386,9 @@ begin
   // DB
   FServer := StringList.Values['Server'];
   FPort := StringList.Values['Port'].ToInteger();
-  FProtocol := StringList.Values['Protocol'];
   FDB := StringList.Values['DB'];
   FEmbedded := StringList.Values['Embedded'].ToLower.Equals('true');
   FVendorLib := StringList.Values['VendorLib'];
-  FBackupNoTrigger := StringList.Values['BackupNoTrigger'] = 'True';
 
   // Folder
   FFolderBin := IncludeTrailingPathDelimiter(StringList.Values['Folder Bin']);
@@ -374,6 +406,21 @@ begin
   FFtpUsername := StringList.Values['FtpUsername'];
   FFtpPassword := StringList.Values['FtpPassword'];
   FFtpDefaultFolder := StringList.Values['FtpDefaultFolder'];
+
+  // SMTP
+  FSmtpHost := Valore('SmtpHost', FSmtpHost);
+  FSmtpPorta := StrToIntDef(StringList.Values['SmtpPorta'], FSmtpPorta);
+  FSmtpUtente := StringList.Values['SmtpUtente'];
+  FSmtpPassword := StringList.Values['SmtpPassword'];
+  FSmtpMittente := StringList.Values['SmtpMittente'];
+  FSmtpDestinatario := Valore('SmtpDestinatario', FSmtpDestinatario);
+
+  // Mantis
+  FMantisUrl := Valore('MantisUrl', FMantisUrl);
+  FMantisToken := StringList.Values['MantisToken'];
+  FMantisProgetto := StringList.Values['MantisProgetto'];
+  FMantisCategoria := Valore('MantisCategoria', FMantisCategoria);
+  FMantisAssegnatario := StringList.Values['MantisAssegnatario'];
 
   // TLS
   FTlsProvider := StringList.Values['TlsProvider'];
@@ -397,14 +444,8 @@ end;
 procedure TConfig.SaveProps(StringList: TStringList);
 begin
   StringList.AddPair('Ente', Ente);
-  // GDrive
-  StringList.AddPair('ClientId', ClientId);
-  StringList.AddPair('ClientSecret', ClientSecret);
-  StringList.AddPair('AccessToken', AccessToken);
-  StringList.AddPair('RefreshToken', RefreshToken);
-  StringList.AddPair('TokenType', TokenType);
 
-  // GDrive Folders
+  // Percorsi remoti sull'ftp
   StringList.AddPair('Remote_UpdateZip', Remote_UpdateZip);
   StringList.AddPair('Remote_BackupFolder', Remote_BackupFolder);
 
@@ -415,15 +456,9 @@ begin
   // DB
   StringList.AddPair('Server', Server);
   StringList.AddPair('Port', Port.ToString);
-  StringList.AddPair('Protocol', Protocol);
   StringList.AddPair('DB', DB);
   StringList.AddPair('Embedded', Embedded.ToString(True));
   StringList.AddPair('VendorLib', VendorLib);
-
-  if BackupNoTrigger then
-    StringList.AddPair('BackupNoTrigger', 'True')
-  else
-    StringList.AddPair('BackupNoTrigger', 'False');
 
   // Folder
   StringList.AddPair('Backup Batch', FileNameBat);
@@ -438,6 +473,21 @@ begin
   StringList.AddPair('FtpUsername', FtpUsername);
   StringList.AddPair('FtpPassword', FtpPassword);
   StringList.AddPair('FtpDefaultFolder', FtpDefaultFolder);
+
+  // SMTP
+  StringList.AddPair('SmtpHost', SmtpHost);
+  StringList.AddPair('SmtpPorta', SmtpPorta.ToString);
+  StringList.AddPair('SmtpUtente', SmtpUtente);
+  StringList.AddPair('SmtpPassword', SmtpPassword);
+  StringList.AddPair('SmtpMittente', SmtpMittente);
+  StringList.AddPair('SmtpDestinatario', SmtpDestinatario);
+
+  // Mantis
+  StringList.AddPair('MantisUrl', MantisUrl);
+  StringList.AddPair('MantisToken', MantisToken);
+  StringList.AddPair('MantisProgetto', MantisProgetto);
+  StringList.AddPair('MantisCategoria', MantisCategoria);
+  StringList.AddPair('MantisAssegnatario', MantisAssegnatario);
 
   // TLS
   StringList.AddPair('TlsProvider', TlsProvider);

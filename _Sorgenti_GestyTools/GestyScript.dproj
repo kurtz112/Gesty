@@ -150,10 +150,6 @@
         </DelphiCompile>
         <DCCReference Include="GestyTools.Config.pas"/>
         <DCCReference Include="GestyTools.Connection.pas"/>
-        <DCCReference Include="GestyTools.GDrive.pas">
-            <Form>GDrive</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="GestyTools.FTP.pas">
             <Form>FTP</Form>
             <DesignClass>TDataModule</DesignClass>
@@ -171,6 +167,8 @@
             <Form>ImportCandidature</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="Mantis.Client.pas"/>
+        <DCCReference Include="GestyTools.Mantis.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
