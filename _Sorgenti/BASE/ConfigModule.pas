@@ -52,7 +52,6 @@ uses
   zSystem,
   zProgressBox,
   dbMaster,
-  zObjectInspector,
   SmartInspect.Vcl.SiAuto,
   SmartInspect.Vcl,
   FireDAC.Moni.Base,
