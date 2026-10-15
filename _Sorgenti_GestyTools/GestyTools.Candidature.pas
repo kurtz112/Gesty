@@ -99,48 +99,68 @@ var
   FileStream: TStream;
   Risposta: IHTTPResponse;
   Tentativo: integer;
+  FileTemporaneo: string;
 begin
   // il predefinito di 60 secondi sulla risposta non bastava: un server lento
   // fermava tutto l'import con "Error receiving data: (12002)"
   NetHTTPClient.ConnectionTimeout := TempoMassimoConnessione;
   NetHTTPClient.ResponseTimeout := TempoMassimoRisposta;
 
-  Risposta := nil;
-  for Tentativo := 1 to TentativiScaricamento do
-  begin
-    Log.ToScreen(Format('Scaricamento di %s (tentativo %d di %d)', [url, Tentativo, TentativiScaricamento]));
-    try
-      FileStream := TFileStream.Create(DestFileName, fmCreate);
+  // Mantis #245 - 2026-10-15: si scarica in un file accanto alla destinazione e la si
+  // sostituisce solo a scaricamento riuscito. Prima fmCreate svuotava la destinazione
+  // prima ancora della risposta, e un errore del sito distruggeva la copia gia' in archivio
+  FileTemporaneo := DestFileName + '.scaricamento';
+  try
+    Risposta := nil;
+    for Tentativo := 1 to TentativiScaricamento do
+    begin
+      Log.ToScreen(Format('Scaricamento di %s (tentativo %d di %d)', [url, Tentativo, TentativiScaricamento]));
       try
-        Risposta := NetHTTPClient.Get(url, FileStream);
-      finally
-        FreeAndNil(FileStream);
-      end;
-      Break;
-    except
-      // errori di rete (tempo scaduto, connessione rifiutata o interrotta):
-      // possono essere passeggeri, si riprova. Gli altri errori salgono subito
-      on E: ENetException do
-      begin
-        Log.ToScreen(Format('Scaricamento di %s non riuscito: %s: %s', [url, E.ClassName, E.Message]));
+        FileStream := TFileStream.Create(FileTemporaneo, fmCreate);
+        try
+          Risposta := NetHTTPClient.Get(url, FileStream);
+        finally
+          FreeAndNil(FileStream);
+        end;
+        Break;
+      except
+        // errori di rete (tempo scaduto, connessione rifiutata o interrotta):
+        // possono essere passeggeri, si riprova. Gli altri errori salgono subito
+        on E: ENetException do
+        begin
+          Log.ToScreen(Format('Scaricamento di %s non riuscito: %s: %s', [url, E.ClassName, E.Message]));
 
-        if Tentativo = TentativiScaricamento then
-          Exception.RaiseOuterException(Exception.CreateFmt('Scaricamento di %s non riuscito dopo %d tentativi (tempo massimo di risposta %d secondi)',
-            [url, TentativiScaricamento, TempoMassimoRisposta div 1000]));
+          if Tentativo = TentativiScaricamento then
+            Exception.RaiseOuterException(Exception.CreateFmt('Scaricamento di %s non riuscito dopo %d tentativi (tempo massimo di risposta %d secondi)',
+              [url, TentativiScaricamento, TempoMassimoRisposta div 1000]));
 
-        Sleep(PausaFraTentativi);
+          Sleep(PausaFraTentativi);
+        end;
       end;
     end;
+
+    // prima una risposta di errore (pagina di accesso, 403, 404) veniva salvata
+    // come se fosse il file, e l'import si fermava piu' avanti con un errore
+    // che non diceva cosa era arrivato ("Error reading zip file")
+    if (Risposta.StatusCode < 200) or (Risposta.StatusCode > 299) then
+      raise Exception.CreateFmt('Scaricamento di %s: il server ha risposto %d %s. %s', [url, Risposta.StatusCode, Risposta.StatusText,
+        DescriviFileScaricato(FileTemporaneo, Risposta.MimeType)]);
+
+    Log.ToScreen(Format('Scaricato %s: %s', [url, DescriviFileScaricato(FileTemporaneo, Risposta.MimeType)]));
+
+    if TFile.Exists(DestFileName) then
+      TFile.Delete(DestFileName);
+    TFile.Move(FileTemporaneo, DestFileName);
+  finally
+    // resta solo se lo scaricamento non e' riuscito: non deve passare per un allegato
+    if TFile.Exists(FileTemporaneo) then
+      try
+        TFile.Delete(FileTemporaneo);
+      except
+        on E: Exception do
+          Log.ToScreen(Format('File temporaneo %s non cancellato: %s', [FileTemporaneo, E.Message]));
+      end;
   end;
-
-  // prima una risposta di errore (pagina di accesso, 403, 404) veniva salvata
-  // come se fosse il file, e l'import si fermava piu' avanti con un errore
-  // che non diceva cosa era arrivato ("Error reading zip file")
-  if (Risposta.StatusCode < 200) or (Risposta.StatusCode > 299) then
-    raise Exception.CreateFmt('Scaricamento di %s: il server ha risposto %d %s. %s', [url, Risposta.StatusCode, Risposta.StatusText,
-      DescriviFileScaricato(DestFileName, Risposta.MimeType)]);
-
-  Log.ToScreen(Format('Scaricato %s: %s', [url, DescriviFileScaricato(DestFileName, Risposta.MimeType)]));
 
   result := True;
 end;
@@ -287,16 +307,26 @@ begin
 
     SpostaAllegati(idFile);
   finally
-    TFile.Delete(tmpFileName);
+    // Mantis #245 - 2026-10-15: se lo scaricamento non riesce il file non c'e' piu'
+    // (DownloadFile scrive in un temporaneo suo)
+    if TFile.Exists(tmpFileName) then
+      TFile.Delete(tmpFileName);
   end;
 end;
 
 procedure TImportCandidature.SpostaAllegati(const IdFileCandidature: integer);
+
+  // un file vuoto e' un allegato mai arrivato: le versioni precedenti salvavano
+  // come allegato anche la risposta vuota di un errore del sito
+  function AllegatoPresente(const FileName: string): boolean;
+  begin
+    result := TFile.Exists(FileName) and (TFile.GetSize(FileName) > 0);
+  end;
+
 var
   FilesNonTrovati: TStringList;
   src, dest, folder: string;
   MotivoMancato: string;
-  idObjectFile: integer;
   idCandidatura: integer;
 begin
   FilesNonTrovati := TStringList.Create;
@@ -308,51 +338,51 @@ begin
       CandidatureAllegati.First;
       while not CandidatureAllegati.Eof do
       begin
-        idObjectFile := CandidatureAllegatiID_OBJECT_FILE.AsInteger;
         idCandidatura := CandidatureAllegatiID_CANDIDATURA.AsInteger;
         src := CandidatureAllegatiFILE_NAME_DA_IMPORT.AsString;
         dest := CandidatureAllegatiFULL_FILE_NAME.AsString;
 
-        folder := TPath.GetDirectoryName(dest);
-        if not TDirectory.Exists(folder) then
-          TDirectory.CreateDirectory(folder);
-
-        MotivoMancato := '';
-        if src.StartsWith('http', True) or src.StartsWith('www', True) then
+        // Mantis #245 - 2026-10-15: si scarica solo l'allegato che manca. Prima a ogni
+        // import si riscaricavano tutti gli allegati delle candidature presenti nel file
+        // (circa 600 ogni notte), e un documento che il sito non serviva piu' andava perso
+        // anche se era gia' in archivio. Un documento nuovo portato da una nuova
+        // registrazione e' una versione nuova dell'allegato, con un file suo che qui non
+        // esiste ancora
+        if not AllegatoPresente(dest) then
         begin
-          // Un allegato che non si scarica, anche dopo i tentativi, finisce
-          // nell'elenco dei file non copiati invece di fermare l'import: le
-          // candidature sono gia' registrate da CANDIDATURE_IMPORT, e
-          // fermarsi qui lasciava senza allegati anche tutte le successive
-          try
-            DownloadFile(src, dest);
-          except
-            on E: Exception do
-            begin
-              MotivoMancato := E.Message;
-              Log.ToScreen('Allegato della candidatura ' + idCandidatura.ToString + ' non scaricato: ' + E.Message);
+          folder := TPath.GetDirectoryName(dest);
+          if not TDirectory.Exists(folder) then
+            TDirectory.CreateDirectory(folder);
 
-              // il file creato prima dell'errore e' vuoto o troncato: lasciarlo
-              // lo farebbe passare per copiato
-              try
-                if TFile.Exists(dest) then
-                  TFile.Delete(dest);
-              except
-                on ErroreCancellazione: Exception do
-                  MotivoMancato := MotivoMancato + ' (file parziale non cancellato: ' + ErroreCancellazione.Message + ')';
+          MotivoMancato := '';
+          if src.StartsWith('http', True) or src.StartsWith('www', True) then
+          begin
+            // Un allegato che non si scarica, anche dopo i tentativi, finisce
+            // nell'elenco dei file non copiati invece di fermare l'import: le
+            // candidature sono gia' registrate da CANDIDATURE_IMPORT, e
+            // fermarsi qui lasciava senza allegati anche tutte le successive.
+            // DownloadFile non tocca la destinazione se lo scaricamento non riesce
+            try
+              DownloadFile(src, dest);
+            except
+              on E: Exception do
+              begin
+                MotivoMancato := E.Message;
+                Log.ToScreen('Allegato della candidatura ' + idCandidatura.ToString + ' non scaricato: ' + E.Message);
               end;
             end;
-          end;
-        end
-        else
-          TFile.Copy(src, dest);
-
-        if not TFile.Exists(dest) then
-        begin
-          if MotivoMancato.IsEmpty then
-            FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src)
+          end
           else
-            FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src + ' - ' + MotivoMancato);
+            // la destinazione manca o e' vuota: si sovrascrive
+            TFile.Copy(src, dest, True);
+
+          if not AllegatoPresente(dest) then
+          begin
+            if MotivoMancato.IsEmpty then
+              FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src)
+            else
+              FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src + ' - ' + MotivoMancato);
+          end;
         end;
 
         CandidatureAllegati.Next;
@@ -366,9 +396,11 @@ begin
     begin
       FilesNonTrovati.Insert(0, 'I seguenti file non sono stati copiati: ');
       FilesNonTrovati.Insert(1, '');
-      FilesNonTrovati.SaveToFile(Config.FolderUpdate + 'Errori Import Candidature File ' + idObjectFile.ToString + '.txt');
+      // Mantis #245 - 2026-10-15: il numero e' quello dell'import; prima era l'allegato
+      // letto per ultimo nel ciclo, che non serviva a ritrovare niente
+      FilesNonTrovati.SaveToFile(Config.FolderUpdate + 'Errori Import Candidature File ' + IdFileCandidature.ToString + '.txt');
 
-      Mail.InviaMail(Config.Ente + ' - Errori Import Candidature File ' + idObjectFile.ToString, FilesNonTrovati.text);
+      Mail.InviaMail(Config.Ente + ' - Errori Import Candidature File ' + IdFileCandidature.ToString, FilesNonTrovati.text);
     end;
   finally
     FreeAndNil(FilesNonTrovati);
