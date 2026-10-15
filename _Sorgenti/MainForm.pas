@@ -1688,7 +1688,7 @@ begin
     begin
       APoint := subMenu.ClientToScreen(Point(X, Y));
       dxBarPopupMenu := TdxBarPopupMenu(subMenu.Tag);
-      dxBarPopupMenu.Tag := Integer(barItem.Action);
+      dxBarPopupMenu.Tag := NativeInt(barItem.Action);
       dxBarPopupMenu.Popup(APoint.X, APoint.Y);
       Abort;
     end;

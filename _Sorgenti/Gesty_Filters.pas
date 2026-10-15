@@ -373,7 +373,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width - 1);
   BindFilter(Combo, FilterFieldName('ANNO_FORMATIVO'));
 
@@ -429,7 +429,7 @@ begin
   SpinProps.MinValue := 0;
   SpinProps.OnValidate := AnnoSolareValidate;
 
-  Spin.Tag := Integer(DataSet);
+  Spin.Tag := NativeInt(DataSet);
   SetFilterWidth(Spin, Spin.Width - 30);
   BindFilter(Spin, FilterFieldName('ANNO'));
 
@@ -479,7 +479,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width - 1);
   BindFilter(Combo, FilterFieldName('ANNO_ESERCIZIO'));
 
@@ -526,7 +526,7 @@ begin
   for Mese := 1 to 12 do
     TzToolFilterHelper.AddPickListValue(ComboProps, Mese, zzCapFirst(FormatSettings.LongMonthNames[Mese], False));
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, 100);
   BindFilter(Combo, FilterFieldName('MESE'));
 
@@ -576,7 +576,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 75);
   BindFilter(Combo, FilterFieldName('ID_ENTE'));
 
@@ -632,7 +632,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 75);
 
   // OnChange custom (es: aggiornamento dataset dipendente) oppure standard
@@ -708,7 +708,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 150);
   BindFilter(Combo, FilterFieldName('FONTE_FINANZIAMENTO'));
   if InitialValue = ivCustom then
@@ -753,7 +753,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 100);
   BindFilter(Combo, FilterFieldName('AREA_RIFERIMENTO'));
   if InitialValue = ivCustom then
@@ -798,7 +798,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 150);
   BindFilter(Combo, FilterFieldName('CODICE_SETTORE_AZIENDALE'));
   if InitialValue = ivCustom then
@@ -843,7 +843,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 150);
   BindFilter(Combo, FilterFieldName('BELFIORE'));
   if InitialValue = ivCustom then
@@ -888,7 +888,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 150);
   BindFilter(Combo, FilterFieldName('BELFIORE'));
   if InitialValue = ivCustom then
@@ -933,7 +933,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 150);
   BindFilter(Combo, FilterFieldName('BELFIORE'));
   if InitialValue = ivCustom then
@@ -978,7 +978,7 @@ begin
 
   InitProperties(ComboProps);
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, Combo.Width + 150);
   BindFilter(Combo, FilterFieldName('SPORTELLO_SAL'));
   if InitialValue = ivCustom then
@@ -1043,7 +1043,7 @@ begin
     Item.ImageIndex := ImmagineVoceTutti;
   end;
 
-  Combo.Tag := Integer(DataSet);
+  Combo.Tag := NativeInt(DataSet);
   SetFilterWidth(Combo, 100);
   BindFilter(Combo, FilterFieldName(''));
 
@@ -1143,7 +1143,7 @@ begin
   DateItem := TzDxBarHelper.CreateDate(Bar, ComboName, FilterCaption('Data:'), FilterHint('filtro per data'), FilterPosition);
   DateProps := DateItem.Properties as TcxDateEditProperties;
 
-  DateItem.Tag := Integer(DataSet);
+  DateItem.Tag := NativeInt(DataSet);
   SetFilterWidth(DateItem, 120);
 
   // Se c'è una procedura di callback registrata, colleghiamo il gestore di classe

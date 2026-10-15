@@ -221,7 +221,7 @@ begin
 
     if ctrl is TcxButton then
       if Assigned(TcxButton(ctrl).Action) then
-        popActions.Tag := integer(TcxButton(ctrl).Action);
+        popActions.Tag := NativeInt(TcxButton(ctrl).Action);
   end;
 end;
 
