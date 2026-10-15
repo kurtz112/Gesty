@@ -18,12 +18,14 @@ type
   TUpdateEngine = class(TDataModule)
     ProgressBox: TProgressBox;
   private
-    FDatabaseInShutdown: boolean;
     procedure doDeleteFile(const FileName: string);
-    procedure doZip(const FileName, ZipFileName: string);
-    procedure doUnzip(const FileName: string; const OutupFolder: string);
 
     procedure ZipProgressEvent(Sender: TObject; FileName: string; Header: TZipHeader; Position: Int64);
+    // processi locali e sessioni di rete che tengono aperto un file
+    function DescriviUtilizzatori(const FileName: string): string;
+    // da chiamare con GestyTools scollegato: True se il file del database si
+    // apre in esclusiva, cioe' si puo' copiare e rinominare
+    function FileDatabaseLibero(out Utilizzatori: string): boolean;
   public
     procedure Connect;
     procedure Disconnect;
@@ -41,23 +43,17 @@ type
     // forza la chiusura di processi locali e sessioni di rete; True se l'exe si e' liberato
     function ChiudiUtilizzatoriExe: boolean;
   public
-    // shutdown del database Firebird: impedisce nuove connessioni (solo SYSDBA/owner)
-    procedure ShutdownDatabase;
-    // riporta il database online
-    procedure OnlineDatabase;
-    property DatabaseInShutdown: boolean read FDatabaseInShutdown;
-  public
+    // Utenti di Gesty collegati, altri collegamenti al database e prova di
+    // apertura esclusiva del file. True se il file si puo' copiare e
+    // rinominare; Rapporto e' il testo da mostrare.
+    function VerificaDatabase(out Rapporto: string): boolean;
     function CopiaFisicaDB: boolean;
     procedure BackupBatch;
-
-    procedure UploadDB; { TODO : GDrive }
-    procedure DownloadDB; { TODO : GDrive }
   public
     function DownloadFileName: string;
     procedure DownloadExe;
     function ApplicaAggiornamento: boolean;
     procedure Gesty;
-    procedure IbExpert;
   end;
 
 var
@@ -113,7 +109,7 @@ begin
   result := TFile.Exists(ExeFileName) and FileIsLocked(ExeFileName);
 end;
 
-function TUpdateEngine.DescriviUtilizzatoriExe: string;
+function TUpdateEngine.DescriviUtilizzatori(const FileName: string): string;
 var
   lockList: TFileLockList;
   lockInfo: TFileLockInfo;
@@ -124,12 +120,12 @@ begin
   lockList := TFileLockList.Create;
   try
     // processi locali che tengono aperto il file (Restart Manager)
-    EnumLocalLockers(ExeFileName, lockList);
+    EnumLocalLockers(FileName, lockList);
 
     // sessioni sulla condivisione: server remoto se il percorso e' UNC,
     // altrimenti il computer locale (il tool di norma gira sul server)
-    serverName := ServerFromUncPath(Config.FolderBin);
-    EnumShareLockers(serverName, 'Gesty.exe', lockList);
+    serverName := ServerFromUncPath(ExtractFilePath(FileName));
+    EnumShareLockers(serverName, ExtractFileName(FileName), lockList);
 
     for lockInfo in lockList do
       result := result + lockInfo.Descrizione + sLineBreak;
@@ -139,6 +135,11 @@ begin
 
   if result.IsEmpty then
     result := 'nessun processo individuato (il blocco potrebbe provenire da un altro computer).';
+end;
+
+function TUpdateEngine.DescriviUtilizzatoriExe: string;
+begin
+  result := DescriviUtilizzatori(ExeFileName);
 end;
 
 function TUpdateEngine.ChiudiUtilizzatoriExe: boolean;
@@ -157,86 +158,144 @@ begin
   result := not ExeInUso;
 end;
 
-procedure TUpdateEngine.ShutdownDatabase;
+function TUpdateEngine.FileDatabaseLibero(out Utilizzatori: string): boolean;
+var
+  tentativo: Integer;
 begin
-  Log.ToFile('ShutdownDatabase');
+  Utilizzatori := '';
 
-  StartWait('Attendere...', true);
-  try
-    Disconnect;
-    Connection.DatabaseShutdown(0);
-    // in shutdown solo SYSDBA/owner possono collegarsi: la connessione del tool resta valida
-    Connect;
-  finally
-    StopWait;
+  // il server Firebird puo' chiudere il file qualche istante dopo l'ultimo
+  // scollegamento (o piu' tardi, se il database ha un LINGER): pochi
+  // tentativi prima di dichiararlo in uso
+  for tentativo := 1 to 3 do
+  begin
+    if not FileIsLocked(Config.DB) then
+      Exit(true);
+
+    Sleep(1000);
   end;
 
-  FDatabaseInShutdown := true;
+  Utilizzatori := DescriviUtilizzatori(Config.DB);
+  result := false;
 end;
 
-procedure TUpdateEngine.OnlineDatabase;
+function TUpdateEngine.VerificaDatabase(out Rapporto: string): boolean;
+var
+  collegamenti: TStringList;
+  utentiGesty: Integer;
+  utilizzatori: string;
 begin
-  Log.ToFile('OnlineDatabase');
+  result := false;
 
-  StartWait('Attendere...', true);
+  Log.ToFile('VerificaDatabase');
+
+  collegamenti := TStringList.Create;
   try
-    Disconnect;
-    Connection.DatabaseOnline;
-    Connect;
-  finally
-    StopWait;
-  end;
+    StartWait('Attendere...', true);
+    try
+      Connection.UtentiAttiviActive := false;
+      Connection.UtentiAttiviActive := true;
+      utentiGesty := Connection.UtentiAttivi.RecordCount;
 
-  FDatabaseInShutdown := false;
+      Connection.AltriCollegamenti(collegamenti);
+
+      // il collegamento di GestyTools tiene aperto il file come gli altri:
+      // la prova di apertura esclusiva si fa scollegati
+      if TFile.Exists(Config.DB) then
+      begin
+        Disconnect;
+        try
+          result := FileDatabaseLibero(utilizzatori);
+        finally
+          Connect;
+        end;
+      end;
+    finally
+      StopWait;
+    end;
+
+    if utentiGesty = 0 then
+      Rapporto := 'Utenti di Gesty collegati: nessuno.'
+    else
+      Rapporto := Format('Utenti di Gesty collegati: %d (elenco nella pagina Utenti).', [utentiGesty]);
+
+    if collegamenti.Count = 0 then
+      Rapporto := Rapporto + sLineBreak + 'Altri collegamenti al database: nessuno.'
+    else
+      Rapporto := Rapporto + sLineBreak + 'Collegamenti al database (Gesty compreso):' + sLineBreak + collegamenti.Text.TrimRight;
+
+    Rapporto := Rapporto + sLineBreak + sLineBreak;
+
+    if not TFile.Exists(Config.DB) then
+      Rapporto := Rapporto + 'Il file ' + Config.DB + ' non e'' raggiungibile da questo computer: ' +
+        'copia e rinomina si possono verificare solo sul server del database.'
+    else
+      if result then
+        Rapporto := Rapporto + 'Il file del database non e'' aperto da nessuno: si puo'' copiare e rinominare.'
+      else
+        Rapporto := Rapporto + 'Il file del database e'' ancora aperto: non si puo'' copiare ne'' rinominare.' + sLineBreak + 'Lo tiene aperto:' +
+          sLineBreak + utilizzatori;
+  finally
+    FreeAndNil(collegamenti);
+  end;
 end;
 
 function TUpdateEngine.CopiaFisicaDB: boolean;
 var
-  avvisi: string;
+  collegamenti: TStringList;
+  utilizzatori: string;
+  libero: boolean;
   dateStr: string;
   SrcFileName: string;
   DstFileName: string;
 begin
   result := false;
-
-  // eventuali anomalie raggruppate in un'unica conferma
-  avvisi := '';
-
-  if Connection.EsistonoUtentiCollegati then
-    avvisi := avvisi + '- risultano utenti collegati al database' + sLineBreak;
+  libero := false;
 
   if TFile.Exists(ExeFileName) then
-    avvisi := avvisi + '- Gesty.exe non risulta disabilitato' + sLineBreak;
-
-  if not avvisi.IsEmpty then
-    if not ConfirmOkCancel('Attenzione:' + sLineBreak + avvisi + 'Continuare comunque?', mtWarning) then
+    if not ConfirmOkCancel('Gesty.exe non risulta disabilitato: gli utenti possono ancora avviarlo.' + sLineBreak + 'Continuare comunque?', mtWarning) then
       Exit;
-
-  // shutdown del database per impedire nuove connessioni durante la copia
-  // e per tutta la durata dell'aggiornamento
-  if not FDatabaseInShutdown then
-    if ConfirmOkCancel('Portare il database in shutdown per impedire ulteriori collegamenti?' + #13#10 + 'Solo SYSDBA potra'' collegarsi fino alla riattivazione.') then
-      ShutdownDatabase;
-
-  /// /////////////////////////////
 
   Log.ToFile('CopiaFisicaDB');
 
-  StartWait('Attendere...', true);
+  dateStr := FormatDateTime('yyyymmdd hh nn - ', now);
+  SrcFileName := Config.DB;
+  DstFileName := Config.FolderBackupDB + dateStr + Config.DBFileName;
+
+  collegamenti := TStringList.Create;
   try
-    Disconnect;
+    StartWait('Attendere...', true);
     try
-      dateStr := FormatDateTime('yyyymmdd hh nn - ', now);
+      // letti prima di scollegarsi: servono a spiegare un file ancora aperto
+      Connection.AltriCollegamenti(collegamenti);
 
-      SrcFileName := Config.DB;
-      DstFileName := Config.FolderBackupDB + dateStr + Config.DBFileName;
+      Disconnect;
+      try
+        // la copia di un database aperto dal server puo' risultare
+        // danneggiata senza che niente lo segnali: si copia solo un file
+        // che si apre in esclusiva
+        libero := FileDatabaseLibero(utilizzatori);
 
-      TFile.Copy(SrcFileName, DstFileName);
+        if libero then
+          TFile.Copy(SrcFileName, DstFileName);
+      finally
+        Connect;
+      end;
     finally
-      Connect;
+      StopWait;
+    end;
+
+    if not libero then
+    begin
+      if collegamenti.Count > 0 then
+        utilizzatori := utilizzatori + sLineBreak + 'Collegamenti al database:' + sLineBreak + collegamenti.Text.TrimRight;
+
+      ConfirmOk('Copia non eseguita: il file del database e'' ancora aperto, e la copia potrebbe risultare danneggiata.' + sLineBreak +
+          'Lo tiene aperto:' + sLineBreak + utilizzatori, mtWarning);
+      Exit;
     end;
   finally
-    StopWait;
+    FreeAndNil(collegamenti);
   end;
 
   result := TFile.Exists(DstFileName);
@@ -260,36 +319,6 @@ end;
 function TUpdateEngine.DownloadFileName: string;
 begin
   result := Config.FolderUpdate + 'GestyExe.zip';
-end;
-
-procedure TUpdateEngine.doZip(const FileName, ZipFileName: string);
-var
-  Zip: TZipFile;
-begin
-  Zip := TZipFile.Create;
-  try
-    Zip.OnProgress := ZipProgressEvent;
-    Zip.Open(ZipFileName, zmWrite);
-
-    Zip.Add(FileName, ExtractFileName(FileName), zcDeflate);
-  finally
-    FreeAndNil(Zip);
-  end;
-end;
-
-procedure TUpdateEngine.doUnzip(const FileName, OutupFolder: string);
-var
-  Zip: TZipFile;
-begin
-  Zip := TZipFile.Create;
-  try
-    Zip.OnProgress := ZipProgressEvent;
-    Zip.Open(FileName, zmRead);
-
-    Zip.ExtractAll(OutupFolder);
-  finally
-    FreeAndNil(Zip);
-  end;
 end;
 
 procedure TUpdateEngine.doDeleteFile(const FileName: string);
@@ -365,227 +394,6 @@ begin
   // l'esito positivo e' visibile nella lista file della pagina
   if not TFile.Exists(DownloadFileName) then
     ConfirmOk('Download non riuscito.', mtError);
-end;
-
-procedure TUpdateEngine.UploadDB;
-var
-  fbk, fdb, Zip: string;
-
-  procedure DeleteTempFiles;
-  begin
-    doDeleteFile(fbk);
-    doDeleteFile(fdb);
-    doDeleteFile(Zip);
-  end;
-
-  procedure Backup;
-  begin
-    Disconnect;
-    try
-      Connection.Backup(fbk);
-    finally
-      Connect;
-    end;
-  end;
-
-  procedure Restore;
-  begin
-    Disconnect;
-    try
-      Connection.Restore(fbk, fdb);
-    finally
-      Connect;
-    end;
-  end;
-
-  procedure Compress;
-  begin
-    doZip(fdb, Zip);
-  end;
-
-  procedure ConnettiFtp;
-  var
-    remoteFolder: string;
-  begin
-    FTP.Connect;
-
-    // cartella remota dei backup (se configurata), relativa alla cartella ftp di default
-    remoteFolder := Config.Remote_BackupFolder.Replace('\', '/').Trim(['/']);
-    if not remoteFolder.IsEmpty then
-      FTP.ChangeDir(remoteFolder);
-  end;
-
-  procedure Upload;
-  begin
-    FTP.Upload(Zip, ExtractFileName(Zip),
-      procedure(const Position, Size: Int64)
-      begin
-
-        if Size > 0 then
-          ProgressBox.SecondLabel := FormatFloat('#,##0 KB', Position / 1024) + ' di ' + FormatFloat('#,##0 KB', Size / 1024)
-        else
-          ProgressBox.SecondLabel := FormatFloat('#,##0 KB', Position / 1024);
-
-        Application.ProcessMessages;
-
-        if ProgressBox.Cancelled then
-          Abort;
-      end);
-  end;
-
-begin
-  Log.ToFile('UploadDB');
-
-  fbk := Config.FolderUpdate + ChangeFileExt(Config.DBFileName, '.fbk');
-  fdb := Config.FolderUpdate + ChangeFileExt(Config.DBFileName, '.fdb');
-  Zip := Config.FolderUpdate + FormatDateTime('yyyymmdd hh nn - ', now) + ChangeFileExt(Config.DBFileName, '.zip');
-
-  // connessione PRIMA della ProgressBox: la form di attesa non deve
-  // sovrapporsi al progresso; la connessione resta aperta durante
-  // backup/restore/compressione (occhio ai timeout di inattivita' del server
-  // con database molto grandi)
-  try
-    ConnettiFtp;
-  except
-    FTP.Disconnect;
-    raise;
-  end;
-
-  ProgressBox.Show(5, 'Upload DB', 'Upload', 'Attendere...');
-  try
-    DeleteTempFiles;
-    ProgressBox.IncProgress('Backup');
-    Backup;
-
-    ProgressBox.IncProgress('Restore');
-    Restore;
-
-    ProgressBox.IncProgress('Compressione');
-    Compress;
-
-    ProgressBox.IncProgress('Upload');
-    Upload;
-
-    // DeleteTempFiles;
-  finally
-    FTP.Disconnect;
-    ProgressBox.Close;
-  end;
-end;
-
-procedure TUpdateEngine.DownloadDB;
-var
-  Remote: string;
-  Zip: string;
-  RemoteBackupName: string;
-
-  procedure DeleteTempFiles;
-  begin
-    doDeleteFile(Zip);
-  end;
-
-  procedure Unzip;
-  begin
-    doUnzip(Zip, Config.FolderUpdate);
-  end;
-
-// backup piu' recente nella cartella remota: il prefisso data yyyymmdd
-// rende l'ordine alfabetico uguale a quello cronologico
-  function CercaBackupPiuRecente: string;
-  var
-    remoteFolder: string;
-    remoteFiles: TStringList;
-    FileName: string;
-  begin
-    result := '';
-
-    FTP.Connect;
-
-    remoteFolder := Config.Remote_BackupFolder.Replace('\', '/').Trim(['/']);
-    if not remoteFolder.IsEmpty then
-      FTP.ChangeDir(remoteFolder);
-
-    remoteFiles := TStringList.Create;
-    try
-      FTP.ListFiles(remoteFiles);
-
-      for FileName in remoteFiles do
-        if FileName.ToLower.EndsWith(Remote.ToLower) then
-          if result.IsEmpty or (CompareText(FileName, result) > 0) then
-            result := FileName;
-    finally
-      FreeAndNil(remoteFiles);
-    end;
-  end;
-
-  procedure Download;
-  begin
-    FTP.Download(RemoteBackupName, Zip,
-      procedure(const Position, Size: Int64)
-      begin
-
-        if Size > 0 then
-        begin
-          ProgressBox.SecondLabel := FormatFloat('#,##0 KB', Position / 1024) + ' di ' + FormatFloat('#,##0 KB', Size / 1024);
-        end
-        else
-          ProgressBox.SecondLabel := FormatFloat('#,##0 KB', Position / 1024);
-
-        Application.ProcessMessages;
-
-        if ProgressBox.Cancelled then
-          Abort;
-      end);
-  end;
-
-begin
-  Log.ToFile('DownloadDB');
-
-  Remote := ChangeFileExt(Config.DBFileName, '.zip');
-  Zip := Config.FolderUpdate + FormatDateTime('yyyymmdd hh nn - ', now) + ChangeFileExt(Config.DBFileName, '.zip');
-
-  // connessione e ricerca del backup PRIMA della ProgressBox: la form di
-  // attesa della connessione non deve sovrapporsi al progresso
-  try
-    RemoteBackupName := CercaBackupPiuRecente;
-  except
-    FTP.Disconnect;
-    raise;
-  end;
-
-  if RemoteBackupName.IsEmpty then
-  begin
-    FTP.Disconnect;
-    ConfirmOk('Nessun backup "' + Remote + '" trovato sull''ftp in "' + Config.Remote_BackupFolder + '".', mtWarning);
-    Exit;
-  end;
-
-  ProgressBox.Show(2, 'Download DB', 'Download', 'Attendere...');
-  try
-    DeleteTempFiles;
-
-    ProgressBox.IncProgress('Download');
-    try
-      Download;
-    except
-      on EAbort do
-      begin
-        // annullato dall'utente: si elimina il file parziale, senza ulteriori avvisi
-        DeleteTempFiles;
-        Exit;
-      end;
-    end;
-
-    ProgressBox.IncProgress('Decompressione');
-    Unzip;
-
-    DeleteTempFiles;
-
-    ConfirmOk('Scaricato e decompresso ' + RemoteBackupName + ' in ' + Config.FolderUpdate);
-  finally
-    FTP.Disconnect;
-    ProgressBox.Close;
-  end;
 end;
 
 function TUpdateEngine.ApplicaAggiornamento: boolean;
@@ -690,11 +498,6 @@ end;
 procedure TUpdateEngine.Gesty;
 begin
   ShellExecute(Application.Handle, 'open', Pchar(Config.FolderBin + 'Gesty.exe'), '', '', SW_SHOWNORMAL);
-end;
-
-procedure TUpdateEngine.IbExpert;
-begin
-  ShellExecute(Application.Handle, 'open', Pchar('IbExpert.exe'), '', '', SW_SHOWNORMAL);
 end;
 
 function TUpdateEngine.RinominaExe: boolean;

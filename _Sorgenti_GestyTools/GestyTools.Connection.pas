@@ -51,8 +51,6 @@ type
     procedure FDIBRestoreError(ASender, AInitiator: TObject; var AException: Exception);
     procedure FDIBRestoreProgress(ASender: TFDPhysDriverService; const AMessage: string);
   private
-    // servizio di configurazione Firebird (equivalente di gfix), creato a runtime
-    FConfigService: TFDIBConfig;
     // connessione dedicata alla COPIA da anonimizzare, creata a runtime.
     // Non punta mai a Config.DB: e' l'unico canale da cui passa
     // ANONYMIZER_GESTY.ESEGUI_ANONIMIZZAZIONE, e le tre verifiche di
@@ -65,7 +63,6 @@ type
     function GetEsistonoUtentiCollegati: boolean;
     function GetUtentiAttiviActive: boolean;
     procedure SetUtentiAttiviActive(const Value: boolean);
-    procedure PreparaServizioConfig;
   private
     function PercorsoNormalizzato(const Percorso: string): string;
     function PercorsoDatabaseRisolto(DataBaseConnection: TFDConnection): string;
@@ -86,11 +83,11 @@ type
     procedure Backup(const BackupFilename: string);
     procedure Restore(const BackupFilename, DatabaseFilename: string);
   public
-    // shutdown del DATABASE Firebird (gfix -shut -force): blocca le nuove
-    // connessioni, restano possibili solo SYSDBA e owner
-    procedure DatabaseShutdown(const TimeoutSecondi: Integer = 0);
-    // riporta il database online (gfix -online)
-    procedure DatabaseOnline;
+    // Tutti i collegamenti al database diversi da quello di GestyTools, una
+    // riga per collegamento (processo, utente, indirizzo). A differenza di
+    // EsistonoUtentiCollegati conta anche IBExpert, GestyScript e le
+    // utilita' pianificate: ognuno tiene aperto il file del database.
+    function AltriCollegamenti(Elenco: TStrings): Integer;
   public
     procedure ExecStoredProc(Params: Variant);
   public
@@ -131,10 +128,6 @@ uses
 constructor TConnection.Create(aOwner: TComponent);
 begin
   inherited;
-
-  // servizio gfix: creato a runtime per non toccare il dfm
-  FConfigService := TFDIBConfig.Create(Self);
-  FConfigService.DriverLink := FDPhysFBDriverLink;
 
   // connessione alla copia: creata a runtime, senza parametri. Li riceve solo
   // in ConnettiCopia, dopo le verifiche, e non eredita niente da FDConnection
@@ -269,38 +262,35 @@ begin
   FCopieRipristinate.Add(PercorsoNormalizzato(DatabaseFilename));
 end;
 
-procedure TConnection.PreparaServizioConfig;
+function TConnection.AltriCollegamenti(Elenco: TStrings): Integer;
+var
+  Query: TFDQuery;
 begin
-  FConfigService.userName := Config.dbUserName;
-  FConfigService.Password := Config.dbPassword;
+  Elenco.Clear;
 
-  if Config.Embedded then
-    FConfigService.Protocol := ipLocal
-  else
-  begin
-    FConfigService.Host := Config.Server;
-    FConfigService.Port := Config.Port;
-    FConfigService.Protocol := ipTCPIP;
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := FDConnection;
+    // MON$SYSTEM_FLAG = 1: thread interni del server (garbage collector,
+    // cache writer), che non sono collegamenti di un programma
+    Query.SQL.Text := 'SELECT MON$ATTACHMENTS.MON$REMOTE_PROCESS, MON$ATTACHMENTS.MON$USER, MON$ATTACHMENTS.MON$REMOTE_ADDRESS ' +
+      'FROM MON$ATTACHMENTS ' + 'WHERE MON$ATTACHMENTS.MON$SYSTEM_FLAG <> 1 AND MON$ATTACHMENTS.MON$ATTACHMENT_ID <> CURRENT_CONNECTION ' +
+      'ORDER BY MON$ATTACHMENTS.MON$REMOTE_PROCESS';
+    Query.Open;
+
+    while not Query.Eof do
+    begin
+      Elenco.Add(Format('%s - utente %s, indirizzo %s', [ExtractFileName(Trim(Query.FieldByName('MON$REMOTE_PROCESS').AsString)),
+          Trim(Query.FieldByName('MON$USER').AsString), Trim(Query.FieldByName('MON$REMOTE_ADDRESS').AsString)]));
+      Query.Next;
+    end;
+
+    Query.Close;
+  finally
+    FreeAndNil(Query);
   end;
 
-  FConfigService.Database := Config.DB;
-end;
-
-procedure TConnection.DatabaseShutdown(const TimeoutSecondi: Integer);
-begin
-  Log.ToFile('DatabaseShutdown');
-
-  PreparaServizioConfig;
-  // smForce: chiude le connessioni attive allo scadere del timeout
-  FConfigService.ShutdownDB(smForce, TimeoutSecondi);
-end;
-
-procedure TConnection.DatabaseOnline;
-begin
-  Log.ToFile('DatabaseOnline');
-
-  PreparaServizioConfig;
-  FConfigService.OnlineDB;
+  Result := Elenco.Count;
 end;
 
 procedure TConnection.ExecStoredProc(Params: Variant);

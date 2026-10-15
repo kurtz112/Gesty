@@ -367,21 +367,6 @@ object MainForm: TMainForm
       ImageIndex = 8
       OnExecute = GestyExecute
     end
-    object UploadDB: TAction
-      Caption = 'Upload DB'
-      ImageIndex = 9
-      OnExecute = UploadDBExecute
-    end
-    object DownloadDB: TAction
-      Caption = 'Download DB'
-      ImageIndex = 10
-      OnExecute = DownloadDBExecute
-    end
-    object IbExpert: TAction
-      Caption = 'IbExpert'
-      ImageIndex = 11
-      OnExecute = IbExpertExecute
-    end
     object Cron: TAction
       Caption = 'Scheduler'
       ImageIndex = 12
@@ -402,15 +387,11 @@ object MainForm: TMainForm
       ImageIndex = 15
       OnExecute = ChiudiProcessiExeExecute
     end
-    object ShutdownDatabase: TAction
-      Caption = 'Shutdown DB'
-      ImageIndex = 16
-      OnExecute = ShutdownDatabaseExecute
-    end
-    object OnlineDatabase: TAction
-      Caption = 'Online DB'
-      ImageIndex = 17
-      OnExecute = OnlineDatabaseExecute
+    object VerificaDB: TAction
+      Caption = 'Verifica DB'
+      Hint = 'Utenti collegati e possibilit'#224' di copiare o rinominare il database'
+      ImageIndex = 14
+      OnExecute = VerificaDBExecute
     end
   end
   object image16: TcxImageList
@@ -1135,13 +1116,7 @@ object MainForm: TMainForm
           UserDefine = [udPaintStyle]
           UserPaintStyle = psCaptionGlyph
           Visible = True
-          ItemName = 'dxBarButton21'
-        end
-        item
-          UserDefine = [udPaintStyle]
-          UserPaintStyle = psCaptionGlyph
-          Visible = True
-          ItemName = 'dxBarButton20'
+          ItemName = 'dxBarButtonVerificaDB'
         end
         item
           BeginGroup = True
@@ -1155,25 +1130,6 @@ object MainForm: TMainForm
           UserPaintStyle = psCaptionGlyph
           Visible = True
           ItemName = 'dxBarButton6'
-        end
-        item
-          BeginGroup = True
-          UserDefine = [udPaintStyle]
-          UserPaintStyle = psCaptionGlyph
-          Visible = True
-          ItemName = 'dxBarButton10'
-        end
-        item
-          UserDefine = [udPaintStyle]
-          UserPaintStyle = psCaptionGlyph
-          Visible = True
-          ItemName = 'dxBarButton11'
-        end
-        item
-          BeginGroup = True
-          UserDefine = [udPaintStyle]
-          Visible = True
-          ItemName = 'dxBarButton13'
         end>
       OneOnRow = True
       Row = 0
@@ -1255,27 +1211,11 @@ object MainForm: TMainForm
       Action = Gesty
       Category = 0
     end
-    object dxBarButton10: TdxBarButton
-      Action = UploadDB
-      Category = 0
-    end
-    object dxBarButton11: TdxBarButton
-      Action = DownloadDB
-      Category = 0
-    end
     object dxBarButton12: TdxBarButton
       Caption = 'New Button'
       Category = 0
       Hint = 'New Button'
       Visible = ivAlways
-    end
-    object dxBarButton13: TdxBarButton
-      Action = IbExpert
-      Category = 0
-    end
-    object dxBarButton14: TdxBarButton
-      Action = IbExpert
-      Category = 0
     end
     object dxBarButton15: TdxBarButton
       Action = Cron
@@ -1299,12 +1239,8 @@ object MainForm: TMainForm
       Action = ChiudiProcessiExe
       Category = 0
     end
-    object dxBarButton20: TdxBarButton
-      Action = OnlineDatabase
-      Category = 0
-    end
-    object dxBarButton21: TdxBarButton
-      Action = ShutdownDatabase
+    object dxBarButtonVerificaDB: TdxBarButton
+      Action = VerificaDB
       Category = 0
     end
     object dxBarSubItemAltriStrumenti: TdxBarSubItem
