@@ -5,6 +5,7 @@ program GestyTools;
 
 uses
   Vcl.Forms,
+  zTranslate.Apply,
   zNet.Tls,
   zNet.Tls.OpenSsl,
   zNet.Tls.SChannel,
@@ -37,6 +38,12 @@ begin
   zNet.Tls.SelezionaProviderTls(Config.TlsProvider);
 
   Application.Initialize;
+
+  // Pulsanti dei dialoghi e menu incorporati di DevExpress e Delphi in
+  // italiano: zTranslate non traduce da solo quando entra nella uses, e va
+  // chiamato prima di creare le form
+  zTranslate.Apply.Translate;
+
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TConnection, Connection);
   Application.CreateForm(TMail, Mail);
