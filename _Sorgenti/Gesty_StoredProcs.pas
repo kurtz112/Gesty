@@ -1,4 +1,3 @@
-// Generata il 15/10/2026 22:36:23
 // DataBase: X:\Gesty\DB\master\Gesty.fdb
 unit Gesty_StoredProcs;
 
@@ -35455,6 +35454,17 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Custom_Save = class (TzStoredProc)
     property Form_Height: TNullableInt64 read fForm_Height write fForm_Height;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Datasets_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_FIELDS_CUSTOM_DELETE_CUSTOM')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Datasets_Fields_Custom_Delete_Custom = class (TzStoredProc)
@@ -35606,6 +35616,21 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Fields_Custom_Save = class (TzStoredPro
     //
     [TParamAttribute('DEPENDS_ON', ptInput, True)]
     property Depends_On: TStringList read fDepends_On write SetDepends_On;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_FIELDS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Datasets_Fields_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fField: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('FIELD', ptInput, False)]
+    property Field: TNullableString read fField write fField;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_FIELDS_LOAD', True)]
@@ -35813,6 +35838,7 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     fForm_Layout: TNullableString;
     fForm_Width: TNullableInt64;
     fForm_Height: TNullableInt64;
+    fAuthorization: TNullableString;
   private
     property Dataset_internal: TNullableString read fDataset write fDataset;
     property Dm_internal: TNullableString read fDm write fDm;
@@ -35843,6 +35869,7 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     property Form_Layout_internal: TNullableString read fForm_Layout write fForm_Layout;
     property Form_Width_internal: TNullableInt64 read fForm_Width write fForm_Width;
     property Form_Height_internal: TNullableInt64 read fForm_Height write fForm_Height;
+    property Authorization_internal: TNullableString read fAuthorization write fAuthorization;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -35955,6 +35982,9 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Load = class (TzStoredProc)
     //
     [TParamAttribute('FORM_HEIGHT', ptOutput, False)]
     property Form_Height: TNullableInt64 read fForm_Height;
+    //
+    [TParamAttribute('AUTHORIZATION', ptOutput, False)]
+    property Authorization: TNullableString read fAuthorization;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_META_LOAD', True)]
@@ -36150,6 +36180,21 @@ TSP_base_Web_Table_Io__Base_Web_Datasets_Save = class (TzStoredProc)
     property Form_Height: TNullableInt64 read fForm_Height write fForm_Height;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_DATASETS_SET_AUTHORIZATION')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Datasets_Set_Authorization = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fAuthorization: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('AUTHORIZATION', ptInput, False)]
+    property Authorization: TNullableString read fAuthorization write fAuthorization;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_BUTTONS_CUSTOM_DELETE_CUSTOM')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Delete_Custom = class (TzStoredProc)
@@ -36330,6 +36375,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Custom_Save = class (TzStoredProc)
     //
     [TParamAttribute('CSS_CLASS', ptInput, False)]
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_BUTTONS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Form_Buttons_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fButton_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('BUTTON_NAME', ptInput, False)]
+    property Button_Name: TNullableString read fButton_Name write fButton_Name;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_BUTTONS_LOAD', True)]
@@ -36736,6 +36796,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Empty_Custom_Save = class (TzStoredProc)
     property Col_Span: TNullableInt64 read fCol_Span write fCol_Span;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_EMPTY_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Form_Empty_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fEmpty_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('EMPTY_NAME', ptInput, False)]
+    property Empty_Name: TNullableString read fEmpty_Name write fEmpty_Name;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_EMPTY_LOAD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Form_Empty_Load = class (TzStoredProc)
@@ -36993,6 +37068,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Fields_Custom_Save = class (TzStoredProc)
     property Required: TNullableBoolean read fRequired write fRequired;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_FIELDS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Form_Fields_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fField: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('FIELD', ptInput, False)]
+    property Field: TNullableString read fField write fField;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_FIELDS_LOAD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Form_Fields_Load = class (TzStoredProc)
@@ -37212,6 +37302,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Groups_Custom_Save = class (TzStoredProc)
     //
     [TParamAttribute('COL_COUNT', ptInput, False)]
     property Col_Count: TNullableInt64 read fCol_Count write fCol_Count;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_GROUPS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Form_Groups_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fGroup_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('GROUP_NAME', ptInput, False)]
+    property Group_Name: TNullableString read fGroup_Name write fGroup_Name;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_GROUPS_LOAD', True)]
@@ -37496,6 +37601,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Custom_Save = class (TzStoredProc)
     //
     [TParamAttribute('TAB_PANEL_OPTIONS', ptInput, True)]
     property Tab_Panel_Options: TStringList read fTab_Panel_Options write SetTab_Panel_Options;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_TABBED_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Form_Tabbed_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fTabbed_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('TABBED_NAME', ptInput, False)]
+    property Tabbed_Name: TNullableString read fTabbed_Name write fTabbed_Name;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_TABBED_LOAD', True)]
@@ -37818,6 +37938,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Custom_Save = class (TzStoredProc)
     property Align_Item_Labels: TNullableBoolean read fAlign_Item_Labels write fAlign_Item_Labels;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_TABS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fTab_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('TAB_NAME', ptInput, False)]
+    property Tab_Name: TNullableString read fTab_Name write fTab_Name;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_FORM_TABS_LOAD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Load = class (TzStoredProc)
@@ -37974,6 +38109,21 @@ TSP_base_Web_Table_Io__Base_Web_Form_Tabs_Save = class (TzStoredProc)
     //
     [TParamAttribute('ALIGN_ITEM_LABELS', ptInput, False)]
     property Align_Item_Labels: TNullableBoolean read fAlign_Item_Labels write fAlign_Item_Labels;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_GRID_BANDS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Grid_Bands_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fBand_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('BAND_NAME', ptInput, False)]
+    property Band_Name: TNullableString read fBand_Name write fBand_Name;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_GRID_BANDS_LOAD', True)]
@@ -38334,6 +38484,21 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Custom_Save = class (TzStoredProc)
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_GRID_COLUMNS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Delete = class (TzStoredProc)
+  private
+    fDataset: TNullableString;
+    fField: TNullableString;
+  public
+    //
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('FIELD', ptInput, False)]
+    property Field: TNullableString read fField write fField;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_GRID_COLUMNS_LOAD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Load = class (TzStoredProc)
@@ -38582,6 +38747,21 @@ TSP_base_Web_Table_Io__Base_Web_Grid_Columns_Save = class (TzStoredProc)
     property Css_Class: TNullableString read fCss_Class write fCss_Class;
 end;
 
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_LOOKUPS_COLUMNS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Delete = class (TzStoredProc)
+  private
+    fLookup: TNullableString;
+    fField: TNullableString;
+  public
+    //
+    [TParamAttribute('LOOKUP', ptInput, False)]
+    property Lookup: TNullableString read fLookup write fLookup;
+    //
+    [TParamAttribute('FIELD', ptInput, False)]
+    property Field: TNullableString read fField write fField;
+end;
+
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_LOOKUPS_COLUMNS_LOAD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Load = class (TzStoredProc)
@@ -38648,6 +38828,17 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Columns_Save = class (TzStoredProc)
     //
     [TParamAttribute('ALIGNMENT', ptInput, False)]
     property Alignment: TNullableString read fAlignment write fAlignment;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_LOOKUPS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Lookups_Delete = class (TzStoredProc)
+  private
+    fLookup: TNullableString;
+  public
+    //
+    [TParamAttribute('LOOKUP', ptInput, False)]
+    property Lookup: TNullableString read fLookup write fLookup;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_LOOKUPS_LOAD', True)]
@@ -38755,6 +38946,17 @@ TSP_base_Web_Table_Io__Base_Web_Lookups_Save = class (TzStoredProc)
     //
     [TParamAttribute('DROPDOWN_WIDTH', ptInput, False)]
     property Dropdown_Width: TNullableInt64 read fDropdown_Width write fDropdown_Width;
+end;
+
+[TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_PICKLISTS_DELETE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_base_Web_Table_Io__Base_Web_Picklists_Delete = class (TzStoredProc)
+  private
+    fPicklist: TNullableString;
+  public
+    //
+    [TParamAttribute('PICKLIST', ptInput, False)]
+    property Picklist: TNullableString read fPicklist write fPicklist;
 end;
 
 [TStoredProcedure('BASE_WEB_TABLE_IO.BASE_WEB_PICKLISTS_ITEMS_LOAD', True)]
@@ -38878,19 +39080,23 @@ TSP_base_Web_Table_Io__Base_Web_Picklists_Save = class (TzStoredProc)
     property Meta: TStringList read fMeta write SetMeta;
 end;
 
-[TStoredProcedure('BASE_WEB_TABLE_IO.GENERATE_EXPORT_SCRIPT')]
+[TStoredProcedure('BASE_WEB_TABLE_IO.CONTROLLA_CONTENITORE_VUOTO')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
-TSP_base_Web_Table_Io__Generate_Export_Script = class (TzStoredProc)
+TSP_base_Web_Table_Io__Controlla_Contenitore_Vuoto = class (TzStoredProc)
   private
-    fScript: TStringList;
-  private
-  public
-    constructor Create; override;
-    destructor Destroy; override;
+    fDataset: TNullableString;
+    fContainer_Name: TNullableString;
+    fContainer_Type: TNullableString;
   public
     //
-    [TParamAttribute('SCRIPT', ptOutput, True)]
-    property Script: TStringList read fScript;
+    [TParamAttribute('DATASET', ptInput, False)]
+    property Dataset: TNullableString read fDataset write fDataset;
+    //
+    [TParamAttribute('CONTAINER_NAME', ptInput, False)]
+    property Container_Name: TNullableString read fContainer_Name write fContainer_Name;
+    //
+    [TParamAttribute('CONTAINER_TYPE', ptInput, False)]
+    property Container_Type: TNullableString read fContainer_Type write fContainer_Type;
 end;
 
 [TStoredProcedure('CSV.TEST', True)]
@@ -45959,19 +46165,6 @@ end;
 procedure TSP_base_Web_Table_Io__Base_Web_Picklists_Save.SetMeta(const Value: TStringList);
 begin
   FMeta.Assign(Value);
-end;
-
-
-constructor TSP_base_Web_Table_Io__Generate_Export_Script.Create;
-begin
-  inherited;
-  fScript := CreateStringList;
-end;
-
-destructor TSP_base_Web_Table_Io__Generate_Export_Script.Destroy;
-begin
-  FreeAndNil(fScript);
-  inherited;
 end;
 
 
