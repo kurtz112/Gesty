@@ -255,7 +255,7 @@ inherited FormValutazioniRisorse: TFormValutazioniRisorse
     Top = 168
     object Esporta: TdxFileSaveAs
       Caption = 'Esporta'
-      ImageIndex = 221
+      ImageIndex = 2160
       OnAccept = EsportaAccept
     end
   end

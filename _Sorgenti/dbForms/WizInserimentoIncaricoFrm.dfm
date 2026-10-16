@@ -439,7 +439,7 @@ inherited WizInserimentoIncaricoForm: TWizInserimentoIncaricoForm
     Top = 368
     object NuovoProgetto: TAction
       Caption = 'NuovoProgetto'
-      ImageIndex = 38
+      ImageIndex = 1629
       OnExecute = NuovoProgettoExecute
     end
   end

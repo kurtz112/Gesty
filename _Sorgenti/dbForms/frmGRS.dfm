@@ -48,7 +48,7 @@ inherited FormGRS: TFormGRS
     end
     object ElaboraFileImport: TAction
       Caption = 'Elabora'
-      ImageIndex = 165
+      ImageIndex = 2195
       OnExecute = ElaboraFileImportExecute
     end
     object EliminaFileImport: TAction
@@ -88,7 +88,7 @@ inherited FormGRS: TFormGRS
       Hint = 
         'Le lezioni selezionate prendono i dati del file, con le supplenz' +
         'e'
-      ImageIndex = 92
+      ImageIndex = 2196
       OnExecute = DifferenzeSovrascriviExecute
     end
     object MonitoraggioEsegui: TAction
@@ -118,7 +118,7 @@ inherited FormGRS: TFormGRS
     object DifformitaRiapri: TAction
       Caption = 'Riapri'
       Hint = 'Le difformit'#224' selezionate tornano da verificare'
-      ImageIndex = 1924
+      ImageIndex = 2197
       OnExecute = DifformitaRiapriExecute
       OnUpdate = DifformitaUpdate
     end

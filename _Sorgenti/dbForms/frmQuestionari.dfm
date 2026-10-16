@@ -331,7 +331,7 @@ inherited FormQuestionari: TFormQuestionari
     end
     object Test_Progetto: TAction
       Caption = 'Test'
-      ImageIndex = 40
+      ImageIndex = 1571
       OnExecute = Test_ProgettoExecute
     end
     object GeneraReport: TdxFileOpen

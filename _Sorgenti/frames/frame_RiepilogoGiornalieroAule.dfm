@@ -174,7 +174,7 @@ inherited FrameRiepilogoGiornalieroAule: TFrameRiepilogoGiornalieroAule
       Dialog.DefaultExt = '*.xslx'
       Dialog.Filter = 'Excel|*.xslx|Tutti|*.*'
       Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-      ImageIndex = 221
+      ImageIndex = 2271
       OnAccept = actEsportaAccept
     end
     object Precedente: TAction

@@ -35,42 +35,42 @@ inherited FormAccordoStatoRegioni: TFormAccordoStatoRegioni
     end
     object ImportNoteAnalisiFabbisogni: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteAnalisiFabbisogniExecute
     end
     object ImportNoteObiettiviRisultatiAttesi: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteObiettiviRisultatiAttesiExecute
     end
     object ImportNoteArticolazioneDidattica: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteArticolazioneDidatticaExecute
     end
     object ImportNoteMetodologia: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteMetodologiaExecute
     end
     object ImportNoteMateriali: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteMaterialiExecute
     end
     object ImportNoteMonitoraggio: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteMonitoraggioExecute
     end
     object ImportDescrizioneProvaVerifica: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportDescrizioneProvaVerificaExecute
     end
     object ImportNoteVerbale: TAction
       Caption = 'Importa'
-      ImageIndex = 1242
+      ImageIndex = 2317
       OnExecute = ImportNoteVerbaleExecute
     end
   end

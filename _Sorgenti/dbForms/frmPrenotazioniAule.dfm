@@ -425,7 +425,7 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 221
+      ImageIndex = 2296
     end
     object dxBarLargeButton6: TdxBarLargeButton
       Caption = 'Docenti'
@@ -454,19 +454,19 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Elimina'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 43
+      ImageIndex = 2298
     end
     object dxBarButton5: TdxBarButton
       Caption = 'Copia'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 42
+      ImageIndex = 2297
     end
     object dxBarButton6: TdxBarButton
       Caption = 'Modifica'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 77
+      ImageIndex = 2300
     end
     object dxBarButton7: TdxBarButton
       Caption = 'Copia Giorno'
@@ -490,7 +490,7 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 221
+      ImageIndex = 2296
     end
     object dxBarButton14: TdxBarButton
       Caption = 'Anteprima'
@@ -584,8 +584,8 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
       Category = 1
       Hint = 'nuovo'
       Visible = ivAlways
-      ImageIndex = 38
-      LargeImageIndex = 38
+      ImageIndex = 2295
+      LargeImageIndex = 2295
     end
     object dxBarSubItem1: TdxBarSubItem
       Caption = 'Scala'
@@ -677,7 +677,7 @@ inherited FormPrenotazioniAule: TFormPrenotazioniAule
     Top = 56
     object CercaSlotLiberi: TAction
       Caption = 'Cerca'
-      ImageIndex = 185
+      ImageIndex = 2299
       OnExecute = CercaSlotLiberiExecute
     end
     object PrenotaAula: TAction

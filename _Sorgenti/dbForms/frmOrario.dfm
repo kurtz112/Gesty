@@ -614,7 +614,7 @@ inherited FormOrario: TFormOrario
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 221
+      ImageIndex = 2184
     end
     object dxBarLargeButton6: TdxBarLargeButton
       Caption = 'Docenti'
@@ -643,19 +643,19 @@ inherited FormOrario: TFormOrario
       Caption = 'Elimina'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 43
+      ImageIndex = 2185
     end
     object dxBarButton5: TdxBarButton
       Caption = 'Copia'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 42
+      ImageIndex = 1425
     end
     object dxBarButton6: TdxBarButton
       Caption = 'Modifica'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 77
+      ImageIndex = 2187
     end
     object dxBarButton7: TdxBarButton
       Caption = 'Copia Giorno'
@@ -679,7 +679,7 @@ inherited FormOrario: TFormOrario
       Caption = 'Esporta'
       Category = 0
       Visible = ivNever
-      ImageIndex = 221
+      ImageIndex = 2184
     end
     object dxBarButton14: TdxBarButton
       Caption = 'Anteprima'
@@ -693,8 +693,8 @@ inherited FormOrario: TFormOrario
       Category = 1
       Hint = 'nuovo'
       Visible = ivAlways
-      ImageIndex = 38
-      LargeImageIndex = 38
+      ImageIndex = 1423
+      LargeImageIndex = 1423
     end
     object dxBarSubItem1: TdxBarSubItem
       Caption = 'Scala'
@@ -794,7 +794,7 @@ inherited FormOrario: TFormOrario
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 2183
       OnAccept = ImportaFileStandardAccept
     end
     object ElaboraFileUntis: TAction
@@ -825,7 +825,7 @@ inherited FormOrario: TFormOrario
     end
     object EliminaCalendario: TAction
       Caption = 'Elimina'
-      ImageIndex = 43
+      ImageIndex = 2185
       OnExecute = EliminaCalendarioExecute
     end
   end

@@ -70,7 +70,7 @@ inherited FormAllegati: TFormAllegati
     Top = 64
     object Cerca: TAction
       Caption = 'Cerca'
-      ImageIndex = 185
+      ImageIndex = 2309
       OnExecute = CercaExecute
     end
     object IndicizzaAllegatiSenzaTesto: TAction

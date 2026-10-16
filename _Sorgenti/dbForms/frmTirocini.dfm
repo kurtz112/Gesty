@@ -152,14 +152,14 @@ inherited FormTirocini: TFormTirocini
     end
     object ElaboraIndennitaMese: TAction
       Caption = 'Elabora'
-      ImageIndex = 165
+      ImageIndex = 2255
       OnExecute = ElaboraIndennitaMeseExecute
     end
     object EsportaIndennitaMese: TFileSaveAs
       Caption = 'Esporta'
       Dialog.DefaultExt = '*.xlsx'
       Dialog.Filter = 'Excel|*.xlsx|Tutti|*.*'
-      ImageIndex = 221
+      ImageIndex = 2254
       BeforeExecute = EsportaIndennitaMeseBeforeExecute
       OnAccept = EsportaIndennitaMeseAccept
     end

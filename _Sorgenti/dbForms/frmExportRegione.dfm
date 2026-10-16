@@ -134,7 +134,7 @@ inherited FormExportRegione: TFormExportRegione
     Top = 88
     object Apri: TAction
       Caption = 'Apri'
-      ImageIndex = 34
+      ImageIndex = 2246
       OnExecute = ApriExecute
     end
     object Esporta: TdxFileSaveAs

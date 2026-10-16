@@ -53,7 +53,7 @@ inherited FormRiunioni: TFormRiunioni
     end
     object Contabilizza: TAction
       Caption = 'Contabilizza'
-      ImageIndex = 1236
+      ImageIndex = 2284
       OnExecute = ContabilizzaExecute
     end
   end

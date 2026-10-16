@@ -89,7 +89,7 @@ inherited FormAgenda: TFormAgenda
       Caption = 'Esporta'
       Category = 0
       Visible = ivAlways
-      ImageIndex = 221
+      ImageIndex = 2155
     end
     object dxBarLargeButton2: TdxBarLargeButton
       Caption = 'Lavorativa'
@@ -175,56 +175,56 @@ inherited FormAgenda: TFormAgenda
     object MostraRiunioni: TAction
       AutoCheck = True
       Caption = 'MostraRiunioni'
-      ImageIndex = 457
+      ImageIndex = 2283
       OnExecute = MostraRiunioniExecute
       OnUpdate = MostraRiunioniUpdate
     end
     object MostraAgendaPersonale: TAction
       AutoCheck = True
       Caption = 'MostraAgendaPersonale'
-      ImageIndex = 457
+      ImageIndex = 2161
       OnExecute = MostraAgendaPersonaleExecute
       OnUpdate = MostraAgendaPersonaleUpdate
     end
     object MostraPrenotazioniAule: TAction
       AutoCheck = True
       Caption = 'MostraPrenotazioniAule'
-      ImageIndex = 457
+      ImageIndex = 2324
       OnExecute = MostraPrenotazioniAuleExecute
       OnUpdate = MostraPrenotazioniAuleUpdate
     end
     object MostraChiusureSedi: TAction
       AutoCheck = True
       Caption = 'MostraChiusureSedi'
-      ImageIndex = 457
+      ImageIndex = 2318
       OnExecute = MostraChiusureSediExecute
       OnUpdate = MostraChiusureSediUpdate
     end
     object MostraInagibilitaAule: TAction
       AutoCheck = True
       Caption = 'MostraInagibilitaAule'
-      ImageIndex = 457
+      ImageIndex = 2273
       OnExecute = MostraInagibilitaAuleExecute
       OnUpdate = MostraInagibilitaAuleUpdate
     end
     object MostraPresenzePersonale: TAction
       AutoCheck = True
       Caption = 'MostraPresenzePersonale'
-      ImageIndex = 457
+      ImageIndex = 2293
       OnExecute = MostraPresenzePersonaleExecute
       OnUpdate = MostraPresenzePersonaleUpdate
     end
     object MostraScadenze: TAction
       AutoCheck = True
       Caption = 'MostraScadenze'
-      ImageIndex = 457
+      ImageIndex = 2243
       OnExecute = MostraScadenzeExecute
       OnUpdate = MostraScadenzeUpdate
     end
     object MostraFuoriSede: TAction
       AutoCheck = True
       Caption = 'MostraFuoriSede'
-      ImageIndex = 457
+      ImageIndex = 2329
       OnExecute = MostraFuoriSedeExecute
       OnUpdate = MostraFuoriSedeUpdate
     end

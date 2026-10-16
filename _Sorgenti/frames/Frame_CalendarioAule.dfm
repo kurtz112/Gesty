@@ -366,7 +366,7 @@ inherited FrameCalendarioAule: TFrameCalendarioAule
       Dialog.DefaultExt = '*.xlsx'
       Dialog.Filter = 'Excel|*.xlsx|Tutti|*.*'
       Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-      ImageIndex = 221
+      ImageIndex = 2155
       OnAccept = actEsportaAccept
     end
     object Oggi: TAction

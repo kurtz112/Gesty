@@ -1596,7 +1596,7 @@
     end
     object Svuota: TAction
       Caption = 'Svuota'
-      ImageIndex = 500
+      ImageIndex = 2186
       OnExecute = SvuotaExecute
     end
   end

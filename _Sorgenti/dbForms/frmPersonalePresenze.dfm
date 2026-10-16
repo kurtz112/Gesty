@@ -17,12 +17,12 @@ inherited FormPersonalePresenze: TFormPersonalePresenze
       Caption = 'Importa'
       Dialog.DefaultExt = '*.*'
       Dialog.Filter = 'Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 2290
       OnAccept = ImportaOmniaTimeAccept
     end
     object ElaboraOmniaTime: TAction
       Caption = 'Elabora'
-      ImageIndex = 165
+      ImageIndex = 2294
       OnExecute = ElaboraOmniaTimeExecute
     end
   end

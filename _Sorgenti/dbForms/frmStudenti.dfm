@@ -34,14 +34,14 @@ inherited FormStudenti: TFormStudenti
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 2274
       OnAccept = ImportSidiAccept
     end
     object ImportSpaggiari: TdxFileOpen
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 2274
       OnAccept = ImportSpaggiariAccept
     end
     object CreaUtenteSistema: TAction
@@ -53,12 +53,12 @@ inherited FormStudenti: TFormStudenti
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'File csv|*.csv|Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 2274
       OnAccept = ImportDomandeIscrizioneAccept
     end
     object ElaboraDomandeIscrizione: TAction
       Caption = 'Elabora'
-      ImageIndex = 165
+      ImageIndex = 2275
       OnExecute = ElaboraDomandeIscrizioneExecute
     end
   end

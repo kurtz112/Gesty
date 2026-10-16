@@ -182,12 +182,12 @@ inherited FormBudget: TFormBudget
     end
     object CercaPerProgetto: TAction
       Caption = 'Cerca'
-      ImageIndex = 185
+      ImageIndex = 2323
       OnExecute = CercaPerProgettoExecute
     end
     object CercaPerEsercizio: TAction
       Caption = 'Cerca'
-      ImageIndex = 185
+      ImageIndex = 2323
       OnExecute = CercaPerEsercizioExecute
     end
   end

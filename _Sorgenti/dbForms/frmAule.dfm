@@ -16,7 +16,7 @@ inherited FormAule: TFormAule
     Top = 56
     object Autorizza: TAction
       Caption = 'Autorizza'
-      ImageIndex = 40
+      ImageIndex = 2272
       OnExecute = AutorizzaExecute
     end
   end

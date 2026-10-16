@@ -143,12 +143,12 @@ inherited FormRisorse: TFormRisorse
     Top = 152
     object InserimentoIncarico: TAction
       Caption = 'Nuovo'
-      ImageIndex = 38
+      ImageIndex = 1496
       OnExecute = InserimentoIncaricoExecute
     end
     object RettificaIncarico: TAction
       Caption = 'Rettifica'
-      ImageIndex = 77
+      ImageIndex = 2202
       OnExecute = RettificaIncaricoExecute
     end
     object GeneraCollegato: TAction
@@ -178,7 +178,7 @@ inherited FormRisorse: TFormRisorse
     end
     object DuplicaIncarico: TAction
       Caption = 'Duplica'
-      ImageIndex = 42
+      ImageIndex = 2201
       OnExecute = DuplicaIncaricoExecute
     end
     object ValidataRilevamentoOre: TAction
@@ -229,24 +229,24 @@ inherited FormRisorse: TFormRisorse
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 1346
       OnAccept = PersonaleImportAccept
     end
     object PersonaleElaboraImport: TAction
       Caption = 'Elabora'
-      ImageIndex = 165
+      ImageIndex = 2162
       OnExecute = PersonaleElaboraImportExecute
     end
     object AziendeImport: TdxFileOpen
       Caption = 'Importa'
       Dialog.DefaultExt = '*.csv'
       Dialog.Filter = 'CSV|*.csv|Tutti|*.*'
-      ImageIndex = 1242
+      ImageIndex = 2325
       OnAccept = AziendeImportAccept
     end
     object AziendeElaboraImport: TAction
       Caption = 'Elabora'
-      ImageIndex = 165
+      ImageIndex = 2326
       OnExecute = AziendeElaboraImportExecute
     end
     object SpostaAltroProgetto: TAction
