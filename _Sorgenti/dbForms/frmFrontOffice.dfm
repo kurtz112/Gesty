@@ -33,5 +33,12 @@ inherited FormFrontOffice: TFormFrontOffice
       OnExecute = RichiedeRispostaExecute
       OnUpdate = RichiedeRispostaUpdate
     end
+    object SbloccaDatiAnagrafe: TAction
+      Caption = 'Sblocca Dati Anagrafe'
+      Hint = 'Consente di modificare nominativo, telefono e mail copiati dall'#39'anagrafe'
+      ImageIndex = 1980
+      OnExecute = SbloccaDatiAnagrafeExecute
+      OnUpdate = SbloccaDatiAnagrafeUpdate
+    end
   end
 end

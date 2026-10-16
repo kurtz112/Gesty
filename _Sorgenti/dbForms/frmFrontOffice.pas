@@ -35,11 +35,14 @@ type
     AssegnaTicket: TAction;
     ModificaTicket: TAction;
     RichiedeRisposta: TAction;
+    SbloccaDatiAnagrafe: TAction;
     procedure InoltraComunicazioneExecute(Sender: TObject);
     procedure AssegnaTicketExecute(Sender: TObject);
     procedure ModificaTicketExecute(Sender: TObject);
     procedure RichiedeRispostaExecute(Sender: TObject);
     procedure RichiedeRispostaUpdate(Sender: TObject);
+    procedure SbloccaDatiAnagrafeExecute(Sender: TObject);
+    procedure SbloccaDatiAnagrafeUpdate(Sender: TObject);
   protected
     procedure CreateDataModule; override;
     procedure DestroyDataModule; override;
@@ -142,6 +145,24 @@ begin
 
   RichiedeRisposta.Checked := Checked;
   RichiedeRisposta.Visible := Visible;
+end;
+
+// Mantis #252 - 2026-10-16: sblocco dei dati copiati dall'anagrafe
+procedure TFormFrontOffice.SbloccaDatiAnagrafeExecute(Sender: TObject);
+begin
+  inherited;
+  FrontOffice.SbloccaDatiAnagrafe;
+end;
+
+procedure TFormFrontOffice.SbloccaDatiAnagrafeUpdate(Sender: TObject);
+var
+  Visible: boolean;
+begin
+  inherited;
+
+  FrontOffice.UpdateSbloccaDatiAnagrafe(Visible);
+
+  SbloccaDatiAnagrafe.Visible := Visible;
 end;
 
 end.
