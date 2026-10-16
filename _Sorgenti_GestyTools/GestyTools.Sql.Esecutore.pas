@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-15
+// Ultima modifica: 2026-10-16
 // ---------------------------------------------------------------------------
 unit GestyTools.Sql.Esecutore;
 
@@ -178,6 +178,12 @@ type
 
 // Il messaggio del server senza i prefissi "[FireDAC][Phys][FB]".
 function TestoErrore(E: Exception): string;
+
+// Legge un file di testo in qualunque codifica usata dagli script: UTF-16 con
+// BOM, UTF-8 con o senza BOM, altrimenti Windows-1252. Serve anche all'editor
+// della pagina Aggiornamento DB, che deve mostrare lo stesso testo che
+// l'esecutore leggerebbe con INPUT.
+function LeggiTestoTollerante(const NomeFile: string): string;
 
 implementation
 

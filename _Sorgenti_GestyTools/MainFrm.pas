@@ -61,8 +61,8 @@ uses
   dxSkinMoneyTwins,
   dxUIAClasses,
   FireDAC.Comp.Client,
-  SynFunc,
   GestyTools.Sql.Esecutore,
+  GestyTools.Sql.Pagina,
   Frame_Editor_SQL,
   ExplorerDrop, System.Net.URLClient, System.Net.HttpClientComponent;
 
@@ -184,21 +184,15 @@ type
     procedure VerificaUsoExeExecute(Sender: TObject);
     procedure ChiudiProcessiExeExecute(Sender: TObject);
     procedure VerificaDBExecute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
-    // esecuzione dello script di aggiornamento db, con le regole di zFbScript
+    // motore di esecuzione degli script, con le regole di zFbScript
     Esecutore: TEsecutore;
-    // file da cui e' stato caricato lo script: gli INPUT relativi partono da li'
-    FileScriptAggiornamento: string;
-    // riga dell'editor su cui si e' fermato lo script, -1 = nessuna
-    RigaErrore: Integer;
+    // interfaccia della pagina Aggiornamento DB (barra comandi, opzioni,
+    // messaggi e risultati), costruita da codice
+    PaginaSql: TPaginaSql;
     procedure CaricaScriptAggiornamento;
-    procedure CaricaFileScript(const NomeFile: string);
     function ConfermaPassaggioPagina: Boolean;
-    procedure EseguiScriptAggiornamento(Sender: TObject);
-    procedure EsecutoreMessaggio(Sender: TObject; Tipo: TTipoMessaggio; const NomeFile: string; Riga: Integer; const Testo: string);
-    procedure EsecutoreAvanzamento(Sender: TObject);
-    procedure EditorScriptCambiato(Sender: TObject);
-    procedure ColoraRigaErrore(Sender: TObject; Line: TSynNativeInt; var Special: Boolean; var FG, BG: TColor);
   public
   end;
 
@@ -251,8 +245,22 @@ begin
   ExplorerDrop.Enabled := False;
   ExplorerDrop.DestinationControl := nil;
 
-  // prima del DataModule Connection, che possiede la connessione usata
+  // la pagina prima di tutto, a controlli ancora vivi: i suoi fogli di
+  // risultati sono figli di controlli che la form sta per distruggere. Poi
+  // l'esecutore, prima del DataModule Connection che possiede la connessione
+  FreeAndNil(PaginaSql);
   FreeAndNil(Esecutore);
+end;
+
+procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  // chiudere con uno script a meta' lascerebbe una transazione aperta e
+  // distruggerebbe le griglie su cui l'esecuzione sta scrivendo
+  if Assigned(PaginaSql) and PaginaSql.InEsecuzione then
+  begin
+    ConfirmOk('Uno script e'' in esecuzione: interromperlo prima di chiudere.', mtWarning);
+    CanClose := False;
+  end;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -290,18 +298,14 @@ begin
   // la pagina Aggiornamento DB usa l'editor sql, la label segnaposto va nascosta
   cxLabel1.Visible := False;
 
-  // il bottone Esegui dell'editor diventa visibile assegnando OnExecute
-  FrameEditor_Sql.OnExecute := EseguiScriptAggiornamento;
-
-  // la riga su cui si ferma lo script si colora finche' il testo non cambia
-  RigaErrore := -1;
-  FrameEditor_Sql.OnChange := EditorScriptCambiato;
-  FrameEditor_Sql.Editor.OnSpecialLineColors := ColoraRigaErrore;
+  OnCloseQuery := FormCloseQuery;
 
   // stessa connessione del resto di GestyTools, con una transazione propria
   Esecutore := TEsecutore.Create(Connection.FDConnection);
-  Esecutore.OnMessaggio := EsecutoreMessaggio;
-  Esecutore.OnAvanzamento := EsecutoreAvanzamento;
+
+  // barra comandi, opzioni, messaggi e risultati della pagina Aggiornamento
+  // DB; l'editor e' il frame gia' presente nella pagina
+  PaginaSql := TPaginaSql.Create(Self, pageAggiornamentoDB, FrameEditor_Sql, Esecutore);
 
   ExplorerDrop.DestinationControl := FrameEditor_Sql.Editor;
   ExplorerDrop.Enabled := True;
@@ -323,6 +327,16 @@ end;
 
 procedure TMainForm.WizardButtonClick(Sender: TObject; AKind: TdxWizardControlButtonKind; var AHandled: Boolean);
 begin
+  // durante uno script l'esecuzione cede il passo alla form fra
+  // un'istruzione e l'altra: un clic su Avanti, Indietro o Annulla
+  // cambierebbe pagina o chiuderebbe la form a meta' transazione
+  if Assigned(PaginaSql) and PaginaSql.InEsecuzione then
+  begin
+    AHandled := True;
+    ConfirmOk('Uno script e'' in esecuzione: interromperlo prima di proseguire.', mtWarning);
+    Exit;
+  end;
+
   case AKind of
     // wcbkBack
     wcbkNext:
@@ -411,7 +425,14 @@ begin
 
   // all'ingresso nella pagina Aggiornamento DB carica lo script piu' recente
   if Wizard.ActivePage = pageAggiornamentoDB then
+  begin
+    PaginaSql.CartellaPredefinita := Config.FolderUpdate;
+    if Config.Server <> '' then
+      PaginaSql.Database := Config.Server + ':' + Config.DB
+    else
+      PaginaSql.Database := Config.DB;
     CaricaScriptAggiornamento;
+  end;
 end;
 
 procedure TMainForm.CaricaScriptAggiornamento;
@@ -421,7 +442,7 @@ var
   newestFileName: string;
 begin
 
-  if not FrameEditor_Sql.Empty then
+  if not PaginaSql.Vuota then
     Exit;
 
   if not TDirectory.Exists(Config.FolderUpdate) then
@@ -437,130 +458,7 @@ begin
     if TFile.GetLastWriteTime(fileName) > TFile.GetLastWriteTime(newestFileName) then
       newestFileName := fileName;
 
-  CaricaFileScript(newestFileName);
-end;
-
-procedure TMainForm.CaricaFileScript(const NomeFile: string);
-begin
-  FrameEditor_Sql.LoadFromFile(NomeFile);
-  FileScriptAggiornamento := NomeFile;
-  RigaErrore := -1;
-end;
-
-procedure TMainForm.EseguiScriptAggiornamento(Sender: TObject);
-var
-  impostazioni: TImpostazioniEsecuzione;
-  esito: TEsitoEsecuzione;
-  testoEsito: string;
-begin
-
-  if not ConfirmOkCancel('Eseguire lo script di aggiornamento sul database?') then
-    Exit;
-
-  // come zFbScript: autoddl attivo, fermo al primo errore (salvo SET BAIL
-  // OFF nello script), nessuna prova
-  impostazioni := Default (TImpostazioniEsecuzione);
-  impostazioni.AutoDdl := True;
-  impostazioni.Continua := False;
-  impostazioni.Prova := False;
-  impostazioni.RigheMassime := 100;
-
-  // un testo mai salvato risolve gli INPUT relativi dalla cartella aggiornamenti
-  Esecutore.CartellaPredefinita := Config.FolderUpdate;
-
-  RigaErrore := -1;
-  FrameEditor_Sql.Editor.Invalidate;
-
-  esito := Esecutore.EseguiTesto(FrameEditor_Sql.SQL, FileScriptAggiornamento, 1, impostazioni);
-
-  FrameEditor_Sql.Log.Lines.Add(Format('Istruzioni eseguite: %d - errori: %d (%d ms)', [esito.Eseguite, esito.Errori, esito.Millisecondi]));
-
-  // la riga si segna solo se l'errore e' nel testo dell'editor, non in un
-  // file richiamato con INPUT
-  if (esito.RigaErrore > 0) and esito.FileErrore.IsEmpty then
-  begin
-    RigaErrore := esito.RigaErrore;
-    FrameEditor_Sql.Editor.CaretX := 1;
-    FrameEditor_Sql.Editor.CaretY := RigaErrore;
-    FrameEditor_Sql.Editor.EnsureCursorPosVisible;
-    FrameEditor_Sql.Editor.Invalidate;
-  end;
-
-  if (esito.Errori = 0) and not esito.Annullata then
-    ConfirmOk('Script di aggiornamento eseguito e confermato.')
-  else
-  begin
-    if esito.Interrotta then
-      testoEsito := 'Script interrotto.'
-    else
-      if esito.Errori = 0 then
-        testoEsito := 'Script terminato da QUIT: transazione annullata.'
-      else
-        if esito.FileErrore.IsEmpty then
-          testoEsito := Format('Script fermato da un errore alla riga %d.', [esito.RigaErrore])
-        else
-          testoEsito := Format('Script fermato da un errore alla riga %d di %s.', [esito.RigaErrore, esito.FileErrore]);
-
-    // con autoddl ogni DDL riuscito e' gia' confermato: l'annullamento
-    // riguarda solo il lavoro successivo all'ultima conferma
-    if esito.Annullata then
-      testoEsito := testoEsito + sLineBreak + 'Le istruzioni dopo l''ultima conferma (COMMIT o DDL con autoddl) sono state annullate; ' +
-        'quelle confermate prima restano nel database.';
-
-    ConfirmOk(testoEsito + sLineBreak + 'Dettaglio nel registro sotto l''editor.', mtError);
-  end;
-end;
-
-procedure TMainForm.EsecutoreMessaggio(Sender: TObject; Tipo: TTipoMessaggio; const NomeFile: string; Riga: Integer; const Testo: string);
-var
-  dove: string;
-begin
-  // l'istruzione eseguita non si ripete: la riga basta a ritrovarla
-  if Tipo = tmIstruzione then
-    Exit;
-
-  if Riga <= 0 then
-    dove := ''
-  else
-    if NomeFile.IsEmpty then
-      dove := Format('Riga %d: ', [Riga])
-    else
-      dove := Format('%s, riga %d: ', [ExtractFileName(NomeFile), Riga]);
-
-  case Tipo of
-    tmAvviso:
-      FrameEditor_Sql.Log.Lines.Add(dove + 'AVVISO: ' + Testo);
-    tmErrore:
-      FrameEditor_Sql.Log.Lines.Add(dove + 'ERRORE: ' + Testo);
-  else
-    FrameEditor_Sql.Log.Lines.Add(dove + Testo);
-  end;
-end;
-
-procedure TMainForm.EsecutoreAvanzamento(Sender: TObject);
-begin
-  Application.ProcessMessages;
-end;
-
-procedure TMainForm.EditorScriptCambiato(Sender: TObject);
-begin
-
-  if RigaErrore > 0 then
-  begin
-    RigaErrore := -1;
-    FrameEditor_Sql.Editor.Invalidate;
-  end;
-end;
-
-procedure TMainForm.ColoraRigaErrore(Sender: TObject; Line: TSynNativeInt; var Special: Boolean; var FG, BG: TColor);
-begin
-
-  if Line = RigaErrore then
-  begin
-    Special := True;
-    BG := clRed;
-    FG := clWhite;
-  end;
+  PaginaSql.Carica(newestFileName, False);
 end;
 
 procedure TMainForm.VerificaDBExecute(Sender: TObject);
@@ -739,7 +637,7 @@ procedure TMainForm.ExplorerDropDropped(Sender: TObject; Files: TStrings; FileCo
 begin
 
   if Files.count > 0 then
-    CaricaFileScript(Files[0]);
+    PaginaSql.Carica(Files[0], True);
 end;
 
 procedure TMainForm.ScriptExecute(Sender: TObject);
