@@ -56,7 +56,9 @@ type
     AggiungiUtenti: TAction;
     InizializzaNotifiche: TAction;
     CreaUtenteDominio: TAction;
+    AzzeraAppAutenticazione: TAction;
     procedure AggiungiUtentiExecute(Sender: TObject);
+    procedure AzzeraAppAutenticazioneExecute(Sender: TObject);
     procedure BroadcastMessageExecute(Sender: TObject);
     procedure ClonaUtenteExecute(Sender: TObject);
     procedure CreaUtenteDominioExecute(Sender: TObject);
@@ -303,6 +305,12 @@ procedure TFormGestioneUtenti.AggiungiUtentiExecute(Sender: TObject);
 begin
   inherited;
   GestioneUtenti.AggiungiUtenti;
+end;
+
+procedure TFormGestioneUtenti.AzzeraAppAutenticazioneExecute(Sender: TObject);
+begin
+  inherited;
+  GestioneUtenti.AzzeraAppAutenticazione;
 end;
 
 procedure TFormGestioneUtenti.BroadcastMessageExecute(Sender: TObject);

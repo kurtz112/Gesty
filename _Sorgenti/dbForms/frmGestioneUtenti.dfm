@@ -58,6 +58,12 @@ inherited FormGestioneUtenti: TFormGestioneUtenti
       ImageIndex = 1827
       OnExecute = CreaUtenteDominioExecute
     end
+    object AzzeraAppAutenticazione: TAction
+      Caption = 'Azzera App di Autenticazione'
+      Hint = 'Per chi ha perso il telefono: registrera'#39' una nuova app al prossimo accesso'
+      ImageIndex = 955
+      OnExecute = AzzeraAppAutenticazioneExecute
+    end
     object InizializzaHyperLinks: TAction
       Caption = 'Inizializza HyperLinks'
       ImageIndex = 1272

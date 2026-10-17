@@ -160,10 +160,14 @@ type
     actPoliticheAccessi: TAction;
     actRicaricaPolitiche: TAction;
     actCambiaPassword: TAction;
+    actAppAutenticazione: TAction;
+    actCodiciRecupero: TAction;
     actGestioneUtenti: TAction;
     dxBarButtonGestioneUtenti: TdxBarButton;
     dxBarButtonGestionePermessi: TdxBarButton;
     dxBarButtonCambiaPassword: TdxBarButton;
+    dxBarButtonAppAutenticazione: TdxBarButton;
+    dxBarButtonCodiciRecupero: TdxBarButton;
     dxBarButtonRicaricaPolitiche: TdxBarButton;
     NuovaRichiestaAttivazione: TAction;
     InserimentoIncarico: TAction;
@@ -427,7 +431,9 @@ type
     procedure AccordoStatoRegioniExecute(Sender: TObject);
     procedure actAIExecute(Sender: TObject);
     procedure actAIUpdate(Sender: TObject);
+    procedure actAppAutenticazioneExecute(Sender: TObject);
     procedure actCambiaPasswordExecute(Sender: TObject);
+    procedure actCodiciRecuperoExecute(Sender: TObject);
     procedure actDizionariExecute(Sender: TObject);
     procedure actDownloadAggiornamentoExecute(Sender: TObject);
     procedure actGestioneUtentiExecute(Sender: TObject);
@@ -590,6 +596,7 @@ type
     procedure UpdateToolMDI;
   private
     procedure AbilitaTrascinamentoPatchLz;
+    procedure AggiornaAppAutenticazione;
   protected
     procedure CreateWnd; override;
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
@@ -738,11 +745,31 @@ type
   TdxBarControlAccess = class(TdxBarControl);
   TdxBarSubMenuControlAccess = class(TdxBarSubMenuControl);
 
+procedure TMain.actAppAutenticazioneExecute(Sender: TObject);
+begin
+  // Registrazione dell'app di autenticazione (TOTP) per l'utente collegato:
+  // QR, primo codice e codici di recupero. Se l'app e' gia' attiva TzSecurity
+  // lo dice con un messaggio: per sostituirla serve l'azzeramento
+  // dell'amministratore da Gestione utenti.
+  if Assigned(Config) then
+    if Config.zSystem.zSecurity.LoggedIn then
+      Config.zSystem.zSecurity.TotpRegistra;
+end;
+
 procedure TMain.actCambiaPasswordExecute(Sender: TObject);
 begin
   if Assigned(Config) then
     if Config.zSystem.zSecurity.LoggedIn then
       Config.CambiaPassword;
+end;
+
+procedure TMain.actCodiciRecuperoExecute(Sender: TObject);
+begin
+  // Nuovi codici di recupero dell'app di autenticazione: quelli di prima non
+  // valgono piu'. TzSecurity chiede conferma.
+  if Assigned(Config) then
+    if Config.zSystem.zSecurity.LoggedIn then
+      Config.zSystem.zSecurity.TotpRigeneraCodiciRecupero;
 end;
 
 procedure TMain.actGestioneUtentiExecute(Sender: TObject);
@@ -1073,10 +1100,25 @@ begin
   InitSkin;
   ApplyModuli;
   ApplyRestrictions;
+  AggiornaAppAutenticazione;
   AggiornaStatusBar;
   // La riconnessione rilegge i parametri di Mantis (InitMantis): la
   // disponibilita' della registrazione puo' essere cambiata.
   StatoLogCambiato(Self);
+end;
+
+procedure TMain.AggiornaAppAutenticazione;
+var
+  Disponibile: Boolean;
+begin
+  // Le voci dell'app di autenticazione compaiono solo dove il database la
+  // prevede (USR_TOTP_DISPONIBILE, cioe' chiave di cifratura impostata).
+  // Dopo ApplyRestrictions, e le due azioni non sono registrate nel
+  // RestrictionManager: la visibilita' la decide solo il database.
+  Disponibile := Assigned(Config) and Config.zSystem.zSecurity.LoggedIn and Config.zSystem.zSecurity.TotpDisponibile;
+
+  actAppAutenticazione.Visible := Disponibile;
+  actCodiciRecupero.Visible := Disponibile;
 end;
 
 procedure TMain.AgendaExecute(Sender: TObject);

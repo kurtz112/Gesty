@@ -39,6 +39,7 @@ type
   public
     procedure ClonaUtente;
     function ImpersonaUtenteSelezionato: Boolean;
+    procedure AzzeraAppAutenticazione;
     procedure RicaricaImpostazioniUtente;
   public
     procedure AggiungiUtenti;
@@ -98,6 +99,41 @@ begin
   finally
     StopWait;
   end;
+end;
+
+procedure TGestioneUtenti.AzzeraAppAutenticazione;
+var
+  DataSet: TzFbDataSet;
+  UserId: Integer;
+  UserName: string;
+begin
+  // Telefono perso e nessun codice di recupero: l'amministratore azzera l'app
+  // dell'utente, che al prossimo accesso registrera' una nuova app. Chi lo ha
+  // fatto resta nel registro USR_EVENTI_SICUREZZA (USR_TOTP_AZZERA).
+  DataSet := getDataset('Usr_Utenti');
+
+  if not Assigned(DataSet) then
+    Exit;
+
+  if DataSet.IsEmpty then
+    Exit;
+
+  if not Config.zSystem.zSecurity.TotpDisponibile then
+  begin
+    ConfirmOk('L''app di autenticazione non e'' prevista su questo database.');
+    Exit;
+  end;
+
+  UserId := DataSet.FieldByName('USER_ID').AsInteger;
+  UserName := DataSet.FieldByName('USER_NAME').AsString;
+
+  if not ConfirmYesNo('Azzerare l''app di autenticazione dell''utente ' + UserName + '?' + sLineBreak + sLineBreak +
+    'Serve quando ha perso il telefono e non ha piu'' codici di recupero: al prossimo accesso ricevera'' il codice via mail e potra'' registrare una nuova app.') then
+    Exit;
+
+  Config.zSystem.zSecurity.TotpAzzera(UserId);
+
+  ConfirmOk('App di autenticazione di ' + UserName + ' azzerata.');
 end;
 
 procedure TGestioneUtenti.InizializzaAutorizzazioni;

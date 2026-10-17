@@ -362,6 +362,20 @@ object Main: TMain
       ImageIndex = 955
       OnExecute = actCambiaPasswordExecute
     end
+    object actAppAutenticazione: TAction
+      Caption = 'App di Autenticazione'
+      Hint = 'Attiva il codice dal telefono al posto del codice via mail'
+      ImageIndex = 955
+      Visible = False
+      OnExecute = actAppAutenticazioneExecute
+    end
+    object actCodiciRecupero: TAction
+      Caption = 'Nuovi Codici di Recupero'
+      Hint = 'Genera nuovi codici di recupero per l'#39'app di autenticazione'
+      ImageIndex = 955
+      Visible = False
+      OnExecute = actCodiciRecuperoExecute
+    end
     object actGestioneUtenti: TAction
       Caption = 'Gestione Utenti'
       ImageIndex = 973
@@ -1777,6 +1791,14 @@ object Main: TMain
       Action = actCambiaPassword
       Category = 0
     end
+    object dxBarButtonAppAutenticazione: TdxBarButton
+      Action = actAppAutenticazione
+      Category = 0
+    end
+    object dxBarButtonCodiciRecupero: TdxBarButton
+      Action = actCodiciRecupero
+      Category = 0
+    end
     object dxBarButtonRicaricaPolitiche: TdxBarButton
       Action = actRicaricaPolitiche
       Category = 0
@@ -2540,6 +2562,14 @@ object Main: TMain
       item
         Visible = True
         ItemName = 'dxBarButtonCambiaPassword'
+      end
+      item
+        Visible = True
+        ItemName = 'dxBarButtonAppAutenticazione'
+      end
+      item
+        Visible = True
+        ItemName = 'dxBarButtonCodiciRecupero'
       end
       item
         Visible = True
