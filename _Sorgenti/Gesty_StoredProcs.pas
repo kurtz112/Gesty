@@ -25104,6 +25104,7 @@ TSP_siuf_Cooperazione_Applicativa_Invii_Add = class (TzStoredProc)
     fErr_Data: TNullableString;
     fRequest_File_Name: TNullableString;
     fResponse_File_Name: TNullableString;
+    fTipologie_Inviate: TNullableString;
     fId_Siuf_Cooperazione_Applicativa_Invio: TNullableInt64;
     fRequest_Full_File_Name: TNullableString;
     fResponse_Full_File_Name: TNullableString;
@@ -25171,6 +25172,9 @@ TSP_siuf_Cooperazione_Applicativa_Invii_Add = class (TzStoredProc)
     //
     [TParamAttribute('RESPONSE_FILE_NAME', ptInput, False)]
     property Response_File_Name: TNullableString read fResponse_File_Name write fResponse_File_Name;
+    //
+    [TParamAttribute('TIPOLOGIE_INVIATE', ptInput, False)]
+    property Tipologie_Inviate: TNullableString read fTipologie_Inviate write fTipologie_Inviate;
     //
     [TParamAttribute('ID_SIUF_COOPERAZIONE_APPLICATIVA_INVIO', ptOutput, False)]
     property Id_Siuf_Cooperazione_Applicativa_Invio: TNullableInt64 read fId_Siuf_Cooperazione_Applicativa_Invio;

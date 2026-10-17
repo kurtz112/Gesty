@@ -401,6 +401,7 @@ function TSIUF_CooperazioneApplicativa.RegistraInvio(APayload: TSiufPayload; con
 var
   sp: TSP_SIUF_COOPERAZIONE_APPLICATIVA_INVII_ADD;
   Det: TSiufDettaglioErrore;
+  Tipologie: string;
 begin
   Result := -1;
   ADestPayload := '';
@@ -416,6 +417,11 @@ begin
     sp.DATA_INIZIO := ParseDataHeader(APayload.DataInizio);
     sp.DATA_FINE := ParseDataHeader(APayload.DataFine);
     sp.NUMERO_STUDENTI := APayload.NumeroStudenti;
+    // Mantis #251 - 2026-10-17: tipologie contenute nell'invio, per i controlli
+    // sulle presenze gia' trasmesse. Se vuote il campo resta NULL (= tutto).
+    Tipologie := TSiufPayloadBuilder.TipologieInviate(APayload);
+    if not Tipologie.IsEmpty then
+      sp.TIPOLOGIE_INVIATE := Tipologie;
     sp.ESITO_CARICAMENTO := AEsito.EsitoCaricamento;
     sp.HTTP_STATUS := AEsito.HttpStatus;
     sp.TIPO_ERRORE := AEsito.Tipo.ToString;

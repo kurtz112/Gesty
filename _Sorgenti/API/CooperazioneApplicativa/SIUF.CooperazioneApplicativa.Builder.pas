@@ -90,11 +90,20 @@ type
     /// giustificate, perché AT SIUF ha confermato che ITS e IFTS le inviano
     /// come gli altri corsi ordinamentali. Oggi non cambia nulla nel tracciato.
     class function BuildChunks(ADataset: TDataSet; const ACodiceFiscaleUser: string; const ACanaleResolver: TSiufCanaleResolver = nil; const AItsIftsResolver: TSiufItsIftsResolver = nil): TObjectList<TSiufPayload>; static;
+
+    /// Mantis #251 - 2026-10-17: codici TIPOLOGIA_FORMAZIONE di Gesty (quelli di
+    /// TSiufPresenza.TipologiaGesty) delle presenze del payload, distinti,
+    /// ordinati e separati da virgola (per esempio '1,2'). Va nel registro
+    /// degli invii (TIPOLOGIE_INVIATE): senza, i controlli sulle presenze già
+    /// trasmesse non sanno se un invio conteneva anche lo stage. Stringa vuota
+    /// se nessuna presenza ha il codice.
+    class function TipologieInviate(APayload: TSiufPayload): string; static;
   end;
 
 implementation
 
 uses
+  System.Classes,
   System.DateUtils,
   System.Generics.Defaults;
 
@@ -779,6 +788,37 @@ begin
     end;
   finally
     Groups.Free; // KeyCmp viene rilasciato automaticamente (refcount -> 0)
+  end;
+end;
+
+// Mantis #251 - 2026-10-17 ---------------------------------------------------
+class function TSiufPayloadBuilder.TipologieInviate(APayload: TSiufPayload): string;
+var
+  Codici: TStringList;
+  Presenza: TSiufPresenza;
+  Codice: string;
+begin
+  Codici := TStringList.Create;
+  try
+    Codici.Sorted := True;
+    Codici.Duplicates := dupIgnore;
+
+    for Presenza in APayload.ListaStudenti do
+    begin
+      Codice := UpperCase(Trim(Presenza.TipologiaGesty));
+      if not Codice.IsEmpty then
+        Codici.Add(Codice);
+    end;
+
+    Result := '';
+    for Codice in Codici do
+    begin
+      if not Result.IsEmpty then
+        Result := Result + ',';
+      Result := Result + Codice;
+    end;
+  finally
+    Codici.Free;
   end;
 end;
 
