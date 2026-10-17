@@ -9,15 +9,13 @@ unit GestyTools.Sql.Icone;
 // Icone della barra comandi della pagina Aggiornamento DB: PNG 32x32 della
 // libreria di immagini DevExpress (D:\AI\SRC\_Immagini\dxImages\png), incluse
 // nel codice in Base64 e caricate all'avvio nella lista di immagini. Non sono
-// SVG come quelle di zFbScript: la barra di GestyTools usa gia' le immagini
-// PNG della libreria DevExpress, e cosi' le nuove si distinguono appena dalle
-// altre. Nel codice e non in un .res: il progetto non ha bisogno di un file
-// risorse in piu' da compilare e da ricordare.
+// SVG come quelle di zFbScript. Nel codice e non in un .res: il progetto non
+// ha bisogno di un file risorse in piu' da compilare e da ricordare.
 
 interface
 
 uses
-  cxImageList;
+  cxGraphics;
 
 type
   // Indice di ogni icona nella lista riempita da CaricaIconeSql
@@ -196,7 +194,6 @@ begin
   Lista.SourceDPI := 96;
   Lista.Width := 32;
   Lista.Height := 32;
-
   AggiungiIcona(Lista, IconaNuovo);
   AggiungiIcona(Lista, IconaApri);
   AggiungiIcona(Lista, IconaSalva);

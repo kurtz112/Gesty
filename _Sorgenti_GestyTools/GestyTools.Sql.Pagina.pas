@@ -84,6 +84,7 @@ uses
   cxBarEditItem,
   cxCheckBox,
   dxBar,
+  dxBarExtItems,
   SynFunc,
   Frame_Editor_SQL,
   zMetadata,

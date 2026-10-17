@@ -29056,6 +29056,21 @@ TSP_usr_Check_Sessione_Attiva = class (TzStoredProc)
     property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
 end;
 
+[TStoredProcedure('USR_CHIAVE_CIFRATURA_IMPOSTA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Chiave_Cifratura_Imposta = class (TzStoredProc)
+  private
+    fNome_Chiave: TNullableString;
+    fChiave_Esadecimale: TNullableString;
+  public
+    //
+    [TParamAttribute('NOME_CHIAVE', ptInput, False)]
+    property Nome_Chiave: TNullableString read fNome_Chiave write fNome_Chiave;
+    //
+    [TParamAttribute('CHIAVE_ESADECIMALE', ptInput, False)]
+    property Chiave_Esadecimale: TNullableString read fChiave_Esadecimale write fChiave_Esadecimale;
+end;
+
 [TStoredProcedure('USR_CONFERMA_REGISTRAZIONE')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Conferma_Registrazione = class (TzStoredProc)
@@ -29165,6 +29180,41 @@ TSP_usr_Crea_Password_Causale = class (TzStoredProc)
     //
     [TParamAttribute('NUOVA_PASSWORD', ptOutput, False)]
     property Nuova_Password: TNullableString read fNuova_Password;
+end;
+
+[TStoredProcedure('USR_EVENTO_SICUREZZA_ADD')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Evento_Sicurezza_Add = class (TzStoredProc)
+  private
+    fTipo: TNullableString;
+    fMotivo: TNullableString;
+    fApp: TNullableString;
+    fUser_Name: TNullableString;
+    fUser_Id: TNullableInt64;
+    fComputer_Name: TNullableString;
+    fComputer_User_Name: TNullableString;
+  public
+    //
+    [TParamAttribute('TIPO', ptInput, False)]
+    property Tipo: TNullableString read fTipo write fTipo;
+    //
+    [TParamAttribute('MOTIVO', ptInput, False)]
+    property Motivo: TNullableString read fMotivo write fMotivo;
+    //
+    [TParamAttribute('APP', ptInput, False)]
+    property App: TNullableString read fApp write fApp;
+    //
+    [TParamAttribute('USER_NAME', ptInput, False)]
+    property User_Name: TNullableString read fUser_Name write fUser_Name;
+    //
+    [TParamAttribute('USER_ID', ptInput, False)]
+    property User_Id: TNullableInt64 read fUser_Id write fUser_Id;
+    //
+    [TParamAttribute('COMPUTER_NAME', ptInput, False)]
+    property Computer_Name: TNullableString read fComputer_Name write fComputer_Name;
+    //
+    [TParamAttribute('COMPUTER_USER_NAME', ptInput, False)]
+    property Computer_User_Name: TNullableString read fComputer_User_Name write fComputer_User_Name;
 end;
 
 [TStoredProcedure('USR_FASCIA_ACCESSO_CHECK', True)]
@@ -30390,6 +30440,158 @@ TSP_usr_Tmp_Events_Get = class (TzStoredProc)
     //
     [TParamAttribute('TAG_STR', ptOutput, False)]
     property Tag_Str: TNullableString read fTag_Str;
+end;
+
+[TStoredProcedure('USR_TOTP_ATTIVA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Attiva = class (TzStoredProc)
+  private
+    fCodice: TNullableString;
+  public
+    //
+    [TParamAttribute('CODICE', ptInput, False)]
+    property Codice: TNullableString read fCodice write fCodice;
+end;
+
+[TStoredProcedure('USR_TOTP_AZZERA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Azzera = class (TzStoredProc)
+  private
+    fUser_Id: TNullableInt64;
+  public
+    //
+    [TParamAttribute('USER_ID', ptInput, False)]
+    property User_Id: TNullableInt64 read fUser_Id write fUser_Id;
+end;
+
+[TStoredProcedure('USR_TOTP_CODICI_RECUPERO_IMPOSTA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Codici_Recupero_Imposta = class (TzStoredProc)
+  private
+    fCodici: TStringList;
+    fNumero_Codici: TNullableInt64;
+  private
+    property Numero_Codici_internal: TNullableInt64 read fNumero_Codici write fNumero_Codici;
+  private
+    procedure SetCodici(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('CODICI', ptInput, True)]
+    property Codici: TStringList read fCodici write SetCodici;
+    //
+    [TParamAttribute('NUMERO_CODICI', ptOutput, False)]
+    property Numero_Codici: TNullableInt64 read fNumero_Codici;
+end;
+
+[TStoredProcedure('USR_TOTP_REGISTRA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Registra = class (TzStoredProc)
+  private
+    fSegreto_Base32: TNullableString;
+    fEmittente: TNullableString;
+    fIndirizzo_Otpauth: TNullableString;
+  private
+    property Indirizzo_Otpauth_internal: TNullableString read fIndirizzo_Otpauth write fIndirizzo_Otpauth;
+  public
+    //
+    [TParamAttribute('SEGRETO_BASE32', ptInput, False)]
+    property Segreto_Base32: TNullableString read fSegreto_Base32 write fSegreto_Base32;
+    //
+    [TParamAttribute('EMITTENTE', ptInput, False)]
+    property Emittente: TNullableString read fEmittente write fEmittente;
+    //
+    [TParamAttribute('INDIRIZZO_OTPAUTH', ptOutput, False)]
+    property Indirizzo_Otpauth: TNullableString read fIndirizzo_Otpauth;
+end;
+
+[TStoredProcedure('USR_TOTP_STATO', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Stato = class (TzStoredProc)
+  private
+    fUtente_Richiesto: TNullableInt64;
+    fUser_Id: TNullableInt64;
+    fRegistrato: TNullableBoolean;
+    fAttivo: TNullableBoolean;
+    fData_Ora_Attivazione: TNullableDateTime;
+    fData_Ora_Ultimo_Uso: TNullableDateTime;
+    fCodici_Recupero_Restanti: TNullableInt64;
+    fSecondi_Blocco: TNullableInt64;
+  private
+    property User_Id_internal: TNullableInt64 read fUser_Id write fUser_Id;
+    property Registrato_internal: TNullableBoolean read fRegistrato write fRegistrato;
+    property Attivo_internal: TNullableBoolean read fAttivo write fAttivo;
+    property Data_Ora_Attivazione_internal: TNullableDateTime read fData_Ora_Attivazione write fData_Ora_Attivazione;
+    property Data_Ora_Ultimo_Uso_internal: TNullableDateTime read fData_Ora_Ultimo_Uso write fData_Ora_Ultimo_Uso;
+    property Codici_Recupero_Restanti_internal: TNullableInt64 read fCodici_Recupero_Restanti write fCodici_Recupero_Restanti;
+    property Secondi_Blocco_internal: TNullableInt64 read fSecondi_Blocco write fSecondi_Blocco;
+  public
+    //
+    [TParamAttribute('UTENTE_RICHIESTO', ptInput, False)]
+    property Utente_Richiesto: TNullableInt64 read fUtente_Richiesto write fUtente_Richiesto;
+    //
+    [TParamAttribute('USER_ID', ptOutput, False)]
+    property User_Id: TNullableInt64 read fUser_Id;
+    //
+    [TParamAttribute('REGISTRATO', ptOutput, False)]
+    property Registrato: TNullableBoolean read fRegistrato;
+    //
+    [TParamAttribute('ATTIVO', ptOutput, False)]
+    property Attivo: TNullableBoolean read fAttivo;
+    //
+    [TParamAttribute('DATA_ORA_ATTIVAZIONE', ptOutput, False)]
+    property Data_Ora_Attivazione: TNullableDateTime read fData_Ora_Attivazione;
+    //
+    [TParamAttribute('DATA_ORA_ULTIMO_USO', ptOutput, False)]
+    property Data_Ora_Ultimo_Uso: TNullableDateTime read fData_Ora_Ultimo_Uso;
+    //
+    [TParamAttribute('CODICI_RECUPERO_RESTANTI', ptOutput, False)]
+    property Codici_Recupero_Restanti: TNullableInt64 read fCodici_Recupero_Restanti;
+    //
+    [TParamAttribute('SECONDI_BLOCCO', ptOutput, False)]
+    property Secondi_Blocco: TNullableInt64 read fSecondi_Blocco;
+end;
+
+[TStoredProcedure('USR_TOTP_VERIFICA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Verifica = class (TzStoredProc)
+  private
+    fId_Sessione: TNullableInt64;
+    fCodice: TNullableString;
+    fRaise_Error: TNullableBoolean;
+    fOk: TNullableBoolean;
+    fError_Message: TNullableString;
+    fCodice_Recupero_Usato: TNullableBoolean;
+    fCodici_Recupero_Restanti: TNullableInt64;
+  private
+    property Ok_internal: TNullableBoolean read fOk write fOk;
+    property Error_Message_internal: TNullableString read fError_Message write fError_Message;
+    property Codice_Recupero_Usato_internal: TNullableBoolean read fCodice_Recupero_Usato write fCodice_Recupero_Usato;
+    property Codici_Recupero_Restanti_internal: TNullableInt64 read fCodici_Recupero_Restanti write fCodici_Recupero_Restanti;
+  public
+    //
+    [TParamAttribute('ID_SESSIONE', ptInput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
+    //
+    [TParamAttribute('CODICE', ptInput, False)]
+    property Codice: TNullableString read fCodice write fCodice;
+    //
+    [TParamAttribute('RAISE_ERROR', ptInput, False)]
+    property Raise_Error: TNullableBoolean read fRaise_Error write fRaise_Error;
+    //
+    [TParamAttribute('OK', ptOutput, False)]
+    property Ok: TNullableBoolean read fOk;
+    //
+    [TParamAttribute('ERROR_MESSAGE', ptOutput, False)]
+    property Error_Message: TNullableString read fError_Message;
+    //
+    [TParamAttribute('CODICE_RECUPERO_USATO', ptOutput, False)]
+    property Codice_Recupero_Usato: TNullableBoolean read fCodice_Recupero_Usato;
+    //
+    [TParamAttribute('CODICI_RECUPERO_RESTANTI', ptOutput, False)]
+    property Codici_Recupero_Restanti: TNullableInt64 read fCodici_Recupero_Restanti;
 end;
 
 [TStoredProcedure('USR_UTENTI_ADD')]
@@ -45235,6 +45437,24 @@ begin
   FreeAndNil(fMail_Registrazione_Corpo);
   FreeAndNil(fMail_Registrazione_Corpo_Html);
   inherited;
+end;
+
+
+constructor TSP_usr_Totp_Codici_Recupero_Imposta.Create;
+begin
+  inherited;
+  fCodici := CreateStringList;
+end;
+
+destructor TSP_usr_Totp_Codici_Recupero_Imposta.Destroy;
+begin
+  FreeAndNil(fCodici);
+  inherited;
+end;
+
+procedure TSP_usr_Totp_Codici_Recupero_Imposta.SetCodici(const Value: TStringList);
+begin
+  FCodici.Assign(Value);
 end;
 
 
