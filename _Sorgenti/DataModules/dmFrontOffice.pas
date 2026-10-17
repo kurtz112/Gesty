@@ -15,6 +15,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.CheckLst,
+  Vcl.ComCtrls,
   Data.DB,
   Base_DataModule,
   zFbDataSet,
@@ -52,6 +53,9 @@ type
 
     procedure SbloccaDatiAnagrafe;
     procedure UpdateSbloccaDatiAnagrafe(out Visible: boolean);
+
+    procedure CercaAnagrafica;
+    procedure UpdateCercaAnagrafica(out Visible: boolean);
   end;
 
 var
@@ -60,6 +64,8 @@ var
 implementation
 
 uses
+  System.Character,
+  FireDAC.Comp.Client,
   zOffice,
   zOffice.types,
   Gesty_StoredProcs,
@@ -337,6 +343,501 @@ begin
       Destinatari.Add(FIdOperatori[Indice]);
 end;
 
+type
+  // Mantis #252 - 2026-10-17: anagrafica scelta o creata nella finestra di ricerca
+  TAnagraficaScelta = record
+    IdAnagrafica: Int64;
+    Nominativo: string;
+    Telefono: string;
+    Mail: string;
+  end;
+
+  // Mantis #252 - 2026-10-17: ricerca dell'anagrafica da collegare al contatto. Cerca per nominativo
+  // (tutte le parole, in qualunque ordine), telefono (solo le cifre), e-mail e codice fiscale, e collega
+  // per identificativo: il lookup sul nominativo sceglie sempre il primo degli omonimi. Se la persona
+  // non c'e', la crea con i dati della telefonata, cosi' chi si iscrive dopo trova gia' il collegamento.
+  // Nasce in codice come la finestra di assegnazione.
+  TFormRicercaAnagrafica = class(TForm)
+  private
+    FDataModulo: TFrontOffice;
+    FCasellaRicerca: TEdit;
+    FEsito: TLabel;
+    FRisultati: TListView;
+    FIdRisultati: TList<Int64>;
+    FCognome: TEdit;
+    FNome: TEdit;
+    FTelefono: TEdit;
+    FMail: TEdit;
+    FCodiceFiscale: TEdit;
+    FScelta: TAnagraficaScelta;
+    function CreaCasella(Contenitore: TWinControl; const Didascalia: string; Sinistra, Alto, Larghezza: Integer): TEdit;
+    function CreaPulsante(Contenitore: TWinControl; const Didascalia: string; Sinistra, Alto, Larghezza: Integer): TButton;
+    procedure Cerca(const Testi: array of string);
+    function CreaAnagrafica: Boolean;
+    procedure CercaClick(Sender: TObject);
+    procedure CollegaClick(Sender: TObject);
+    procedure CreaClick(Sender: TObject);
+  public
+    constructor CreateRicerca(DataModulo: TFrontOffice; const Nominativo, Telefono, Mail: string);
+    destructor Destroy; override;
+    property Scelta: TAnagraficaScelta read FScelta;
+  end;
+
+const
+  MASSIMO_RISULTATI = 100;
+
+// le sole cifre di un numero di telefono, senza il prefisso internazionale italiano
+function CifreTelefono(const Testo: string): string;
+var
+  Carattere: Char;
+begin
+  Result := '';
+  for Carattere in Testo do
+    if CharInSet(Carattere, ['0' .. '9']) then
+      Result := Result + Carattere;
+
+  if Result.StartsWith('0039') then
+    Result := Result.Substring(4)
+  else
+    if Result.StartsWith('39') and (Result.Length > 10) then
+      Result := Result.Substring(2);
+end;
+
+// espressione SQL che toglie da un campo telefono spazi e separatori, per confrontarne le sole cifre
+function SqlCifreTelefono(const Campo: string): string;
+begin
+  Result := 'REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(' + Campo + ', ''''), ' +
+    ''' '', ''''), ''.'', ''''), ''-'', ''''), ''/'', ''''), ''('', ''''), '')'', ''''), ''+'', '''')';
+end;
+
+// 16 caratteri fra lettere e cifre, con almeno una cifra: una parola di 16 lettere e' un cognome, non un codice
+function CodiceFiscalePlausibile(const Testo: string): Boolean;
+var
+  Carattere: Char;
+  ContieneCifre: Boolean;
+begin
+  if Testo.Length <> 16 then
+    Exit(False);
+
+  ContieneCifre := False;
+
+  for Carattere in Testo do
+    if CharInSet(Carattere, ['0' .. '9']) then
+      ContieneCifre := True
+    else
+      if not CharInSet(Carattere, ['A' .. 'Z', 'a' .. 'z']) then
+        Exit(False);
+
+  Result := ContieneCifre;
+end;
+
+function ContieneLettere(const Testo: string): Boolean;
+var
+  Carattere: Char;
+begin
+  Result := False;
+
+  for Carattere in Testo do
+    if Carattere.IsLetter then
+      Exit(True);
+end;
+
+// TFormRicercaAnagrafica
+
+constructor TFormRicercaAnagrafica.CreateRicerca(DataModulo: TFrontOffice; const Nominativo, Telefono, Mail: string);
+var
+  Etichetta: TLabel;
+  Gruppo: TGroupBox;
+  Pulsante: TButton;
+  Colonna: TListColumn;
+  NominativoPulito: string;
+  Spazio: Integer;
+begin
+  inherited CreateNew(Application);
+
+  FDataModulo := DataModulo;
+  FIdRisultati := TList<Int64>.Create;
+
+  Caption := 'Cerca anagrafica';
+  BorderStyle := bsDialog;
+  Position := poOwnerFormCenter;
+  ClientWidth := 760;
+  ClientHeight := 566;
+
+  Etichetta := TLabel.Create(Self);
+  Etichetta.Parent := Self;
+  Etichetta.SetBounds(12, 12, 500, 15);
+  Etichetta.Caption := 'Cerca per nominativo, telefono, e-mail o codice fiscale';
+
+  FCasellaRicerca := TEdit.Create(Self);
+  FCasellaRicerca.Parent := Self;
+  FCasellaRicerca.SetBounds(12, 32, 620, 23);
+
+  // Invio nella casella di ricerca avvia la ricerca
+  Pulsante := CreaPulsante(Self, 'Cerca', 640, 31, 108);
+  Pulsante.Default := True;
+  Pulsante.OnClick := CercaClick;
+
+  FRisultati := TListView.Create(Self);
+  FRisultati.Parent := Self;
+  FRisultati.SetBounds(12, 64, 736, 250);
+  FRisultati.ViewStyle := vsReport;
+  FRisultati.RowSelect := True;
+  FRisultati.ReadOnly := True;
+  FRisultati.HideSelection := False;
+  FRisultati.GridLines := True;
+  FRisultati.OnDblClick := CollegaClick;
+
+  Colonna := FRisultati.Columns.Add;
+  Colonna.Caption := 'Nominativo';
+  Colonna.Width := 200;
+  Colonna := FRisultati.Columns.Add;
+  Colonna.Caption := 'Codice fiscale';
+  Colonna.Width := 130;
+  Colonna := FRisultati.Columns.Add;
+  Colonna.Caption := 'Nato il';
+  Colonna.Width := 75;
+  Colonna := FRisultati.Columns.Add;
+  Colonna.Caption := 'Telefono';
+  Colonna.Width := 105;
+  Colonna := FRisultati.Columns.Add;
+  Colonna.Caption := 'E-mail';
+  Colonna.Width := 135;
+  Colonna := FRisultati.Columns.Add;
+  Colonna.Caption := 'Residenza';
+  Colonna.Width := 80;
+
+  FEsito := TLabel.Create(Self);
+  FEsito.Parent := Self;
+  FEsito.SetBounds(12, 322, 500, 15);
+
+  Pulsante := CreaPulsante(Self, 'Collega l''anagrafica selezionata', 528, 318, 220);
+  Pulsante.OnClick := CollegaClick;
+
+  Gruppo := TGroupBox.Create(Self);
+  Gruppo.Parent := Self;
+  Gruppo.SetBounds(12, 356, 736, 166);
+  Gruppo.Caption := ' Nuova anagrafica, se la persona non e'' nell''elenco ';
+
+  FCognome := CreaCasella(Gruppo, 'Cognome', 12, 22, 230);
+  FNome := CreaCasella(Gruppo, 'Nome', 254, 22, 230);
+  FCodiceFiscale := CreaCasella(Gruppo, 'Codice fiscale (facoltativo)', 496, 22, 228);
+  FCodiceFiscale.CharCase := ecUpperCase;
+  FCodiceFiscale.MaxLength := 16;
+  FTelefono := CreaCasella(Gruppo, 'Telefono', 12, 76, 230);
+  FMail := CreaCasella(Gruppo, 'E-mail', 254, 76, 230);
+
+  Pulsante := CreaPulsante(Gruppo, 'Crea e collega', 496, 94, 228);
+  Pulsante.OnClick := CreaClick;
+
+  Pulsante := CreaPulsante(Self, 'Annulla', 668, 532, 80);
+  Pulsante.ModalResult := mrCancel;
+  Pulsante.Cancel := True;
+
+  // i dati della telefonata propongono la nuova anagrafica: il nominativo si divide al primo spazio
+  // (cognome, poi nome), l'operatore lo corregge per i cognomi composti
+  NominativoPulito := Trim(Nominativo);
+  Spazio := Pos(' ', NominativoPulito);
+
+  if Spazio > 0 then
+  begin
+    FCognome.Text := Copy(NominativoPulito, 1, Spazio - 1);
+    FNome.Text := Trim(Copy(NominativoPulito, Spazio + 1, MaxInt));
+  end
+  else
+    FCognome.Text := NominativoPulito;
+
+  FTelefono.Text := Trim(Telefono);
+  FMail.Text := Trim(Mail);
+
+  if Trim(Telefono) <> '' then
+    FCasellaRicerca.Text := Trim(Telefono)
+  else
+    if Trim(Mail) <> '' then
+      FCasellaRicerca.Text := Trim(Mail)
+    else
+      FCasellaRicerca.Text := NominativoPulito;
+
+  Cerca([Nominativo, Telefono, Mail]);
+end;
+
+destructor TFormRicercaAnagrafica.Destroy;
+begin
+  FreeAndNil(FIdRisultati);
+  inherited;
+end;
+
+function TFormRicercaAnagrafica.CreaCasella(Contenitore: TWinControl; const Didascalia: string; Sinistra, Alto, Larghezza: Integer): TEdit;
+var
+  Etichetta: TLabel;
+begin
+  Etichetta := TLabel.Create(Self);
+  Etichetta.Parent := Contenitore;
+  Etichetta.SetBounds(Sinistra, Alto, Larghezza, 15);
+  Etichetta.Caption := Didascalia;
+
+  Result := TEdit.Create(Self);
+  Result.Parent := Contenitore;
+  Result.SetBounds(Sinistra, Alto + 18, Larghezza, 23);
+end;
+
+function TFormRicercaAnagrafica.CreaPulsante(Contenitore: TWinControl; const Didascalia: string; Sinistra, Alto, Larghezza: Integer): TButton;
+begin
+  Result := TButton.Create(Self);
+  Result.Parent := Contenitore;
+  Result.SetBounds(Sinistra, Alto, Larghezza, 26);
+  Result.Caption := Didascalia;
+end;
+
+procedure TFormRicercaAnagrafica.Cerca(const Testi: array of string);
+var
+  Valori: TList<string>;
+  Condizioni: string;
+  CondizioneNominativo: string;
+  Testo: string;
+  Parola: string;
+  Cifre: string;
+  Query: TzFbDataSet;
+  Indice: Integer;
+  Elemento: TListItem;
+  AltriRisultati: Boolean;
+
+  function Parametro(const Valore: string): string;
+  begin
+    Result := ':P' + IntToStr(Valori.Count);
+    Valori.Add(Valore);
+  end;
+
+  procedure AggiungiCondizione(const Condizione: string);
+  begin
+    if Condizioni <> '' then
+      Condizioni := Condizioni + ' OR ';
+    Condizioni := Condizioni + Condizione;
+  end;
+
+begin
+  Valori := TList<string>.Create;
+  FRisultati.Items.BeginUpdate;
+  try
+    FRisultati.Items.Clear;
+    FIdRisultati.Clear;
+    Condizioni := '';
+
+    for Indice := Low(Testi) to High(Testi) do
+    begin
+      Testo := Trim(Testi[Indice]);
+
+      if Testo = '' then
+        Continue;
+
+      if Testo.Contains('@') then
+      begin
+        AggiungiCondizione('(ANAGRAFE.E_MAIL = ' + Parametro(Testo) + ' OR ANAGRAFE.E_MAIL_ENTE = ' + Parametro(Testo) + ')');
+        Continue;
+      end;
+
+      if CodiceFiscalePlausibile(Testo) then
+      begin
+        AggiungiCondizione('(ANAGRAFE.CODICE_FISCALE = ' + Parametro(UpperCase(Testo)) + ')');
+        Continue;
+      end;
+
+      // un numero si confronta sulle sole cifre: in anagrafe i telefoni sono scritti in molti modi
+      Cifre := CifreTelefono(Testo);
+      if Cifre.Length >= 6 then
+        AggiungiCondizione('(' + SqlCifreTelefono('ANAGRAFE.TELEFONO_1') + ' CONTAINING ' + Parametro(Cifre) +
+          ' OR ' + SqlCifreTelefono('ANAGRAFE.TELEFONO_2') + ' CONTAINING ' + Parametro(Cifre) + ')');
+
+      // ogni parola deve comparire nel nominativo, in qualunque ordine ("Mario Rossi" trova "Rossi Mario")
+      if ContieneLettere(Testo) then
+      begin
+        CondizioneNominativo := '';
+
+        for Parola in Testo.Split([' '], TStringSplitOptions.ExcludeEmpty) do
+        begin
+          if CondizioneNominativo <> '' then
+            CondizioneNominativo := CondizioneNominativo + ' AND ';
+          CondizioneNominativo := CondizioneNominativo + 'ANAGRAFE.NOMINATIVO CONTAINING ' + Parametro(Parola);
+        end;
+
+        AggiungiCondizione('(' + CondizioneNominativo + ')');
+      end;
+    end;
+
+    if Condizioni = '' then
+    begin
+      FEsito.Caption := 'Scrivere un nominativo, un telefono (almeno 6 cifre), una e-mail o un codice fiscale.';
+      exit;
+    end;
+
+    Query := FDataModulo.NuovaQuery('SELECT FIRST ' + IntToStr(MASSIMO_RISULTATI + 1) + ' ' +
+      'ANAGRAFE.ID_ANAGRAFICA, ANAGRAFE.NOMINATIVO, ANAGRAFE.CODICE_FISCALE, ANAGRAFE.DATA_NASCITA, ' +
+      'COALESCE(ANAGRAFE.TELEFONO_1, ANAGRAFE.TELEFONO_2) AS TELEFONO, ' +
+      'COALESCE(ANAGRAFE.E_MAIL, ANAGRAFE.E_MAIL_ENTE) AS E_MAIL, ' +
+      'ANAGRAFE.RESIDENZA_CITTA ' +
+      'FROM ANAGRAFE ' +
+      'WHERE ' + Condizioni + ' ' +
+      'ORDER BY ANAGRAFE.COGNOME, ANAGRAFE.NOME, ANAGRAFE.DATA_NASCITA');
+    try
+      for Indice := 0 to Valori.Count - 1 do
+        Query.ParamByName('P' + IntToStr(Indice)).AsString := Valori[Indice];
+
+      Query.Open;
+
+      while (not Query.Eof) and (FIdRisultati.Count < MASSIMO_RISULTATI) do
+      begin
+        Elemento := FRisultati.Items.Add;
+        Elemento.Caption := Query.FieldByName('NOMINATIVO').AsString;
+        Elemento.SubItems.Add(Query.FieldByName('CODICE_FISCALE').AsString);
+
+        if Query.FieldByName('DATA_NASCITA').IsNull then
+          Elemento.SubItems.Add('')
+        else
+          Elemento.SubItems.Add(DateToStr(Query.FieldByName('DATA_NASCITA').AsDateTime));
+
+        Elemento.SubItems.Add(Query.FieldByName('TELEFONO').AsString);
+        Elemento.SubItems.Add(Query.FieldByName('E_MAIL').AsString);
+        Elemento.SubItems.Add(Query.FieldByName('RESIDENZA_CITTA').AsString);
+
+        FIdRisultati.Add(Query.FieldByName('ID_ANAGRAFICA').AsLargeInt);
+        Query.Next;
+      end;
+
+      AltriRisultati := not Query.Eof;
+    finally
+      FreeAndNil(Query);
+    end;
+
+    if FIdRisultati.Count = 0 then
+      FEsito.Caption := 'Nessuna anagrafica trovata.'
+    else
+      if AltriRisultati then
+        FEsito.Caption := Format('Mostrate le prime %d anagrafiche: precisare la ricerca.', [MASSIMO_RISULTATI])
+      else
+        FEsito.Caption := Format('%d anagrafiche trovate.', [FIdRisultati.Count]);
+  finally
+    FRisultati.Items.EndUpdate;
+    FreeAndNil(Valori);
+  end;
+end;
+
+procedure TFormRicercaAnagrafica.CercaClick(Sender: TObject);
+begin
+  Cerca([FCasellaRicerca.Text]);
+end;
+
+procedure TFormRicercaAnagrafica.CollegaClick(Sender: TObject);
+var
+  Elemento: TListItem;
+begin
+  Elemento := FRisultati.Selected;
+
+  if not Assigned(Elemento) then
+  begin
+    MessageDlg('Selezionare un''anagrafica dall''elenco.', mtInformation, [mbOK], 0);
+    exit;
+  end;
+
+  FScelta.IdAnagrafica := FIdRisultati[Elemento.Index];
+  FScelta.Nominativo := Elemento.Caption;
+  FScelta.Telefono := Elemento.SubItems[2];
+  FScelta.Mail := Elemento.SubItems[3];
+
+  ModalResult := mrOk;
+end;
+
+procedure TFormRicercaAnagrafica.CreaClick(Sender: TObject);
+var
+  CodiceFiscale: string;
+begin
+  if (Trim(FCognome.Text) = '') or (Trim(FNome.Text) = '') then
+  begin
+    MessageDlg('Cognome e nome sono obbligatori per creare l''anagrafica.', mtWarning, [mbOK], 0);
+    exit;
+  end;
+
+  CodiceFiscale := UpperCase(Trim(FCodiceFiscale.Text));
+
+  if (CodiceFiscale <> '') and not CodiceFiscalePlausibile(CodiceFiscale) then
+  begin
+    MessageDlg('Il codice fiscale deve avere 16 caratteri fra lettere e cifre. Se non lo si conosce, lasciarlo vuoto.', mtWarning, [mbOK], 0);
+    exit;
+  end;
+
+  // prima di creare si mostrano le anagrafiche che somigliano: un doppione in anagrafe e' peggio
+  // di un contatto non collegato, perche' l'iscrizione successiva potrebbe agganciare l'altra
+  Cerca([Trim(FCognome.Text) + ' ' + Trim(FNome.Text), FTelefono.Text, FMail.Text, CodiceFiscale]);
+
+  if FIdRisultati.Count > 0 then
+    if MessageDlg(Format('Ci sono %d anagrafiche simili, elencate sopra. Se la persona e'' fra queste, ' +
+      'selezionarla e premere "Collega l''anagrafica selezionata".' + sLineBreak + sLineBreak +
+      'Creare comunque una nuova anagrafica?', [FIdRisultati.Count]), mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+      exit;
+
+  if CreaAnagrafica then
+    ModalResult := mrOk;
+end;
+
+function TFormRicercaAnagrafica.CreaAnagrafica: Boolean;
+var
+  Transazione: TFDTransaction;
+  Query: TFDQuery;
+
+  procedure ImpostaTesto(const NomeParametro, Valore: string);
+  begin
+    Query.ParamByName(NomeParametro).DataType := ftString;
+
+    if Trim(Valore) = '' then
+      Query.ParamByName(NomeParametro).Clear
+    else
+      Query.ParamByName(NomeParametro).AsString := Trim(Valore);
+  end;
+
+begin
+  Result := False;
+
+  // transazione propria: il Commit del modulo dati salverebbe anche il contatto ancora in modifica
+  Transazione := TFDTransaction.Create(nil);
+  Query := TFDQuery.Create(nil);
+  try
+    Transazione.Connection := Config.Database;
+    Query.Connection := Config.Database;
+    Query.Transaction := Transazione;
+
+    // con RETURNING FireDAC apre l'istruzione come un cursore di una riga
+    Query.SQL.Text := 'INSERT INTO ANAGRAFE (COGNOME, NOME, TELEFONO_1, E_MAIL, CODICE_FISCALE) ' +
+      'VALUES (:COGNOME, :NOME, :TELEFONO_1, :E_MAIL, :CODICE_FISCALE) ' +
+      'RETURNING ID_ANAGRAFICA, NOMINATIVO';
+
+    ImpostaTesto('COGNOME', FCognome.Text);
+    ImpostaTesto('NOME', FNome.Text);
+    ImpostaTesto('TELEFONO_1', FTelefono.Text);
+    ImpostaTesto('E_MAIL', FMail.Text);
+    ImpostaTesto('CODICE_FISCALE', UpperCase(FCodiceFiscale.Text));
+
+    Transazione.StartTransaction;
+    try
+      Query.Open;
+      FScelta.IdAnagrafica := Query.FieldByName('ID_ANAGRAFICA').AsLargeInt;
+      FScelta.Nominativo := Query.FieldByName('NOMINATIVO').AsString;
+      Query.Close;
+
+      Transazione.Commit;
+    except
+      if Transazione.Active then
+        Transazione.Rollback;
+      raise;
+    end;
+
+    FScelta.Telefono := Trim(FTelefono.Text);
+    FScelta.Mail := Trim(FMail.Text);
+    Result := True;
+  finally
+    FreeAndNil(Query);
+    FreeAndNil(Transazione);
+  end;
+end;
+
 { TFrontOffice }
 
 function TFrontOffice.NuovaQuery(const Sql: string): TzFbDataSet;
@@ -439,6 +940,87 @@ begin
 
   Visible := Assigned(DataSet) and (not DataSet.IsEmpty) and (DataSet.State <> dsInsert) and
     (not DataSet.FieldByName('ID_ANAGRAFICA_CONTATTO').IsNull) and (not FDatiAnagrafeSbloccati);
+end;
+
+// Mantis #252 - 2026-10-17: collegamento del contatto all'anagrafica, scelta per identificativo o creata
+procedure TFrontOffice.CercaAnagrafica;
+var
+  DataSet: TzFbDataSet;
+  Finestra: TFormRicercaAnagrafica;
+  Confermato: Boolean;
+  Scelta: TAnagraficaScelta;
+  TelefonoContatto: string;
+  MailContatto: string;
+  NomeCampo: string;
+  Campo: TField;
+  CampoId: TField;
+  IdEraInSolaLettura: Boolean;
+begin
+  DataSet := GetDataSet('Front_Office_Contatti');
+
+  if not Assigned(DataSet) or (DataSet.IsEmpty and (DataSet.State <> dsInsert)) then
+    exit;
+
+  // il telefono e la mail della telefonata valgono piu' di quelli dell'anagrafe: si conservano
+  TelefonoContatto := Trim(DataSet.FieldByName('TELEFONO').AsString);
+  MailContatto := Trim(DataSet.FieldByName('E_MAIL').AsString);
+
+  Finestra := TFormRicercaAnagrafica.CreateRicerca(Self, DataSet.FieldByName('NOMINATIVO_CONTATTO').AsString,
+    TelefonoContatto, MailContatto);
+  try
+    Confermato := Finestra.ShowModal = mrOk;
+
+    if Confermato then
+      Scelta := Finestra.Scelta;
+  finally
+    FreeAndNil(Finestra);
+  end;
+
+  if not Confermato then
+    exit;
+
+  if DataSet.State = dsBrowse then
+    DataSet.Edit;
+
+  // i campi copiati dall'anagrafe sono in sola lettura se il contatto era gia' collegato:
+  // si scrivono qui e AggiornaBloccoCampi li riblocca
+  for NomeCampo in CAMPI_COPIATI_DA_ANAGRAFE do
+  begin
+    Campo := DataSet.FindField(NomeCampo);
+    if Assigned(Campo) then
+      Campo.ReadOnly := False;
+  end;
+
+  CampoId := DataSet.FieldByName('ID_ANAGRAFICA_CONTATTO');
+  IdEraInSolaLettura := CampoId.ReadOnly;
+  CampoId.ReadOnly := False;
+  try
+    // prima il nominativo: il dizionario, quando cambia, svuota collegamento, telefono e mail
+    DataSet.FieldByName('NOMINATIVO_CONTATTO').AsString := Scelta.Nominativo;
+    CampoId.AsLargeInt := Scelta.IdAnagrafica;
+
+    if TelefonoContatto <> '' then
+      DataSet.FieldByName('TELEFONO').AsString := TelefonoContatto
+    else
+      DataSet.FieldByName('TELEFONO').AsString := Scelta.Telefono;
+
+    if MailContatto <> '' then
+      DataSet.FieldByName('E_MAIL').AsString := MailContatto
+    else
+      DataSet.FieldByName('E_MAIL').AsString := Scelta.Mail;
+  finally
+    CampoId.ReadOnly := IdEraInSolaLettura;
+    AggiornaBloccoCampi(DataSet);
+  end;
+end;
+
+procedure TFrontOffice.UpdateCercaAnagrafica(out Visible: boolean);
+var
+  DataSet: TzFbDataSet;
+begin
+  DataSet := GetDataSet('Front_Office_Contatti');
+
+  Visible := Assigned(DataSet) and ((not DataSet.IsEmpty) or (DataSet.State = dsInsert));
 end;
 
 procedure TFrontOffice.Front_Office_Ambiti_Int_RisorseAfterPost(DataSet: TDataSet);

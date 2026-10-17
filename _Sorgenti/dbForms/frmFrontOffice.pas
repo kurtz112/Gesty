@@ -36,6 +36,7 @@ type
     ModificaTicket: TAction;
     RichiedeRisposta: TAction;
     SbloccaDatiAnagrafe: TAction;
+    CercaAnagrafica: TAction;
     procedure InoltraComunicazioneExecute(Sender: TObject);
     procedure AssegnaTicketExecute(Sender: TObject);
     procedure ModificaTicketExecute(Sender: TObject);
@@ -43,6 +44,8 @@ type
     procedure RichiedeRispostaUpdate(Sender: TObject);
     procedure SbloccaDatiAnagrafeExecute(Sender: TObject);
     procedure SbloccaDatiAnagrafeUpdate(Sender: TObject);
+    procedure CercaAnagraficaExecute(Sender: TObject);
+    procedure CercaAnagraficaUpdate(Sender: TObject);
   protected
     procedure CreateDataModule; override;
     procedure DestroyDataModule; override;
@@ -163,6 +166,24 @@ begin
   FrontOffice.UpdateSbloccaDatiAnagrafe(Visible);
 
   SbloccaDatiAnagrafe.Visible := Visible;
+end;
+
+// Mantis #252 - 2026-10-17: collegamento del contatto all'anagrafica, con creazione se manca
+procedure TFormFrontOffice.CercaAnagraficaExecute(Sender: TObject);
+begin
+  inherited;
+  FrontOffice.CercaAnagrafica;
+end;
+
+procedure TFormFrontOffice.CercaAnagraficaUpdate(Sender: TObject);
+var
+  Visible: boolean;
+begin
+  inherited;
+
+  FrontOffice.UpdateCercaAnagrafica(Visible);
+
+  CercaAnagrafica.Visible := Visible;
 end;
 
 end.

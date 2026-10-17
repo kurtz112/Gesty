@@ -40,5 +40,12 @@ inherited FormFrontOffice: TFormFrontOffice
       OnExecute = SbloccaDatiAnagrafeExecute
       OnUpdate = SbloccaDatiAnagrafeUpdate
     end
+    object CercaAnagrafica: TAction
+      Caption = 'Cerca Anagrafica'
+      Hint = 'Collega il contatto a un'#39'anagrafica cercata per nome, telefono, e-mail o codice fiscale, o la crea se manca'
+      ImageIndex = 2323
+      OnExecute = CercaAnagraficaExecute
+      OnUpdate = CercaAnagraficaUpdate
+    end
   end
 end
