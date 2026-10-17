@@ -322,6 +322,7 @@ uses
   SmartInspect.Vcl,
   SmartInspect.Vcl.SiAuto,
   Gesty.dxSettings in 'Gesty.dxSettings.pas',
+  Gesty.Sonda in 'Varie\Gesty.Sonda.pas',
   CalcoloPeriodi.Verifiche in 'Varie\CalcoloPeriodi.Verifiche.pas',
   CalcoloAbitare.Lib in 'Varie\CalcoloAbitare.Lib.pas',
   CalcoloAbitare.Verifiche in 'Varie\CalcoloAbitare.Verifiche.pas',
@@ -370,6 +371,12 @@ begin
     Application.Initialize;
     Application.Title := 'Gesty';
     Application.HelpFile := ChangeFileExt(Application.ExeName, '.chm');
+
+    // Sonda di collaudo: attiva solo nelle versioni compilate con la direttiva
+    // SONDA e avviate con --sonda <pipe> da zMCP_App; altrimenti non fa niente.
+    // Qui, prima del login, perche' il collaudo deve vedere anche la finestra
+    // di accesso e i dialoghi dell'avvio.
+    AvviaSondaGesty;
 
     // Schermata di avvio di DevExpress. Va mostrata qui e non dall'InitProc di
     // Gesty.dxSettings.pas: quella procedura chiama LoadAppearance, che azzera
