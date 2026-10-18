@@ -1,14 +1,13 @@
 object Mail: TMail
-  Height = 219
-  Width = 130
+  Height = 438
+  Width = 260
+  PixelsPerInch = 192
   object IdSMTP: TIdSMTP
     AuthType = satSASL
     Host = 'mail.tophost.it'
-    Port = 587
     SASLMechanisms = <>
-    UseTLS = utUseExplicitTLS
-    Left = 48
-    Top = 24
+    Left = 96
+    Top = 48
   end
   object IdMessage: TIdMessage
     AttachmentEncoding = 'UUE'
@@ -21,7 +20,7 @@ object Mail: TMail
     Recipients = <>
     ReplyTo = <>
     ConvertPreamble = True
-    Left = 48
-    Top = 144
+    Left = 96
+    Top = 288
   end
 end

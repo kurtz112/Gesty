@@ -13,7 +13,11 @@ uses
   IdSMTP,
   IdMessage,
   IdSASL,
-  IdUserPassProvider;
+  IdUserPassProvider,
+  IdBaseComponent,
+  IdComponent,
+  IdTCPConnection,
+  IdTCPClient;
 
 type
   TMail = class(TDataModule)
@@ -99,7 +103,7 @@ begin
   Password := Config.SmtpPassword;
 
   if UserName.IsEmpty or Password.IsEmpty then
-    raise Exception.Create('Mail non inviata: SmtpUtente o SmtpPassword non valorizzati nella configurazione.');
+    raise exception.Create('Mail non inviata: SmtpUtente o SmtpPassword non valorizzati nella configurazione.');
 
   // handler creato dalla fabbrica registrata in zNet.Tls: oggi OpenSSL,
   // domani SChannel, senza toccare questa unit. Stessa versione fissa

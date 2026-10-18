@@ -30338,6 +30338,17 @@ TSP_usr_Richiesta_Registrazione = class (TzStoredProc)
     property Mail_Registrazione_Corpo_Html: TStringList read fMail_Registrazione_Corpo_Html;
 end;
 
+[TStoredProcedure('USR_SESSIONE_COMPLETA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Sessione_Completa = class (TzStoredProc)
+  private
+    fId_Sessione: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_SESSIONE', ptInput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
+end;
+
 [TStoredProcedure('USR_SESSIONI_ADD')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Sessioni_Add = class (TzStoredProc)
