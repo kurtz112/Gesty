@@ -26,6 +26,9 @@ type
     // da chiamare con GestyTools scollegato: True se il file del database si
     // apre in esclusiva, cioe' si puo' copiare e rinominare
     function FileDatabaseLibero(out Utilizzatori: string): boolean;
+    // una riga per utente di Gesty collegato (nominativo e computer), dal
+    // dataset gia' riletto da EsistonoUtentiCollegati
+    function DescriviUtentiCollegati: string;
   public
     procedure Connect;
     procedure Disconnect;
@@ -179,6 +182,53 @@ begin
   result := false;
 end;
 
+function TUpdateEngine.DescriviUtentiCollegati: string;
+var
+  elenco: TStringList;
+  nominativo: string;
+  computer: string;
+  segnalibro: TBookmark;
+begin
+  elenco := TStringList.Create;
+  try
+    // il dataset e' quello della griglia della pagina Utenti: si lascia dove
+    // era, e senza aggiornare la griglia a ogni riga
+    Connection.UtentiAttivi.DisableControls;
+    segnalibro := Connection.UtentiAttivi.GetBookmark;
+    try
+      Connection.UtentiAttivi.First;
+
+      while not Connection.UtentiAttivi.Eof do
+      begin
+        nominativo := '';
+        computer := '';
+
+        if Connection.UtentiAttivi.FindField('NOMINATIVO') <> nil then
+          nominativo := Connection.UtentiAttivi.FieldByName('NOMINATIVO').AsString;
+
+        if nominativo.IsEmpty and (Connection.UtentiAttivi.FindField('USER_NAME') <> nil) then
+          nominativo := Connection.UtentiAttivi.FieldByName('USER_NAME').AsString;
+
+        if Connection.UtentiAttivi.FindField('COMPUTER_NAME') <> nil then
+          computer := Connection.UtentiAttivi.FieldByName('COMPUTER_NAME').AsString;
+
+        elenco.Add(Trim('- ' + nominativo + ' (' + computer + ')'));
+        Connection.UtentiAttivi.Next;
+      end;
+
+      if Connection.UtentiAttivi.BookmarkValid(segnalibro) then
+        Connection.UtentiAttivi.GotoBookmark(segnalibro);
+    finally
+      Connection.UtentiAttivi.FreeBookmark(segnalibro);
+      Connection.UtentiAttivi.EnableControls;
+    end;
+
+    result := elenco.Text.TrimRight;
+  finally
+    FreeAndNil(elenco);
+  end;
+end;
+
 function TUpdateEngine.VerificaDatabase(out Rapporto: string): boolean;
 var
   collegamenti: TStringList;
@@ -244,6 +294,7 @@ function TUpdateEngine.CopiaFisicaDB: boolean;
 var
   collegamenti: TStringList;
   utilizzatori: string;
+  utentiCollegati: string;
   libero: boolean;
   dateStr: string;
   SrcFileName: string;
@@ -251,6 +302,7 @@ var
 begin
   result := false;
   libero := false;
+  utentiCollegati := '';
 
   if TFile.Exists(ExeFileName) then
     if not ConfirmOkCancel('Gesty.exe non risulta disabilitato: gli utenti possono ancora avviarlo.' + sLineBreak + 'Continuare comunque?', mtWarning) then
@@ -269,20 +321,35 @@ begin
       // letti prima di scollegarsi: servono a spiegare un file ancora aperto
       Connection.AltriCollegamenti(collegamenti);
 
-      Disconnect;
-      try
-        // la copia di un database aperto dal server puo' risultare
-        // danneggiata senza che niente lo segnali: si copia solo un file
-        // che si apre in esclusiva
-        libero := FileDatabaseLibero(utilizzatori);
+      // Subito prima della copia l'elenco degli utenti si rilegge dal
+      // database: chi si e' collegato dopo l'ultima verifica (pagina Utenti,
+      // Verifica DB) non risulterebbe, e la copia partirebbe con Gesty in uso
+      if Connection.EsistonoUtentiCollegati then
+        utentiCollegati := DescriviUtentiCollegati
+      else
+      begin
+        Disconnect;
+        try
+          // la copia di un database aperto dal server puo' risultare
+          // danneggiata senza che niente lo segnali: si copia solo un file
+          // che si apre in esclusiva
+          libero := FileDatabaseLibero(utilizzatori);
 
-        if libero then
-          TFile.Copy(SrcFileName, DstFileName);
-      finally
-        Connect;
+          if libero then
+            TFile.Copy(SrcFileName, DstFileName);
+        finally
+          Connect;
+        end;
       end;
     finally
       StopWait;
+    end;
+
+    if utentiCollegati <> '' then
+    begin
+      ConfirmOk('Copia non eseguita: risultano utenti di Gesty collegati al database.' + sLineBreak + utentiCollegati + sLineBreak +
+          'Scollegarli (pagina Utenti, Shutdown) e ripetere la copia.', mtWarning);
+      Exit;
     end;
 
     if not libero then
