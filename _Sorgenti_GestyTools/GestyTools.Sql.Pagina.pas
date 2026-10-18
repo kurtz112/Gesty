@@ -409,10 +409,13 @@ begin
   actCopiaErrori := NuovaAzione('Copia errori', 'Copia negli appunti gli errori dell''ultima esecuzione, o tutti i messaggi se non ce ne sono', isCopia,
     AzioneCopiaErrori);
 
-  // TdxBarManager vuole come proprietario un TWinControl: la pagina e' un
-  // TComponent, quindi si usa il suo proprietario (la form principale), che
-  // ha la stessa durata
-  FManager := TdxBarManager.Create(Owner);
+  // TdxBarManager vuole come proprietario un TWinControl (la pagina e' un
+  // TComponent) e ne ammette UNO SOLO per proprietario: la form principale ha
+  // gia' il suo dxBarManager, quindi con Owner solleva "piu' di un gestore di
+  // barre" gia' in FormCreate. PaginaSql restava nullo e l'ingresso nella
+  // pagina andava in access violation. La pagina del wizard non ne ha
+  // nessuno, e il gestore viene liberato con lei.
+  FManager := TdxBarManager.Create(FContenitore);
   FManager.Categories.Add('Sql');
   FManager.ImageOptions.LargeImages := FIcone;
   FManager.ImageOptions.LargeIcons := True;
