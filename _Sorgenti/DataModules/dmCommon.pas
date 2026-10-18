@@ -64,6 +64,8 @@ type
     // memoria del vincolo di firma: Stato() passa di qui a ogni idle della
     // form, il database si interroga solo quando cambia la pratica
     FOidFirmaVerificato: Int64;
+    FTipoDocumentoFirmaVerificato: string;
+    FScadenzaFirmaVerificata: UInt64;
     FFirmaElettronicaAmmessa: Boolean;
   private
     FFirmaElettronicaController: TDocumentazioneReportActionsController;
@@ -74,7 +76,8 @@ type
     function FirmaElettronicaController: TDocumentazioneReportActionsController;
 
     // la risorsa della pratica accetta il contratto in forma elettronica?
-    // Il valore letto resta in memoria finche' non cambia la pratica.
+    // Il valore letto resta in memoria per pochi secondi, per pratica e tipo
+    // documento, poi viene riletto dal database.
     function FirmaElettronicaAmmessa(Oid: Int64; const TipoDocumento: string): Boolean;
   public
     function DocumentAzioniController: TDocumentazioneReportActionsController;
@@ -127,6 +130,7 @@ var
 implementation
 
 uses
+  Winapi.Windows,
   System.DateUtils,
   System.Variants,
   System.IOUtils,
@@ -154,10 +158,16 @@ uses
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
 
+const
+  // durata della memoria dell'esito di FirmaElettronicaAmmessa
+  DurataMemoriaFirmaMillisecondi = 5000;
+
 procedure TCommon.DataModuleCreate(Sender: TObject);
 begin
   inherited;
   FOidFirmaVerificato := -1;
+  FTipoDocumentoFirmaVerificato := '';
+  FScadenzaFirmaVerificata := 0;
   FFirmaElettronicaAmmessa := false;
 end;
 
@@ -563,7 +573,9 @@ begin
   // il controller interroga questo metodo a ogni aggiornamento delle azioni
   // della barra, cioe' molte volte al secondo: senza memoria del valore
   // sarebbe una lettura sul database a ogni giro
-  if Oid = FOidFirmaVerificato then
+  // Mantis #254 - 2026-10-18: la memoria dell'esito scade e distingue il tipo documento, il flag Firma elettronica della risorsa si recepisce senza riavviare
+  if (Oid = FOidFirmaVerificato) and (TipoDocumento = FTipoDocumentoFirmaVerificato) and
+     (Winapi.Windows.GetTickCount64 < FScadenzaFirmaVerificata) then
     exit(FFirmaElettronicaAmmessa);
 
   sp := GetSP<TSP_OBJ_FILES_FIRMA_CONTRATTI_AMMESSA>();
@@ -577,6 +589,8 @@ begin
   end;
 
   FOidFirmaVerificato := Oid;
+  FTipoDocumentoFirmaVerificato := TipoDocumento;
+  FScadenzaFirmaVerificata := Winapi.Windows.GetTickCount64 + DurataMemoriaFirmaMillisecondi;
   result := FFirmaElettronicaAmmessa;
 end;
 
