@@ -409,7 +409,10 @@ begin
   actCopiaErrori := NuovaAzione('Copia errori', 'Copia negli appunti gli errori dell''ultima esecuzione, o tutti i messaggi se non ce ne sono', isCopia,
     AzioneCopiaErrori);
 
-  FManager := TdxBarManager.Create(Self);
+  // TdxBarManager vuole come proprietario un TWinControl: la pagina e' un
+  // TComponent, quindi si usa il suo proprietario (la form principale), che
+  // ha la stessa durata
+  FManager := TdxBarManager.Create(Owner);
   FManager.Categories.Add('Sql');
   FManager.ImageOptions.LargeImages := FIcone;
   FManager.ImageOptions.LargeIcons := True;
