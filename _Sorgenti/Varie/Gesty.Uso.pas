@@ -13,7 +13,12 @@
 // e Gesty: dice come descrivere un'azione e dove scrivere i conteggi.
 //
 //   - Modulo: la voce del menu dei moduli (lista ModuliActions della finestra
-//     principale), solo per l'azione che apre il modulo.
+//     principale) che ha aperto la form. L'azione che apre il modulo porta il
+//     proprio nome; la form appena aperta viene collegata al modulo alla sua
+//     prima azione (la prima form comparsa dopo il clic sulla voce di menu) e
+//     da allora tutte le sue azioni, e quelle dei suoi frame e delle sue viste,
+//     portano lo stesso modulo. Le azioni della finestra principale e quelle di
+//     una form di cui non si conosce il modulo restano senza.
 //   - Funzione: la classe della form o del frame che possiede la lista di
 //     azioni; per le viste e le schede generate dal dizionario LZ, il ruolo
 //     con il nome LZ del dataset ("vista:<Modulo>.<Dataset>"), perche' la
@@ -50,7 +55,9 @@ uses
   System.SysUtils,
   System.Classes,
   System.Actions,
+  System.Generics.Collections,
   Vcl.ActnList,
+  Vcl.Forms,
   Data.DB,
   FireDAC.Stan.Option,
   SmartInspect.Vcl.SiAuto,
@@ -76,6 +83,60 @@ var
   Registro: TRegistroUtilizzi = nil;
   Transazione: TzFbTransaction = nil;
   ErroreSegnalato: Boolean = False;
+  // Modulo di ogni classe di form, imparato alla prima azione della form.
+  ModuliDelleForm: TDictionary<string, string> = nil;
+  // Ultima voce del menu dei moduli eseguita e form che esistevano in quel
+  // momento: la form comparsa dopo il clic e' quella aperta dalla voce.
+  ModuloPendente: string = '';
+  FormEsistentiAlClic: TArray<TCustomForm> = nil;
+
+function FormEsistente(Form: TCustomForm): Boolean;
+var
+  Indice: Integer;
+begin
+  Result := False;
+  for Indice := 0 to High(FormEsistentiAlClic) do
+    if FormEsistentiAlClic[Indice] = Form then
+      Exit(True);
+end;
+
+procedure RicordaModuloAperto(const Modulo: string);
+var
+  Indice: Integer;
+begin
+  ModuloPendente := Modulo;
+  SetLength(FormEsistentiAlClic, Screen.CustomFormCount);
+  for Indice := 0 to Screen.CustomFormCount - 1 do
+    FormEsistentiAlClic[Indice] := Screen.CustomForms[Indice];
+end;
+
+// Modulo a cui appartiene la form che possiede la lista di azioni.
+function ModuloDellaForm(Proprietario: TComponent): string;
+var
+  Form: TComponent;
+begin
+  Result := '';
+  if ModuliDelleForm = nil then
+    Exit;
+
+  Form := Proprietario;
+  while (Form <> nil) and not(Form is TCustomForm) do
+    Form := Form.Owner;
+  if (Form = nil) or (Form = Application.MainForm) then
+    Exit;
+
+  if ModuliDelleForm.TryGetValue(Form.ClassName, Result) then
+    Exit;
+
+  // Prima azione di una form nuova: se e' comparsa dopo il clic sulla voce del
+  // menu, e' la form di quel modulo.
+  if (ModuloPendente <> '') and not FormEsistente(TCustomForm(Form)) then
+  begin
+    Result := ModuloPendente;
+    ModuliDelleForm.AddOrSetValue(Form.ClassName, Result);
+    ModuloPendente := '';
+  end;
+end;
 
 // Nome LZ del dataset, come TzSystem.Get_IdDataSet: IdDataSet se il dataset lo
 // ha gia' caricato dal dizionario, altrimenti Owner.Name + '.' + Name.
@@ -114,7 +175,12 @@ begin
 
   Funzione := Copy(NomeFunzione(Contenuta.ActionList.Owner), 1, LunghezzaFunzione);
   if SameText(Contenuta.ActionList.Name, NomeListaModuli) then
+  begin
     Modulo := Copy(Contenuta.Name, 1, LunghezzaModulo);
+    RicordaModuloAperto(Modulo);
+  end
+  else
+    Modulo := Copy(ModuloDellaForm(Contenuta.ActionList.Owner), 1, LunghezzaModulo);
   Registrare := True;
 end;
 
@@ -162,6 +228,10 @@ begin
   if Registro <> nil then
     Exit;
 
+  ModuliDelleForm := TDictionary<string, string>.Create;
+  ModuloPendente := '';
+  FormEsistentiAlClic := nil;
+
   Transazione := TzFbTransaction.Create(nil);
   Transazione.Options.Isolation := xiReadCommitted;
   Transazione.Connection := Config.Database;
@@ -183,6 +253,8 @@ begin
   Registro.Scrivi;
   FreeAndNil(Registro);
   FreeAndNil(Transazione);
+  FreeAndNil(ModuliDelleForm);
+  FormEsistentiAlClic := nil;
 end;
 
 end.
