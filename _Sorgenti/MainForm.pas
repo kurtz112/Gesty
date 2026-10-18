@@ -89,6 +89,7 @@ uses
   zWaitFrm,
   zCollection,
   ActionListController,
+  Gesty.Uso,
   frmAgenda,
   zRestrictions,
   frmOrario,
@@ -804,6 +805,7 @@ procedure TMain.FormDestroy(Sender: TObject);
 begin
   TaskbarManager.Reset;
   FreeAndNil(ToolButtons);
+  FermaUsoGesty;
   FreeAndNil(ActionListController);
   FreeAndNil(RestrictionManager);
 end;
@@ -889,6 +891,10 @@ begin
 
   ActionListController := TActionListController.Create;
   ActionListController.register(ActionList);
+
+  // Registro delle funzioni usate: si accende qui, a login avvenuto, cosi' ogni
+  // azione appartiene a un utente. Analisi: OUT\20261018-funzionalita-piu-usate-e-collaudo.
+  AvviaUsoGesty;
 
   // La schermata di avvio non si chiude piu' qui: resta a video per tutta la
   // creazione della finestra principale e la chiude il .dpr subito dopo
@@ -995,6 +1001,9 @@ begin
   // ancora nessuna finestra e il puntatore del mouse dice dove si e' fatto
   // doppio clic, non dove si lavora.
   TWorkingMonitor.Remember(Self);
+
+  // Con la connessione ancora aperta: poi non si potrebbe piu' scrivere.
+  ScriviUsoGesty;
 
   for i := FormCollection.Count - 1 downto 0 do
     FormCollection[i].Form.Close;

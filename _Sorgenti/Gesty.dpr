@@ -323,6 +323,7 @@ uses
   SmartInspect.Vcl.SiAuto,
   Gesty.dxSettings in 'Gesty.dxSettings.pas',
   Gesty.Sonda in 'Varie\Gesty.Sonda.pas',
+  Gesty.Uso in 'Varie\Gesty.Uso.pas',
   CalcoloPeriodi.Verifiche in 'Varie\CalcoloPeriodi.Verifiche.pas',
   CalcoloAbitare.Lib in 'Varie\CalcoloAbitare.Lib.pas',
   CalcoloAbitare.Verifiche in 'Varie\CalcoloAbitare.Verifiche.pas',
