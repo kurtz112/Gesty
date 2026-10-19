@@ -168,7 +168,8 @@ begin
 
   Incarichi := TList<integer>.Create;
   try
-    view.GetSelectedRows('ID_INCARICO', Incarichi);
+    // Mantis #183 - 2026-10-19: ogni incarico una volta sola
+    view.GetSelectedRows('ID_INCARICO', Incarichi, true);
 
     Fase := Progetti.FaseDegliIncarichi(Incarichi, Azione);
 
@@ -193,6 +194,10 @@ begin
     FreeAndNil(Incarichi);
   end;
 
+  // Mantis #183 - 2026-10-19: dopo la riapertura la selezione restava sulle
+  // righe di prima e il Procedi successivo poteva riprendere un incarico gia'
+  // lavorato: si riparte dalla sola riga corrente
+  view.ClearSelection;
   view.FocusGrid;
 end;
 

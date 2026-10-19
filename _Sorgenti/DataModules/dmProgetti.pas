@@ -64,6 +64,10 @@ type
     procedure TimesheetAnnualeBeforeOpen(DataSet: TDataSet);
     function AttivaConFinestra(DataSet: TzFbDataSet): boolean;
     procedure AttivaInBlocco(Incarichi: TList<integer>; const Azione: string);
+    // Mantis #183 - 2026-10-19: dopo un passaggio dell'iter il cursore va
+    // sull'incarico che seguiva quelli lavorati, non sul primo
+    function IncaricoDopoLaSelezione(DataSet: TzFbDataSet; Incarichi: TList<integer>): integer;
+    procedure RiapriSullIncarico(DataSet: TzFbDataSet; const IdIncarico: integer);
   protected
     procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
 
@@ -218,6 +222,8 @@ procedure TProgetti.AutorizzazioneDirezione(Incarichi: TList<integer>; const Azi
 var
   id: integer;
   sp: TSP_incarico_Autorizzazione_Direzione;
+  DataSet: TzFbDataSet;
+  IdSuccessivo: integer;
 begin
   Assert(assigned(Incarichi));
   if Incarichi.Count = 0 then
@@ -228,6 +234,9 @@ begin
   // "Autorizzazione della direzione"
   if not ConfirmYesNo(Format('%s: %d incarichi selezionati. Procedere?', [Azione, Incarichi.Count])) then
     exit;
+
+  DataSet := GetDataSet(DATASET_DA_GESTIRE);
+  IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
 
   ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
   try
@@ -241,11 +250,13 @@ begin
     finally
       FreeAndNil(sp);
     end;
-
-    RefreshDataSets;
   finally
     ProgressBox.Close;
   end;
+
+  // Mantis #183 - 2026-10-19: era RefreshDataSets, che riapriva tutti i
+  // dataset del modulo e lasciava l'elenco sulla prima riga
+  RiapriSullIncarico(DataSet, IdSuccessivo);
 end;
 
 // Mantis #183 - 2026-10-02: autorizzazione finanziaria, dove e' una fase
@@ -255,6 +266,8 @@ procedure TProgetti.AutorizzazioneFinanziaria(Incarichi: TList<integer>; const A
 var
   id: integer;
   sp: TSP_incarico_Autorizzazione_Finanziaria;
+  DataSet: TzFbDataSet;
+  IdSuccessivo: integer;
 begin
   Assert(assigned(Incarichi));
   if Incarichi.Count = 0 then
@@ -262,6 +275,9 @@ begin
 
   if not ConfirmYesNo(Format('%s: %d incarichi selezionati. Procedere?', [Azione, Incarichi.Count])) then
     exit;
+
+  DataSet := GetDataSet(DATASET_DA_GESTIRE);
+  IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
 
   ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
   try
@@ -275,11 +291,12 @@ begin
     finally
       FreeAndNil(sp);
     end;
-
-    RefreshDataSets;
   finally
     ProgressBox.Close;
   end;
+
+  // Mantis #183 - 2026-10-19: era RefreshDataSets (vedi AutorizzazioneDirezione)
+  RiapriSullIncarico(DataSet, IdSuccessivo);
 end;
 
 // Mantis #183 - 2026-10-01: fase comune degli incarichi selezionati
@@ -307,7 +324,9 @@ begin
   try
     for id in Incarichi do
     begin
-      if not DataSet.Locate('ID_INCARICO', id, []) then
+      // Mantis #183 - 2026-10-19: LocateNonSQL e non Locate: con UseSqlLocate
+      // (vero di norma) Locate riapre l'elenco con WHERE ID_INCARICO = ...
+      if not DataSet.LocateNonSQL('ID_INCARICO', id, []) then
         continue;
 
       Fase := DataSet.FieldByName('FASE').AsString;
@@ -550,6 +569,7 @@ var
   DataSet: TzFbDataSet;
   id: integer;
   sp: TSP_incarico_Accetta_Ore_Residue;
+  IdSuccessivo: integer;
 begin
   // Mantis #183 - 2026-10-02: era IncongruitaVerificata. Piu' incarichi con una
   // sola conferma
@@ -568,6 +588,8 @@ begin
     if not ConfirmYesNo(Format('Accettare le ore residue dei %d incarichi selezionati?', [Incarichi.Count])) then
       exit;
 
+  IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
+
   sp := TSP_incarico_Accetta_Ore_Residue.create(WriteTrans);
   try
     for id in Incarichi do
@@ -579,7 +601,9 @@ begin
     FreeAndNil(sp);
   end;
 
-  DataSet.Reopen(true);
+  // Mantis #183 - 2026-10-19: Reopen tornava sul segnalibro di un incarico
+  // uscito dall'elenco
+  RiapriSullIncarico(DataSet, IdSuccessivo);
 end;
 
 procedure TProgetti.CopiaMaterie;
@@ -931,7 +955,7 @@ var
   DataSet: TzFbDataSet;
   InBlocco, UnoAllaVolta: TList<integer>;
   id: integer;
-  oldRecNo: integer;
+  IdSuccessivo: integer;
 begin
   Assert(assigned(Incarichi));
   if Incarichi.Count = 0 then
@@ -942,40 +966,115 @@ begin
   if DataSet.IsEmpty then
     exit;
 
-  oldRecNo := DataSet.RecNo;
+  IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
 
   InBlocco := TList<integer>.create;
   UnoAllaVolta := TList<integer>.create;
   try
     for id in Incarichi do
-      if DataSet.Locate('ID_INCARICO', id, []) then
-        if DataSet.FieldByName('RICHIEDE_PROTOCOLLO').AsBoolean or DataSet.FieldByName('RICHIEDE_CONTRATTO').AsBoolean then
-          UnoAllaVolta.Add(id)
-        else
-          InBlocco.Add(id);
+      // Mantis #183 - 2026-10-19: un incarico gia' attivato (o elencato due
+      // volte) non riapre la finestra del protocollo
+      if (not InBlocco.Contains(id)) and (not UnoAllaVolta.Contains(id)) then
+        if DataSet.LocateNonSQL('ID_INCARICO', id, []) then
+          if DataSet.FieldByName('DATA_ATTIVAZIONE').IsNull then
+            if DataSet.FieldByName('RICHIEDE_PROTOCOLLO').AsBoolean or DataSet.FieldByName('RICHIEDE_CONTRATTO').AsBoolean then
+              UnoAllaVolta.Add(id)
+            else
+              InBlocco.Add(id);
 
     AttivaInBlocco(InBlocco, Azione);
 
     for id in UnoAllaVolta do
-      if DataSet.Locate('ID_INCARICO', id, []) then
+      if DataSet.LocateNonSQL('ID_INCARICO', id, []) then
         if not AttivaConFinestra(DataSet) then
-          break; // annullato dall'utente: i successivi restano da attivare
+        begin
+          // Mantis #183 - 2026-10-19: annullato dall'utente, il cursore resta
+          // sull'incarico annullato; i successivi restano da attivare
+          IdSuccessivo := id;
+          break;
+        end;
   finally
     FreeAndNil(UnoAllaVolta);
     FreeAndNil(InBlocco);
   end;
 
-  /// ////////////////////
-  /// Con reopen elimina i record attivati, esclusi dal filtro.
-  /// RecNo dovrebbe posizionare sul record successivo [richiesta di Paolo]
+  // Mantis #183 - 2026-10-19: la riapertura toglie gli incarichi attivati; il
+  // cursore va su quello che li seguiva [richiesta di Paolo]. RecNo non
+  // bastava: era la posizione prima dei Locate e contava solo le righe gia'
+  // lette dal server.
+  RiapriSullIncarico(DataSet, IdSuccessivo);
+end;
 
+// Mantis #183 - 2026-10-19: l'incarico su cui riportare il cursore dopo un
+// passaggio dell'iter: il primo che segue l'ultimo degli incarichi lavorati e
+// non ne fa parte, altrimenti il piu' vicino che li precede. -1 se l'elenco
+// contiene solo quelli. Tutte le ricerche sono LocateNonSQL: Locate, con
+// UseSqlLocate, riaprirebbe l'elenco ridotto all'incarico cercato.
+function TProgetti.IncaricoDopoLaSelezione(DataSet: TzFbDataSet; Incarichi: TList<integer>): integer;
+var
+  id: integer;
+  UltimaPosizione: integer;
+  PrimaPosizione: integer;
+begin
+  result := -1;
+
+  if (not assigned(DataSet)) or DataSet.IsEmpty or (Incarichi.Count = 0) then
+    exit;
+
+  UltimaPosizione := -1;
+  PrimaPosizione := MaxInt;
+
+  DataSet.DisableControls;
+  try
+    for id in Incarichi do
+      if DataSet.LocateNonSQL('ID_INCARICO', id, []) then
+      begin
+        UltimaPosizione := Max(UltimaPosizione, DataSet.RecNo);
+        PrimaPosizione := Min(PrimaPosizione, DataSet.RecNo);
+      end;
+
+    if UltimaPosizione = -1 then
+      exit;
+
+    DataSet.RecNo := UltimaPosizione;
+    DataSet.Next;
+    while not DataSet.Eof do
+    begin
+      if not Incarichi.Contains(DataSet.FieldByName('ID_INCARICO').AsInteger) then
+        exit(DataSet.FieldByName('ID_INCARICO').AsInteger);
+      DataSet.Next;
+    end;
+
+    DataSet.RecNo := PrimaPosizione;
+    DataSet.Prior;
+    while not DataSet.Bof do
+    begin
+      if not Incarichi.Contains(DataSet.FieldByName('ID_INCARICO').AsInteger) then
+        exit(DataSet.FieldByName('ID_INCARICO').AsInteger);
+      DataSet.Prior;
+    end;
+
+    // Prior sulla prima riga accende Bof senza spostarsi: la prima riga resta
+    // da controllare
+    if not Incarichi.Contains(DataSet.FieldByName('ID_INCARICO').AsInteger) then
+      result := DataSet.FieldByName('ID_INCARICO').AsInteger;
+  finally
+    DataSet.EnableControls;
+  end;
+end;
+
+// Mantis #183 - 2026-10-19: riapre l'elenco e si posiziona sull'incarico
+// indicato; se non c'e' piu' (o e' -1) resta sulla prima riga.
+procedure TProgetti.RiapriSullIncarico(DataSet: TzFbDataSet; const IdIncarico: integer);
+begin
   StartWait('Attendere...', true);
   try
     DataSet.DisableControls;
     try
-      DataSet.Reopen(true); // <-------------------
-      if not DataSet.IsEmpty then
-        DataSet.RecNo := Min(oldRecNo, DataSet.RecordCount);
+      DataSet.Reopen(true);
+
+      if (IdIncarico = -1) or (not DataSet.LocateNonSQL('ID_INCARICO', IdIncarico, [])) then
+        DataSet.First;
     finally
       DataSet.EnableControls;
     end;
