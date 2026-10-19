@@ -30863,6 +30863,45 @@ TSP_usr_Utenti_Settings_Set_Value = class (TzStoredProc)
     property Valore: TNullableString read fValore write fValore;
 end;
 
+[TStoredProcedure('USR_UTILIZZI_FUNZIONI_REGISTRA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Utilizzi_Funzioni_Registra = class (TzStoredProc)
+  private
+    fApp: TNullableString;
+    fVersione: TNullableString;
+    fData_Ora: TNullableDateTime;
+    fModulo: TNullableString;
+    fFunzione: TNullableString;
+    fAzione: TNullableString;
+    fEsecuzioni: TNullableInt64;
+    fUltima_Esecuzione: TNullableDateTime;
+  public
+    //
+    [TParamAttribute('APP', ptInput, False)]
+    property App: TNullableString read fApp write fApp;
+    //
+    [TParamAttribute('VERSIONE', ptInput, False)]
+    property Versione: TNullableString read fVersione write fVersione;
+    //
+    [TParamAttribute('DATA_ORA', ptInput, False)]
+    property Data_Ora: TNullableDateTime read fData_Ora write fData_Ora;
+    //
+    [TParamAttribute('MODULO', ptInput, False)]
+    property Modulo: TNullableString read fModulo write fModulo;
+    //
+    [TParamAttribute('FUNZIONE', ptInput, False)]
+    property Funzione: TNullableString read fFunzione write fFunzione;
+    //
+    [TParamAttribute('AZIONE', ptInput, False)]
+    property Azione: TNullableString read fAzione write fAzione;
+    //
+    [TParamAttribute('ESECUZIONI', ptInput, False)]
+    property Esecuzioni: TNullableInt64 read fEsecuzioni write fEsecuzioni;
+    //
+    [TParamAttribute('ULTIMA_ESECUZIONE', ptInput, False)]
+    property Ultima_Esecuzione: TNullableDateTime read fUltima_Esecuzione write fUltima_Esecuzione;
+end;
+
 [TStoredProcedure('USR_VERIFICA_PASSWORD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Verifica_Password = class (TzStoredProc)
