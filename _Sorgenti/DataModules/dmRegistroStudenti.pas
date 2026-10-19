@@ -274,6 +274,9 @@ begin
       sp.Stato_Presenza := Presenza.StatoPresenza.ToString;
       sp.Override_Tipologia_Formazione := Presenza.OverrideTipologiaFormazione;
       sp.Minuti_Assenza := Presenza.MinutiAssenza;
+      // Mantis #260 - 2026-10-19: richiede il parametro CALCOLARE in STUDENTI_PRESENZE_COLL_TMP_UPD e il
+      // wrapper rigenerato (Gesty_StoredProcs.pas): verificare il nome esatto sul file generato prima di compilare
+      sp.Calcolare := Presenza.Calcolare;
       sp.ExecuteAndCommit;
       RegistroCollettivo.Modificato;
     end;

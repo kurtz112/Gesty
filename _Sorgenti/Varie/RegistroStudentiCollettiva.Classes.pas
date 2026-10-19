@@ -65,6 +65,8 @@ type
 
   TPresenza = class(TCollectionItem)
   private
+    // Mantis #260 - 2026-10-19: falso = la presenza non va a SIUF
+    FCalcolare: boolean;
     FIdPresenzaCollettiva: integer;
     FIdOrario: integer;
     FMinutiAssenza: integer;
@@ -80,6 +82,7 @@ type
     property OverrideTipologiaFormazione: string read FOverrideTipologiaFormazione write FOverrideTipologiaFormazione;
     property StatoPresenza: TStatoPresenza read FStatoPresenza write FStatoPresenza;
     property MinutiAssenza: integer read FMinutiAssenza write FMinutiAssenza;
+    property Calcolare: boolean read FCalcolare write FCalcolare;
   end;
 
   TPresenze = class(TzGenericCollection<TPresenza>)
@@ -93,6 +96,8 @@ type
     procedure UpdatePresenza(const Ora: integer; const MinutiAssenza: integer); overload;
 
     procedure OverrideTipologia(const Ora: integer; IsFAD: boolean);
+    // Mantis #260 - 2026-10-19
+    procedure ImpostaCalcolare(const Ora: integer; const Calcolare: boolean);
 
     property StatoPresenza: TStatoPresenza read GetStatoPresenza write SetStatoPresenza;
     property TotaleOre: integer read GetTotaleOre;
@@ -104,9 +109,11 @@ type
     FNode: TcxTreeListNode;
     FNominativoStudente: string;
     FPresenzeOre: TPresenze;
+    function GetCalcolare: boolean;
     function GetIsFAD: boolean;
     function GetStatoPresenza: TStatoPresenza;
     function GetTotaleOre: integer;
+    procedure SetCalcolare(const Value: boolean);
     procedure SetStatoPresenza(const Value: TStatoPresenza);
     procedure SetPresenzeOre(const Value: TPresenze);
     procedure SetIsFAD(const Value: boolean);
@@ -119,6 +126,8 @@ type
     property OrePresenza: TPresenze read FPresenzeOre write SetPresenzeOre;
     property StatoPresenza: TStatoPresenza read GetStatoPresenza write SetStatoPresenza;
     property IsFAD: boolean read GetIsFAD write SetIsFAD;
+    // Mantis #260 - 2026-10-19: vero se tutte le ore dell'allievo vanno a SIUF
+    property Calcolare: boolean read GetCalcolare write SetCalcolare;
     property TotaleOre: integer read GetTotaleOre;
     property Node: TcxTreeListNode read FNode write FNode;
   end;
@@ -256,6 +265,7 @@ begin
   FOverrideTipologiaFormazione := '';
   FStatoPresenza := spPresente;
   FMinutiAssenza := 0;
+  FCalcolare := True;
 end;
 
 function TPresenze.GetPresenza(const Ora: integer): TPresenza;
@@ -313,6 +323,17 @@ begin
       Presenza.OverrideTipologiaFormazione := FAD
     else
       Presenza.OverrideTipologiaFormazione := '';
+  end;
+
+  // Mantis #260 - 2026-10-19: esclude o riammette una singola ora dall'invio a SIUF
+  procedure TPresenze.ImpostaCalcolare(const Ora: integer; const Calcolare: boolean);
+  var
+    Presenza: TPresenza;
+  begin
+    Presenza := GetPresenza(Ora);
+
+    if Assigned(Presenza) then
+      Presenza.Calcolare := Calcolare;
   end;
 
   procedure TPresenze.UpdatePresenza(const Ora: integer; Materia: TMateria; const StatoPresenza: TStatoPresenza);
@@ -394,6 +415,29 @@ begin
 
     for Presenza in OrePresenza do
       if Presenza.OverrideTipologiaFormazione <> FAD then
+        Exit(False);
+  end;
+
+  // Mantis #260 - 2026-10-19: modello di IsFAD
+  procedure TStudente.SetCalcolare(const Value: boolean);
+  var
+    Presenza: TPresenza;
+  begin
+    for Presenza in OrePresenza do
+      Presenza.Calcolare := Value;
+  end;
+
+  function TStudente.GetCalcolare: boolean;
+  var
+    Presenza: TPresenza;
+  begin
+    if OrePresenza.Count = 0 then
+      Exit(True);
+
+    Result := True;
+
+    for Presenza in OrePresenza do
+      if not Presenza.Calcolare then
         Exit(False);
   end;
 
@@ -518,6 +562,10 @@ begin
     Presenza.OverrideTipologiaFormazione := DataSet.FieldByName('OVERRIDE_TIPOLOGIA_FORMAZIONE').asString;
     Presenza.StatoPresenza := TStatoPresenza.FromString(DataSet.FieldByName('STATO_PRESENZA').asString);
     Presenza.MinutiAssenza := DataSet.FieldByName('MINUTI_ASSENZA').Value;
+
+    // Mantis #260 - 2026-10-19: richiede la colonna CALCOLARE su STUDENTI_PRESENZE_COLLETT_TMP e sulla vista
+    // STUDENTI_PRES_COLL_TMP_ELENCO (script 02 dei ticket 179 e 182, gia' installato su CAPAC)
+    Presenza.Calcolare := DataSet.FieldByName('CALCOLARE').asBoolean;
   end;
 
 end.

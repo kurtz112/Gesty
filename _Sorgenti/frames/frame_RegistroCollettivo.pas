@@ -214,6 +214,11 @@ type
     function GetMateriaColumn(const Ora: integer): TcxTreeListColumn;
     function GetMinutiAssenzaColumn(const Ora: integer): TcxTreeListColumn;
     function GetFADColumn(const Ora: integer): TcxTreeListColumn;
+    // Mantis #260 - 2026-10-19: casella Calcolare (esclusione dall'invio a SIUF), per ora e complessiva.
+    // Colonne e repository sono creati in codice, come le colonne delle ore, per non toccare il DFM.
+    function GetCalcolareColumn(const Ora: integer): TcxTreeListColumn;
+    procedure CreaColonnaCalcolare;
+    procedure CalcolarePropertiesEditValueChanged(Sender: TObject);
     function GetMateria(const column: TcxTreeListColumn): TMateria;
 
     function SelectedStudente: TStudente;
@@ -235,6 +240,9 @@ type
   private
     FDataLezione: TDate;
     Scrolling: Boolean;
+    // Mantis #260 - 2026-10-19
+    FColonnaCalcolare: TcxTreeListColumn;
+    FRepositoryCalcolare: TcxEditRepositoryCheckBoxItem;
 
     function GetIdProgetto: integer;
     function GetIdCorso: integer;
@@ -276,6 +284,8 @@ uses
 
 const
   WidthMinutiAssenza = 40;
+  // Mantis #260 - 2026-10-19
+  WidthCalcolare = 40;
 
 type
   TcxTreeListAccess = class(TcxTreeList);
@@ -291,6 +301,9 @@ begin
 
   dx.InitBar(dxBarManagerBar);
   dx.InitTreeList(treeRegistro);
+
+  // Mantis #260 - 2026-10-19: prima di InitStyles, che applica lo stile a tutte le colonne
+  CreaColonnaCalcolare;
 
   InitStyles;
 
@@ -322,6 +335,21 @@ begin
     end;
 
   CaricaProgetto;
+end;
+
+// Mantis #260 - 2026-10-19: repository e colonna complessiva "Calcolare" (tutte le ore dell'allievo)
+procedure TFrameRegistroCollettivo.CreaColonnaCalcolare;
+begin
+  FRepositoryCalcolare := TcxEditRepositoryCheckBoxItem.Create(cxEditRepositoryFAD.Repository);
+  FRepositoryCalcolare.Properties.OnEditValueChanged := CalcolarePropertiesEditValueChanged;
+
+  FColonnaCalcolare := CreateColumn(treeRegistro, treeRegistro.Name + 'Calcolare', 'Calcolare');
+  FColonnaCalcolare.DataBinding.ValueType := 'boolean';
+  FColonnaCalcolare.RepositoryItem := FRepositoryCalcolare;
+  FColonnaCalcolare.Options.Sizing := false;
+  FColonnaCalcolare.MinWidth := Normalize(60);
+  FColonnaCalcolare.Width := FColonnaCalcolare.MinWidth;
+  FColonnaCalcolare.BestFitMaxWidth := FColonnaCalcolare.MinWidth;
 end;
 
 procedure TFrameRegistroCollettivo.cxScrollBarChange(Sender: TObject);
@@ -459,7 +487,8 @@ var
   col: TcxTreeListColumn;
 begin
   band := treeMaterie.Bands.Add;
-  band.Width := treeRegistroColStatoPresenza.Width + treeRegistroColFAD.Width + Normalize(WidthMinutiAssenza);
+  // Mantis #260 - 2026-10-19: + colonna "Calc." di ogni ora
+  band.Width := treeRegistroColStatoPresenza.Width + treeRegistroColFAD.Width + Normalize(WidthMinutiAssenza) + Normalize(WidthCalcolare);
   //
   // Docente
   col := CreateColumn(treeMaterie, treeMaterie.Name + 'Docente' + Materia.Ora.ToString, 'Docente' + Materia.Ora.ToString);
@@ -612,9 +641,19 @@ begin
         col.MinWidth := Normalize(treeRegistroColFAD.MinWidth);
         col.Width := col.MinWidth;
         col.BestFitMaxWidth := col.MinWidth;
+
+        // Mantis #260 - 2026-10-19: Calcolare per questa ora
+        col := CreateColumn(treeRegistro, treeRegistro.Name + 'Calcolare' + Materia.Ora.ToString, 'Calc.');
+        col.Tag := Materia.Ora;
+        col.DataBinding.ValueType := 'boolean';
+        col.RepositoryItem := FRepositoryCalcolare;
+        col.Options.Sizing := false;
+        col.MinWidth := Normalize(WidthCalcolare);
+        col.Width := col.MinWidth;
+        col.BestFitMaxWidth := col.MinWidth;
       end;
 
-      treeMaterie.Bands[0].Width := treeRegistroColStudente.Width + treeRegistroColStatoPresenza.Width + treeRegistroColFAD.Width + treeRegistroColOrePresenza.Width;
+      treeMaterie.Bands[0].Width := treeRegistroColStudente.Width + treeRegistroColStatoPresenza.Width + treeRegistroColFAD.Width + treeRegistroColOrePresenza.Width + FColonnaCalcolare.Width;
     finally
       treeRegistro.EndUpdate;
     end;
@@ -639,7 +678,28 @@ begin
       if col.Tag = Ora then
         if col.Caption.Text <> 'FAD' then
           if col.Caption.Text <> 'R/A' then
-            exit(col);
+            // Mantis #260 - 2026-10-19: la colonna Calc. e' distinta dalla colonna Ora
+            if col.Caption.Text <> 'Calc.' then
+              exit(col);
+  end;
+end;
+
+// Mantis #260 - 2026-10-19
+function TFrameRegistroCollettivo.GetCalcolareColumn(const Ora: integer): TcxTreeListColumn;
+var
+  i: integer;
+  col: TcxTreeListColumn;
+begin
+  result := nil;
+
+  for i := treeRegistro.ColumnCount - 1 downto 0 do
+  begin
+    col := treeRegistro.Columns[i];
+
+    if col.Tag > 0 then
+      if col.Tag = Ora then
+        if col.Caption.Text = 'Calc.' then
+          exit(col);
   end;
 end;
 
@@ -738,6 +798,7 @@ begin
       nodo.Values[treeRegistroColStatoPresenza.ItemIndex] := Studente.StatoPresenza.ToString;
       nodo.Values[treeRegistroColFAD.ItemIndex] := Studente.IsFAD;
       nodo.Values[treeRegistroColOrePresenza.ItemIndex] := Studente.TotaleOre;
+      nodo.Values[FColonnaCalcolare.ItemIndex] := Studente.Calcolare;
 
       for Presenza in Studente.OrePresenza do
       begin
@@ -749,6 +810,9 @@ begin
 
         col := GetFADColumn(Presenza.Ora);
         nodo.Values[col.ItemIndex] := Presenza.OverrideTipologiaFormazione = FAD;
+
+        col := GetCalcolareColumn(Presenza.Ora);
+        nodo.Values[col.ItemIndex] := Presenza.Calcolare;
       end;
     end;
 
@@ -969,7 +1033,7 @@ end;
 
 procedure TFrameRegistroCollettivo.treeRegistroColumnSizeChanged(Sender: TcxCustomTreeList; AColumn: TcxTreeListColumn);
 begin
-  treeMaterie.Bands[0].Width := treeRegistroColStudente.Width + treeRegistroColStatoPresenza.Width + treeRegistroColFAD.Width + treeRegistroColOrePresenza.Width;
+  treeMaterie.Bands[0].Width := treeRegistroColStudente.Width + treeRegistroColStatoPresenza.Width + treeRegistroColFAD.Width + treeRegistroColOrePresenza.Width + FColonnaCalcolare.Width;
 end;
 
 procedure TFrameRegistroCollettivo.PreparaItemsStatoPresenza;
@@ -1106,6 +1170,35 @@ begin
     Ora := treeRegistro.FocusedColumn.Tag;
     Materia := RegistroStudenti.RegistroCollettivo.Materie.GetMateria(Ora);
     Studente.OrePresenza.OverrideTipologia(Ora, IsFAD);
+  end;
+
+  RegistroStudenti.SalvaStudente(IdProgetto, DataLezione, Studente);
+  PostMessage(Self.Handle, cmd_DisplayTree, 0, 0);
+end;
+
+// Mantis #260 - 2026-10-19: modello di cxEditRepositoryFADPropertiesEditValueChanged. Colonna complessiva =
+// tutte le ore dell'allievo, colonna di un'ora = solo quell'ora
+procedure TFrameRegistroCollettivo.CalcolarePropertiesEditValueChanged(Sender: TObject);
+var
+  Studente: TStudente;
+  Ora: integer;
+  Calcolare: Boolean;
+begin
+  if IsOraBloccata(treeRegistro.FocusedColumn) then
+    exit;
+
+  Studente := SelectedStudente;
+  if not Assigned(Studente) then
+    exit;
+
+  Calcolare := TcxCheckBox(Sender).EditValue;
+
+  if treeRegistro.FocusedColumn = FColonnaCalcolare then
+    Studente.Calcolare := Calcolare
+  else
+  begin
+    Ora := treeRegistro.FocusedColumn.Tag;
+    Studente.OrePresenza.ImpostaCalcolare(Ora, Calcolare);
   end;
 
   RegistroStudenti.SalvaStudente(IdProgetto, DataLezione, Studente);
