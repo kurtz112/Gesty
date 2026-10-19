@@ -26016,6 +26016,7 @@ TSP_studenti_Presenze_Coll_Tmp_Upd = class (TzStoredProc)
     fOverride_Tipologia_Formazione: TNullableString;
     fStato_Presenza: TNullableString;
     fMinuti_Assenza: TNullableInt64;
+    fCalcolare: TNullableBoolean;
   public
     //
     [TParamAttribute('ID_PRESENZA_COLLETTIVA', ptInput, False)]
@@ -26029,6 +26030,9 @@ TSP_studenti_Presenze_Coll_Tmp_Upd = class (TzStoredProc)
     //
     [TParamAttribute('MINUTI_ASSENZA', ptInput, False)]
     property Minuti_Assenza: TNullableInt64 read fMinuti_Assenza write fMinuti_Assenza;
+    //
+    [TParamAttribute('CALCOLARE', ptInput, False)]
+    property Calcolare: TNullableBoolean read fCalcolare write fCalcolare;
 end;
 
 [TStoredProcedure('STUDENTI_PROGETTI_ADD')]
@@ -43153,6 +43157,7 @@ TSP_web_Area_Personale__Risorsa_Notifiche = class (TzStoredProc)
     fOggetto: TNullableString;
     fMessaggio: TStringList;
     fData_Ora_Notifica: TNullableDateTime;
+    fData_Ora_Lettura: TNullableDateTime;
   private
     property Id_Notifica_internal: TNullableInt64 read fId_Notifica write fId_Notifica;
     property Notifica_internal: TNullableString read fNotifica write fNotifica;
@@ -43160,6 +43165,7 @@ TSP_web_Area_Personale__Risorsa_Notifiche = class (TzStoredProc)
     property Nominativo_Destinatario_internal: TNullableString read fNominativo_Destinatario write fNominativo_Destinatario;
     property Oggetto_internal: TNullableString read fOggetto write fOggetto;
     property Data_Ora_Notifica_internal: TNullableDateTime read fData_Ora_Notifica write fData_Ora_Notifica;
+    property Data_Ora_Lettura_internal: TNullableDateTime read fData_Ora_Lettura write fData_Ora_Lettura;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -43188,6 +43194,9 @@ TSP_web_Area_Personale__Risorsa_Notifiche = class (TzStoredProc)
     //
     [TParamAttribute('DATA_ORA_NOTIFICA', ptOutput, False)]
     property Data_Ora_Notifica: TNullableDateTime read fData_Ora_Notifica;
+    //
+    [TParamAttribute('DATA_ORA_LETTURA', ptOutput, False)]
+    property Data_Ora_Lettura: TNullableDateTime read fData_Ora_Lettura;
 end;
 
 [TStoredProcedure('WEB_AREA_PERSONALE.RISORSA_ORE_RECUPERO', True)]
