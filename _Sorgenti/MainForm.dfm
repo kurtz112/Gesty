@@ -572,24 +572,6 @@ object Main: TMain
     Left = 58
     Top = 160
     PixelsPerInch = 96
-    object dxBarManagerBarQuickAccess: TdxBar
-      Caption = 'QuickAccessBar'
-      CaptionButtons = <>
-      DockedLeft = 0
-      DockedTop = 0
-      FloatLeft = 1123
-      FloatTop = 8
-      FloatClientWidth = 71
-      FloatClientHeight = 24
-      Images = dx.Immagini
-      ItemLinks = <>
-      OneOnRow = True
-      Row = 0
-      SizeGrip = False
-      UseOwnFont = False
-      Visible = True
-      WholeRow = False
-    end
     object dxBarManagerBarHome: TdxBar
       Caption = 'Home'
       CaptionButtons = <>
