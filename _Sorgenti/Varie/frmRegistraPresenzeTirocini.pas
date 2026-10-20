@@ -147,6 +147,12 @@ begin
   Width := 1050;
   Height := 480;
 
+  // Legami a dx.Immagini ripristinati da codice: l'IDE li toglie dal DFM se la unit
+  // si salva con zDX chiuso
+  Actions.Images := dx.Immagini;
+  dxBarManager.ImageOptions.Images := dx.Immagini;
+  dxBarManager.ImageOptions.LargeImages := dx.Immagini;
+
   dx.InitBar(dxBarManagerBar);
   dx.InitLayoutControl(dxLayoutControl);
 

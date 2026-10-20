@@ -67,6 +67,9 @@ type
     procedure Init; virtual;
   end;
 
+// Lega a dx.Immagini le ActionList di Proprietario rimaste senza immagini
+procedure AssegnaImmaginiActionList(Proprietario: TComponent);
+
 implementation
 
 uses
@@ -79,6 +82,21 @@ uses
   zDx;
 
 {$R *.dfm}
+
+procedure AssegnaImmaginiActionList(Proprietario: TComponent);
+var
+  Indice: Integer;
+  ActionList: TActionList;
+begin
+  for Indice := 0 to Proprietario.ComponentCount - 1 do
+    if Proprietario.Components[Indice] is TActionList then
+    begin
+      ActionList := TActionList(Proprietario.Components[Indice]);
+      if not Assigned(ActionList.Images) then
+        ActionList.Images := dx.Immagini;
+    end;
+end;
+
 { TBaseFrame }
 
 constructor TBaseFrame.Create(aOwner: TComponent);
@@ -86,6 +104,13 @@ var
   IRestrictionIntf: IRestriction;
 begin
   inherited;
+
+  // I legami a dx.Immagini scritti nel DFM si perdono se la unit si salva con zDX
+  // chiuso: si ripristinano da codice, anche per le ActionList dei frame derivati
+  dxBarManager.ImageOptions.Images := dx.Immagini;
+  dxBarManager.ImageOptions.LargeImages := dx.Immagini;
+  BaseActions.Images := dx.Immagini;
+  AssegnaImmaginiActionList(Self);
 
   ShowHint := True;
 

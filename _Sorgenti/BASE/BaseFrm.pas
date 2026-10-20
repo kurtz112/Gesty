@@ -432,6 +432,11 @@ begin
 
   BaseActions.Images := dx.Immagini;
 
+  // Le form derivate hanno ActionList proprie legate a dx.Immagini nel DFM: se la unit
+  // si salva con zDX chiuso l'IDE toglie il legame, quindi lo si ripristina da codice.
+  // Solo le liste senza immagini, per non toccare quelle legate ad altri elenchi
+  AssegnaImmaginiActionList(Self);
+
   Init_Ctrls(Self);
 
   doCreateDataModule;
