@@ -27,8 +27,6 @@ uses
   cxLookAndFeels,
   FireDAC.Phys.IBWrapper in 'FireDAC.Phys.IBWrapper.pas',
   dxSpreadSheetReportDesigner in 'X:\Druido\LIB\dxSpreadSheetReportDesigner.pas',
-  cxCheckBox in 'X:\Druido\LIB\Patch\cxCheckBox.pas',
-  cxFilterControl in 'X:\Druido\LIB\Patch\cxFilterControl.pas',
   zBaseLib,
   zSystem,
   zz.SplashWait,

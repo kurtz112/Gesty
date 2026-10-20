@@ -67,8 +67,8 @@
         <VerInfo_MajorVer>2026</VerInfo_MajorVer>
         <VerInfo_MinorVer>10</VerInfo_MinorVer>
         <VerInfo_Release>20</VerInfo_Release>
-        <VerInfo_Build>0</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Luca Zebro;FileDescription=$(MSBuildProjectName);FileVersion=2026.10.20.0;InternalName=Gesty;LegalCopyright=Luca Zebro;LegalTrademarks=Gesty;OriginalFilename=Gesty;ProductName=$(MSBuildProjectName);ProductVersion=2026.10.20.0;Comments=;ProgramID=it.lucazebro.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>1</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=Luca Zebro;FileDescription=$(MSBuildProjectName);FileVersion=2026.10.20.1;InternalName=Gesty;LegalCopyright=Luca Zebro;LegalTrademarks=Gesty;OriginalFilename=Gesty;ProductName=$(MSBuildProjectName);ProductVersion=2026.10.20.1;Comments=;ProgramID=it.lucazebro.$(MSBuildProjectName)</VerInfo_Keys>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
@@ -134,8 +134,6 @@
         <DCCReference Include="vcl.Consts.pas"/>
         <DCCReference Include="FireDAC.Phys.IBWrapper.pas"/>
         <DCCReference Include="X:\Druido\LIB\dxSpreadSheetReportDesigner.pas"/>
-        <DCCReference Include="X:\Druido\LIB\Patch\cxCheckBox.pas"/>
-        <DCCReference Include="X:\Druido\LIB\Patch\cxFilterControl.pas"/>
         <DCCReference Include="BASE\MDI_Lib.pas"/>
         <DCCReference Include="Varie\Files.Lib.pas"/>
         <DCCReference Include="Gesty_StoredProcs.pas"/>
@@ -917,6 +915,8 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Gesty.dxSettings.pas"/>
+        <DCCReference Include="Varie\Gesty.Sonda.pas"/>
+        <DCCReference Include="Varie\Gesty.Uso.pas"/>
         <DCCReference Include="Varie\CalcoloPeriodi.Verifiche.pas"/>
         <DCCReference Include="Varie\CalcoloAbitare.Lib.pas"/>
         <DCCReference Include="Varie\CalcoloAbitare.Verifiche.pas"/>
