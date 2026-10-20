@@ -12437,6 +12437,22 @@ TSP_grs_Import_Files_Risolvi_Riga = class (TzStoredProc)
     property Rif_Evento_Formativo: TNullableString read fRif_Evento_Formativo;
 end;
 
+[TStoredProcedure('GRS_IMPORT_FILES_VALIDA_TESTO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_grs_Import_Files_Valida_Testo = class (TzStoredProc)
+  private
+    fTesto: TStringList;
+  private
+    procedure SetTesto(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('TESTO', ptInput, True)]
+    property Testo: TStringList read fTesto write SetTesto;
+end;
+
 [TStoredProcedure('GRS_IMPORT_GENERA_SUPPLENZA', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_grs_Import_Genera_Supplenza = class (TzStoredProc)
@@ -32860,6 +32876,75 @@ TSP_web_Risorsa_Elenco_Presenze = class (TzStoredProc)
     property Nominativo_Rilevatore: TNullableString read fNominativo_Rilevatore;
 end;
 
+[TStoredProcedure('WEB_RISORSA_NOTIFICA_LETTA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_web_Risorsa_Notifica_Letta = class (TzStoredProc)
+  private
+    fId_Sessione: TNullableInt64;
+    fId_Notifica: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_SESSIONE', ptInput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
+    //
+    [TParamAttribute('ID_NOTIFICA', ptInput, False)]
+    property Id_Notifica: TNullableInt64 read fId_Notifica write fId_Notifica;
+end;
+
+[TStoredProcedure('WEB_RISORSA_NOTIFICHE', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_web_Risorsa_Notifiche = class (TzStoredProc)
+  private
+    fId_Sessione: TNullableInt64;
+    fId_Notifica: TNullableInt64;
+    fNotifica: TNullableString;
+    fNominativo_Mittente: TNullableString;
+    fNominativo_Destinatario: TNullableString;
+    fOggetto: TNullableString;
+    fMessaggio: TStringList;
+    fData_Ora_Notifica: TNullableDateTime;
+    fData_Ora_Lettura: TNullableDateTime;
+  private
+    property Id_Notifica_internal: TNullableInt64 read fId_Notifica write fId_Notifica;
+    property Notifica_internal: TNullableString read fNotifica write fNotifica;
+    property Nominativo_Mittente_internal: TNullableString read fNominativo_Mittente write fNominativo_Mittente;
+    property Nominativo_Destinatario_internal: TNullableString read fNominativo_Destinatario write fNominativo_Destinatario;
+    property Oggetto_internal: TNullableString read fOggetto write fOggetto;
+    property Data_Ora_Notifica_internal: TNullableDateTime read fData_Ora_Notifica write fData_Ora_Notifica;
+    property Data_Ora_Lettura_internal: TNullableDateTime read fData_Ora_Lettura write fData_Ora_Lettura;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('ID_SESSIONE', ptInput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
+    //
+    [TParamAttribute('ID_NOTIFICA', ptOutput, False)]
+    property Id_Notifica: TNullableInt64 read fId_Notifica;
+    //
+    [TParamAttribute('NOTIFICA', ptOutput, False)]
+    property Notifica: TNullableString read fNotifica;
+    //
+    [TParamAttribute('NOMINATIVO_MITTENTE', ptOutput, False)]
+    property Nominativo_Mittente: TNullableString read fNominativo_Mittente;
+    //
+    [TParamAttribute('NOMINATIVO_DESTINATARIO', ptOutput, False)]
+    property Nominativo_Destinatario: TNullableString read fNominativo_Destinatario;
+    //
+    [TParamAttribute('OGGETTO', ptOutput, False)]
+    property Oggetto: TNullableString read fOggetto;
+    //
+    [TParamAttribute('MESSAGGIO', ptOutput, True)]
+    property Messaggio: TStringList read fMessaggio;
+    //
+    [TParamAttribute('DATA_ORA_NOTIFICA', ptOutput, False)]
+    property Data_Ora_Notifica: TNullableDateTime read fData_Ora_Notifica;
+    //
+    [TParamAttribute('DATA_ORA_LETTURA', ptOutput, False)]
+    property Data_Ora_Lettura: TNullableDateTime read fData_Ora_Lettura;
+end;
+
 [TStoredProcedure('WEB_RISORSA_SCHEDA_PERSONALE', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_web_Risorsa_Scheda_Personale = class (TzStoredProc)
@@ -34955,7 +35040,7 @@ TSP_anonymizer__Verifica = class (TzStoredProc)
     property Anomalia: TNullableString read fAnomalia;
 end;
 
-[TStoredProcedure('ANONYMIZER_GESTY.CONFIGURA', True)]
+[TStoredProcedure('ANONYMIZER_GESTY.CONFIGURA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer_Gesty__Configura = class (TzStoredProc)
   private
@@ -34979,7 +35064,7 @@ TSP_anonymizer_Gesty__Esegui_Anonimizzazione = class (TzStoredProc)
     property Parola_Ordine: TNullableString read fParola_Ordine write fParola_Ordine;
 end;
 
-[TStoredProcedure('ANONYMIZER_GESTY.INIZIALIZZA', True)]
+[TStoredProcedure('ANONYMIZER_GESTY.INIZIALIZZA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer_Gesty__Inizializza = class (TzStoredProc)
   private
@@ -44485,6 +44570,24 @@ begin
 end;
 
 
+constructor TSP_grs_Import_Files_Valida_Testo.Create;
+begin
+  inherited;
+  fTesto := CreateStringList;
+end;
+
+destructor TSP_grs_Import_Files_Valida_Testo.Destroy;
+begin
+  FreeAndNil(fTesto);
+  inherited;
+end;
+
+procedure TSP_grs_Import_Files_Valida_Testo.SetTesto(const Value: TStringList);
+begin
+  FTesto.Assign(Value);
+end;
+
+
 constructor TSP_inail_Comunic_Inizio_Tirocinio.Create;
 begin
   inherited;
@@ -45619,6 +45722,19 @@ end;
 destructor TSP_web_Risorsa_Elenco_Incarichi.Destroy;
 begin
   FreeAndNil(fNote);
+  inherited;
+end;
+
+
+constructor TSP_web_Risorsa_Notifiche.Create;
+begin
+  inherited;
+  fMessaggio := CreateStringList;
+end;
+
+destructor TSP_web_Risorsa_Notifiche.Destroy;
+begin
+  FreeAndNil(fMessaggio);
   inherited;
 end;
 
