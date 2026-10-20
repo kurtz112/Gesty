@@ -36,7 +36,8 @@ object Main: TMain
     ColorSchemeAccent = rcsaGreen
     ColorSchemeName = 'Colorful'
     PopupMenuItems = []
-    QuickAccessToolbar.Toolbar = dxBarManagerBarTabArea
+    CaptionAreaSearchToolbar.Alignment = Right
+    CaptionAreaSearchToolbar.Toolbar = dxBarManagerBarTabArea
     SupportNonClientDrawing = True
     Contexts = <>
     TabAreaSearchToolbar.Toolbar = TabAreaSearchToolBar
@@ -1257,8 +1258,6 @@ object Main: TMain
       FloatClientHeight = 24
       ItemLinks = <
         item
-          UserDefine = [udPaintStyle]
-          UserPaintStyle = psCaptionGlyph
           Visible = True
           ItemName = 'dxBarButtonNotifiche'
         end
