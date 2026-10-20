@@ -36,12 +36,10 @@ object Main: TMain
     ColorSchemeAccent = rcsaGreen
     ColorSchemeName = 'Colorful'
     PopupMenuItems = []
-    QuickAccessToolbar.Toolbar = dxBarManagerBarQuickAccess
-    QuickAccessToolbar.Visible = False
+    QuickAccessToolbar.Toolbar = dxBarManagerBarTabArea
     SupportNonClientDrawing = True
     Contexts = <>
     TabAreaSearchToolbar.Toolbar = TabAreaSearchToolBar
-    TabAreaToolbar.Toolbar = dxBarManagerBarTabArea
     TabOrder = 0
     TabStop = False
     object tabHome: TdxRibbonTab

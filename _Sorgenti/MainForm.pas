@@ -1386,9 +1386,11 @@ procedure TMain.InitSkin;
 var
   Skin: string;
 begin
-  // blocco da eliminare
-  // dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
+  // La galleria nasce nascosta nel DFM: solo InitSkinChooserGalleryItem la rende
+  // visibile, e senza questa chiamata non c'e' piu' modo di scegliere l'aspetto
+  dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
 
+  // blocco da eliminare
   // Skin := Config.zSystem.SkinName;
   // CaricaSkin(Skin);
 
