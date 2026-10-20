@@ -101,7 +101,7 @@ uses
   Vcl.Taskbar,
   zz.Taskbar,
   dxUIAClasses,
-   zProgressBox,
+  zProgressBox,
   dxScreenTip,
   dxSkinsDefaultPainters,
   zChatAIPane;
@@ -820,7 +820,7 @@ begin
   CambioParametriLavoroInCorso := false;
   ScegliComuneEnabled := false;
 
-  FChatAI:=nil;
+  FChatAI := nil;
 
   cxImage.AutoSize := false;
   cxImage.Visible := false; // viene poi ativata da center image
@@ -1382,10 +1382,10 @@ var
   Skin: string;
 begin
   // blocco da eliminare
-  dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
+  // dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
 
-  Skin := Config.zSystem.SkinName;
-  CaricaSkin(Skin);
+  // Skin := Config.zSystem.SkinName;
+  // CaricaSkin(Skin);
 
   // \fine blocco
 
@@ -1429,10 +1429,10 @@ begin
 
   if dx.SkinActive then
   begin
-   if Config.zSystem.SkinName <> ASkinName then
-    Config.zSystem.SkinName := ASkinName;
-   
-   dxRibbonMain.ColorSchemeName := 'UserSkin';
+    if Config.zSystem.SkinName <> ASkinName then
+      Config.zSystem.SkinName := ASkinName;
+
+    dxRibbonMain.ColorSchemeName := 'UserSkin';
   end
   else
   begin
@@ -2481,7 +2481,6 @@ begin
   CreaForm(TFormCOGE_Soggetti);
 end;
 
-
 procedure TMain.actAIExecute(Sender: TObject);
 const
   // Icone in dx.Immagini: scintilla monocromatica (spento) e colorata (acceso)
@@ -2494,7 +2493,7 @@ begin
   begin
     FChatAI := TzChatAIPane.Create(Self);
     FChatAI.Parent := Self;
-    FChatAI.ToggleAction := actAI;   // il pannello sincronizza Checked e icona
+    FChatAI.ToggleAction := actAI; // il pannello sincronizza Checked e icona
     FChatAI.OpenedImageIndex := dx.IndiceIcona(ICONA_CHAT_ACCESA);
     FChatAI.ClosedImageIndex := dx.IndiceIcona(ICONA_CHAT_SPENTA);
   end;
@@ -2504,7 +2503,7 @@ end;
 
 procedure TMain.actAIUpdate(Sender: TObject);
 begin
- TAction(Sender).Visible := Config.zSystem.Authorizhed(Gesty_Authorizations.AI_UTILIZZO);
+  TAction(Sender).Visible := Config.zSystem.Authorizhed(Gesty_Authorizations.AI_UTILIZZO);
 end;
 
 end.
