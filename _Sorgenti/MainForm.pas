@@ -822,6 +822,11 @@ begin
 
   FChatAI := nil;
 
+  ActionList.Images := dx.Immagini;
+  ModuliActions.Images := dx.Immagini;
+  dxBarManager.ImageOptions.Images := dx.Immagini;
+  dxBarManagerBarQuickAccess.Images := dx.Immagini;
+
   cxImage.AutoSize := false;
   cxImage.Visible := false; // viene poi ativata da center image
 
