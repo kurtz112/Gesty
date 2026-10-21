@@ -204,7 +204,9 @@ constructor TFormAgenda.Create(aOwner: TComponent);
 
     if action.ImageIndex <> -1 then
     begin
-      dx.GetBitmap(btn.Glyph, FrameScheduler.imagesScheduler, action.ImageIndex);
+      // Le azioni di flagActions hanno gli indici della lista globale dx.Immagini: imagesScheduler
+      // ha solo le icone degli eventi, e un indice fuori lista lascia il pulsante senza icona
+      dx.GetBitmap(btn.Glyph, dx.Immagini, action.ImageIndex);
       btn.ImageIndex := -1;
     end;
   end;
@@ -223,7 +225,7 @@ begin
   FrameScheduler.Scheduler.DateNavigator.ColCount := 1;
   FrameScheduler.Scheduler.OnCustomDrawContent := FrameSchedulerSchedulerCustomDrawContent;
   // FrameScheduler.dxBarManagerBarFree.Images := FrameScheduler.imagesScheduler;
-  flagActions.Images := FrameScheduler.imagesScheduler;
+  flagActions.Images := dx.Immagini;
 
   AddToolbarButton(MostraLezioni);
   AddToolbarButton(MostraRilevamenti);
