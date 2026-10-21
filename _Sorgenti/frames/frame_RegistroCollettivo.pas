@@ -1037,22 +1037,23 @@ begin
 end;
 
 procedure TFrameRegistroCollettivo.PreparaItemsStatoPresenza;
-  procedure Add(const ImageIndex: integer; const Caption: String; const value: String);
+  procedure Add(const NomeIcona: string; const Caption: String; const value: String);
   var
     item: TcxImageComboBoxItem;
   begin
     item := cxEditRepositoryStatoPresenza.Properties.Items.Add;
     item.Description := Caption;
     item.value := value;
-    item.ImageIndex := ImageIndex;
+    item.ImageIndex := dx.IndiceIcona(NomeIcona);
   end;
 
 begin
   cxEditRepositoryStatoPresenza.Properties.Items.Clear;
-  Add(282, 'Presente', 'P');
-  Add(278, 'Assente', 'A');
-  Add(283, 'Giustificato', 'G');
-  Add(284, 'Non Svolta', 'B');
+  // Mantis #270 - 2026-10-21: icone per nome in dx.Immagini, gli indici fissi della vecchia ImageList16 mostravano icone di tabella
+  Add('pallino_verde', 'Presente', 'P');
+  Add('pallino_rosso', 'Assente', 'A');
+  Add('pallino_blu', 'Giustificato', 'G');
+  Add('pallino_nero', 'Non Svolta', 'B');
 end;
 
 procedure TFrameRegistroCollettivo.treeMaterieDblClick(Sender: TObject);
