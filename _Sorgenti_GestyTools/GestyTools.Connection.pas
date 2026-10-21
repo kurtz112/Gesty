@@ -206,7 +206,11 @@ begin
   FDIBBackup.BackupFiles.Add(BackupFilename);
   FDIBBackup.Options := FDIBBackup.Options + [boNoTriggers];
 
-  FDIBBackup.Backup;
+  try
+    FDIBBackup.Backup;
+  finally
+    Log.ChiudiAvanzamento;
+  end;
 end;
 
 procedure TConnection.FDIBBackupError(ASender, AInitiator: TObject; var AException: Exception);
@@ -216,7 +220,7 @@ end;
 
 procedure TConnection.FDIBBackupProgress(ASender: TFDPhysDriverService; const AMessage: string);
 begin
-  Log.ToScreen('Backup: ' + AMessage);
+  Log.Avanzamento('Backup: ' + AMessage);
 end;
 
 procedure TConnection.FDIBRestoreError(ASender, AInitiator: TObject; var AException: Exception);
@@ -226,7 +230,7 @@ end;
 
 procedure TConnection.FDIBRestoreProgress(ASender: TFDPhysDriverService; const AMessage: string);
 begin
-  Log.ToScreen('Restore: ' + AMessage);
+  Log.Avanzamento('Restore: ' + AMessage);
 end;
 
 procedure TConnection.Restore(const BackupFilename, DatabaseFilename: string);
@@ -254,7 +258,11 @@ begin
   FDIBRestore.BackupFiles.Clear; // se chiamato più volte
   FDIBRestore.BackupFiles.Add(BackupFilename);
 
-  FDIBRestore.Restore;
+  try
+    FDIBRestore.Restore;
+  finally
+    Log.ChiudiAvanzamento;
+  end;
 
   // Da qui in poi questo percorso e' un database nato da un ripristino fatto
   // adesso, da questo processo: e' la condizione che l'anonimizzazione
