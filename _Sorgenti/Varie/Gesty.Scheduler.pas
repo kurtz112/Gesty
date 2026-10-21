@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-02
+// Ultima modifica: 2026-10-21
 // ---------------------------------------------------------------------------
 unit Gesty.Scheduler;
 
@@ -60,7 +60,10 @@ type
 
   // Modulo dati che sa copiare e incollare ore, giorni e settimane
   ISchedulerCopyPaste = interface
-    function TipoEventiPerInserimento: TSchedulerTipoEventi;
+    // i tipi di evento che IncollaOra sa incollare: non coincidono per forza con
+    // quelli che si possono inserire (l'agenda inserisce appuntamenti e attivita'
+    // fuori sede, ma incolla solo rilevamenti ore)
+    function TipoEventiAmmessi: TSchedulerTipoEventi;
     procedure IncollaOra(srcId: integer; DestData: TDate; DestOra: TTime; Taglia: boolean);
     procedure IncollaGiorno(srcGiorno, destGiorno: TDateTime);
     procedure IncollaSettimana(srcGiorno, destGiorno: TDateTime);
@@ -181,7 +184,13 @@ end;
 
 function TGestySchedulerCopyPaste.TipoEventiPerInserimento: TzSchedulerKinds;
 begin
-  result := TGestyScheduler.Kinds(FCopyPaste.TipoEventiPerInserimento);
+  // Il calendario di zPack abilita Copia e Taglia sui tipi restituiti qui, e
+  // Incolla passa l'id dell'evento a IncollaOra del modulo dati. Con i tipi
+  // inseribili l'agenda abilitava Copia e Taglia anche su appuntamenti e
+  // attivita' fuori sede, e AGENDA_RILEVAMENTI_INCOLLA_ORA copiava (e con
+  // Taglia cancellava) il rilevamento ore con lo stesso numero, di chiunque fosse:
+  // le chiavi delle due tabelle hanno contatori distinti e si sovrappongono
+  result := TGestyScheduler.Kinds(FCopyPaste.TipoEventiAmmessi);
 end;
 
 procedure TGestySchedulerCopyPaste.IncollaOra(IdOrigine: Integer; DataDestinazione: TDate; OraDestinazione: TTime; Taglia: Boolean);
