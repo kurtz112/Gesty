@@ -64,6 +64,12 @@ type
     procedure ListFiles(Files: TStrings);
     // nome relativo alla cartella corrente, come per RemoteFileExists
     procedure Delete(const FileName: string);
+    // invia "SITE <Comando>" (per esempio CPFR/CPTO di ProFTPD, che copiano un
+    // file sul server senza ritrasmetterlo). Restituisce false se il server
+    // non conosce il comando (500/502) o lo rifiuta; il testo della risposta
+    // resta in UltimaRisposta, per scriverlo nel registro dello script
+    function Site(const Comando: string): boolean;
+    function UltimaRisposta: string;
     procedure Download(const SrcFileName, DestFileName: string; ProgressCallback: TFtpProgressCallback = nil);
     procedure Upload(const SrcFileName, DestFileName: string; ProgressCallback: TFtpProgressCallback = nil);
   end;
@@ -193,6 +199,25 @@ procedure TFTP.Delete(const FileName: string);
 begin
   Connect;
   IdFTP.Delete(FileName);
+end;
+
+function TFTP.Site(const Comando: string): boolean;
+var
+  CodiceRisposta: integer;
+begin
+  Connect;
+
+  // senza elenco dei codici attesi SendCmd non solleva su 5xx: lo script
+  // decide se ripiegare su un secondo invio
+  CodiceRisposta := IdFTP.SendCmd('SITE ' + Comando);
+
+  // 200/250 = eseguito, 350 = CPFR in attesa del CPTO
+  Result := (CodiceRisposta = 200) or (CodiceRisposta = 250) or (CodiceRisposta = 350);
+end;
+
+function TFTP.UltimaRisposta: string;
+begin
+  Result := IdFTP.LastCmdResult.Text.Text.Trim;
 end;
 
 function TFTP.ChangeDirForFile(const RemotePath: string): string;

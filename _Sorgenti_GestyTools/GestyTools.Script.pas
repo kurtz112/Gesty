@@ -492,6 +492,18 @@ begin
     begin
       FTP.Delete(Params[0]);
     end);
+
+  RegistraFunzione('function FtpSite(const Comando: string): boolean',
+    function(var Params: Variant): Variant
+    begin
+      result := FTP.Site(Params[0]);
+    end);
+
+  RegistraFunzione('function FtpUltimaRisposta: string',
+    function(var Params: Variant): Variant
+    begin
+      result := FTP.UltimaRisposta;
+    end);
 end;
 
 function TScriptModule.ElencoFunzioni: string;
