@@ -64,6 +64,7 @@ type
     function GetField(DataSet: TDataSet; FieldName: string; out Field: TField): boolean;
     function GetRilevamento(idDocente, IdProgetto, IdCorso: integer; DataLezione: TDateTime; OraInizio, OraFine: TTime; IdIncarico: integer): integer;
     function CercaIncarico(FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria: TField): integer;
+    function IncaricoCoerente(FieldIncarico, FieldProgetto, FieldDocente: TField): boolean;
   protected
     procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
   public
@@ -286,6 +287,18 @@ var
 begin
   DataSet := GetDataSet('Ore_Sostegno');
 
+  // Mantis #267 - 2026-10-21: un incarico gia' assegnato che non e' del progetto e del formatore della riga
+  // violerebbe FK_ORE_SOSTEGNO_INCARICHI al salvataggio: lo si toglie insieme al rilevamento e lo si ricerca sotto
+  if GetField(DataSet, 'ID_INCARICO', FieldIncarico) and (not FieldIncarico.IsNull) then
+    if GetField(DataSet, 'ID_PROGETTO', FieldProgetto) and GetField(DataSet, 'ID_FORMATORE', FieldDocente) then
+      if not IncaricoCoerente(FieldIncarico, FieldProgetto, FieldDocente) then
+      begin
+        FieldIncarico.Clear;
+
+        if GetField(DataSet, 'ID_RILEVAMENTO_ORE', FieldRilevamento) then
+          FieldRilevamento.Clear;
+      end;
+
   // Viene chiamato anche da
 
   if GetField(DataSet, 'ID_PROGETTO', FieldProgetto) and (not FieldProgetto.IsNull) then
@@ -351,6 +364,20 @@ begin
   finally
     FreeAndNil(sp);
   end;
+end;
+
+// Vero se l'incarico appartiene al progetto e al formatore della riga: e' la condizione di FK_ORE_SOSTEGNO_INCARICHI.
+function TSostegno.IncaricoCoerente(FieldIncarico, FieldProgetto, FieldDocente: TField): boolean;
+var
+  Conteggio: Variant;
+begin
+  if FieldProgetto.IsNull or FieldDocente.IsNull then
+    exit(False);
+
+  Conteggio := Config.Database.ExecSQLScalar('SELECT COUNT(*) FROM INCARICHI WHERE INCARICHI.ID_INCARICO = :ID_INCARICO AND ' +
+    'INCARICHI.ID_PROGETTO = :ID_PROGETTO AND INCARICHI.ID_RISORSA = :ID_RISORSA', [FieldIncarico.Value, FieldProgetto.Value, FieldDocente.Value]);
+
+  result := Conteggio > 0;
 end;
 
 function TSostegno.GetRilevamento(idDocente, IdProgetto, IdCorso: integer; DataLezione: TDateTime; OraInizio, OraFine: TTime; IdIncarico: integer): integer;
