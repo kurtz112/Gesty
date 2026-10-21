@@ -151,18 +151,6 @@ inherited FormBudget: TFormBudget
   end
   inherited dxBarManager: TdxBarManager
     PixelsPerInch = 96
-    inherited barFree: TdxBar
-      ItemLinks = <
-        item
-          UserDefine = [udPaintStyle]
-          UserPaintStyle = psCaptionGlyph
-          Visible = True
-          ItemName = 'dxBarButton1'
-        end>
-    end
-    inherited barSistema: TdxBar
-      DockedLeft = 193
-    end
     object dxBarButton1: TdxBarButton
       Action = ElaboraCostiRicavi
       Category = 0
