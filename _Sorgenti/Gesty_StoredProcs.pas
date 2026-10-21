@@ -3037,6 +3037,104 @@ TSP_aule_Cerca_Slot_Liberi = class (TzStoredProc)
     property Ora_Fine: TNullableTime read fOra_Fine;
 end;
 
+[TStoredProcedure('AULE_CERCA_SLOT_LIBERI_RISORSA', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_aule_Cerca_Slot_Liberi_Risorsa = class (TzStoredProc)
+  private
+    fParam_Aula: TNullableString;
+    fParam_Id_Sede: TNullableInt64;
+    fData_Inizio: TNullableDate;
+    fData_Fine: TNullableDate;
+    fDalle_Ore: TNullableTime;
+    fAlle_Ore: TNullableTime;
+    fDurata: TNullableInt64;
+    fMinuti_Incremento: TNullableInt64;
+    fParam_Id_Risorsa: TNullableInt64;
+    fIncludi_Fine_Settimana: TNullableBoolean;
+    fAula: TNullableString;
+    fDesc_Aula: TNullableString;
+    fId_Ente: TNullableInt64;
+    fEnte: TNullableString;
+    fId_Sede: TNullableInt64;
+    fSede: TNullableString;
+    fGiorno: TNullableString;
+    fData: TNullableDate;
+    fOra_Inizio: TNullableTime;
+    fOra_Fine: TNullableTime;
+  private
+    property Aula_internal: TNullableString read fAula write fAula;
+    property Desc_Aula_internal: TNullableString read fDesc_Aula write fDesc_Aula;
+    property Id_Ente_internal: TNullableInt64 read fId_Ente write fId_Ente;
+    property Ente_internal: TNullableString read fEnte write fEnte;
+    property Id_Sede_internal: TNullableInt64 read fId_Sede write fId_Sede;
+    property Sede_internal: TNullableString read fSede write fSede;
+    property Giorno_internal: TNullableString read fGiorno write fGiorno;
+    property Data_internal: TNullableDate read fData write fData;
+    property Ora_Inizio_internal: TNullableTime read fOra_Inizio write fOra_Inizio;
+    property Ora_Fine_internal: TNullableTime read fOra_Fine write fOra_Fine;
+  public
+    //
+    [TParamAttribute('PARAM_AULA', ptInput, False)]
+    property Param_Aula: TNullableString read fParam_Aula write fParam_Aula;
+    //
+    [TParamAttribute('PARAM_ID_SEDE', ptInput, False)]
+    property Param_Id_Sede: TNullableInt64 read fParam_Id_Sede write fParam_Id_Sede;
+    //
+    [TParamAttribute('DATA_INIZIO', ptInput, False)]
+    property Data_Inizio: TNullableDate read fData_Inizio write fData_Inizio;
+    //
+    [TParamAttribute('DATA_FINE', ptInput, False)]
+    property Data_Fine: TNullableDate read fData_Fine write fData_Fine;
+    //
+    [TParamAttribute('DALLE_ORE', ptInput, False)]
+    property Dalle_Ore: TNullableTime read fDalle_Ore write fDalle_Ore;
+    //
+    [TParamAttribute('ALLE_ORE', ptInput, False)]
+    property Alle_Ore: TNullableTime read fAlle_Ore write fAlle_Ore;
+    //
+    [TParamAttribute('DURATA', ptInput, False)]
+    property Durata: TNullableInt64 read fDurata write fDurata;
+    //
+    [TParamAttribute('MINUTI_INCREMENTO', ptInput, False)]
+    property Minuti_Incremento: TNullableInt64 read fMinuti_Incremento write fMinuti_Incremento;
+    //
+    [TParamAttribute('PARAM_ID_RISORSA', ptInput, False)]
+    property Param_Id_Risorsa: TNullableInt64 read fParam_Id_Risorsa write fParam_Id_Risorsa;
+    //
+    [TParamAttribute('INCLUDI_FINE_SETTIMANA', ptInput, False)]
+    property Includi_Fine_Settimana: TNullableBoolean read fIncludi_Fine_Settimana write fIncludi_Fine_Settimana;
+    //
+    [TParamAttribute('AULA', ptOutput, False)]
+    property Aula: TNullableString read fAula;
+    //
+    [TParamAttribute('DESC_AULA', ptOutput, False)]
+    property Desc_Aula: TNullableString read fDesc_Aula;
+    //
+    [TParamAttribute('ID_ENTE', ptOutput, False)]
+    property Id_Ente: TNullableInt64 read fId_Ente;
+    //
+    [TParamAttribute('ENTE', ptOutput, False)]
+    property Ente: TNullableString read fEnte;
+    //
+    [TParamAttribute('ID_SEDE', ptOutput, False)]
+    property Id_Sede: TNullableInt64 read fId_Sede;
+    //
+    [TParamAttribute('SEDE', ptOutput, False)]
+    property Sede: TNullableString read fSede;
+    //
+    [TParamAttribute('GIORNO', ptOutput, False)]
+    property Giorno: TNullableString read fGiorno;
+    //
+    [TParamAttribute('DATA', ptOutput, False)]
+    property Data: TNullableDate read fData;
+    //
+    [TParamAttribute('ORA_INIZIO', ptOutput, False)]
+    property Ora_Inizio: TNullableTime read fOra_Inizio;
+    //
+    [TParamAttribute('ORA_FINE', ptOutput, False)]
+    property Ora_Fine: TNullableTime read fOra_Fine;
+end;
+
 [TStoredProcedure('AULE_PRENOTAZIONI_AUTORIZZA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_aule_Prenotazioni_Autorizza = class (TzStoredProc)
