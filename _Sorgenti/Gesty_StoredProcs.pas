@@ -8772,6 +8772,51 @@ TSP_enti_Sedi_Giorni_Chiusura_Add = class (TzStoredProc)
     property Anno: TNullableInteger read fAnno write fAnno;
 end;
 
+[TStoredProcedure('ENTI_SEDI_INDIRIZZO_ALLA_DATA', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_enti_Sedi_Indirizzo_Alla_Data = class (TzStoredProc)
+  private
+    fParam_Id_Ente: TNullableInt64;
+    fParam_Id_Sede: TNullableInt64;
+    fParam_Data: TNullableDate;
+    fIndirizzo: TNullableString;
+    fCap: TNullableString;
+    fCitta: TNullableString;
+    fProvincia: TNullableString;
+    fAccreditamento: TNullableString;
+  private
+    property Indirizzo_internal: TNullableString read fIndirizzo write fIndirizzo;
+    property Cap_internal: TNullableString read fCap write fCap;
+    property Citta_internal: TNullableString read fCitta write fCitta;
+    property Provincia_internal: TNullableString read fProvincia write fProvincia;
+    property Accreditamento_internal: TNullableString read fAccreditamento write fAccreditamento;
+  public
+    //
+    [TParamAttribute('PARAM_ID_ENTE', ptInput, False)]
+    property Param_Id_Ente: TNullableInt64 read fParam_Id_Ente write fParam_Id_Ente;
+    //
+    [TParamAttribute('PARAM_ID_SEDE', ptInput, False)]
+    property Param_Id_Sede: TNullableInt64 read fParam_Id_Sede write fParam_Id_Sede;
+    //
+    [TParamAttribute('PARAM_DATA', ptInput, False)]
+    property Param_Data: TNullableDate read fParam_Data write fParam_Data;
+    //
+    [TParamAttribute('INDIRIZZO', ptOutput, False)]
+    property Indirizzo: TNullableString read fIndirizzo;
+    //
+    [TParamAttribute('CAP', ptOutput, False)]
+    property Cap: TNullableString read fCap;
+    //
+    [TParamAttribute('CITTA', ptOutput, False)]
+    property Citta: TNullableString read fCitta;
+    //
+    [TParamAttribute('PROVINCIA', ptOutput, False)]
+    property Provincia: TNullableString read fProvincia;
+    //
+    [TParamAttribute('ACCREDITAMENTO', ptOutput, False)]
+    property Accreditamento: TNullableString read fAccreditamento;
+end;
+
 [TStoredProcedure('ESISTE_CV', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_esiste_Cv = class (TzStoredProc)
