@@ -63,6 +63,7 @@ type
   private
     function GetField(DataSet: TDataSet; FieldName: string; out Field: TField): boolean;
     function GetRilevamento(idDocente, IdProgetto, IdCorso: integer; DataLezione: TDateTime; OraInizio, OraFine: TTime; IdIncarico: integer): integer;
+    function CercaIncarico(FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria: TField): integer;
   protected
     procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
   public
@@ -281,8 +282,7 @@ procedure TSostegno.OreSostegnoFieldChanged(Sender: TField);
 var
   DataSet: TzFbDataSet;
   FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria, FieldIncarico, FieldRilevamento, FieldOraInizio, FieldOraFine: TField;
-  idRilevamento: integer;
-  sp: TSP_INCARICHI_GET_X_SOSTEGNO;
+  idRilevamento, idIncarico: integer;
 begin
   DataSet := GetDataSet('Ore_Sostegno');
 
@@ -298,31 +298,10 @@ begin
                 if GetField(DataSet, 'ORA_INIZIO', FieldOraInizio) then
                   if GetField(DataSet, 'ORA_FINE', FieldOraFine) then
                   begin
-                    sp := TSP_INCARICHI_GET_X_SOSTEGNO.Create(WriteTrans);
-                    try
-                      sp.ID_PROGETTO := FieldProgetto.Value;
-
-                      if FieldCorso.IsNull then
-                        sp.ID_CORSO.Clear
-                      else
-                        sp.ID_CORSO := FieldCorso.Value;
-
-                      sp.ID_RISORSA := FieldDocente.Value;
-                      sp.DATA_LEZIONE := FieldDataLezione.Value;
-
-                      if FieldMateria.IsNull then
-                        sp.MATERIA.Clear
-                      else
-                        sp.MATERIA := FieldMateria.Value;
-
-                      sp.SUPPLENZA := False;
-
-                      sp.ExecuteAndCommit;
-
-                      if not sp.ID_INCARICO.IsNull then
-                        if sp.ID_INCARICO.Value <> -1 then
-                          FieldIncarico.Value := sp.ID_INCARICO;
-                      { TODO : Verificare se un eventuale id_incarico preesistente è ancora valido? }
+                    idIncarico := CercaIncarico(FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria);
+                    if idIncarico <> -1 then
+                      FieldIncarico.Value := idIncarico;
+                    { TODO : Verificare se un eventuale id_incarico preesistente è ancora valido? }
 
                       if not FieldIncarico.IsNull then
                         if FieldRilevamento.IsNull then { TODO : else verificare se un eventuale rilevamento preesistente è ancora valido? }
@@ -335,10 +314,43 @@ begin
                           else
                             FieldRilevamento.Value := idRilevamento;
                         end;
-                    finally
-                      FreeAndNil(sp);
-                    end;
                   end;
+end;
+
+// Cerca l'incarico di sostegno valido per la riga (stessa chiamata usata quando si modifica un campo della riga e da GeneraRilevamento).
+// Restituisce -1 se non ne trova.
+function TSostegno.CercaIncarico(FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria: TField): integer;
+var
+  sp: TSP_INCARICHI_GET_X_SOSTEGNO;
+begin
+  result := -1;
+
+  sp := TSP_INCARICHI_GET_X_SOSTEGNO.Create(WriteTrans);
+  try
+    sp.ID_PROGETTO := FieldProgetto.Value;
+
+    if FieldCorso.IsNull then
+      sp.ID_CORSO.Clear
+    else
+      sp.ID_CORSO := FieldCorso.Value;
+
+    sp.ID_RISORSA := FieldDocente.Value;
+    sp.DATA_LEZIONE := FieldDataLezione.Value;
+
+    if FieldMateria.IsNull then
+      sp.MATERIA.Clear
+    else
+      sp.MATERIA := FieldMateria.Value;
+
+    sp.SUPPLENZA := False;
+
+    sp.ExecuteAndCommit;
+
+    if not sp.ID_INCARICO.IsNull then
+      result := sp.ID_INCARICO.Value;
+  finally
+    FreeAndNil(sp);
+  end;
 end;
 
 function TSostegno.GetRilevamento(idDocente, IdProgetto, IdCorso: integer; DataLezione: TDateTime; OraInizio, OraFine: TTime; IdIncarico: integer): integer;
@@ -418,7 +430,7 @@ var
   sp: TSP_ORE_RILEVATE_GENERA_RILEVAMENTO;
   FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria, FieldContenuti, FieldIncarico, FieldRilevamento, FieldOraInizio, FieldOraFine: TField;
   Ore_Sostegno: TzFbDataSet;
-  idRilevamento: integer;
+  idRilevamento, idIncarico: integer;
 begin
   Ore_Sostegno := GetDataSet('Ore_Sostegno');
 
@@ -463,9 +475,23 @@ begin
                         exit;
                       end;
 
+                      // Mantis #266 - 2026-10-21: l'incarico puo' essere stato creato dopo l'inserimento della riga, quindi lo si cerca di nuovo prima di rifiutare
                       if FieldIncarico.IsNull then
                       begin
-                        ConfirmOk('Id Incarico non specificato.');
+                        idIncarico := CercaIncarico(FieldProgetto, FieldCorso, FieldDocente, FieldDataLezione, FieldMateria);
+
+                        if idIncarico <> -1 then
+                        begin
+                          Ore_Sostegno.CheckEditMode;
+                          FieldIncarico.Value := idIncarico;
+                          Ore_Sostegno.CheckBrowseMode;
+                        end;
+                      end;
+
+                      if FieldIncarico.IsNull then
+                      begin
+                        ConfirmOk('Il formatore non ha un incarico di sostegno valido su questo progetto nella data della lezione.' + sLineBreak +
+                          'Creare l''incarico con "Genera Incarico".');
                         exit;
                       end;
 
