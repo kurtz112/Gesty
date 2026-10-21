@@ -34,6 +34,7 @@ type
     ImportLines: TStrings;
     function CleanImportString(const s: string): string;
     procedure PrepareImportMapXLSX;
+    function AreaRiferimentoProgetto(const IdProgetto: Variant): Variant;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -53,6 +54,7 @@ implementation
 
 uses
   WizInserimentoIncaricoFrm,
+  ConfigModule,
   Gesty_StoredProcs,
   zBaseLib,
   QImport3Common,
@@ -228,6 +230,31 @@ begin
   QImport3Xlsx.Map.Add('CODICE FISCALE=E');
 end;
 
+function TAccordoStatoRegioni.AreaRiferimentoProgetto(const IdProgetto: Variant): Variant;
+var
+  Query: TzFbDataSet;
+begin
+  Result := Null;
+
+  if VarIsNull(IdProgetto) or VarIsEmpty(IdProgetto) then
+    Exit;
+
+  Query := TzFbDataSet.Create(nil);
+  try
+    Query.Connection := Config.Database;
+    Query.Transaction := ReadTrans;
+    Query.SQL.Text :=
+      'SELECT PROGETTI.AREA_RIFERIMENTO FROM PROGETTI WHERE PROGETTI.ID_PROGETTO = :ID_PROGETTO';
+    Query.ParamByName('ID_PROGETTO').Value := IdProgetto;
+    Query.Active := True;
+
+    if not Query.IsEmpty then
+      Result := Query.Fields[0].Value;
+  finally
+    Query.Free;
+  end;
+end;
+
 procedure TAccordoStatoRegioni.ImportNote(const LookupDataSet: string; memo: TcxMemo);
 var
   dataset, lookup: TzFbDataSet;
@@ -237,7 +264,20 @@ begin
 
   dataset.CheckEditMode;
 
+  // Mantis #269 - 2026-10-21: testi filtrati per l'area del progetto; se l'area
+  // non ne ha, o il progetto non e' ancora scelto, si mostrano tutti come prima
   lookup.RevertSQL(False);
+  if lookup.ParamExists('AREA_RIFERIMENTO') then
+  begin
+    lookup.ParamByName('AREA_RIFERIMENTO').Value := AreaRiferimentoProgetto(dataset.FieldByName('ID_PROGETTO').Value);
+    lookup.Active := true;
+
+    if lookup.IsEmpty and not lookup.ParamByName('AREA_RIFERIMENTO').IsNull then
+    begin
+      lookup.Active := False;
+      lookup.ParamByName('AREA_RIFERIMENTO').Clear;
+    end;
+  end;
   lookup.Active := true;
   try
     ImportNoteDlg.dataset := lookup;
