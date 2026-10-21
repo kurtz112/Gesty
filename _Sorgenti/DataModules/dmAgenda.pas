@@ -81,6 +81,20 @@ type
     procedure SetPeriodo(DalGiorno: TDate; AlGiorno: TDate);
     procedure RefreshScheduler;
     function TipoEventiPerInserimento: TSchedulerTipoEventi;
+  public // prenotazione di un'aula dall'agenda (TFormPrenotaAulaDaAgenda)
+    function AuleLibere: TzFbDataSet;
+    function SlotLiberiAula: TzFbDataSet;
+    function ElencoAule: TzFbDataSet;
+    // Modo A: aule libere nell'orario, tenendo conto anche degli impegni della persona
+    procedure CercaAuleLibere(Data: TDate; DalleOre, AlleOre: TTime);
+    // Modo B: orari in cui sono liberi l'aula e la persona
+    procedure CercaSlotLiberiAula(const Aula: string; DalGiorno, AlGiorno: TDate; DalleOre, AlleOre: TTime; Durata, Passo: integer; IncludiFineSettimana: boolean);
+    // La persona dell'agenda non ha impegni nella fascia (PERSONALE_LIBERO)
+    function PersonaLibera(Data: TDate; DalleOre, AlleOre: TTime): boolean;
+    // Apre la scheda della prenotazione con data, ore e aula della riga corrente.
+    // Vero se la prenotazione e' stata salvata; PrenotazioniAccese e' vero se
+    // per mostrarla e' stato acceso "Mostra prenotazioni aule"
+    function PrenotaDaRicerca(Risultati: TzFbDataSet; out PrenotazioniAccese: boolean): boolean;
   public // ISchedulerCopyPaste
     function TipoEventiAmmessi: TSchedulerTipoEventi;
     procedure IncollaOra(srcId: integer; DestData: TDate; DestOra: TTime; Taglia: boolean);
@@ -111,9 +125,10 @@ uses
   System.DateUtils,
   Gesty_StoredProcs,
   zOffice.Reports,
-   
+
   dmScheduler.Tools,
-  ConfigModule;
+  ConfigModule,
+  zBaseLib;
 
 {$R *.dfm}
 
@@ -199,7 +214,121 @@ end;
 
 function TAgenda.TipoEventiPerInserimento: TSchedulerTipoEventi;
 begin
-  result := [teAgendaPersonale, teOreRilevamento, teAttivitaFuoriSede];
+  // la prenotazione d'aula e' inseribile ma non incollabile (TipoEventiAmmessi):
+  // Copia e Taglia guardano TipoEventiAmmessi dal rilascio 001
+  result := [teAgendaPersonale, teOreRilevamento, teAttivitaFuoriSede, tePrenotazioneAule];
+end;
+
+function TAgenda.AuleLibere: TzFbDataSet;
+begin
+  result := GetDataSet('AuleLibere');
+end;
+
+function TAgenda.SlotLiberiAula: TzFbDataSet;
+begin
+  result := GetDataSet('SlotLiberiAula');
+end;
+
+function TAgenda.ElencoAule: TzFbDataSet;
+begin
+  result := GetDataSet('lkAule');
+end;
+
+procedure TAgenda.CercaAuleLibere(Data: TDate; DalleOre, AlleOre: TTime);
+var
+  Risultati: TzFbDataSet;
+  Durata: integer;
+begin
+  // un solo orario: durata e passo coincidono con la fascia scelta
+  Durata := Round((AlleOre - DalleOre) * MinsPerDay);
+
+  Risultati := AuleLibere;
+  StartWait('Attendere...', True);
+  try
+    Risultati.Active := False;
+    Risultati.ParamByName('PARAM_AULA').AsString := '';
+    Risultati.ParamByName('PARAM_ID_SEDE').Value := -1;
+    Risultati.ParamByName('DATA_INIZIO').AsDate := Data;
+    Risultati.ParamByName('DATA_FINE').AsDate := Data;
+    Risultati.ParamByName('DALLE_ORE').AsTime := DalleOre;
+    Risultati.ParamByName('ALLE_ORE').AsTime := AlleOre;
+    Risultati.ParamByName('DURATA').Value := Durata;
+    Risultati.ParamByName('MINUTI_INCREMENTO').Value := Durata;
+    Risultati.ParamByName('PARAM_ID_RISORSA').Value := IdRisorsa;
+    // il giorno l'ha scelto l'utente: anche sabato e domenica
+    Risultati.ParamByName('INCLUDI_FINE_SETTIMANA').AsBoolean := true;
+    Risultati.Active := true;
+  finally
+    StopWait;
+  end;
+end;
+
+procedure TAgenda.CercaSlotLiberiAula(const Aula: string; DalGiorno, AlGiorno: TDate; DalleOre, AlleOre: TTime; Durata, Passo: integer; IncludiFineSettimana: boolean);
+var
+  Risultati: TzFbDataSet;
+begin
+  Risultati := SlotLiberiAula;
+  StartWait('Attendere...', True);
+  try
+    Risultati.Active := False;
+    Risultati.ParamByName('PARAM_AULA').AsString := Aula;
+    Risultati.ParamByName('PARAM_ID_SEDE').Value := -1;
+    Risultati.ParamByName('DATA_INIZIO').AsDate := DalGiorno;
+    Risultati.ParamByName('DATA_FINE').AsDate := AlGiorno;
+    Risultati.ParamByName('DALLE_ORE').AsTime := DalleOre;
+    Risultati.ParamByName('ALLE_ORE').AsTime := AlleOre;
+    Risultati.ParamByName('DURATA').Value := Durata;
+    Risultati.ParamByName('MINUTI_INCREMENTO').Value := Passo;
+    Risultati.ParamByName('PARAM_ID_RISORSA').Value := IdRisorsa;
+    Risultati.ParamByName('INCLUDI_FINE_SETTIMANA').AsBoolean := IncludiFineSettimana;
+    Risultati.Active := true;
+  finally
+    StopWait;
+  end;
+end;
+
+function TAgenda.PersonaLibera(Data: TDate; DalleOre, AlleOre: TTime): boolean;
+var
+  Esito: Variant;
+begin
+  Esito := Config.Database.ExecSQLScalar('SELECT PERSONALE_LIBERO(CAST(:ID_RISORSA AS BIGINT), CAST(:DATA AS DATE), CAST(:DALLE_ORE AS TIME), CAST(:ALLE_ORE AS TIME)) FROM RDB$DATABASE',
+    [IdRisorsa, DateOf(Data), TimeOf(DalleOre), TimeOf(AlleOre)]);
+
+  result := VarIsNull(Esito) or (Esito = true);
+end;
+
+function TAgenda.PrenotaDaRicerca(Risultati: TzFbDataSet; out PrenotazioniAccese: boolean): boolean;
+var
+  Params: TEventoParams;
+begin
+  result := False;
+  PrenotazioniAccese := False;
+
+  if not Risultati.Active or Risultati.IsEmpty then
+    exit;
+
+  Params.Init;
+  Params.TipoEvento := tePrenotazioneAule;
+  Params.id := -1;
+  Params.Data := DateOf(Risultati.FieldByName('DATA').AsDateTime);
+  Params.OraInizio := TimeOf(Risultati.FieldByName('ORA_INIZIO').AsDateTime);
+  Params.OraFine := TimeOf(Risultati.FieldByName('ORA_FINE').AsDateTime);
+  Params.Aula := Risultati.FieldByName('AULA').AsString;
+
+  result := SchedulerTools.ApriEvento(Params);
+
+  if result then
+  begin
+    // senza "Mostra prenotazioni aule" la prenotazione appena fatta non
+    // comparirebbe nell'agenda: si accende, e il cambio rilegge il calendario
+    if not MostraPrenotazioniAule then
+    begin
+      MostraPrenotazioniAule := true;
+      PrenotazioniAccese := true;
+    end
+    else
+      RefreshScheduler;
+  end;
 end;
 
 function TAgenda.TipoEventiAmmessi: TSchedulerTipoEventi;

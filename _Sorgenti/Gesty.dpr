@@ -123,6 +123,7 @@ uses
   dmInail in 'DataModules\dmInail.pas' {Inail: TDataModule},
   dmPrenotazioniAule in 'DataModules\dmPrenotazioniAule.pas' {PrenotazioniAule},
   frmPrenotazioniAule in 'dbForms\frmPrenotazioniAule.pas' {FormPrenotazioniAule},
+  frmPrenotaAulaDaAgenda in 'dbForms\frmPrenotaAulaDaAgenda.pas' {FormPrenotaAulaDaAgenda},
   CalendarioCorsi.classes in 'Varie\CalendarioCorsi.classes.pas',
   Frame_CalendarioDocenti in 'frames\Frame_CalendarioDocenti.pas' {FrameCalendarioDocenti: TFrame},
   dmCalendarioDocenti in 'DataModules\dmCalendarioDocenti.pas' {CalendarioDocenti: TDataModule},

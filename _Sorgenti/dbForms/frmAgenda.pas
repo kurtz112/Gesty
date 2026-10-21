@@ -150,6 +150,11 @@ type
     AnchorDate: TDateTime;
   private
     function EsistePresenza(inizio, fine: TDateTime): Boolean;
+  private // prenotazione di un'aula dall'agenda
+    procedure AggiungiVociPrenotazioneAula;
+    procedure LeggiSelezione(out Data: TDate; out DalleOre, AlleOre: TTime);
+    procedure CercaAulaLiberaExecute(Sender: TObject);
+    procedure CercaQuandoLiberaAulaExecute(Sender: TObject);
   protected
     procedure AfterCreateControls; override;
     procedure CreateDataModule; override;
@@ -166,6 +171,7 @@ uses
   System.DateUtils,
   System.Math,
   dmAgenda,
+  frmPrenotaAulaDaAgenda,
   cxSchedulerDialogs,
   cxSchedulerOutlookExchange,
   zDm_Images,
@@ -184,7 +190,116 @@ begin
   // il modulo dati resta quello di sempre: il ponte Gesty.Scheduler lo adatta
   // al calendario di zPack
   FrameScheduler.Init(TGestyScheduler.Storage(Agenda), TGestyScheduler.CopiaIncolla(Agenda));
+  // dopo Init, che mette in cima al menu del calendario le voci "Nuovo ..."
+  AggiungiVociPrenotazioneAula;
   SiMain.LeaveMethod(Self, 'CreateDataModule');
+end;
+
+procedure TFormAgenda.AggiungiVociPrenotazioneAula;
+
+  function NuovaVoce(const NomeAzione, Caption: string; Handler: TNotifyEvent; const Posizione: Integer): TdxBarItemLink;
+  var
+    Azione: TAction;
+    Pulsante: TdxBarButton;
+  begin
+    // con un nome, come le azioni del .dfm: permessi e collaudo la trovano
+    Azione := TAction.Create(Self);
+    Azione.Name := NomeAzione;
+    Azione.Caption := Caption;
+    Azione.OnExecute := Handler;
+
+    // come le voci "Nuovo ..." del frame (TzDbScheduler.AggiungiAzioneNuovo):
+    // il pulsante appartiene al frame, che ha il gestore delle barre del menu
+    Pulsante := TdxBarButton.Create(FrameScheduler);
+    Pulsante.Action := Azione;
+
+    result := FrameScheduler.popScheduler.ItemLinks.Add(Pulsante);
+    result.Index := Posizione;
+  end;
+
+var
+  Posizione: Integer;
+  Indice: Integer;
+begin
+  // subito dopo le voci "Nuovo ...", cioe' prima di "Copia giorno", la prima
+  // voce fissa del menu del calendario
+  Posizione := FrameScheduler.popScheduler.ItemLinks.Count;
+  for Indice := 0 to FrameScheduler.popScheduler.ItemLinks.Count - 1 do
+    if FrameScheduler.popScheduler.ItemLinks[Indice].Item = FrameScheduler.dxBarButtonCopiaGiorno then
+    begin
+      Posizione := Indice;
+      Break;
+    end;
+
+  NuovaVoce('CercaAulaLibera', 'Cerca aula libera in questo orario...', CercaAulaLiberaExecute, Posizione).BeginGroup := True;
+  NuovaVoce('CercaQuandoLiberaAula', 'Cerca quando '#232' libera un''aula...', CercaQuandoLiberaAulaExecute, Posizione + 1);
+end;
+
+procedure TFormAgenda.LeggiSelezione(out Data: TDate; out DalleOre, AlleOre: TTime);
+var
+  Inizio: TDateTime;
+  Fine: TDateTime;
+begin
+  // dalla selezione del calendario, non dal punto del clic: e' la regola di
+  // NuovoEvento (Mantis #197), perche' fuori dalle celle HitTest.Time vale
+  // NullDate. Il clic destro seleziona la cella (SelectOnRightClick)
+  Inizio := FrameScheduler.Scheduler.SelStart;
+  Fine := FrameScheduler.Scheduler.SelFinish;
+
+  // nessuna cella selezionata: oggi, nell'orario di lavoro
+  if Inizio < EncodeDate(1900, 1, 1) then
+  begin
+    Inizio := Date;
+    Fine := IncDay(Inizio);
+  end;
+
+  Data := DateOf(Inizio);
+
+  if (TimeOf(Inizio) = 0) and (Fine - Inizio >= 1) then
+  begin
+    // giornate intere (vista mese o riga del giorno): la prima ora di lavoro
+    DalleOre := FrameScheduler.Scheduler.OptionsView.WorkStart;
+    AlleOre := IncHour(DalleOre, 1);
+  end
+  else
+  begin
+    DalleOre := TimeOf(Inizio);
+
+    // una selezione che arriva a mezzanotte finisce alle 23:59, come i nuovi eventi
+    if DateOf(Fine) > Data then
+      AlleOre := EncodeTime(23, 59, 0, 0)
+    else
+      AlleOre := TimeOf(Fine);
+  end;
+
+  if AlleOre <= DalleOre then
+    AlleOre := Min(IncHour(DalleOre, 1), EncodeTime(23, 59, 0, 0));
+end;
+
+procedure TFormAgenda.CercaAulaLiberaExecute(Sender: TObject);
+var
+  Data: TDate;
+  DalleOre, AlleOre: TTime;
+begin
+  LeggiSelezione(Data, DalleOre, AlleOre);
+
+  if TFormPrenotaAulaDaAgenda.Esegui(mraAuleLibere, Data, DalleOre, AlleOre, FrameScheduler.Scheduler.OptionsView.WorkStart, FrameScheduler.Scheduler.OptionsView.WorkFinish) then
+    FrameScheduler.RefreshScheduler;
+end;
+
+procedure TFormAgenda.CercaQuandoLiberaAulaExecute(Sender: TObject);
+var
+  Data: TDate;
+  DalleOre, AlleOre: TTime;
+begin
+  LeggiSelezione(Data, DalleOre, AlleOre);
+
+  // il periodo parte dal giorno selezionato, ma mai prima di oggi
+  if Data < Date then
+    Data := Date;
+
+  if TFormPrenotaAulaDaAgenda.Esegui(mraOrariAula, Data, DalleOre, AlleOre, FrameScheduler.Scheduler.OptionsView.WorkStart, FrameScheduler.Scheduler.OptionsView.WorkFinish) then
+    FrameScheduler.RefreshScheduler;
 end;
 
 procedure TFormAgenda.DestroyDataModule;

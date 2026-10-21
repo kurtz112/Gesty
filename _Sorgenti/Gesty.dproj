@@ -411,6 +411,9 @@
         <DCCReference Include="dbForms\frmPrenotazioniAule.pas">
             <Form>FormPrenotazioniAule</Form>
         </DCCReference>
+        <DCCReference Include="dbForms\frmPrenotaAulaDaAgenda.pas">
+            <Form>FormPrenotaAulaDaAgenda</Form>
+        </DCCReference>
         <DCCReference Include="Varie\CalendarioCorsi.classes.pas"/>
         <DCCReference Include="frames\Frame_CalendarioDocenti.pas">
             <Form>FrameCalendarioDocenti</Form>
