@@ -35183,7 +35183,14 @@ TSP_anonymizer__Verifica = class (TzStoredProc)
     property Anomalia: TNullableString read fAnomalia;
 end;
 
-[TStoredProcedure('ANONYMIZER_GESTY.CONFIGURA')]
+[TStoredProcedure('ANONYMIZER_GESTY.ANONIMIZZA_ENTI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_anonymizer_Gesty__Anonimizza_Enti = class (TzStoredProc)
+  private
+  public
+end;
+
+[TStoredProcedure('ANONYMIZER_GESTY.CONFIGURA', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer_Gesty__Configura = class (TzStoredProc)
   private
@@ -35207,7 +35214,7 @@ TSP_anonymizer_Gesty__Esegui_Anonimizzazione = class (TzStoredProc)
     property Parola_Ordine: TNullableString read fParola_Ordine write fParola_Ordine;
 end;
 
-[TStoredProcedure('ANONYMIZER_GESTY.INIZIALIZZA')]
+[TStoredProcedure('ANONYMIZER_GESTY.INIZIALIZZA', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer_Gesty__Inizializza = class (TzStoredProc)
   private
