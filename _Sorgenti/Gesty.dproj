@@ -482,6 +482,9 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Varie\Gesty.Scheduler.pas"/>
+        <DCCReference Include="Varie\MicrosoftGraph.Autorizzazione.pas"/>
+        <DCCReference Include="Varie\MicrosoftGraph.Calendario.pas"/>
+        <DCCReference Include="Varie\Gesty.Outlook.pas"/>
         <DCCReference Include="DataModules\dmScadenze.pas">
             <Form>Scadenze</Form>
             <DesignClass>TDataModule</DesignClass>

@@ -155,6 +155,12 @@ type
     procedure LeggiSelezione(out Data: TDate; out DalleOre, AlleOre: TTime);
     procedure CercaAulaLiberaExecute(Sender: TObject);
     procedure CercaQuandoLiberaAulaExecute(Sender: TObject);
+  private // sincronizzazione con Outlook
+    OutlookDisponibile: Boolean;
+    procedure AggiungiAzioniOutlook;
+    procedure SincronizzaOutlook(const Interattiva: Boolean);
+    procedure SincronizzaOutlookExecute(Sender: TObject);
+    procedure ScollegaOutlookExecute(Sender: TObject);
   protected
     procedure AfterCreateControls; override;
     procedure CreateDataModule; override;
@@ -175,7 +181,10 @@ uses
   cxSchedulerDialogs,
   cxSchedulerOutlookExchange,
   zDm_Images,
-  zdx;
+  zdx,
+  zBaseLib,
+  zMsg,
+  Gesty.Outlook;
 {$R *.dfm}
 { TFormAgenda }
 
@@ -354,7 +363,88 @@ begin
   AddToolbarButton(MostraFuoriSede);
   // FrameScheduler.AddToolbarButton(MostraAssenze);
 
+  AggiungiAzioniOutlook;
+
   SiMain.LeaveMethod(Self, 'Create');
+end;
+
+procedure TFormAgenda.AggiungiAzioniOutlook;
+
+  function NuovaAzione(const NomeAzione, Caption, Hint: string; Handler, Update: TNotifyEvent): TAction;
+  var
+    Pulsante: TdxBarButton;
+  begin
+    // con un nome, come le azioni del .dfm: permessi e collaudo la trovano
+    Result := TAction.Create(Self);
+    Result.Name := NomeAzione;
+    Result.Caption := Caption;
+    Result.Hint := Hint;
+    Result.ActionList := flagActions;
+    Result.OnExecute := Handler;
+    Result.OnUpdate := Update;
+    Result.ImageIndex := dx.IndiceIcona('outlook');
+
+    Pulsante := FrameScheduler.AddToolbarButton(Result);
+    Pulsante.PaintStyle := psStandard;
+    if Result.ImageIndex <> -1 then
+    begin
+      dx.GetBitmap(Pulsante.Glyph, dx.Immagini, Result.ImageIndex);
+      Pulsante.ImageIndex := -1;
+    end;
+  end;
+
+begin
+  // senza ID tenant e ID applicazione in CONFIG la funzione non c'e'
+  OutlookDisponibile := TSincronizzazioneOutlook.Disponibile;
+  if not OutlookDisponibile then
+    Exit;
+
+  NuovaAzione('SincronizzaOutlook', 'Sincronizza con Outlook',
+    'Allinea la tua agenda personale con il tuo calendario Outlook (al primo uso chiede l''accesso a Microsoft 365)',
+    SincronizzaOutlookExecute, nil);
+  NuovaAzione('ScollegaOutlook', 'Scollega Outlook',
+    'Interrompe la sincronizzazione con Outlook: gli eventi gi' + #224 + ' presenti restano nei due calendari',
+    ScollegaOutlookExecute, nil);
+end;
+
+procedure TFormAgenda.SincronizzaOutlook(const Interattiva: Boolean);
+var
+  Esito: string;
+  Riuscita: Boolean;
+begin
+  StartWait('Sincronizzazione con Outlook...', True);
+  try
+    Riuscita := TSincronizzazioneOutlook.Sincronizza(Interattiva, Esito);
+  finally
+    StopWait;
+  end;
+
+  if Riuscita then
+    FrameScheduler.RefreshScheduler;
+
+  // all'apertura dell'agenda la sincronizzazione e' silenziosa: l'esito resta in USR_UTENTI_OUTLOOK
+  if Interattiva then
+    if Riuscita then
+      ConfirmOk(Esito, mtInformation)
+    else
+      ConfirmOk(Esito, mtWarning)
+  else
+    SiMain.LogMessage('Sincronizzazione con Outlook all''apertura: ' + Esito);
+end;
+
+procedure TFormAgenda.SincronizzaOutlookExecute(Sender: TObject);
+begin
+  SincronizzaOutlook(True);
+end;
+
+procedure TFormAgenda.ScollegaOutlookExecute(Sender: TObject);
+begin
+  if not ConfirmYesNo('Interrompere la sincronizzazione dell''agenda con Outlook?' + sLineBreak +
+    'Gli eventi gi' + #224 + ' presenti restano sia in Gesty sia in Outlook, ma non saranno pi' + #249 + ' allineati.', mtConfirmation) then
+    Exit;
+
+  TSincronizzazioneOutlook.Scollega;
+  ConfirmOk('Agenda scollegata da Outlook.', mtInformation);
 end;
 
 procedure TFormAgenda.AfterCreateControls;
@@ -376,6 +466,12 @@ begin
   SiMain.EnterMethod(Self, 'FormShow');
   inherited;
   FrameScheduler.RefreshScheduler;
+
+  // chi ha gia' collegato Outlook trova l'agenda allineata; senza browser:
+  // se l'accesso va rinnovato lo dira' il pulsante "Sincronizza con Outlook"
+  if OutlookDisponibile and TSincronizzazioneOutlook.Collegato then
+    SincronizzaOutlook(False);
+
   SiMain.LeaveMethod(Self, 'FormShow');
 end;
 
