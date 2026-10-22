@@ -100,6 +100,7 @@ type
     FMotivazioneVisibile: boolean;
     FMotivazioneDefault: string;
     procedure LeggiMotivazione;
+    function LeggiMotivazioneDaFile: string;
     function GetMotivazioneVisibile: boolean;
     procedure ImpostaMotivazioneDefault;
   private
@@ -167,6 +168,7 @@ uses
   System.Math,
   System.DateUtils,
   System.Variants,
+  System.IOUtils,
   Vcl.Forms,
   ConfigModule,
   Gesty_StoredProcs,
@@ -592,6 +594,7 @@ end;
 procedure TWizInserimentoIncarico.LeggiMotivazione;
 var
   sp: TSP_incarichi_Motivazione_Get;
+  TestoFile: string;
 begin
   if FMotivazioneLetta then
     exit;
@@ -605,7 +608,74 @@ begin
     FreeAndNil(sp);
   end;
 
+  // il testo di "motivazione incarico.txt" accanto all'eseguibile prevale su
+  // quello predefinito della configurazione, solo se la motivazione e' visibile
+  if FMotivazioneVisibile then
+  begin
+    TestoFile := TrimRight(LeggiMotivazioneDaFile);
+    if Trim(TestoFile) <> '' then
+      FMotivazioneDefault := TestoFile;
+  end;
+
   FMotivazioneLetta := true;
+end;
+
+function TWizInserimentoIncarico.LeggiMotivazioneDaFile: string;
+const
+  // Winapi.Windows: CP_UTF8 e MB_ERR_INVALID_CHARS
+  CodePageUtf8 = 65001;
+  ErroreSuCaratteriNonValidi = 8;
+var
+  NomeFile: string;
+  Contenuto: TBytes;
+  Codifica, Utf8Rigoroso: TEncoding;
+  LunghezzaBom: integer;
+begin
+  result := '';
+
+  NomeFile := ExtractFilePath(Application.ExeName) + 'motivazione incarico.txt';
+  if not FileExists(NomeFile) then
+    exit;
+
+  try
+    Contenuto := TFile.ReadAllBytes(NomeFile);
+  except
+    on e: exception do
+    begin
+      ConfirmOk('Impossibile leggere il file "' + NomeFile + '":' + sLineBreak + e.Message);
+      exit;
+    end;
+  end;
+
+  if Length(Contenuto) = 0 then
+    exit;
+
+  // con il BOM la codifica e' dichiarata; senza, il Blocco note di Windows 11
+  // salva in UTF-8, i file piu' vecchi in ANSI: si prova UTF-8 rigoroso e,
+  // se i byte non sono UTF-8 valido, si legge in ANSI
+  Codifica := nil;
+  LunghezzaBom := TEncoding.GetBufferEncoding(Contenuto, Codifica, nil);
+
+  if LunghezzaBom > 0 then
+  begin
+    result := Codifica.GetString(Contenuto, LunghezzaBom, Length(Contenuto) - LunghezzaBom);
+    exit;
+  end;
+
+  Utf8Rigoroso := TMBCSEncoding.Create(CodePageUtf8, ErroreSuCaratteriNonValidi, 0);
+  try
+    try
+      result := Utf8Rigoroso.GetString(Contenuto);
+    except
+      on EEncodingError do
+        result := '';
+    end;
+  finally
+    FreeAndNil(Utf8Rigoroso);
+  end;
+
+  if result = '' then
+    result := TEncoding.ANSI.GetString(Contenuto);
 end;
 
 function TWizInserimentoIncarico.GetMotivazioneVisibile: boolean;
