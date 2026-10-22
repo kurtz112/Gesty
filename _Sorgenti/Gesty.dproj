@@ -482,9 +482,15 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Varie\Gesty.Scheduler.pas"/>
+        <DCCReference Include="Varie\CalendarioEsterno.Types.pas"/>
+        <DCCReference Include="Varie\OAuth2.AccessoDesktop.pas"/>
         <DCCReference Include="Varie\MicrosoftGraph.Autorizzazione.pas"/>
         <DCCReference Include="Varie\MicrosoftGraph.Calendario.pas"/>
-        <DCCReference Include="Varie\Gesty.Outlook.pas"/>
+        <DCCReference Include="Varie\GoogleCalendar.Autorizzazione.pas"/>
+        <DCCReference Include="Varie\GoogleCalendar.Calendario.pas"/>
+        <DCCReference Include="Varie\CalendarioEsterno.Microsoft.pas"/>
+        <DCCReference Include="Varie\CalendarioEsterno.Google.pas"/>
+        <DCCReference Include="Varie\Gesty.CalendarioEsterno.pas"/>
         <DCCReference Include="DataModules\dmScadenze.pas">
             <Form>Scadenze</Form>
             <DesignClass>TDataModule</DesignClass>

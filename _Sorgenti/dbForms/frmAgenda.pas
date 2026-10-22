@@ -60,6 +60,7 @@ uses
   cxSchedulercxGridConnection,
   StdActns,
   BaseFrm,
+  Gesty.CalendarioEsterno,
   cxContainer,
   cxLabel,
   zDbView,
@@ -155,12 +156,16 @@ type
     procedure LeggiSelezione(out Data: TDate; out DalleOre, AlleOre: TTime);
     procedure CercaAulaLiberaExecute(Sender: TObject);
     procedure CercaQuandoLiberaAulaExecute(Sender: TObject);
-  private // sincronizzazione con Outlook
-    OutlookDisponibile: Boolean;
-    procedure AggiungiAzioniOutlook;
-    procedure SincronizzaOutlook(const Interattiva: Boolean);
-    procedure SincronizzaOutlookExecute(Sender: TObject);
-    procedure ScollegaOutlookExecute(Sender: TObject);
+  private // sincronizzazione con un calendario esterno (Outlook o Google Calendar)
+    FornitoriCalendario: TFornitoriCalendario;
+    AzioneSincronizzaCalendario: TAction;
+    AzioneScollegaCalendario: TAction;
+    procedure AggiungiAzioniCalendario;
+    procedure AggiornaAzioniCalendario;
+    function ScegliFornitoreCalendario(out Fornitore: TFornitoreCalendario): Boolean;
+    procedure SincronizzaCalendario(const Fornitore: TFornitoreCalendario; const Interattiva: Boolean);
+    procedure SincronizzaCalendarioExecute(Sender: TObject);
+    procedure ScollegaCalendarioExecute(Sender: TObject);
   protected
     procedure AfterCreateControls; override;
     procedure CreateDataModule; override;
@@ -183,8 +188,7 @@ uses
   zDm_Images,
   zdx,
   zBaseLib,
-  zMsg,
-  Gesty.Outlook;
+  zMsg;
 {$R *.dfm}
 { TFormAgenda }
 
@@ -363,26 +367,27 @@ begin
   AddToolbarButton(MostraFuoriSede);
   // FrameScheduler.AddToolbarButton(MostraAssenze);
 
-  AggiungiAzioniOutlook;
+  AggiungiAzioniCalendario;
 
   SiMain.LeaveMethod(Self, 'Create');
 end;
 
-procedure TFormAgenda.AggiungiAzioniOutlook;
+procedure TFormAgenda.AggiungiAzioniCalendario;
 
-  function NuovaAzione(const NomeAzione, Caption, Hint: string; Handler, Update: TNotifyEvent): TAction;
+  function NuovaAzione(const NomeAzione: string; Handler: TNotifyEvent): TAction;
   var
     Pulsante: TdxBarButton;
   begin
     // con un nome, come le azioni del .dfm: permessi e collaudo la trovano
     Result := TAction.Create(Self);
     Result.Name := NomeAzione;
-    Result.Caption := Caption;
-    Result.Hint := Hint;
     Result.ActionList := flagActions;
     Result.OnExecute := Handler;
-    Result.OnUpdate := Update;
-    Result.ImageIndex := dx.IndiceIcona('outlook');
+    // solo Outlook configurato: la sua icona; altrimenti quella del calendario
+    if FornitoriCalendario = [FornitoreMicrosoft] then
+      Result.ImageIndex := dx.IndiceIcona('outlook')
+    else
+      Result.ImageIndex := dx.IndiceIcona('opencalendar');
 
     Pulsante := FrameScheduler.AddToolbarButton(Result);
     Pulsante.PaintStyle := psStandard;
@@ -394,27 +399,97 @@ procedure TFormAgenda.AggiungiAzioniOutlook;
   end;
 
 begin
-  // senza ID tenant e ID applicazione in CONFIG la funzione non c'e'
-  OutlookDisponibile := TSincronizzazioneOutlook.Disponibile;
-  if not OutlookDisponibile then
+  // nessun fornitore configurato in CONFIG: la funzione non c'e'
+  FornitoriCalendario := TSincronizzazioneCalendario.FornitoriDisponibili;
+  if FornitoriCalendario = [] then
     Exit;
 
-  NuovaAzione('SincronizzaOutlook', 'Sincronizza con Outlook',
-    'Allinea la tua agenda personale con il tuo calendario Outlook (al primo uso chiede l''accesso a Microsoft 365)',
-    SincronizzaOutlookExecute, nil);
-  NuovaAzione('ScollegaOutlook', 'Scollega Outlook',
-    'Interrompe la sincronizzazione con Outlook: gli eventi gi' + #224 + ' presenti restano nei due calendari',
-    ScollegaOutlookExecute, nil);
+  AzioneSincronizzaCalendario := NuovaAzione('SincronizzaCalendario', SincronizzaCalendarioExecute);
+  AzioneScollegaCalendario := NuovaAzione('ScollegaCalendario', ScollegaCalendarioExecute);
+  AggiornaAzioniCalendario;
 end;
 
-procedure TFormAgenda.SincronizzaOutlook(const Interattiva: Boolean);
+procedure TFormAgenda.AggiornaAzioniCalendario;
+var
+  Collegato: TFornitoreCalendario;
+  Nome: string;
+begin
+  if not Assigned(AzioneSincronizzaCalendario) then
+    Exit;
+
+  // il nome del servizio quando e' certo: quello collegato, o l'unico configurato
+  Collegato := TSincronizzazioneCalendario.FornitoreCollegato;
+  if Collegato <> FornitoreNessuno then
+    Nome := TSincronizzazioneCalendario.NomeServizio(Collegato)
+  else if FornitoriCalendario = [FornitoreMicrosoft] then
+    Nome := TSincronizzazioneCalendario.NomeServizio(FornitoreMicrosoft)
+  else if FornitoriCalendario = [FornitoreGoogle] then
+    Nome := TSincronizzazioneCalendario.NomeServizio(FornitoreGoogle)
+  else
+    Nome := '';
+
+  if Nome <> '' then
+  begin
+    AzioneSincronizzaCalendario.Caption := 'Sincronizza con ' + Nome;
+    AzioneSincronizzaCalendario.Hint := Format('Allinea la tua agenda personale con il tuo calendario %s ' +
+      '(al primo uso chiede l''accesso al tuo account)', [Nome]);
+  end
+  else
+  begin
+    AzioneSincronizzaCalendario.Caption := 'Sincronizza calendario';
+    AzioneSincronizzaCalendario.Hint := 'Allinea la tua agenda personale con il tuo calendario Outlook o Google ' +
+      '(al primo uso chiede quale e l''accesso al tuo account)';
+  end;
+
+  AzioneScollegaCalendario.Caption := 'Scollega calendario';
+  AzioneScollegaCalendario.Hint := 'Interrompe la sincronizzazione con il calendario esterno: gli eventi gi' + #224 +
+    ' presenti restano nei due calendari';
+  AzioneScollegaCalendario.Enabled := Collegato <> FornitoreNessuno;
+end;
+
+function TFormAgenda.ScegliFornitoreCalendario(out Fornitore: TFornitoreCalendario): Boolean;
+var
+  Dialogo: TTaskDialog;
+  Pulsante: TTaskDialogBaseButtonItem;
+begin
+  Fornitore := FornitoreNessuno;
+
+  Dialogo := TTaskDialog.Create(nil);
+  try
+    Dialogo.Caption := 'Sincronizza calendario';
+    Dialogo.Title := 'Con quale calendario vuoi allineare la tua agenda?';
+    Dialogo.Text := 'La scelta vale finch' + #233 + ' non scolleghi il calendario.';
+    Dialogo.Flags := [tfUseCommandLinks, tfAllowDialogCancellation];
+    Dialogo.CommonButtons := [tcbCancel];
+
+    Pulsante := Dialogo.Buttons.Add;
+    Pulsante.Caption := 'Outlook';
+    Pulsante.ModalResult := 100 + Ord(FornitoreMicrosoft);
+    TTaskDialogButtonItem(Pulsante).CommandLinkHint := 'Account di lavoro Microsoft 365';
+
+    Pulsante := Dialogo.Buttons.Add;
+    Pulsante.Caption := 'Google Calendar';
+    Pulsante.ModalResult := 100 + Ord(FornitoreGoogle);
+    TTaskDialogButtonItem(Pulsante).CommandLinkHint := 'Account Google Workspace';
+
+    Result := Dialogo.Execute and (Dialogo.ModalResult >= 100 + Ord(FornitoreMicrosoft));
+    if Result then
+      Fornitore := TFornitoreCalendario(Dialogo.ModalResult - 100);
+  finally
+    Dialogo.Free;
+  end;
+end;
+
+procedure TFormAgenda.SincronizzaCalendario(const Fornitore: TFornitoreCalendario; const Interattiva: Boolean);
 var
   Esito: string;
   Riuscita: Boolean;
+  Nome: string;
 begin
-  StartWait('Sincronizzazione con Outlook...', True);
+  Nome := TSincronizzazioneCalendario.NomeServizio(Fornitore);
+  StartWait(Format('Sincronizzazione con %s...', [Nome]), True);
   try
-    Riuscita := TSincronizzazioneOutlook.Sincronizza(Interattiva, Esito);
+    Riuscita := TSincronizzazioneCalendario.Sincronizza(Fornitore, Interattiva, Esito);
   finally
     StopWait;
   end;
@@ -422,29 +497,48 @@ begin
   if Riuscita then
     FrameScheduler.RefreshScheduler;
 
-  // all'apertura dell'agenda la sincronizzazione e' silenziosa: l'esito resta in USR_UTENTI_OUTLOOK
+  // all'apertura dell'agenda la sincronizzazione e' silenziosa: l'esito resta in USR_UTENTI_CALENDARI_ESTERNI
   if Interattiva then
+  begin
+    AggiornaAzioniCalendario;
     if Riuscita then
       ConfirmOk(Esito, mtInformation)
     else
-      ConfirmOk(Esito, mtWarning)
+      ConfirmOk(Esito, mtWarning);
+  end
   else
-    SiMain.LogMessage('Sincronizzazione con Outlook all''apertura: ' + Esito);
+    SiMain.LogMessage(Format('Sincronizzazione con %s all''apertura: %s', [Nome, Esito]));
 end;
 
-procedure TFormAgenda.SincronizzaOutlookExecute(Sender: TObject);
+procedure TFormAgenda.SincronizzaCalendarioExecute(Sender: TObject);
+var
+  Fornitore: TFornitoreCalendario;
 begin
-  SincronizzaOutlook(True);
+  // collegato: sempre lo stesso calendario; altrimenti l'unico configurato, o la scelta dell'utente
+  Fornitore := TSincronizzazioneCalendario.FornitoreCollegato;
+  if Fornitore = FornitoreNessuno then
+    if FornitoriCalendario = [FornitoreMicrosoft] then
+      Fornitore := FornitoreMicrosoft
+    else if FornitoriCalendario = [FornitoreGoogle] then
+      Fornitore := FornitoreGoogle
+    else if not ScegliFornitoreCalendario(Fornitore) then
+      Exit;
+
+  SincronizzaCalendario(Fornitore, True);
 end;
 
-procedure TFormAgenda.ScollegaOutlookExecute(Sender: TObject);
+procedure TFormAgenda.ScollegaCalendarioExecute(Sender: TObject);
+var
+  Nome: string;
 begin
-  if not ConfirmYesNo('Interrompere la sincronizzazione dell''agenda con Outlook?' + sLineBreak +
-    'Gli eventi gi' + #224 + ' presenti restano sia in Gesty sia in Outlook, ma non saranno pi' + #249 + ' allineati.', mtConfirmation) then
+  Nome := TSincronizzazioneCalendario.NomeServizio(TSincronizzazioneCalendario.FornitoreCollegato);
+  if not ConfirmYesNo(Format('Interrompere la sincronizzazione dell''agenda con %s?', [Nome]) + sLineBreak +
+    Format('Gli eventi gi' + #224 + ' presenti restano sia in Gesty sia in %s, ma non saranno pi' + #249 + ' allineati.', [Nome]), mtConfirmation) then
     Exit;
 
-  TSincronizzazioneOutlook.Scollega;
-  ConfirmOk('Agenda scollegata da Outlook.', mtInformation);
+  TSincronizzazioneCalendario.Scollega;
+  AggiornaAzioniCalendario;
+  ConfirmOk(Format('Agenda scollegata da %s.', [Nome]), mtInformation);
 end;
 
 procedure TFormAgenda.AfterCreateControls;
@@ -462,15 +556,21 @@ begin
 end;
 
 procedure TFormAgenda.FormShow(Sender: TObject);
+var
+  Collegato: TFornitoreCalendario;
 begin
   SiMain.EnterMethod(Self, 'FormShow');
   inherited;
   FrameScheduler.RefreshScheduler;
 
-  // chi ha gia' collegato Outlook trova l'agenda allineata; senza browser:
-  // se l'accesso va rinnovato lo dira' il pulsante "Sincronizza con Outlook"
-  if OutlookDisponibile and TSincronizzazioneOutlook.Collegato then
-    SincronizzaOutlook(False);
+  // chi ha gia' collegato un calendario trova l'agenda allineata; senza browser:
+  // se l'accesso va rinnovato lo dira' il pulsante di sincronizzazione
+  if FornitoriCalendario <> [] then
+  begin
+    Collegato := TSincronizzazioneCalendario.FornitoreCollegato;
+    if Collegato in FornitoriCalendario then
+      SincronizzaCalendario(Collegato, False);
+  end;
 
   SiMain.LeaveMethod(Self, 'FormShow');
 end;

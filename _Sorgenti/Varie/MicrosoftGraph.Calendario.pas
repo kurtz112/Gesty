@@ -14,6 +14,8 @@ unit MicrosoftGraph.Calendario;
 //   l'utente sposta l'evento in un'altra cartella;
 // - date e ore nel fuso orario indicato (outlook.timezone), cosi' inizio e fine
 //   arrivano e partono nell'ora locale dell'agenda.
+// Evento, profilo ed errori sono quelli comuni di CalendarioEsterno.Types: la
+// versione dell'evento (Versione) e' il changeKey di Outlook.
 
 interface
 
@@ -23,37 +25,17 @@ uses
   System.Generics.Collections,
   System.JSON,
   System.Net.HttpClient,
-  System.Net.URLClient;
+  System.Net.URLClient,
+  CalendarioEsterno.Types;
 
 type
-  EMicrosoftGraph = class(Exception)
-  public
-    StatoHttp: Integer;
-  end;
+  EMicrosoftGraph = class(ECalendarioEsterno);
 
   // La lettura delle modifiche (delta) non e' piu' valida: va ripresa da capo
-  EMicrosoftGraphDeltaScaduto = class(EMicrosoftGraph);
+  EMicrosoftGraphDeltaScaduto = class(ECalendarioEsternoLetturaScaduta);
 
-  TMicrosoftGraphEvento = record
-    Id: string;
-    ChangeKey: string;
-    Oggetto: string;
-    Note: string;
-    Inizio: TDateTime;
-    Fine: TDateTime;
-    // ora locale
-    UltimaModifica: TDateTime;
-    GiornataIntera: Boolean;
-    Annullato: Boolean;
-    // cancellato in Outlook: solo Id e' valorizzato
-    Rimosso: Boolean;
-  end;
-
-  TMicrosoftGraphProfilo = record
-    Mail: string;
-    NomeAccesso: string;
-    Nome: string;
-  end;
+  TMicrosoftGraphEvento = TEventoEsterno;
+  TMicrosoftGraphProfilo = TProfiloEsterno;
 
   TMicrosoftGraphCalendario = class
   strict private
@@ -143,7 +125,7 @@ var
   Errore: TJSONValue;
   CodiceErrore: string;
   MessaggioErrore: string;
-  Eccezione: EMicrosoftGraph;
+  Eccezione: ECalendarioEsterno;
 begin
   Result := nil;
   Risposta := nil;
@@ -257,7 +239,7 @@ begin
     Exit;
   end;
 
-  Result.ChangeKey := Oggetto.GetValue<string>('changeKey', '');
+  Result.Versione := Oggetto.GetValue<string>('changeKey', '');
   Result.Oggetto := Oggetto.GetValue<string>('subject', '');
   Result.Note := Oggetto.GetValue<string>('bodyPreview', '');
   Result.GiornataIntera := Oggetto.GetValue<Boolean>('isAllDay', False);
