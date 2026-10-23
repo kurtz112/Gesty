@@ -600,6 +600,10 @@ begin
   lkProgettiColonne.ParamByName('MESE').Value := Master.ParamByName('MESE').Value;
   lkProgettiColonne.Active := True;
   try
+    // nessun altro progetto con ore nel mese: niente da scegliere, si stampa il solo progetto principale
+    if lkProgettiColonne.IsEmpty then
+      exit(True);
+
     Conteggio := 0;
     ElencoScelto := '';
 
