@@ -8856,6 +8856,9 @@ TSP_enti_Carta_Intestata_Format_Periodo_Proposto = class (TzStoredProc)
     fTipo_Carta_Intestata: TNullableString;
     fData_Inizio_Validita: TNullableDate;
     fData_Fine_Validita: TNullableDate;
+  private
+    property Data_Inizio_Validita_internal: TNullableDate read fData_Inizio_Validita write fData_Inizio_Validita;
+    property Data_Fine_Validita_internal: TNullableDate read fData_Fine_Validita write fData_Fine_Validita;
   public
     //
     [TParamAttribute('ID_ENTE', ptInput, False)]
