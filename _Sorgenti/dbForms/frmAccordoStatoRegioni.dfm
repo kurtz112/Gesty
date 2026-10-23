@@ -73,5 +73,54 @@ inherited FormAccordoStatoRegioni: TFormAccordoStatoRegioni
       ImageIndex = 2317
       OnExecute = ImportNoteVerbaleExecute
     end
+    object GefosDatiCorso: TAction
+      Category = 'GEFOS'
+      Caption = 'Dati GEFOS del corso'
+      Hint = 'Crea i dati GEFOS del corso con la sede dell'#39'ente e la tipologia proposta'
+      ImageIndex = 1496
+      OnExecute = GefosDatiCorsoExecute
+    end
+    object GefosGeneraGiornate: TAction
+      Category = 'GEFOS'
+      Caption = 'Genera giornate'
+      Hint = 'Riempie le giornate del corso dalle date e dalle ore totali'
+      ImageIndex = 1496
+      OnExecute = GefosGeneraGiornateExecute
+    end
+    object GefosControllaCorso: TAction
+      Category = 'GEFOS'
+      Caption = 'Controlla per GEFOS'
+      Hint = 'Controlla corso, giornate e partecipanti senza inviare niente'
+      ImageIndex = 2044
+      OnExecute = GefosControllaCorsoExecute
+    end
+    object GefosComunicaAvvio: TAction
+      Category = 'GEFOS'
+      Caption = 'Comunica avvio a GEFOS'
+      Hint = 'Crea corso, edizioni e partecipanti in GEFOS e comunica l'#39'avvio'
+      ImageIndex = 1744
+      OnExecute = GefosComunicaAvvioExecute
+    end
+    object GefosComunicaEsiti: TAction
+      Category = 'GEFOS'
+      Caption = 'Comunica esiti a GEFOS'
+      Hint = 'Comunica a GEFOS gli esiti dei partecipanti'
+      ImageIndex = 1744
+      OnExecute = GefosComunicaEsitiExecute
+    end
+    object GefosConfermaConclusione: TAction
+      Category = 'GEFOS'
+      Caption = 'Conferma conclusione a GEFOS'
+      Hint = 'Conferma a GEFOS la conclusione del corso (irreversibile)'
+      ImageIndex = 1744
+      OnExecute = GefosConfermaConclusioneExecute
+    end
+    object GefosAggiornaTipologie: TAction
+      Category = 'GEFOS'
+      Caption = 'Aggiorna tipologie GEFOS'
+      Hint = 'Legge da GEFOS le tipologie di corso dell'#39'ente'
+      ImageIndex = 1346
+      OnExecute = GefosAggiornaTipologieExecute
+    end
   end
 end

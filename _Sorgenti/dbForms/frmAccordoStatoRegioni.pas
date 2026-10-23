@@ -49,6 +49,20 @@ type
     ImportDescrizioneProvaVerifica: TAction;
     ImportNoteVerbale: TAction;
     ImportaAnagrafe: TAction;
+    GefosDatiCorso: TAction;
+    GefosGeneraGiornate: TAction;
+    GefosControllaCorso: TAction;
+    GefosComunicaAvvio: TAction;
+    GefosComunicaEsiti: TAction;
+    GefosConfermaConclusione: TAction;
+    GefosAggiornaTipologie: TAction;
+    procedure GefosAggiornaTipologieExecute(Sender: TObject);
+    procedure GefosComunicaAvvioExecute(Sender: TObject);
+    procedure GefosComunicaEsitiExecute(Sender: TObject);
+    procedure GefosConfermaConclusioneExecute(Sender: TObject);
+    procedure GefosControllaCorsoExecute(Sender: TObject);
+    procedure GefosDatiCorsoExecute(Sender: TObject);
+    procedure GefosGeneraGiornateExecute(Sender: TObject);
     procedure ImportaAnagrafeExecute(Sender: TObject);
     procedure ImportaFileIscrizioniAccept(Sender: TObject);
     procedure ImportaStudentiExecute(Sender: TObject);
@@ -298,6 +312,51 @@ procedure TFormAccordoStatoRegioni.ImportaAnagrafeExecute(Sender: TObject);
 begin
   inherited;
   AccordoStatoRegioni.ImportaAnagrafe;
+end;
+
+// Comandi GEFOS: le azioni compaiono sulle viste tramite le ToolActions del dizionario LZ
+// (patch "Gefos comandi e dati") e il lavoro lo fa il DataModule
+
+procedure TFormAccordoStatoRegioni.GefosDatiCorsoExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosDatiCorso;
+end;
+
+procedure TFormAccordoStatoRegioni.GefosGeneraGiornateExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosGeneraGiornate;
+end;
+
+procedure TFormAccordoStatoRegioni.GefosControllaCorsoExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosControllaCorso;
+end;
+
+procedure TFormAccordoStatoRegioni.GefosComunicaAvvioExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosComunicaAvvio;
+end;
+
+procedure TFormAccordoStatoRegioni.GefosComunicaEsitiExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosComunicaEsiti;
+end;
+
+procedure TFormAccordoStatoRegioni.GefosConfermaConclusioneExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosConfermaConclusione;
+end;
+
+procedure TFormAccordoStatoRegioni.GefosAggiornaTipologieExecute(Sender: TObject);
+begin
+  inherited;
+  AccordoStatoRegioni.GefosAggiornaTipologie;
 end;
 
 procedure TFormAccordoStatoRegioni.SetupComponent(const DataSetName: String; Component: TComponent);
