@@ -21,7 +21,8 @@ uses
   QImport3XMLBased,
   QImport3Xlsx,
   QImport3XLS,
-  cxMemo;
+  cxMemo,
+  dmGefosCooperazioneApplicativa;
 
 type
   TAccordoStatoRegioni = class(TBaseDataModule)
@@ -38,6 +39,9 @@ type
     // GEFOS: numero della riga ASR corrente, 0 se non si puo' procedere
     function CorsoGefosCorrente: Int64;
     procedure AggiornaDatiGefos;
+    // Crea il ponte, esegue l'operazione e lo libera; i dati mancanti segnalati dal
+    // ponte (EGefosErrore) diventano un avviso, non un errore da assistenza
+    procedure EseguiGefos(const Operazione: TProc<TGefosCooperazioneApplicativa>);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -74,7 +78,7 @@ uses
   Gesty_Filters,
   zMsg,
   zMemoDialog,
-  dmGefosCooperazioneApplicativa;
+  Gefos.Types;
 
 {$R *.dfm}
 
@@ -372,29 +376,43 @@ begin
   ReopenDataSet('Giornate');
 end;
 
+procedure TAccordoStatoRegioni.EseguiGefos(const Operazione: TProc<TGefosCooperazioneApplicativa>);
+var
+  Gefos: TGefosCooperazioneApplicativa;
+begin
+  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
+  try
+    try
+      Operazione(Gefos);
+    except
+      on Errore: EGefosErrore do
+        ConfirmOk(Errore.Message, mtWarning);
+    end;
+  finally
+    FreeAndNil(Gefos);
+  end;
+end;
+
 procedure TAccordoStatoRegioni.GefosDatiCorso;
 var
   IdProgettoAsr: Int64;
-  Gefos: TGefosCooperazioneApplicativa;
 begin
   IdProgettoAsr := CorsoGefosCorrente;
   if IdProgettoAsr = 0 then
     Exit;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    if Gefos.PreparaCorsoGefos(IdProgettoAsr) then
-      ConfirmOk('Dati GEFOS del corso pronti: verificare tipologia, sede e collegamento nella scheda Dati GEFOS.');
-  finally
-    FreeAndNil(Gefos);
-  end;
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    begin
+      if Gefos.PreparaCorsoGefos(IdProgettoAsr) then
+        ConfirmOk('Dati GEFOS del corso pronti: verificare tipologia, sede e collegamento nella scheda Dati GEFOS.');
+    end);
   AggiornaDatiGefos;
 end;
 
 procedure TAccordoStatoRegioni.GefosGeneraGiornate;
 var
   IdProgettoAsr: Int64;
-  Gefos: TGefosCooperazioneApplicativa;
   Orari: array of string;
   OraMattina, OraPomeriggio: TDateTime;
 begin
@@ -413,96 +431,87 @@ begin
     Exit;
   end;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    ConfirmOk(Gefos.GeneraGiornate(IdProgettoAsr, OraMattina, OraPomeriggio, 4));
-  finally
-    FreeAndNil(Gefos);
-  end;
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    begin
+      ConfirmOk(Gefos.GeneraGiornate(IdProgettoAsr, OraMattina, OraPomeriggio, 4));
+    end);
   AggiornaDatiGefos;
 end;
 
 procedure TAccordoStatoRegioni.GefosControllaCorso;
 var
   IdProgettoAsr: Int64;
-  Gefos: TGefosCooperazioneApplicativa;
-  Problemi: string;
 begin
   IdProgettoAsr := CorsoGefosCorrente;
   if IdProgettoAsr = 0 then
     Exit;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    Problemi := Gefos.ControllaCorso(IdProgettoAsr);
-  finally
-    FreeAndNil(Gefos);
-  end;
-
-  if Problemi = '' then
-    ConfirmOk('Il corso e'' pronto per la comunicazione dell''avvio a GEFOS.')
-  else
-    zExecuteMemoDialog(Problemi, 'GEFOS - controlli del corso', nil, nil, True);
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    var
+      Problemi: string;
+    begin
+      Problemi := Gefos.ControllaCorso(IdProgettoAsr);
+      if Problemi = '' then
+        ConfirmOk('Il corso e'' pronto per la comunicazione dell''avvio a GEFOS.')
+      else
+        zExecuteMemoDialog(Problemi, 'GEFOS - controlli del corso', nil, nil, True);
+    end);
 end;
 
 procedure TAccordoStatoRegioni.GefosComunicaAvvio;
 var
   IdProgettoAsr: Int64;
-  Gefos: TGefosCooperazioneApplicativa;
 begin
   IdProgettoAsr := CorsoGefosCorrente;
   if IdProgettoAsr = 0 then
     Exit;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    Gefos.ComunicaAvvio(IdProgettoAsr);
-  finally
-    FreeAndNil(Gefos);
-  end;
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    begin
+      Gefos.ComunicaAvvio(IdProgettoAsr);
+    end);
   AggiornaDatiGefos;
 end;
 
 procedure TAccordoStatoRegioni.GefosComunicaEsiti;
 var
   IdProgettoAsr: Int64;
-  Gefos: TGefosCooperazioneApplicativa;
 begin
   IdProgettoAsr := CorsoGefosCorrente;
   if IdProgettoAsr = 0 then
     Exit;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    Gefos.ComunicaEsiti(IdProgettoAsr);
-  finally
-    FreeAndNil(Gefos);
-  end;
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    begin
+      Gefos.ComunicaEsiti(IdProgettoAsr);
+    end);
   AggiornaDatiGefos;
 end;
 
 procedure TAccordoStatoRegioni.GefosConfermaConclusione;
 var
   IdProgettoAsr: Int64;
-  Gefos: TGefosCooperazioneApplicativa;
 begin
   IdProgettoAsr := CorsoGefosCorrente;
   if IdProgettoAsr = 0 then
     Exit;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    Gefos.ConfermaConclusione(IdProgettoAsr);
-  finally
-    FreeAndNil(Gefos);
-  end;
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    begin
+      Gefos.ConfermaConclusione(IdProgettoAsr);
+    end);
   AggiornaDatiGefos;
 end;
 
 procedure TAccordoStatoRegioni.GefosAggiornaTipologie;
 var
   progetto: TzFbDataSet;
-  Gefos: TGefosCooperazioneApplicativa;
+  IdEnte: Int64;
 begin
   // Le tipologie sono dell'ente: si prende quello del corso selezionato
   progetto := getDataSet('Progetti_Asr_Sicurezza');
@@ -512,12 +521,12 @@ begin
     Exit;
   end;
 
-  Application.CreateForm(TGefosCooperazioneApplicativa, Gefos);
-  try
-    Gefos.AggiornaTipologie(progetto.FieldByName('ID_ENTE').AsLargeInt);
-  finally
-    FreeAndNil(Gefos);
-  end;
+  IdEnte := progetto.FieldByName('ID_ENTE').AsLargeInt;
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    begin
+      Gefos.AggiornaTipologie(IdEnte);
+    end);
 end;
 
 end.
