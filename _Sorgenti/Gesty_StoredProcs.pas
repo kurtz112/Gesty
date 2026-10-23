@@ -8848,6 +8848,29 @@ TSP_elimina_Grs_Import_Files_Riga = class (TzStoredProc)
     property Ora_Inizio: TNullableTime read fOra_Inizio write fOra_Inizio;
 end;
 
+[TStoredProcedure('ENTI_CARTA_INTESTATA_FORMAT_PERIODO_PROPOSTO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_enti_Carta_Intestata_Format_Periodo_Proposto = class (TzStoredProc)
+  private
+    fId_Ente: TNullableInt64;
+    fTipo_Carta_Intestata: TNullableString;
+    fData_Inizio_Validita: TNullableDate;
+    fData_Fine_Validita: TNullableDate;
+  public
+    //
+    [TParamAttribute('ID_ENTE', ptInput, False)]
+    property Id_Ente: TNullableInt64 read fId_Ente write fId_Ente;
+    //
+    [TParamAttribute('TIPO_CARTA_INTESTATA', ptInput, False)]
+    property Tipo_Carta_Intestata: TNullableString read fTipo_Carta_Intestata write fTipo_Carta_Intestata;
+    //
+    [TParamAttribute('DATA_INIZIO_VALIDITA', ptOutput, False)]
+    property Data_Inizio_Validita: TNullableDate read fData_Inizio_Validita;
+    //
+    [TParamAttribute('DATA_FINE_VALIDITA', ptOutput, False)]
+    property Data_Fine_Validita: TNullableDate read fData_Fine_Validita;
+end;
+
 [TStoredProcedure('ENTI_CARTA_INT_TEMPL_NUOVA_VER')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_enti_Carta_Int_Templ_Nuova_Ver = class (TzStoredProc)
