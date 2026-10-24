@@ -9620,6 +9620,110 @@ TSP_futura_Export_Studenti = class (TzStoredProc)
     property Tipo_Partecipante: TNullableString read fTipo_Partecipante;
 end;
 
+[TStoredProcedure('GEFOS_COOPERAZIONE_APPLICATIVA_INVII_ADD')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_gefos_Cooperazione_Applicativa_Invii_Add = class (TzStoredProc)
+  private
+    fId_Ente: TNullableInt64;
+    fAmbiente_Test: TNullableBoolean;
+    fUser_Id: TNullableInt64;
+    fOperazione: TNullableString;
+    fMetodo_Http: TNullableString;
+    fUrl: TNullableString;
+    fId_Progetto_Asr: TNullableInt64;
+    fId_Partecipante_Progetto_Asr: TNullableInt64;
+    fId_Corso_Gefos: TNullableInt64;
+    fId_Edizione_Gefos: TNullableInt64;
+    fId_Partecipante_Gefos: TNullableInt64;
+    fDichiarazioni_Accettate: TNullableBoolean;
+    fRiuscita: TNullableBoolean;
+    fHttp_Status: TNullableInt64;
+    fCodice_Errore: TNullableString;
+    fMessaggio: TStringList;
+    fDurata_Ms: TNullableInt64;
+    fRequest_File_Name: TNullableString;
+    fResponse_File_Name: TNullableString;
+    fId_Gefos_Cooperazione_Applicativa_Invio: TNullableInt64;
+    fRequest_Full_File_Name: TNullableString;
+    fResponse_Full_File_Name: TNullableString;
+  private
+    property Id_Gefos_Cooperazione_Applicativa_Invio_internal: TNullableInt64 read fId_Gefos_Cooperazione_Applicativa_Invio write fId_Gefos_Cooperazione_Applicativa_Invio;
+    property Request_Full_File_Name_internal: TNullableString read fRequest_Full_File_Name write fRequest_Full_File_Name;
+    property Response_Full_File_Name_internal: TNullableString read fResponse_Full_File_Name write fResponse_Full_File_Name;
+  private
+    procedure SetMessaggio(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('ID_ENTE', ptInput, False)]
+    property Id_Ente: TNullableInt64 read fId_Ente write fId_Ente;
+    //
+    [TParamAttribute('AMBIENTE_TEST', ptInput, False)]
+    property Ambiente_Test: TNullableBoolean read fAmbiente_Test write fAmbiente_Test;
+    //
+    [TParamAttribute('USER_ID', ptInput, False)]
+    property User_Id: TNullableInt64 read fUser_Id write fUser_Id;
+    //
+    [TParamAttribute('OPERAZIONE', ptInput, False)]
+    property Operazione: TNullableString read fOperazione write fOperazione;
+    //
+    [TParamAttribute('METODO_HTTP', ptInput, False)]
+    property Metodo_Http: TNullableString read fMetodo_Http write fMetodo_Http;
+    //
+    [TParamAttribute('URL', ptInput, False)]
+    property Url: TNullableString read fUrl write fUrl;
+    //
+    [TParamAttribute('ID_PROGETTO_ASR', ptInput, False)]
+    property Id_Progetto_Asr: TNullableInt64 read fId_Progetto_Asr write fId_Progetto_Asr;
+    //
+    [TParamAttribute('ID_PARTECIPANTE_PROGETTO_ASR', ptInput, False)]
+    property Id_Partecipante_Progetto_Asr: TNullableInt64 read fId_Partecipante_Progetto_Asr write fId_Partecipante_Progetto_Asr;
+    //
+    [TParamAttribute('ID_CORSO_GEFOS', ptInput, False)]
+    property Id_Corso_Gefos: TNullableInt64 read fId_Corso_Gefos write fId_Corso_Gefos;
+    //
+    [TParamAttribute('ID_EDIZIONE_GEFOS', ptInput, False)]
+    property Id_Edizione_Gefos: TNullableInt64 read fId_Edizione_Gefos write fId_Edizione_Gefos;
+    //
+    [TParamAttribute('ID_PARTECIPANTE_GEFOS', ptInput, False)]
+    property Id_Partecipante_Gefos: TNullableInt64 read fId_Partecipante_Gefos write fId_Partecipante_Gefos;
+    //
+    [TParamAttribute('DICHIARAZIONI_ACCETTATE', ptInput, False)]
+    property Dichiarazioni_Accettate: TNullableBoolean read fDichiarazioni_Accettate write fDichiarazioni_Accettate;
+    //
+    [TParamAttribute('RIUSCITA', ptInput, False)]
+    property Riuscita: TNullableBoolean read fRiuscita write fRiuscita;
+    //
+    [TParamAttribute('HTTP_STATUS', ptInput, False)]
+    property Http_Status: TNullableInt64 read fHttp_Status write fHttp_Status;
+    //
+    [TParamAttribute('CODICE_ERRORE', ptInput, False)]
+    property Codice_Errore: TNullableString read fCodice_Errore write fCodice_Errore;
+    //
+    [TParamAttribute('MESSAGGIO', ptInput, True)]
+    property Messaggio: TStringList read fMessaggio write SetMessaggio;
+    //
+    [TParamAttribute('DURATA_MS', ptInput, False)]
+    property Durata_Ms: TNullableInt64 read fDurata_Ms write fDurata_Ms;
+    //
+    [TParamAttribute('REQUEST_FILE_NAME', ptInput, False)]
+    property Request_File_Name: TNullableString read fRequest_File_Name write fRequest_File_Name;
+    //
+    [TParamAttribute('RESPONSE_FILE_NAME', ptInput, False)]
+    property Response_File_Name: TNullableString read fResponse_File_Name write fResponse_File_Name;
+    //
+    [TParamAttribute('ID_GEFOS_COOPERAZIONE_APPLICATIVA_INVIO', ptOutput, False)]
+    property Id_Gefos_Cooperazione_Applicativa_Invio: TNullableInt64 read fId_Gefos_Cooperazione_Applicativa_Invio;
+    //
+    [TParamAttribute('REQUEST_FULL_FILE_NAME', ptOutput, False)]
+    property Request_Full_File_Name: TNullableString read fRequest_Full_File_Name;
+    //
+    [TParamAttribute('RESPONSE_FULL_FILE_NAME', ptOutput, False)]
+    property Response_Full_File_Name: TNullableString read fResponse_Full_File_Name;
+end;
+
 [TStoredProcedure('GET_CARTA_INTESTATA', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_get_Carta_Intestata = class (TzStoredProc)
@@ -21783,6 +21887,45 @@ TSP_personale_Stampa_Cp1 = class (TzStoredProc)
     property Direttore: TNullableString read fDirettore;
 end;
 
+[TStoredProcedure('PROGETTI_ASR_SICUREZZA_GENERA_GIORNATE', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_progetti_Asr_Sicurezza_Genera_Giornate = class (TzStoredProc)
+  private
+    fId_Progetto_Asr: TNullableInt64;
+    fOra_Inizio_Mattina: TNullableTime;
+    fOra_Inizio_Pomeriggio: TNullableTime;
+    fOre_Mattina: TNullableInt64;
+    fGiorni_Usati: TNullableInt64;
+    fGiorni_Utili: TNullableInt64;
+    fRighe_Orario: TNullableInt64;
+  private
+    property Giorni_Usati_internal: TNullableInt64 read fGiorni_Usati write fGiorni_Usati;
+    property Giorni_Utili_internal: TNullableInt64 read fGiorni_Utili write fGiorni_Utili;
+    property Righe_Orario_internal: TNullableInt64 read fRighe_Orario write fRighe_Orario;
+  public
+    //
+    [TParamAttribute('ID_PROGETTO_ASR', ptInput, False)]
+    property Id_Progetto_Asr: TNullableInt64 read fId_Progetto_Asr write fId_Progetto_Asr;
+    //
+    [TParamAttribute('ORA_INIZIO_MATTINA', ptInput, False)]
+    property Ora_Inizio_Mattina: TNullableTime read fOra_Inizio_Mattina write fOra_Inizio_Mattina;
+    //
+    [TParamAttribute('ORA_INIZIO_POMERIGGIO', ptInput, False)]
+    property Ora_Inizio_Pomeriggio: TNullableTime read fOra_Inizio_Pomeriggio write fOra_Inizio_Pomeriggio;
+    //
+    [TParamAttribute('ORE_MATTINA', ptInput, False)]
+    property Ore_Mattina: TNullableInt64 read fOre_Mattina write fOre_Mattina;
+    //
+    [TParamAttribute('GIORNI_USATI', ptOutput, False)]
+    property Giorni_Usati: TNullableInt64 read fGiorni_Usati;
+    //
+    [TParamAttribute('GIORNI_UTILI', ptOutput, False)]
+    property Giorni_Utili: TNullableInt64 read fGiorni_Utili;
+    //
+    [TParamAttribute('RIGHE_ORARIO', ptOutput, False)]
+    property Righe_Orario: TNullableInt64 read fRighe_Orario;
+end;
+
 [TStoredProcedure('PROGETTI_ASR_SICUREZZA_PARTECIPANTI_ISCRIVI_ANAGRAFICA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_progetti_Asr_Sicurezza_Partecipanti_Iscrivi_Anagrafica = class (TzStoredProc)
@@ -27770,6 +27913,8 @@ TSP_timesheet_Elenco_Progetti_X_Risorsa = class (TzStoredProc)
     fPeriodo: TNullableString;
     fDummy_Master: TNullableInt64;
     fDummy_Detail: TNullableInt64;
+    fOre_Progetto: TNullableDouble;
+    fOre_Totale_Mese: TNullableDouble;
   private
     property Id_Progetto_internal: TNullableInt64 read fId_Progetto write fId_Progetto;
     property Denominazione_Progetto_internal: TNullableString read fDenominazione_Progetto write fDenominazione_Progetto;
@@ -27782,6 +27927,8 @@ TSP_timesheet_Elenco_Progetti_X_Risorsa = class (TzStoredProc)
     property Periodo_internal: TNullableString read fPeriodo write fPeriodo;
     property Dummy_Master_internal: TNullableInt64 read fDummy_Master write fDummy_Master;
     property Dummy_Detail_internal: TNullableInt64 read fDummy_Detail write fDummy_Detail;
+    property Ore_Progetto_internal: TNullableDouble read fOre_Progetto write fOre_Progetto;
+    property Ore_Totale_Mese_internal: TNullableDouble read fOre_Totale_Mese write fOre_Totale_Mese;
   public
     //
     [TParamAttribute('PARAM_ID_RISORSA', ptInput, False)]
@@ -27825,6 +27972,12 @@ TSP_timesheet_Elenco_Progetti_X_Risorsa = class (TzStoredProc)
     //
     [TParamAttribute('DUMMY_DETAIL', ptOutput, False)]
     property Dummy_Detail: TNullableInt64 read fDummy_Detail;
+    //
+    [TParamAttribute('ORE_PROGETTO', ptOutput, False)]
+    property Ore_Progetto: TNullableDouble read fOre_Progetto;
+    //
+    [TParamAttribute('ORE_TOTALE_MESE', ptOutput, False)]
+    property Ore_Totale_Mese: TNullableDouble read fOre_Totale_Mese;
 end;
 
 [TStoredProcedure('TIMESHEET_GIORNI', True)]
@@ -44665,6 +44818,24 @@ begin
   FreeAndNil(fNote_Assegnazione);
   FreeAndNil(fNote_Risposta);
   inherited;
+end;
+
+
+constructor TSP_gefos_Cooperazione_Applicativa_Invii_Add.Create;
+begin
+  inherited;
+  fMessaggio := CreateStringList;
+end;
+
+destructor TSP_gefos_Cooperazione_Applicativa_Invii_Add.Destroy;
+begin
+  FreeAndNil(fMessaggio);
+  inherited;
+end;
+
+procedure TSP_gefos_Cooperazione_Applicativa_Invii_Add.SetMessaggio(const Value: TStringList);
+begin
+  FMessaggio.Assign(Value);
 end;
 
 
