@@ -8,6 +8,7 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.Generics.Collections,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -33,6 +34,10 @@ type
     procedure QImport3XlsxUserDefinedImport(Sender: TObject; Row: TQImportRow);
   private
     ImportLines: TStrings;
+    // Corso per cui la generazione e' stata rimandata dopo il commit; corsi per cui l'operatore
+    // ha rifiutato la proposta in questa sessione, per non richiederla a ogni salvataggio
+    IdGiornateInAttesa: Int64;
+    ProposteRifiutate: TList<Int64>;
     function CleanImportString(const s: string): string;
     procedure PrepareImportMapXLSX;
     function AreaRiferimentoProgetto(const IdProgetto: Variant): Variant;
@@ -42,9 +47,20 @@ type
     // Crea il ponte, esegue l'operazione e lo libera; i dati mancanti segnalati dal
     // ponte (EGefosErrore) diventano un avviso, non un errore da assistenza
     procedure EseguiGefos(const Operazione: TProc<TGefosCooperazioneApplicativa>);
+    // Corso ASR salvato: se GEFOS e' attivo per l'ente e il corso ha le date ma non le giornate,
+    // le genera (corso di un giorno) o le propone (piu' giorni)
+    procedure GeneraGiornateAlSalvataggio(const IdProgettoAsr: Int64);
+    // AfterPost del corso: il commit dell'autocommit lo fa il dataset subito dopo l'evento, quindi
+    // la generazione parte dopo, dal ciclo dei messaggi
+    procedure ProgettiAsrSicurezzaAfterPost(DataSet: TDataSet);
+    procedure GeneraGiornateInAttesa;
+  protected
+    procedure AfterCreateDataSet(const DataSetName: string; DataSet: TzFbDataSet); override;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
+
+    function Commit(const Verbose: Boolean = True): Boolean; override;
 
     procedure NuovoIncarico;
     procedure ImportaFileIscrizioni(const FileName: string);
@@ -86,12 +102,54 @@ constructor TAccordoStatoRegioni.Create(aOwner: TComponent);
 begin
   inherited;
   ImportLines := TStringList.Create;
+  ProposteRifiutate := TList<Int64>.Create;
 end;
 
 destructor TAccordoStatoRegioni.Destroy;
 begin
+  // Una generazione rimandata non deve partire su un modulo gia' distrutto
+  TThread.RemoveQueuedEvents(nil, GeneraGiornateInAttesa);
+  FreeAndNil(ProposteRifiutate);
   FreeAndNil(ImportLines);
   inherited;
+end;
+
+procedure TAccordoStatoRegioni.AfterCreateDataSet(const DataSetName: string; DataSet: TzFbDataSet);
+begin
+  inherited;
+  if SameText(DataSetName, 'Progetti_Asr_Sicurezza') then
+    DataSet.AfterPost := ProgettiAsrSicurezzaAfterPost;
+end;
+
+procedure TAccordoStatoRegioni.ProgettiAsrSicurezzaAfterPost(DataSet: TDataSet);
+begin
+  IdGiornateInAttesa := DataSet.FieldByName('ID_PROGETTO_ASR').AsLargeInt;
+  if IdGiornateInAttesa <> 0 then
+    TThread.ForceQueue(nil, GeneraGiornateInAttesa);
+end;
+
+procedure TAccordoStatoRegioni.GeneraGiornateInAttesa;
+var
+  IdProgettoAsr: Int64;
+begin
+  IdProgettoAsr := IdGiornateInAttesa;
+  IdGiornateInAttesa := 0;
+  if IdProgettoAsr <> 0 then
+    GeneraGiornateAlSalvataggio(IdProgettoAsr);
+end;
+
+function TAccordoStatoRegioni.Commit(const Verbose: Boolean): Boolean;
+var
+  progetto: TzFbDataSet;
+begin
+  Result := inherited Commit(Verbose);
+  // Con l'autocommit spento il salvataggio passa da qui: la riga e' ormai confermata
+  if Result and DataSetExists('Progetti_Asr_Sicurezza') then
+  begin
+    progetto := getDataSet('Progetti_Asr_Sicurezza');
+    if progetto.Active and not progetto.IsEmpty then
+      GeneraGiornateAlSalvataggio(progetto.FieldByName('ID_PROGETTO_ASR').AsLargeInt);
+  end;
 end;
 
 { TAccordoStatoRegioni }
@@ -391,6 +449,86 @@ begin
   finally
     FreeAndNil(Gefos);
   end;
+end;
+
+procedure TAccordoStatoRegioni.GeneraGiornateAlSalvataggio(const IdProgettoAsr: Int64);
+var
+  Query: TzFbDataSet;
+  DataInizio, DataFine: TDateTime;
+  OraMattina, OraPomeriggio: TTime;
+  CorsoDiUnGiorno: Boolean;
+begin
+  // Una riga senza chiave letta indietro dopo l'inserimento: resta il comando Genera giornate
+  if (IdProgettoAsr = 0) or ProposteRifiutate.Contains(IdProgettoAsr) then
+    Exit;
+
+  // Solo dove GEFOS e' attivo per l'ente del corso: negli altri enti le giornate si
+  // continuano a inserire dal calendario corsi, senza righe create da sole
+  Query := TzFbDataSet.Create(nil);
+  try
+    Query.Connection := Config.Database;
+    Query.Transaction := ReadTrans;
+    Query.SQL.Text :=
+      'SELECT ' +
+      '    PROGETTI_ASR_SICUREZZA.DATA_INIZIO_EFFETTIVA, ' +
+      '    PROGETTI_ASR_SICUREZZA.DATA_FINE_EFFETTIVA ' +
+      'FROM ' +
+      '    PROGETTI_ASR_SICUREZZA ' +
+      '        INNER JOIN PROGETTI ON PROGETTI.ID_PROGETTO = PROGETTI_ASR_SICUREZZA.ID_PROGETTO ' +
+      'WHERE ' +
+      '    PROGETTI_ASR_SICUREZZA.ID_PROGETTO_ASR = :ID_PROGETTO_ASR AND ' +
+      '    PROGETTI_ASR_SICUREZZA.DATA_INIZIO_EFFETTIVA IS NOT NULL AND ' +
+      '    PROGETTI_ASR_SICUREZZA.DATA_FINE_EFFETTIVA IS NOT NULL AND ' +
+      '    COALESCE(PROGETTI_ASR_SICUREZZA.ORE_TOTALI, 0) > 0 AND ' +
+      '    EXISTS(SELECT 1 FROM GEFOS_COOPERAZIONE_APPLICATIVA_CONFIG ' +
+      '           WHERE GEFOS_COOPERAZIONE_APPLICATIVA_CONFIG.ID_ENTE = PROGETTI.ID_ENTE AND ' +
+      '                 GEFOS_COOPERAZIONE_APPLICATIVA_CONFIG.ATTIVO = TRUE) AND ' +
+      '    NOT EXISTS(SELECT 1 FROM ORARIO ' +
+      '               WHERE ORARIO.ID_PROGETTO = PROGETTI_ASR_SICUREZZA.ID_PROGETTO AND ' +
+      '                     ORARIO.ID_CORSO IS NOT DISTINCT FROM PROGETTI_ASR_SICUREZZA.ID_CORSO)';
+    Query.ParamByName('ID_PROGETTO_ASR').Value := IdProgettoAsr;
+    Query.Active := True;
+
+    if Query.IsEmpty then
+      Exit;
+
+    DataInizio := Query.FieldByName('DATA_INIZIO_EFFETTIVA').AsDateTime;
+    DataFine := Query.FieldByName('DATA_FINE_EFFETTIVA').AsDateTime;
+  finally
+    Query.Free;
+  end;
+
+  CorsoDiUnGiorno := DataInizio = DataFine;
+  if not CorsoDiUnGiorno then
+    if not ConfirmYesNo(Format('Il corso va dal %s al %s e non ha ancora le giornate.' + sLineBreak + sLineBreak +
+      'Generarle ora? Mattina dalle 09:00, pomeriggio dalle 14:00; gli orari si possono correggere nella scheda Giornate.',
+      [DateToStr(DataInizio), DateToStr(DataFine)])) then
+    begin
+      ProposteRifiutate.Add(IdProgettoAsr);
+      Exit;
+    end;
+
+  OraMattina := EncodeTime(9, 0, 0, 0);
+  OraPomeriggio := EncodeTime(14, 0, 0, 0);
+
+  // Il corso e' gia' salvato: un errore della generazione non annulla niente, si avvisa e
+  // l'operatore puo' riprovare con il comando Genera giornate
+  EseguiGefos(
+    procedure(Gefos: TGefosCooperazioneApplicativa)
+    var
+      Esito: string;
+    begin
+      try
+        Esito := Gefos.GeneraGiornate(IdProgettoAsr, OraMattina, OraPomeriggio, 4);
+        // Il corso di un giorno non interrompe l'operatore: la scheda mostra le giornate
+        if not CorsoDiUnGiorno then
+          ConfirmOk(Esito);
+      except
+        on Errore: Exception do
+          ConfirmOk('Le giornate non sono state generate: ' + Errore.Message, mtWarning);
+      end;
+    end);
+  AggiornaDatiGefos;
 end;
 
 procedure TAccordoStatoRegioni.GefosDatiCorso;
