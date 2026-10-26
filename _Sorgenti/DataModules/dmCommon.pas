@@ -47,6 +47,7 @@ uses
   FireDAC.Comp.DataSet,
   FireDAC.Comp.Client,
   zFbDataSet,
+  zMemoriaConScadenza,
   Base_DataModule,
   dbMaster,
   zOffice.Reports,
@@ -62,11 +63,10 @@ type
     procedure DataModuleCreate(Sender: TObject);
   private
     // memoria del vincolo di firma: Stato() passa di qui a ogni idle della
-    // form, il database si interroga solo quando cambia la pratica
-    FOidFirmaVerificato: Int64;
-    FTipoDocumentoFirmaVerificato: string;
-    FScadenzaFirmaVerificata: UInt64;
-    FFirmaElettronicaAmmessa: Boolean;
+    // form, il database si interroga solo quando cambia la pratica o scade
+    // la memoria
+    // Mantis #254 - 2026-10-26: memoria dell'esito con TzMemoriaConScadenza
+    FMemoriaFirma: TzMemoriaConScadenza;
   private
     FFirmaElettronicaController: TDocumentazioneReportActionsController;
     FDocumentAzioniController: TDocumentazioneReportActionsController;
@@ -80,6 +80,8 @@ type
     // documento, poi viene riletto dal database.
     function FirmaElettronicaAmmessa(Oid: Int64; const TipoDocumento: string): Boolean;
   public
+    destructor Destroy; override;
+
     function DocumentAzioniController: TDocumentazioneReportActionsController;
   public
     // ponte PEC unico dell'ente di lavoro (creato al primo uso): le feature
@@ -165,10 +167,14 @@ const
 procedure TCommon.DataModuleCreate(Sender: TObject);
 begin
   inherited;
-  FOidFirmaVerificato := -1;
-  FTipoDocumentoFirmaVerificato := '';
-  FScadenzaFirmaVerificata := 0;
-  FFirmaElettronicaAmmessa := false;
+  // Mantis #254 - 2026-10-26: memoria dell'esito con TzMemoriaConScadenza
+  FMemoriaFirma := TzMemoriaConScadenza.Create(DurataMemoriaFirmaMillisecondi);
+end;
+
+destructor TCommon.Destroy;
+begin
+  FreeAndNil(FMemoriaFirma);
+  inherited;
 end;
 
 function TCommon.AnnoFormativoCorrente: string;
@@ -567,31 +573,28 @@ begin
 end;
 
 function TCommon.FirmaElettronicaAmmessa(Oid: Int64; const TipoDocumento: string): Boolean;
-var
-  sp: TSP_OBJ_FILES_FIRMA_CONTRATTI_AMMESSA;
 begin
   // il controller interroga questo metodo a ogni aggiornamento delle azioni
   // della barra, cioe' molte volte al secondo: senza memoria del valore
   // sarebbe una lettura sul database a ogni giro
   // Mantis #254 - 2026-10-18: la memoria dell'esito scade e distingue il tipo documento, il flag Firma elettronica della risorsa si recepisce senza riavviare
-  if (Oid = FOidFirmaVerificato) and (TipoDocumento = FTipoDocumentoFirmaVerificato) and
-     (Winapi.Windows.GetTickCount64 < FScadenzaFirmaVerificata) then
-    exit(FFirmaElettronicaAmmessa);
-
-  sp := GetSP<TSP_OBJ_FILES_FIRMA_CONTRATTI_AMMESSA>();
-  try
-    sp.Oid := Oid;
-    sp.Tipo_Documento := TipoDocumento;
-    sp.ExecuteWithoutCommit;
-    FFirmaElettronicaAmmessa := sp.Firma_Elettronica.Value;
-  finally
-    FreeAndNil(sp);
-  end;
-
-  FOidFirmaVerificato := Oid;
-  FTipoDocumentoFirmaVerificato := TipoDocumento;
-  FScadenzaFirmaVerificata := Winapi.Windows.GetTickCount64 + DurataMemoriaFirmaMillisecondi;
-  result := FFirmaElettronicaAmmessa;
+  // Mantis #254 - 2026-10-26: memoria dell'esito con TzMemoriaConScadenza
+  // (se la lettura solleva un'eccezione non si memorizza niente)
+  result := FMemoriaFirma.Ottieni(Oid, TipoDocumento,
+    function: Boolean
+    var
+      sp: TSP_OBJ_FILES_FIRMA_CONTRATTI_AMMESSA;
+    begin
+      sp := GetSP<TSP_OBJ_FILES_FIRMA_CONTRATTI_AMMESSA>();
+      try
+        sp.Oid := Oid;
+        sp.Tipo_Documento := TipoDocumento;
+        sp.ExecuteWithoutCommit;
+        result := sp.Firma_Elettronica.Value;
+      finally
+        FreeAndNil(sp);
+      end;
+    end);
 end;
 
 function TCommon.PecBridge: TDocumentazioneBridgeMessaggi;
