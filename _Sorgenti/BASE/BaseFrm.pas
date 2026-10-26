@@ -240,6 +240,7 @@ type
     procedure OnAfterCreateControls(Sender: TObject);
     procedure OnAfterCreateComponent(zFormController: TzFormController; LayoutController: TLayoutController; const DataSetName: String; Component: TComponent);
     procedure OnAfterLayoutControlLoadProps(Sender: TObject);
+    procedure SchedaIncaricoAfterCreateControls(Sender: TObject);
 
     procedure OnDatasetAssigned(zFormController: TzFormController; const DataSetName: String; Component: TComponent);
   protected
@@ -1916,8 +1917,53 @@ begin
   // (ToolActions/ToolFilters delle props): il registro da codice
   // TzComponentSetup (zToolFilterSetup) e' stato eliminato.
 
+  // Mantis #288 - 2026-10-26: la scheda Incarico la aprono molti dataset in
+  // moduli diversi, quindi la regola sui campi si aggancia qui per tutti.
+  // Prima di SetupComponent, cosi' una form puo' sostituire il gestore.
+  if Component is TzDbView then
+    if SameText(TzDbView(Component).CardID, 'Incarico') then
+      TzDbView(Component).OnCardAfterCreateControls := SchedaIncaricoAfterCreateControls;
+
   // Chiama il nuovo hook per il codice residuo non-configurabile
   SetupComponent(DataSetName, Component);
+end;
+
+// Mantis #288 - 2026-10-26: come nella procedura guidata (Mantis #183), la
+// motivazione si vede solo se CONFIG.INCARICHI_MOTIVAZIONE_VISIBILE; i campi di
+// un'autorizzazione solo se CONFIG la richiede per gli incarichi interni o esterni
+procedure TBaseForm.SchedaIncaricoAfterCreateControls(Sender: TObject);
+
+  function ConfigAttiva(const Espressione: string): boolean;
+  var
+    Valore: Variant;
+  begin
+    Valore := Config.Database.ExecSQLScalar('SELECT ' + Espressione + ' FROM CONFIG');
+    result := (not VarIsNull(Valore)) and (not VarIsEmpty(Valore)) and Boolean(Valore);
+  end;
+
+var
+  Card: TzDbCard;
+begin
+  if not (Sender is TzDbCard) then
+    exit;
+
+  Card := TzDbCard(Sender);
+
+  if not ConfigAttiva('CONFIG.INCARICHI_MOTIVAZIONE_VISIBILE') then
+    Card.HideField('MOTIVAZIONE');
+
+  if not ConfigAttiva('CONFIG.AUTORIZZAZIONE_FINANZIARIA_INCARICHI_INTERNI OR CONFIG.AUTORIZZAZIONE_FINANZIARIA_INCARICHI_ESTERNI') then
+  begin
+    Card.HideField('DATA_AUTORIZZAZIONE_FINANZIARIA');
+    Card.HideField('NOMINATIVO_AUTORIZZAZIONE_FINANZIARIA');
+  end;
+
+  if not ConfigAttiva('CONFIG.AUTORIZZAZIONE_DIREZIONE_INCARICHI_INTERNI OR CONFIG.AUTORIZZAZIONE_DIREZIONE_INCARICHI_ESTERNI') then
+  begin
+    Card.HideField('TIPO_AUTORIZZAZIONE_DIREZIONE');
+    Card.HideField('DATA_AUTORIZZAZIONE_DIREZIONE');
+    Card.HideField('NOMINATIVO_AUTORIZZAZIONE_DIREZIONE');
+  end;
 end;
 
 procedure TBaseForm.SetupComponent(const DataSetName: String; Component: TComponent);
