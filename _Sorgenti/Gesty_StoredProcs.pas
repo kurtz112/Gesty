@@ -25221,6 +25221,7 @@ TSP_sia_Interventi_Detail = class (TzStoredProc)
     fNumero_Ore_Totali: TNullableInt64;
     fImporto_Nominale_Iva_Inclusa_Forzato: TNullableDouble;
     fImporto_Nominale_Iva_Esclusa_Forzato: TNullableDouble;
+    fId_Cooperativa_Sia: TNullableInt64;
     fTariffa_Oraria_Iva_Inclusa: TNullableDouble;
     fTariffa_Oraria_Iva_Esclusa: TNullableDouble;
     fImporto_Nominale_Iva_Inclusa: TNullableDouble;
@@ -25264,6 +25265,9 @@ TSP_sia_Interventi_Detail = class (TzStoredProc)
     //
     [TParamAttribute('IMPORTO_NOMINALE_IVA_ESCLUSA_FORZATO', ptInput, False)]
     property Importo_Nominale_Iva_Esclusa_Forzato: TNullableDouble read fImporto_Nominale_Iva_Esclusa_Forzato write fImporto_Nominale_Iva_Esclusa_Forzato;
+    //
+    [TParamAttribute('ID_COOPERATIVA_SIA', ptInput, False)]
+    property Id_Cooperativa_Sia: TNullableInt64 read fId_Cooperativa_Sia write fId_Cooperativa_Sia;
     //
     [TParamAttribute('TARIFFA_ORARIA_IVA_INCLUSA', ptOutput, False)]
     property Tariffa_Oraria_Iva_Inclusa: TNullableDouble read fTariffa_Oraria_Iva_Inclusa;
@@ -35365,6 +35369,13 @@ end;
 [TStoredProcedure('ANONYMIZER_GESTY.ANONIMIZZA_ENTI')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_anonymizer_Gesty__Anonimizza_Enti = class (TzStoredProc)
+  private
+  public
+end;
+
+[TStoredProcedure('ANONYMIZER_GESTY.ANONIMIZZA_LUOGHI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_anonymizer_Gesty__Anonimizza_Luoghi = class (TzStoredProc)
   private
   public
 end;
