@@ -20,6 +20,7 @@ inherited FormFrontOffice: TFormFrontOffice
       Caption = 'Assegna Ticket'
       ImageIndex = 1979
       OnExecute = AssegnaTicketExecute
+      OnUpdate = AssegnaTicketUpdate
     end
     object ModificaTicket: TAction
       Caption = 'Modifica Ticket'

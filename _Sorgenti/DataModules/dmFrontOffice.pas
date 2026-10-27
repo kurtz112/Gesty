@@ -45,6 +45,7 @@ type
     function NuovaQuery(const Sql: string): TzFbDataSet;
 
     procedure AssegnaTicket;
+    procedure UpdateAssegnaTicket(out Visible: boolean);
     procedure InoltraComunicazione;
     procedure ModificaTicket;
 
@@ -92,14 +93,23 @@ type
     FAmbitoAttuale: string;
     FGiaAssegnati: TList<Int64>;
     FIdOperatori: TList<Int64>;
+    // Mantis #252 - 2026-10-27: operatori caricati, prima del filtro della ricerca, e destinatari spuntati
+    FTuttiId: TList<Int64>;
+    FTuttiNominativi: TStringList;
+    FScelti: TList<Int64>;
     FComboAmbito: TComboBox;
     FCasellaTuttiGliOperatori: TCheckBox;
+    FRicerca: TEdit;
     FElenco: TCheckListBox;
     FNote: TMemo;
     procedure CaricaAmbiti;
     procedure CaricaOperatori;
+    procedure MostraOperatori;
+    function CorrispondeAllaRicerca(const Nominativo: string): Boolean;
     procedure AmbitoCambiato(Sender: TObject);
     procedure TuttiGliOperatoriCambiato(Sender: TObject);
+    procedure RicercaCambiata(Sender: TObject);
+    procedure ElencoSpuntato(Sender: TObject);
     procedure ControllaChiusura(Sender: TObject; var CanClose: Boolean);
     function AmbitoScelto: string;
     function AmbitoValido: Boolean;
@@ -125,6 +135,9 @@ begin
   FAmbitoAttuale := AmbitoAttuale;
   FGiaAssegnati := GiaAssegnati;
   FIdOperatori := TList<Int64>.Create;
+  FTuttiId := TList<Int64>.Create;
+  FTuttiNominativi := TStringList.Create;
+  FScelti := TList<Int64>.Create;
 
   Caption := 'Assegna ticket';
   BorderStyle := bsDialog;
@@ -154,12 +167,20 @@ begin
   FCasellaTuttiGliOperatori := TCheckBox.Create(Self);
   FCasellaTuttiGliOperatori.Parent := Self;
   FCasellaTuttiGliOperatori.SetBounds(300, 66, 228, 19);
-  FCasellaTuttiGliOperatori.Caption := 'Mostra tutti gli operatori';
+  FCasellaTuttiGliOperatori.Caption := 'Mostra tutti gli utenti di Gesty';
   FCasellaTuttiGliOperatori.OnClick := TuttiGliOperatoriCambiato;
+
+  // Mantis #252 - 2026-10-27: ricerca per nome, l'elenco di tutti gli utenti e' lungo
+  FRicerca := TEdit.Create(Self);
+  FRicerca.Parent := Self;
+  FRicerca.SetBounds(12, 88, 516, 23);
+  FRicerca.TextHint := 'Cerca per nome o cognome';
+  FRicerca.OnChange := RicercaCambiata;
 
   FElenco := TCheckListBox.Create(Self);
   FElenco.Parent := Self;
-  FElenco.SetBounds(12, 88, 516, 230);
+  FElenco.SetBounds(12, 116, 516, 202);
+  FElenco.OnClickCheck := ElencoSpuntato;
 
   Etichetta := TLabel.Create(Self);
   Etichetta.Parent := Self;
@@ -193,6 +214,9 @@ end;
 destructor TFormAssegnazioneTicket.Destroy;
 begin
   FreeAndNil(FIdOperatori);
+  FreeAndNil(FTuttiId);
+  FreeAndNil(FTuttiNominativi);
+  FreeAndNil(FScelti);
   inherited;
 end;
 
@@ -218,8 +242,62 @@ end;
 procedure TFormAssegnazioneTicket.CaricaOperatori;
 var
   Query: TzFbDataSet;
+begin
+  FTuttiId.Clear;
+  FTuttiNominativi.Clear;
+
+  // Mantis #252 - 2026-10-27: solo chi ha un utente Gesty attivo, gli altri non vedrebbero la notifica del ticket
+  if FCasellaTuttiGliOperatori.Checked then
+    Query := FDataModulo.NuovaQuery('SELECT FRONT_OFFICE_OPERATORI_ELENCO.ID_OPERATORE_FRONT_OFFICE AS ID_OPERATORE, ' +
+      'FRONT_OFFICE_OPERATORI_ELENCO.NOMINATIVO_OPERATORE AS NOMINATIVO_OPERATORE ' +
+      'FROM FRONT_OFFICE_OPERATORI_ELENCO ' +
+      'WHERE FRONT_OFFICE_OPERATORI_ELENCO.TIPO_OPERATORE = ''P'' ' +
+      'AND EXISTS (SELECT 1 FROM USR_UTENTI ' +
+      'WHERE USR_UTENTI.ID_ANAGRAFICA = FRONT_OFFICE_OPERATORI_ELENCO.ID_OPERATORE_FRONT_OFFICE ' +
+      'AND USR_UTENTI.ATTIVO = TRUE) ' +
+      'ORDER BY FRONT_OFFICE_OPERATORI_ELENCO.NOMINATIVO_OPERATORE')
+  else
+  begin
+    Query := FDataModulo.NuovaQuery('SELECT FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE.ID_PERSONALE AS ID_OPERATORE, ' +
+      'ANAGRAFE.NOMINATIVO AS NOMINATIVO_OPERATORE ' +
+      'FROM FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE ' +
+      'INNER JOIN ANAGRAFE ON ANAGRAFE.ID_ANAGRAFICA = FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE.ID_PERSONALE ' +
+      'WHERE FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE.AMBITO_INTERESSE = :AMBITO_INTERESSE ' +
+      'ORDER BY ANAGRAFE.NOMINATIVO');
+    Query.ParamByName('AMBITO_INTERESSE').AsString := AmbitoScelto;
+  end;
+
+  try
+    Query.Open;
+    while not Query.Eof do
+    begin
+      FTuttiId.Add(Query.FieldByName('ID_OPERATORE').AsLargeInt);
+      FTuttiNominativi.Add(Query.FieldByName('NOMINATIVO_OPERATORE').AsString);
+      Query.Next;
+    end;
+  finally
+    FreeAndNil(Query);
+  end;
+
+  MostraOperatori;
+end;
+
+// Mantis #252 - 2026-10-27: vero se il nominativo contiene tutte le parole cercate, in qualunque ordine
+function TFormAssegnazioneTicket.CorrispondeAllaRicerca(const Nominativo: string): Boolean;
+var
+  Parola: string;
+begin
+  for Parola in Trim(FRicerca.Text).ToUpper.Split([' '], TStringSplitOptions.ExcludeEmpty) do
+    if not Nominativo.ToUpper.Contains(Parola) then
+      exit(False);
+  Result := True;
+end;
+
+procedure TFormAssegnazioneTicket.MostraOperatori;
+var
   Nominativo: string;
   Indice: Integer;
+  Posizione: Integer;
   IdOperatore: Int64;
 begin
   FElenco.Items.BeginUpdate;
@@ -227,48 +305,53 @@ begin
     FElenco.Items.Clear;
     FIdOperatori.Clear;
 
-    if FCasellaTuttiGliOperatori.Checked then
-      Query := FDataModulo.NuovaQuery('SELECT FRONT_OFFICE_OPERATORI_ELENCO.ID_OPERATORE_FRONT_OFFICE AS ID_OPERATORE, ' +
-        'FRONT_OFFICE_OPERATORI_ELENCO.NOMINATIVO_OPERATORE AS NOMINATIVO_OPERATORE ' +
-        'FROM FRONT_OFFICE_OPERATORI_ELENCO ' +
-        'WHERE FRONT_OFFICE_OPERATORI_ELENCO.TIPO_OPERATORE = ''P'' ' +
-        'ORDER BY FRONT_OFFICE_OPERATORI_ELENCO.NOMINATIVO_OPERATORE')
-    else
+    for Posizione := 0 to FTuttiId.Count - 1 do
     begin
-      Query := FDataModulo.NuovaQuery('SELECT FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE.ID_PERSONALE AS ID_OPERATORE, ' +
-        'ANAGRAFE.NOMINATIVO AS NOMINATIVO_OPERATORE ' +
-        'FROM FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE ' +
-        'INNER JOIN ANAGRAFE ON ANAGRAFE.ID_ANAGRAFICA = FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE.ID_PERSONALE ' +
-        'WHERE FRONT_OFFICE_AMBITI_INTERESSE_PERSONALE.AMBITO_INTERESSE = :AMBITO_INTERESSE ' +
-        'ORDER BY ANAGRAFE.NOMINATIVO');
-      Query.ParamByName('AMBITO_INTERESSE').AsString := AmbitoScelto;
-    end;
+      IdOperatore := FTuttiId[Posizione];
+      Nominativo := FTuttiNominativi[Posizione];
 
-    try
-      Query.Open;
-      while not Query.Eof do
+      if not CorrispondeAllaRicerca(Nominativo) then
+        continue;
+
+      FIdOperatori.Add(IdOperatore);
+      Indice := FElenco.Items.Add(Nominativo);
+
+      // chi ha gia' un ticket aperto su questo contatto non si assegna due volte
+      if FGiaAssegnati.Contains(IdOperatore) then
       begin
-        IdOperatore := Query.FieldByName('ID_OPERATORE').AsLargeInt;
-        Nominativo := Query.FieldByName('NOMINATIVO_OPERATORE').AsString;
-
-        FIdOperatori.Add(IdOperatore);
-        Indice := FElenco.Items.Add(Nominativo);
-
-        // chi ha gia' un ticket aperto su questo contatto non si assegna due volte
-        if FGiaAssegnati.Contains(IdOperatore) then
-        begin
-          FElenco.Items[Indice] := Nominativo + ' (gia'' assegnato)';
-          FElenco.ItemEnabled[Indice] := False;
-        end;
-
-        Query.Next;
-      end;
-    finally
-      FreeAndNil(Query);
+        FElenco.Items[Indice] := Nominativo + ' (gia'' assegnato)';
+        FElenco.ItemEnabled[Indice] := False;
+      end
+      else
+        // la spunta resta anche se l'operatore esce e rientra dal filtro della ricerca
+        FElenco.Checked[Indice] := FScelti.Contains(IdOperatore);
     end;
   finally
     FElenco.Items.EndUpdate;
   end;
+end;
+
+procedure TFormAssegnazioneTicket.RicercaCambiata(Sender: TObject);
+begin
+  MostraOperatori;
+end;
+
+procedure TFormAssegnazioneTicket.ElencoSpuntato(Sender: TObject);
+var
+  IdOperatore: Int64;
+begin
+  if FElenco.ItemIndex < 0 then
+    exit;
+
+  IdOperatore := FIdOperatori[FElenco.ItemIndex];
+
+  if FElenco.Checked[FElenco.ItemIndex] then
+  begin
+    if not FScelti.Contains(IdOperatore) then
+      FScelti.Add(IdOperatore);
+  end
+  else
+    FScelti.Remove(IdOperatore);
 end;
 
 function TFormAssegnazioneTicket.AmbitoScelto: string;
@@ -336,11 +419,13 @@ end;
 
 procedure TFormAssegnazioneTicket.ElencoDestinatariScelti(Destinatari: TList<Int64>);
 var
-  Indice: Integer;
+  IdOperatore: Int64;
 begin
-  for Indice := 0 to FElenco.Items.Count - 1 do
-    if FElenco.Checked[Indice] and FElenco.ItemEnabled[Indice] then
-      Destinatari.Add(FIdOperatori[Indice]);
+  // Mantis #252 - 2026-10-27: dalle spunte registrate, non dalle righe visibili, che dipendono dalla ricerca
+  // e solo fra gli operatori dell'elenco caricato: cambiando ambito, le spunte dell'elenco di prima non valgono
+  for IdOperatore in FScelti do
+    if FTuttiId.Contains(IdOperatore) and not FGiaAssegnati.Contains(IdOperatore) then
+      Destinatari.Add(IdOperatore);
 end;
 
 type
@@ -1012,6 +1097,16 @@ begin
     CampoId.ReadOnly := IdEraInSolaLettura;
     AggiornaBloccoCampi(DataSet);
   end;
+end;
+
+// Mantis #252 - 2026-10-27: nascosto mentre si registra un contatto nuovo, che il database assegna per ambito
+procedure TFrontOffice.UpdateAssegnaTicket(out Visible: boolean);
+var
+  DataSet: TzFbDataSet;
+begin
+  DataSet := GetDataSet('Front_Office_Contatti');
+
+  Visible := not (Assigned(DataSet) and (DataSet.State = dsInsert));
 end;
 
 procedure TFrontOffice.UpdateCercaAnagrafica(out Visible: boolean);

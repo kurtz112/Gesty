@@ -39,6 +39,7 @@ type
     CercaAnagrafica: TAction;
     procedure InoltraComunicazioneExecute(Sender: TObject);
     procedure AssegnaTicketExecute(Sender: TObject);
+    procedure AssegnaTicketUpdate(Sender: TObject);
     procedure ModificaTicketExecute(Sender: TObject);
     procedure RichiedeRispostaExecute(Sender: TObject);
     procedure RichiedeRispostaUpdate(Sender: TObject);
@@ -124,6 +125,18 @@ procedure TFormFrontOffice.AssegnaTicketExecute(Sender: TObject);
 begin
   inherited;
   FrontOffice.AssegnaTicket;
+end;
+
+// Mantis #252 - 2026-10-27: nel primo invio il ticket lo assegna l'ambito, il pulsante serve solo dopo
+procedure TFormFrontOffice.AssegnaTicketUpdate(Sender: TObject);
+var
+  Visible: boolean;
+begin
+  inherited;
+
+  FrontOffice.UpdateAssegnaTicket(Visible);
+
+  AssegnaTicket.Visible := Visible;
 end;
 
 procedure TFormFrontOffice.ModificaTicketExecute(Sender: TObject);
