@@ -75,7 +75,8 @@ begin
   end;
 
   Config.NotificheLette;
-  RefreshDataSet('NoficheRicevute');
+  // Mantis #291 - 2026-10-27: corretto refuso nel nome del dataset
+  RefreshDataSet('NotificheRicevute');
 end;
 
 procedure TNotifiche.AssegnaTicket;

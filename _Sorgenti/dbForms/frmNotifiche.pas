@@ -131,7 +131,8 @@ begin
 
   if SameText(PkField, 'ID_NOTIFICA') then
   begin
-    view := getView('NoficheRicevute'); // nome dataset/vista da confermare, vedi nota
+    // Mantis #291 - 2026-10-27: corretto refuso nel nome del dataset
+    view := getView('NotificheRicevute');
     if Assigned(view) then
     begin
       view.ClearFilter(false);
