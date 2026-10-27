@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-17
+// Ultima modifica: 2026-10-27
 // ---------------------------------------------------------------------------
 
 // ***************************************************************************
@@ -30,7 +30,9 @@
 //     Name dei frame lo sceglie il generatore e cambia col layout; il ruolo
 //     no;
 //   - le eccezioni le mostra gia' TzExceptionManager (TConfig.
-//     ApplicationEventsException): la sonda le registra soltanto.
+//     ApplicationEventsException): la sonda le registra soltanto;
+//   - i comandi sui componenti di zBase: filtro e colonna attiva delle
+//     viste, skin (Sonda.zBase).
 //
 // Analisi: D:\AI\Analisi\COLLAUDO e
 // D:\AI\OUT\20261017-collaudo-autonomo-win32\.
@@ -61,7 +63,8 @@ uses
   zDbView,
   zDbCard,
   Sonda.Server,
-  Sonda.Ispezione;
+  Sonda.Ispezione,
+  Sonda.zBase;
 
 const
   RuoloVista = 'vista';
@@ -161,6 +164,7 @@ begin
     end;
   RisolutoreRuoloSonda := RisolviRuolo;
   DescrittoreRuoloSonda := RuoloComponente;
+  RegistraComandiSondaZBase;
   AvviaSonda;
 {$ENDIF}
 end;
