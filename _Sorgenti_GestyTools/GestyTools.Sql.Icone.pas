@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-16
+// Ultima modifica: 2026-10-27
 // ---------------------------------------------------------------------------
 unit GestyTools.Sql.Icone;
 
@@ -15,7 +15,8 @@ unit GestyTools.Sql.Icone;
 interface
 
 uses
-  cxGraphics;
+  cxGraphics,
+  dxGDIPlusClasses;
 
 type
   // Indice di ogni icona nella lista riempita da CaricaIconeSql
@@ -25,14 +26,55 @@ type
 // icone nell'ordine di TIconaSql.
 procedure CaricaIconeSql(Lista: TcxImageList);
 
+// Lucchetto del pulsante "Blocca avvio di Gesty", presente su tutte le pagine:
+// va nei glifi del pulsante e non in una lista, perche' le barre delle pagine
+// e quella della pagina Aggiornamento DB hanno liste di immagini diverse
+procedure CaricaIconaBlocco(Glifo, GlifoGrande: TdxSmartImage);
+
 implementation
 
 uses
   System.SysUtils,
   System.Classes,
   System.NetEncoding,
-  Vcl.Graphics,
-  dxGDIPlusClasses;
+  Vcl.Graphics;
+
+const
+  // RichEdit\ProtectDocument_16x16.png
+  IconaBlocco16 =
+    'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAH3RFWHRUaXRsZQBQcm90ZWN0RG9jdW1lbnQ7U2VjdXJpdHk7nIOmoQAA'
+    + 'AkNJREFUeF6Fkk1IVVsUx39bbpI5KGkUQVDQKCkowj4sntTg3YokkD4IHkHviWhgGakIgqOkL4THhaIGQaRCVKSDBg8bmIKIRYhiVAQ1'
+    + 'aBCRlnE/uuestR7scw8HHdQfFntzWHut3/mv5QDXMzDzDOfqzBRTUDPMwPypqEb3ICiM9TXtPWhmRUpKAc6wup6T1fxObben9pXeLC2g'
+    + 'ilfn3UkSOVxZ6XRwoX4rEiX6r8sKKABdJ3ZgRPjJrxiK+buIArjlBVA1AHofvCSW+c6+u49zR6rjPFd7vAMJhYnH1yMCMQWgvWG7J/BA'
+    + 'ZohHwROYGiKCzw+VUDTxoITGtUeviIWLCNavraQipcy8mGJu+i07688PhiL/qOinxAOxyOVj2+LxeVwj8qE308+mjRto+vsUD4dG0g+H'
+    + '/utX0T9igrLYxL4nMyQEsK5qJVUVjunZNzQcPchfjR10dzYz+GB49+zI7UrnMgUHrGrJTGQzLbv4/K3gO8aLk81lyT1tZcX8HBIIoQhS'
+    + 'VG/g91wwmb758UBpjALAv8OzSwhWlwuHvs5R3TKASR7CAoQ5LMgyerW1BihPAfGC0Hx4Szx3TGF+YZ7wtUCYx6Yvc//OGKfP1GAaegrA'
+    + 'pQAp5LLPz94Y3R8ZVzLQ4GdukXYJfXeTkPdfCv4xKoRBMsbiva70n0B5aU1dEqy5eGnzO4IcJkJ32x7QEFNBgxDAUmamQN7HMjnn8gs/'
+    + 'gvHRK421EggSKCKKirCYl3GgmOLXKqRvfYjpHIkMKAKF/wEcsWqWxQxBSwAAAABJRU5ErkJggg==';
+  // RichEdit\ProtectDocument_32x32.png
+  IconaBlocco32 =
+    'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAH3RFWHRUaXRsZQBQcm90ZWN0RG9jdW1lbnQ7U2VjdXJpdHk7nIOmoQAA'
+    + 'BhhJREFUeF6tln9sleUVxz/Pe29vW7hlqzTbKsN2DCtixBkS0XUJgumouh9micNkc8uqzC0jmUvmFrZk/2xL5l/ExWQs6ELcsjh1BiNT'
+    + 'VgwUIeDPRVxBClJaQaCW2dL7673v+z7nrLRP7vu26+UGstOcnPM8vbnnnO/3nPNco6o4wRgDYBJKDT++q/4/BSwQAhGgyZhp/lfMb/7W'
+    + '/wqYNQqIKKCoKIKielGJzwKiAok7mfKl8tkwCPb/4eHV3YC4ZKom4Kowa375zeX8v2Tj4we+BNQBZWKpigCKAlDwLbVEARRnFXFWpw3j'
+    + 'OR8HeAowzBJvLgpEtEqo2NNkcFVAE2diqhyNcfDaCBhUScpf9g6jKCqOfwQR9+UqiGglqOj05zas60DjvwS9tROYHZ9vr25LYuAgNgl/'
+    + 'ZsUa3zlELhMBmZXBU3tOoqoVOBWtVC1TgafOsa/KQ93LABBAlMtLQJkp31nzuSTfSTRc5UlfEXBoKDoHAsaYS44hsxHYtvsEIriKxVmd'
+    + 'NfeKFVtB4wd3LkNUESuoCIB3RU2oCt9ds6SCgFApD3eFqLpgltBa1FpKvo+i+OUQayM3hni1E0gi4KL+6ZUTCDjedSbvImQbU7RkM0Tl'
+    + 'Au8cPsboR+cp5CYm79N8uqUZv5gFqHfxPEAuiUCSZ8XwvTs+j6KgBkGTAGGtxS+V+efBft7sH+SOVddx/ZJOmuY3MHJ+jH+/N8ip/W/R'
+    + '+ZWeh9/e89xv/cJEAIS4EudOQGYunyd2vY+qYIXEBCgeyuKWRo4cPY6RiE0b7mbvwUM8vu15zo6c56pPNrG0fRHrv7qWf+yq/5Fl/YLX'
+    + 'dmzd6GqLaiPgqO7pWgqiKPGc24tqLQODZ+ibrHTTA938/qmX0aDIN9Z1cs2iT3Fy+Bwv7TnA8RPD3HbLTXxwZvT+6794z/PvHdjeC9i5'
+    + 'EDDJPSAO9q29x+I5d2pFaWtp4FD/AF23LqP31bewfoEf99xDJlMPeCxfNp+2xa1s+fPfGRr6kGuXfJaRkY96gD1AUIUCN7fx3E8j4NBQ'
+    + 'UdSAjSxBUKZv/+us6FjFpt/1svH+u0mlUhhjUFWM55FKp1nbuZIn/7qD1ZP21dcyq4AMUAJsFQpIUsDWnceQZPdbZeXSZgK/TL5QpGl+'
+    + 'IyOjYyxszuL7AZgQEUFE8YMyC+bPI5fPk520Vr1moAEoANHcq1gEiDfZg1/uqPjKdAJhGOCffoObvdd55tFe7m1XPrH7W44qMBaMQqNA'
+    + 'vUB3ayvjB7by9faU13Pftbc/8vTxF4FgbgSY2YR/3DkQb74p/i03ty/gpqOP8pONv6bh6i+AKiCg4qCTxFm4wZ0nhg6ljjz9q83ALqA4'
+    + '5ypWARIdv6G7I/HGK2EklEpF0u+O09C6Ah0fgDBHTUnV07RoKV6kC90Emku9hi4obHn5KKIav4SRZUVblpWFcZAIimdJyu6DR3ji2T4e'
+    + 'vHc1a2+7gYqEeTAZ/PyFysTV2AOKAt9fd10FDdHpCSiWCoR9Y2hxBJ04iWlswQmPbXuJI6d9GvaeY+2tyyHKA6Cl80Sj/fgTHwOYqi9U'
+    + 'kgKSz6q7EBXECiLTVdmh7cjwDmT0X2humPu6OvhM+3LW37kKvDQ6eW+HdqAnt0PhHCIGwFTbhK5uGM+Vp4MDIpVsiKKIQr5MkwU0wEul'
+    + 'Mf5/0IuK4n18gdHTdZjSjegH+9AL72OMgXQdaIRYrZqAAlFQLvU99Nj+29VxrpUt6GiwlqBc4BdWQUNMKhN3MLBvoIi1Wd4ZnKDrmhSm'
+    + 'LgMKGByC1REQoPzkI11fAzKJn9KeszhbBzT9/KfN7yIhJl1XocsA+w7nmHdVG28OjGHuakULp8AAajBYVKnShPErVQT8RFCSvkugLGIw'
+    + 'EqJeHSYukUNbboGr78KkG9GohEnVYTCItaDqegCq9gBgnVYTC2SiSPNjx9/IZtML3Sga1ACqmMHtrmVc9gbw6hk99SGRUARCQNKzH6Fa'
+    + 'YowjEoLDZ6MfBs9s3mygRSyIgBWQ6UIRMVhRVAzipigSk3v7TPAzoOQSuCIRoPzAs7kXgJ2OElNbAQhd8Lx7Da9Ykr3izbXSq9yJUwvo'
+    + 'fwGpZ0sNbf7W+AAAAABJRU5ErkJggg==';
 
 const
   // Actions\New_32x32.png
@@ -201,6 +243,24 @@ begin
   AggiungiIcona(Lista, IconaEsegui);
   AggiungiIcona(Lista, IconaInterrompi);
   AggiungiIcona(Lista, IconaCopia);
+end;
+
+procedure CaricaImmagine(Immagine: TdxSmartImage; const DatiBase64: string);
+var
+  Flusso: TBytesStream;
+begin
+  Flusso := TBytesStream.Create(TNetEncoding.Base64.DecodeStringToBytes(DatiBase64));
+  try
+    Immagine.LoadFromStream(Flusso);
+  finally
+    Flusso.Free;
+  end;
+end;
+
+procedure CaricaIconaBlocco(Glifo, GlifoGrande: TdxSmartImage);
+begin
+  CaricaImmagine(Glifo, IconaBlocco16);
+  CaricaImmagine(GlifoGrande, IconaBlocco32);
 end;
 
 end.

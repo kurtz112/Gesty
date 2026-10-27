@@ -191,8 +191,20 @@ type
     // interfaccia della pagina Aggiornamento DB (barra comandi, opzioni,
     // messaggi e risultati), costruita da codice
     PaginaSql: TPaginaSql;
+    // "Blocca avvio": un solo pulsante collegato alle barre delle pagine, piu'
+    // quello della barra della pagina Aggiornamento DB, che ha un gestore
+    // di barre suo. Lo stato premuto e' l'esistenza del file Gesty.blocco
+    PulsanteBlocco: TdxBarButton;
+    PulsanteBloccoSql: TdxBarLargeButton;
+    AggiornamentoPulsantiBlocco: Boolean;
     procedure CaricaScriptAggiornamento;
     function ConfermaPassaggioPagina: Boolean;
+    procedure CreaPulsantiBlocco;
+    procedure PulsanteBloccoClick(Sender: TObject);
+    procedure AggiornaPulsantiBlocco;
+    // Lo shutdown scollega gli utenti; il blocco impedisce che rientrino
+    // mentre si aggiorna. Restituisce il testo da accodare al messaggio
+    function BloccaDopoShutdown: string;
   public
   end;
 
@@ -214,6 +226,7 @@ uses
   GestyTools.Script.Editor,
   GestyTools.Config.Editor,
   GestyTools.Connection,
+  GestyTools.Sql.Icone,
   zMsg;
 
 {$R *.dfm}
@@ -260,7 +273,109 @@ begin
   begin
     ConfirmOk('Uno script e'' in esecuzione: interromperlo prima di chiudere.', mtWarning);
     CanClose := False;
+    Exit;
   end;
+
+  // un blocco dimenticato lascia tutti fuori da Gesty finche' qualcuno non
+  // riapre GestyTools o cancella il file a mano
+  if Assigned(UpdateEngine) and UpdateEngine.BloccoAttivo then
+  begin
+    case ConfirmYesNoCancel('L''avvio di Gesty e'' ancora bloccato: finche'' il blocco resta, nessuno puo'' aprirlo.' + sLineBreak +
+      'Togliere il blocco prima di uscire?', mtWarning) of
+      mrYes:
+        CanClose := UpdateEngine.DisattivaBlocco;
+      mrNo:
+        CanClose := True;
+    else
+      CanClose := False;
+    end;
+
+    AggiornaPulsantiBlocco;
+  end;
+end;
+
+procedure TMainForm.CreaPulsantiBlocco;
+const
+  Didascalia = 'Blocca avvio';
+  Suggerimento = 'Premuto: Gesty non si apre (file Gesty.blocco accanto a Gesty.exe). Rialzato: Gesty si apre di nuovo';
+
+  procedure Collega(Barra: TdxBar);
+  var
+    Collegamento: TdxBarItemLink;
+  begin
+    Collegamento := Barra.ItemLinks.Add;
+    Collegamento.Item := PulsanteBlocco;
+    Collegamento.BeginGroup := True;
+    Collegamento.UserDefine := [udPaintStyle];
+    Collegamento.UserPaintStyle := psCaptionGlyph;
+  end;
+
+begin
+  // un item solo con un collegamento per barra: lo stato premuto e' dell'item,
+  // quindi le pagine lo vedono uguale senza doverle allineare
+  PulsanteBlocco := TdxBarButton(dxBarManager.AddItem(TdxBarButton));
+  PulsanteBlocco.ButtonStyle := bsChecked;
+  PulsanteBlocco.Caption := Didascalia;
+  PulsanteBlocco.Hint := Suggerimento;
+  CaricaIconaBlocco(PulsanteBlocco.Glyph, PulsanteBlocco.LargeGlyph);
+  PulsanteBlocco.OnClick := PulsanteBloccoClick;
+
+  Collega(barUtenti);
+  Collega(barRinominaExe);
+  Collega(barBackup);
+  Collega(barAggiornamento);
+
+  PulsanteBloccoSql := PaginaSql.NuovoPulsante;
+  PulsanteBloccoSql.ButtonStyle := bsChecked;
+  PulsanteBloccoSql.Caption := Didascalia;
+  PulsanteBloccoSql.Hint := Suggerimento;
+  CaricaIconaBlocco(PulsanteBloccoSql.Glyph, PulsanteBloccoSql.LargeGlyph);
+  PulsanteBloccoSql.OnClick := PulsanteBloccoClick;
+end;
+
+procedure TMainForm.PulsanteBloccoClick(Sender: TObject);
+begin
+  // il clic ha gia' cambiato lo stato del pulsante, ma fa fede il file: se
+  // scriverlo o cancellarlo non riesce, AggiornaPulsantiBlocco riporta il
+  // pulsante com'era
+  if AggiornamentoPulsantiBlocco then
+    Exit;
+
+  if UpdateEngine.BloccoAttivo then
+    UpdateEngine.DisattivaBlocco
+  else
+    UpdateEngine.AttivaBlocco;
+
+  AggiornaPulsantiBlocco;
+end;
+
+procedure TMainForm.AggiornaPulsantiBlocco;
+var
+  Attivo: Boolean;
+begin
+  if not Assigned(PulsanteBlocco) or not Assigned(UpdateEngine) then
+    Exit;
+
+  Attivo := UpdateEngine.BloccoAttivo;
+
+  // cambiare Down da codice non deve rientrare in PulsanteBloccoClick
+  AggiornamentoPulsantiBlocco := True;
+  try
+    PulsanteBlocco.Down := Attivo;
+    PulsanteBloccoSql.Down := Attivo;
+  finally
+    AggiornamentoPulsantiBlocco := False;
+  end;
+end;
+
+function TMainForm.BloccaDopoShutdown: string;
+begin
+  if UpdateEngine.BloccoAttivo or UpdateEngine.AttivaBlocco then
+    Result := sLineBreak + 'L''avvio di Gesty e'' bloccato: per riaprirlo rialzare il pulsante "Blocca avvio".'
+  else
+    Result := sLineBreak + 'Attenzione: l''avvio di Gesty NON e'' bloccato, gli utenti possono ricollegarsi.';
+
+  AggiornaPulsantiBlocco;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -307,6 +422,10 @@ begin
   // DB; l'editor e' il frame gia' presente nella pagina
   PaginaSql := TPaginaSql.Create(Self, pageAggiornamentoDB, FrameEditor_Sql, Esecutore);
 
+  // lo stato lo legge FormShow: UpdateEngine e la configurazione nascono
+  // dopo la form
+  CreaPulsantiBlocco;
+
   ExplorerDrop.DestinationControl := FrameEditor_Sql.Editor;
   ExplorerDrop.Enabled := True;
 end;
@@ -323,6 +442,9 @@ begin
   shellBreadcrumbBin.Properties.ShellOptions.Root.CustomPath := Config.FolderBin;
   shellBreadcrumbDB.Properties.ShellOptions.Root.CustomPath := Config.DBFolder;
   shellBreadcrumbAggiornamenti.Properties.ShellOptions.Root.CustomPath := Config.FolderUpdate;
+
+  // un blocco rimasto da una sessione precedente si vede subito premuto
+  AggiornaPulsantiBlocco;
 end;
 
 procedure TMainForm.WizardButtonClick(Sender: TObject; AKind: TdxWizardControlButtonKind; var AHandled: Boolean);
@@ -387,7 +509,7 @@ begin
           StopWait;
         end;
 
-        ConfirmOk('Shutdown in corso: attendere che gli utenti si scolleghino, poi aggiornare l''elenco.');
+        ConfirmOk('Shutdown in corso: attendere che gli utenti si scolleghino, poi aggiornare l''elenco.' + BloccaDopoShutdown);
       end;
 
       Exit(False);
@@ -422,6 +544,9 @@ end;
 procedure TMainForm.WizardPageChanged(Sender: TObject);
 begin
   Wizard.Buttons.Cancel.Enabled := Wizard.ActivePageIndex < Wizard.PageCount - 1;
+
+  // il file puo' essere stato creato o cancellato da fuori
+  AggiornaPulsantiBlocco;
 
   // all'ingresso nella pagina Aggiornamento DB carica lo script piu' recente
   if Wizard.ActivePage = pageAggiornamentoDB then
@@ -563,7 +688,7 @@ begin
       StopWait;
     end;
 
-    ConfirmOk('Shutdown in corso.');
+    ConfirmOk('Shutdown in corso.' + BloccaDopoShutdown);
   end;
 end;
 
@@ -657,7 +782,11 @@ begin
   if zMsg.InputPassword('Password', 'Password', Password) then
     if Password.Equals(AdminPwd.ToString) then
       if EditConfig then
+      begin
         Connection.LoadConfig;
+        // la cartella di Gesty puo' essere cambiata
+        AggiornaPulsantiBlocco;
+      end;
 end;
 
 end.

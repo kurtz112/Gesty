@@ -346,11 +346,51 @@ uses
 // {$SETPEFLAGS IMAGE_FILE_NET_RUN_FROM_SWAP} da verificare
 {$SETPEOPTFLAGS $140}
 
+// Blocco dell'avvio messo da GestyTools durante la manutenzione (pulsante
+// "Blocca avvio", o shutdown): il file Gesty.blocco accanto all'eseguibile.
+// Se c'e', avvisa e restituisce True: l'avvio si ferma prima di toccare il
+// database. GestyTools avvia Gesty con -ignorablocco, perche' chi aggiorna
+// deve poterlo provare prima di togliere il blocco.
+function AvvioBloccato: Boolean;
+var
+  NomeFile: string;
+  Contenuto: TStringList;
+  Dettaglio: string;
+begin
+  NomeFile := ExtractFilePath(ParamStr(0)) + 'Gesty.blocco';
+  Result := FileExists(NomeFile) and not FindCmdLineSwitch('ignorablocco');
+  if not Result then
+    Exit;
+
+  // chi ha messo il blocco e quando, per sapere a chi chiedere
+  Dettaglio := '';
+  Contenuto := TStringList.Create;
+  try
+    try
+      Contenuto.LoadFromFile(NomeFile);
+      if Contenuto.Values['Data'] <> '' then
+        Dettaglio := sLineBreak + sLineBreak + 'Bloccato il ' + Contenuto.Values['Data'] + ' da ' + Contenuto.Values['Utente'] + ' (' +
+          Contenuto.Values['Computer'] + ').';
+    except
+      // file illeggibile, per esempio mentre GestyTools lo scrive: basta il
+      // messaggio senza dettaglio
+    end;
+  finally
+    Contenuto.Free;
+  end;
+
+  ConfirmOk('Gesty e'' in manutenzione (aggiornamento in corso) e al momento non puo'' essere aperto.' + sLineBreak + 'Riprovare piu'' tardi.' +
+    Dettaglio, mtWarning);
+end;
+
 var
   logfilename: string;
 
 begin
   ReportMemoryLeaksOnShutdown := DebugHook <> 0;
+
+  if AvvioBloccato then
+    Exit;
 
   if FindCmdLineSwitch('log', logfilename) then
     if not logfilename.IsEmpty then

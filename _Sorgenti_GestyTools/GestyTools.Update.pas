@@ -57,6 +57,16 @@ type
     procedure DownloadExe;
     function ApplicaAggiornamento: boolean;
     procedure Gesty;
+  public
+    // Blocco dell'avvio di Gesty durante la manutenzione: il file
+    // Gesty.blocco accanto a Gesty.exe. Gesty, se lo trova all'avvio, avvisa
+    // ed esce (vedi Gesty.dpr)
+    function BloccoFileName: string;
+    function BloccoAttivo: boolean;
+    // Scrivono o cancellano il file; False, con il messaggio gia' mostrato,
+    // se non ci riescono
+    function AttivaBlocco: boolean;
+    function DisattivaBlocco: boolean;
   end;
 
 var
@@ -564,7 +574,67 @@ end;
 
 procedure TUpdateEngine.Gesty;
 begin
-  ShellExecute(Application.Handle, 'open', Pchar(Config.FolderBin + 'Gesty.exe'), '', '', SW_SHOWNORMAL);
+  // chi aggiorna deve poter provare Gesty prima di togliere il blocco: dal
+  // pulsante di GestyTools l'avvio lo ignora (vedi Gesty.dpr)
+  ShellExecute(Application.Handle, 'open', Pchar(Config.FolderBin + 'Gesty.exe'), '-ignorablocco', '', SW_SHOWNORMAL);
+end;
+
+function TUpdateEngine.BloccoFileName: string;
+begin
+  result := Config.FolderBin + 'Gesty.blocco';
+end;
+
+function TUpdateEngine.BloccoAttivo: boolean;
+begin
+  result := (Config.FolderBin <> '') and TFile.Exists(BloccoFileName);
+end;
+
+function TUpdateEngine.AttivaBlocco: boolean;
+var
+  Contenuto: TStringList;
+begin
+  result := false;
+
+  if (Config.FolderBin = '') or not TDirectory.Exists(Config.FolderBin) then
+  begin
+    ConfirmOk('Cartella di Gesty non trovata: impossibile bloccarne l''avvio.' + sLineBreak + Config.FolderBin, mtError);
+    Exit;
+  end;
+
+  // chi e quando: Gesty lo mostra a chi prova ad aprirlo, cosi' sa a chi
+  // chiedere
+  Contenuto := TStringList.Create;
+  try
+    Contenuto.Values['Computer'] := GetEnvironmentVariable('COMPUTERNAME');
+    Contenuto.Values['Utente'] := GetEnvironmentVariable('USERNAME');
+    Contenuto.Values['Data'] := FormatDateTime('dd/mm/yyyy hh:nn', Now);
+    try
+      Contenuto.SaveToFile(BloccoFileName, TEncoding.UTF8);
+      result := true;
+    except
+      on E: Exception do
+        ConfirmOk('Impossibile bloccare l''avvio di Gesty:' + sLineBreak + E.Message, mtError);
+    end;
+  finally
+    Contenuto.Free;
+  end;
+end;
+
+function TUpdateEngine.DisattivaBlocco: boolean;
+begin
+  result := true;
+  if not BloccoAttivo then
+    Exit;
+
+  try
+    TFile.Delete(BloccoFileName);
+  except
+    on E: Exception do
+    begin
+      result := false;
+      ConfirmOk('Impossibile togliere il blocco dell''avvio di Gesty:' + sLineBreak + E.Message, mtError);
+    end;
+  end;
 end;
 
 function TUpdateEngine.RinominaExe: boolean;

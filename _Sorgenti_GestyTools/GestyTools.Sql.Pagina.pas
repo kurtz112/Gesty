@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-10-16
+// Ultima modifica: 2026-10-27
 // ---------------------------------------------------------------------------
 unit GestyTools.Sql.Pagina;
 
@@ -211,6 +211,9 @@ type
     // stato modificato e non salvato chiede se sostituirlo; False se l'utente
     // rinuncia.
     function Carica(const NomeFile: string; ConPreavviso: Boolean): Boolean;
+    // Pulsante in fondo alla barra comandi, per i comandi della form comuni
+    // a tutte le pagine: didascalia, glifo ed evento li imposta chi lo chiede
+    function NuovoPulsante: TdxBarLargeButton;
 
     property InEsecuzione: Boolean read FInEsecuzione;
     property Modificato: Boolean read GetModificato;
@@ -362,6 +365,20 @@ begin
   Collegamento := Barra.ItemLinks.Add;
   Collegamento.Item := Result;
   Collegamento.BeginGroup := IniziaGruppo;
+  Collegamento.UserDefine := [udPaintStyle];
+  Collegamento.UserPaintStyle := psCaptionGlyph;
+end;
+
+function TPaginaSql.NuovoPulsante: TdxBarLargeButton;
+var
+  Collegamento: TdxBarItemLink;
+begin
+  Result := TdxBarLargeButton(FManager.AddItem(TdxBarLargeButton));
+  Result.AutoGrayScale := False;
+
+  Collegamento := FBarraComandi.ItemLinks.Add;
+  Collegamento.Item := Result;
+  Collegamento.BeginGroup := True;
   Collegamento.UserDefine := [udPaintStyle];
   Collegamento.UserPaintStyle := psCaptionGlyph;
 end;
