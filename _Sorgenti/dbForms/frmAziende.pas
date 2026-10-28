@@ -132,7 +132,7 @@ implementation
 
 uses
   VCL.TMSFNCMapsCommonTypes, cxCustomData, zDm_Images, dmAziende, zDX, zBaseLib,
-    zDbCard, zMsg;
+    zDbCard, zDbRecordView, zMsg;
 
 {$R *.dfm}
 
@@ -688,6 +688,7 @@ procedure TFormAziende.SetupComponent(const DataSetName: String; Component: TCom
 var
   view: TzDbView;
   card: TzDbCard;
+  recordView: TzDbRecordView;
 begin
   inherited;
 
@@ -749,6 +750,16 @@ begin
       card.OnDataSetEdit := cardAziendaDblClick;
     end
     ;
+  end;
+
+  // La scheda affiancata all'elenco e' la recordview Aziende.Aziende_Scheda,
+  // in sola lettura: la modifica apre la scheda dell'azienda come faceva la card
+  if Component is TzDbRecordView then
+  begin
+    recordView := TzDbRecordView(Component);
+
+    if SameText(DataSetName, 'Aziende') then
+      recordView.OnDataSetEdit := cardAziendaDblClick;
   end;
 
 end;

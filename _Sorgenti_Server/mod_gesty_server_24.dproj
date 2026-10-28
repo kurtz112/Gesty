@@ -72,9 +72,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>2026</VerInfo_MajorVer>
         <VerInfo_MinorVer>10</VerInfo_MinorVer>
-        <VerInfo_Release>20</VerInfo_Release>
+        <VerInfo_Release>27</VerInfo_Release>
         <VerInfo_Build>0</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Luca Zebro;FileDescription=$(MSBuildProjectName);FileVersion=2026.10.20.0;ProgramID=it.zebro.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2026.10.20.0;LegalCopyright=Luca Zebro;LegalTrademarks=Luca Zebro</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Luca Zebro;FileDescription=$(MSBuildProjectName);FileVersion=2026.10.27.0;ProgramID=it.zebro.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2026.10.27.0;LegalCopyright=Luca Zebro;LegalTrademarks=Luca Zebro</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>

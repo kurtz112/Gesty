@@ -26868,6 +26868,66 @@ TSP_studenti_Tirocini_Date_Stage = class (TzStoredProc)
     property Data_Presenza: TNullableDate read fData_Presenza;
 end;
 
+[TStoredProcedure('STUDENTI_TIROCINI_DIFFERENZE_PRESEN', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_studenti_Tirocini_Differenze_Presen = class (TzStoredProc)
+  private
+    fId_Tirocinio: TNullableInt64;
+    fDal_Giorno: TNullableDate;
+    fAl_Giorno: TNullableDate;
+    fAzione: TNullableString;
+    fData_Lezione: TNullableDate;
+    fOra_Inizio: TNullableTime;
+    fTipologia_Formazione: TNullableString;
+    fDurata: TNullableInteger;
+    fStato_Presenza: TNullableString;
+    fMateria: TNullableString;
+    fContenuti: TNullableString;
+  private
+    property Azione_internal: TNullableString read fAzione write fAzione;
+    property Data_Lezione_internal: TNullableDate read fData_Lezione write fData_Lezione;
+    property Ora_Inizio_internal: TNullableTime read fOra_Inizio write fOra_Inizio;
+    property Tipologia_Formazione_internal: TNullableString read fTipologia_Formazione write fTipologia_Formazione;
+    property Durata_internal: TNullableInteger read fDurata write fDurata;
+    property Stato_Presenza_internal: TNullableString read fStato_Presenza write fStato_Presenza;
+    property Materia_internal: TNullableString read fMateria write fMateria;
+    property Contenuti_internal: TNullableString read fContenuti write fContenuti;
+  public
+    //
+    [TParamAttribute('ID_TIROCINIO', ptInput, False)]
+    property Id_Tirocinio: TNullableInt64 read fId_Tirocinio write fId_Tirocinio;
+    //
+    [TParamAttribute('DAL_GIORNO', ptInput, False)]
+    property Dal_Giorno: TNullableDate read fDal_Giorno write fDal_Giorno;
+    //
+    [TParamAttribute('AL_GIORNO', ptInput, False)]
+    property Al_Giorno: TNullableDate read fAl_Giorno write fAl_Giorno;
+    //
+    [TParamAttribute('AZIONE', ptOutput, False)]
+    property Azione: TNullableString read fAzione;
+    //
+    [TParamAttribute('DATA_LEZIONE', ptOutput, False)]
+    property Data_Lezione: TNullableDate read fData_Lezione;
+    //
+    [TParamAttribute('ORA_INIZIO', ptOutput, False)]
+    property Ora_Inizio: TNullableTime read fOra_Inizio;
+    //
+    [TParamAttribute('TIPOLOGIA_FORMAZIONE', ptOutput, False)]
+    property Tipologia_Formazione: TNullableString read fTipologia_Formazione;
+    //
+    [TParamAttribute('DURATA', ptOutput, False)]
+    property Durata: TNullableInteger read fDurata;
+    //
+    [TParamAttribute('STATO_PRESENZA', ptOutput, False)]
+    property Stato_Presenza: TNullableString read fStato_Presenza;
+    //
+    [TParamAttribute('MATERIA', ptOutput, False)]
+    property Materia: TNullableString read fMateria;
+    //
+    [TParamAttribute('CONTENUTI', ptOutput, False)]
+    property Contenuti: TNullableString read fContenuti;
+end;
+
 [TStoredProcedure('STUDENTI_TIROCINI_GENERA_CALEND')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_studenti_Tirocini_Genera_Calend = class (TzStoredProc)
