@@ -70,6 +70,7 @@ inherited WizNuovaAziendaOspitante: TWizNuovaAziendaOspitante
     FetchOptions.DetailDelay = 300
     UpdateOptions.AssignedValues = [uvAutoCommitUpdates]
     AutoCommit = False
+    NewRecordOptions.MasterToFieldsExcluded = 'CODICE_FISCALE;PARTITA_IVA;TELEFONO_1;TELEFONO_2;E_MAIL;MAIL_PEC;SITO_WEB'
     TableName = 'AZIENDE_CONTATTI_ELENCO'
     Left = 41
     Top = 384
