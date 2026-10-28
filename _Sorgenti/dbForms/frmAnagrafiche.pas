@@ -91,6 +91,8 @@ end;
 initialization
 
 HyperLinks.RegisterHandler('ID_ANAGRAFICA', TFormAnagrafiche);
+// Mantis #252 - 2026-10-28: il campo del Front Office apre la stessa scheda anagrafe
+HyperLinks.RegisterHandler('ID_ANAGRAFICA_CONTATTO', TFormAnagrafiche);
 
 end.
 
