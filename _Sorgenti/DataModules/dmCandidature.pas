@@ -154,19 +154,32 @@ procedure TCandidature.SpostaAllegatiAfterImport;
     FileStream: TStream;
     HttpClient: THTTPClient;
     Risposta: IHTTPResponse;
+    FileTemporaneo: string;
   begin
-    FileStream := TFileStream.Create(dest, fmCreate);
+    // Mantis #245 - 2026-10-28: si scarica in un file accanto alla destinazione e la si sostituisce
+    // solo se il sito risponde 2xx. Prima il corpo della risposta andava direttamente sulla
+    // destinazione, e una risposta di errore lasciava al posto del documento la pagina di errore.
+    FileTemporaneo := dest + '.scaricamento';
     try
-      HttpClient := THTTPClient.Create;
+      FileStream := TFileStream.Create(FileTemporaneo, fmCreate);
       try
-        Risposta := HttpClient.Get(src, FileStream);
-        if Risposta.StatusCode >= 300 then
-          raise Exception.CreateFmt('Errore HTTP %d nello scarico di %s', [Risposta.StatusCode, src]);
+        HttpClient := THTTPClient.Create;
+        try
+          Risposta := HttpClient.Get(src, FileStream);
+        finally
+          FreeAndNil(HttpClient);
+        end;
       finally
-        FreeAndNil(HttpClient);
+        FreeAndNil(FileStream);
       end;
+
+      if (Risposta.StatusCode < 200) or (Risposta.StatusCode > 299) then
+        raise Exception.CreateFmt('Errore HTTP %d nello scarico di %s', [Risposta.StatusCode, src]);
+
+      TFile.Copy(FileTemporaneo, dest, True);
     finally
-      FreeAndNil(FileStream);
+      if TFile.Exists(FileTemporaneo) then
+        TFile.Delete(FileTemporaneo);
     end;
   end;
 
