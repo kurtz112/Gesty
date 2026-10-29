@@ -74,6 +74,7 @@ type
     procedure ProcediExecute(Sender: TObject);
     procedure RegistroStudentiExecute(Sender: TObject);
   private
+    procedure IncarichiDaLavorare(view: TzDbView; Incarichi: TList<integer>);
   protected
     procedure CreateDataModule; override;
     procedure DestroyDataModule; override;
@@ -105,6 +106,7 @@ uses
   MDI_Lib,
   zMsg,
   frmContratti,
+  zFbDataSet,
   zSystem;
 
 {$R *.dfm}
@@ -168,8 +170,9 @@ begin
 
   Incarichi := TList<integer>.Create;
   try
-    // Mantis #183 - 2026-10-19: ogni incarico una volta sola
-    view.GetSelectedRows('ID_INCARICO', Incarichi, true);
+    // Mantis #183 - 2026-10-29: dalla scheda aperta solo l'incarico della
+    // scheda, dall'elenco la selezione solo se comprende la riga corrente
+    IncarichiDaLavorare(view, Incarichi);
 
     Fase := Progetti.FaseDegliIncarichi(Incarichi, Azione);
 
@@ -199,6 +202,43 @@ begin
   // lavorato: si riparte dalla sola riga corrente
   view.ClearSelection;
   view.FocusGrid;
+end;
+
+// Mantis #183 - 2026-10-29: gli incarichi su cui lavora Procedi. Prima era
+// sempre la selezione della griglia, anche con la scheda di un incarico
+// aperta: la scheda lavora sul record corrente, ma la griglia poteva tenere
+// selezionate altre righe (a CAPAC il 22/10, dalla scheda dell'incarico 513036,
+// e' stato attivato e protocollato anche il 513002, che lo precede
+// nell'elenco, con lo stesso numero 671). Ora:
+// - con la scheda aperta conta solo l'incarico della scheda;
+// - dall'elenco conta la selezione se comprende la riga corrente; una
+//   selezione che non la comprende e' rimasta da un passaggio precedente e
+//   si lavora sulla sola riga corrente, quella che l'utente vede.
+procedure TFormProgetti.IncarichiDaLavorare(view: TzDbView; Incarichi: TList<integer>);
+var
+  DataSet: TzFbDataSet;
+  IdCorrente: integer;
+begin
+  Incarichi.Clear;
+
+  DataSet := view.zDataSet;
+  if (not assigned(DataSet)) or (not DataSet.Active) or DataSet.IsEmpty then
+    exit;
+
+  IdCorrente := DataSet.FieldByName('ID_INCARICO').AsInteger;
+
+  if not view.CardVisible then
+  begin
+    // Mantis #183 - 2026-10-19: ogni incarico una volta sola
+    view.GetSelectedRows('ID_INCARICO', Incarichi, true);
+
+    if Incarichi.Contains(IdCorrente) then
+      exit;
+
+    Incarichi.Clear;
+  end;
+
+  Incarichi.Add(IdCorrente);
 end;
 
 procedure TFormProgetti.CopiaMaterieExecute(Sender: TObject);
