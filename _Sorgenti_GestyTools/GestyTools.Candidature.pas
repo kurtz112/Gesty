@@ -45,6 +45,7 @@ type
     function DownloadFile(const url: string; const DestFileName: String): boolean;
     function DescriviFileScaricato(const FileName, TipoContenuto: string): string;
     procedure SpostaAllegati(const IdFileCandidature: integer);
+    procedure RegistraImpronta(const IdObjectFile: Int64; const FileName: string);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -61,6 +62,8 @@ uses
   System.DateUtils,
   System.IOUtils,
   System.Zip,
+  System.Hash,
+  System.Generics.Collections,
   QImport3Common,
   GestyTools.Log,
   GestyTools.Config,
@@ -325,12 +328,17 @@ procedure TImportCandidature.SpostaAllegati(const IdFileCandidature: integer);
 
 var
   FilesNonTrovati: TStringList;
+  AllegatiArrivati: TList<TPair<Int64, string>>;
+  Allegato: TPair<Int64, string>;
   src, dest, folder: string;
   MotivoMancato: string;
   idCandidatura: integer;
 begin
+  AllegatiArrivati := nil;
   FilesNonTrovati := TStringList.Create;
   try
+    AllegatiArrivati := TList<TPair<Int64, string>>.Create;
+
     CandidatureAllegati.Active := False;
     CandidatureAllegati.ParamByName('ID_FILE_CANDIDATURE').AsInteger := IdFileCandidature;
     CandidatureAllegati.Active := True;
@@ -382,7 +390,9 @@ begin
               FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src)
             else
               FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src + ' - ' + MotivoMancato);
-          end;
+          end
+          else
+            AllegatiArrivati.Add(TPair<Int64, string>.Create(CandidatureAllegatiID_OBJECT_FILE.AsLargeInt, dest));
         end;
 
         CandidatureAllegati.Next;
@@ -391,6 +401,12 @@ begin
     finally
       CandidatureAllegati.Active := False;
     end;
+
+    // R-118 - 2026-10-29: dimensione e impronta si scrivono a cursore chiuso, perche' la
+    // connessione lavora in commit automatico e la lettura degli allegati e' ancora aperta
+    // dentro il ciclo
+    for Allegato in AllegatiArrivati do
+      RegistraImpronta(Allegato.Key, Allegato.Value);
 
     if FilesNonTrovati.Count > 0 then
     begin
@@ -404,6 +420,28 @@ begin
     end;
   finally
     FreeAndNil(FilesNonTrovati);
+    FreeAndNil(AllegatiArrivati);
+  end;
+end;
+
+procedure TImportCandidature.RegistraImpronta(const IdObjectFile: Int64; const FileName: string);
+var
+  Dimensione: Int64;
+  Impronta: string;
+begin
+  // R-118 - 2026-10-29: l'allegato nasce in OBJ_FILES con FILE_SIZE 0 e SHA256 nullo,
+  // perche' CANDIDATURE_FILES_ELABORA_ALLEGATI lo registra prima che il file sia
+  // scaricato. Qui si scrivono i valori del file arrivato. Un errore non ferma l'import:
+  // il documento e' gia' in archivio, manca solo il dato di controllo
+  try
+    Dimensione := TFile.GetSize(FileName);
+    Impronta := THashSHA2.GetHashStringFromFile(FileName);
+
+    Connection.FDConnection.ExecSQL('EXECUTE PROCEDURE OBJ_FILES_IMPRONTA_SET(:ID_OBJECT_FILE, :FILE_SIZE, :SHA256)',
+      [IdObjectFile, Dimensione, Impronta]);
+  except
+    on E: Exception do
+      Log.ToScreen(Format('Dimensione e impronta dell''allegato %d non registrate: %s', [IdObjectFile, E.Message]));
   end;
 end;
 

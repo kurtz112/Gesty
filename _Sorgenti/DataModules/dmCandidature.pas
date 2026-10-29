@@ -25,6 +25,7 @@ type
   private
     procedure SpostaAllegatiAfterImport;
     procedure CopiaAllegato(srcFile, destFile: string);
+    procedure RegistraImpronta(const IdObjectFile: Int64; const FileName: string);
   public
     //
     function ImportaFile(const FileName: string): integer;
@@ -38,6 +39,7 @@ implementation
 
 uses
   System.IOUtils,
+  System.Hash,
   SmartInspect.Vcl.SiAuto,
   Gesty_StoredProcs,
   zBaseLib,
@@ -215,7 +217,9 @@ begin
           TFile.Copy(src, dest);
 
         if not TFile.Exists(dest) then
-          FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src);
+          FilesNonTrovati.AddPair('Candidatura ' + idCandidatura.ToString, src)
+        else
+          RegistraImpronta(Allegati.FieldByName('ID_OBJECT_FILE').AsLargeInt, dest);
 
         Allegati.Next;
       end;
@@ -234,6 +238,30 @@ begin
     end;
   finally
     FreeAndNil(FilesNonTrovati);
+  end;
+end;
+
+procedure TCandidature.RegistraImpronta(const IdObjectFile: Int64; const FileName: string);
+var
+  sp: TSP_obj_Files_Impronta_Set;
+begin
+  // R-118 - 2026-10-29: l'allegato nasce in OBJ_FILES con FILE_SIZE 0 e SHA256 nullo,
+  // perche' CANDIDATURE_FILES_ELABORA_ALLEGATI lo registra prima che il file sia
+  // scaricato. Qui si scrivono i valori del file arrivato. Un errore non ferma l'import:
+  // il documento e' gia' in archivio, manca solo il dato di controllo
+  try
+    sp := TSP_obj_Files_Impronta_Set.Create(WriteTrans);
+    try
+      sp.Id_Object_File := IdObjectFile;
+      sp.File_Size := TFile.GetSize(FileName);
+      sp.Sha256 := THashSHA2.GetHashStringFromFile(FileName);
+      sp.ExecuteAndCommit;
+    finally
+      FreeAndNil(sp);
+    end;
+  except
+    on E: Exception do
+      SiMain.LogException(E);
   end;
 end;
 
