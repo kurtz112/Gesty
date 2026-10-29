@@ -82,6 +82,10 @@ type
     procedure AttivaIncarico(const DataSetName: string; Incarichi: TList<integer>; const Azione: string);
     procedure ModificaEstensore(const DataSetName: string);
     procedure AccettaOreResidue(const DataSetName: string; Incarichi: TList<integer>);
+    // Mantis #183 - 2026-10-29: respingimento di una richiesta in attesa del
+    // visto contabile o della direzione, e sua ripresentazione dopo la correzione
+    procedure Respingi(Incarichi: TList<integer>);
+    procedure Ripresenta(Incarichi: TList<integer>; const Azione: string);
     function FaseDegliIncarichi(Incarichi: TList<integer>; out Azione: string): string;
     procedure Procedi(Incarichi: TList<integer>; const Fase, Azione: string);
     procedure CopiaMaterie;
@@ -370,8 +374,117 @@ begin
         if SameText(Fase, 'ORE_RESIDUE') then
           AccettaOreResidue(DATASET_DA_GESTIRE, Incarichi)
         else
-          if Fase <> '' then
-            ConfirmOk('Per questa fase non c''' + #232 + ' un passaggio da eseguire dall''elenco.');
+          // Mantis #183 - 2026-10-29: per una richiesta respinta il passaggio
+          // e' la ripresentazione (ZZ_INCARICHI_FASI.AZIONE = Ripresenta)
+          if SameText(Fase, 'RESPINTO') then
+            Ripresenta(Incarichi, Azione)
+          else
+            if Fase <> '' then
+              ConfirmOk('Per questa fase non c''' + #232 + ' un passaggio da eseguire dall''elenco.');
+end;
+
+// Mantis #183 - 2026-10-29: respinge le richieste selezionate, tutte nella
+// stessa fase, con un motivo solo. Chi puo' respingere e in quali fasi lo
+// decide INCARICO_RESPINGI (visto contabile o direzione, con il loro permesso);
+// qui si evita solo di chiedere il motivo per una selezione che non si puo'
+// respingere.
+procedure TProgetti.Respingi(Incarichi: TList<integer>);
+var
+  id: integer;
+  sp: TSP_incarico_Respingi;
+  DataSet: TzFbDataSet;
+  IdSuccessivo: integer;
+  Fase, Azione: string;
+  Motivo: TStringList;
+begin
+  Assert(assigned(Incarichi));
+  if Incarichi.Count = 0 then
+    exit;
+
+  Fase := FaseDegliIncarichi(Incarichi, Azione);
+  if Fase = '' then
+    exit;
+
+  if not (SameText(Fase, 'FINANZIARIA') or SameText(Fase, 'DIREZIONE')) then
+  begin
+    ConfirmOk('Si possono respingere solo le richieste in attesa del visto contabile o dell''autorizzazione della direzione.');
+    exit;
+  end;
+
+  DataSet := GetDataSet(DATASET_DA_GESTIRE);
+  IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
+
+  Motivo := TStringList.Create;
+  try
+    if not InputMemo('Respingi', Format('Motivo del respingimento (%d richieste selezionate)', [Incarichi.Count]), Motivo) then
+      exit;
+
+    if Trim(Motivo.Text) = '' then
+    begin
+      ConfirmOk('Il motivo del respingimento ' + #232 + ' obbligatorio.');
+      exit;
+    end;
+
+    ProgressBox.Show(Incarichi.Count, 'Respingi', 'Respingi', 'Attendere...');
+    try
+      sp := TSP_incarico_Respingi.create(WriteTrans);
+      try
+        for id in Incarichi do
+        begin
+          sp.Id_Incarico := id;
+          sp.Motivo := Trim(Motivo.Text);
+          sp.ExecuteAndCommit;
+        end;
+      finally
+        FreeAndNil(sp);
+      end;
+    finally
+      ProgressBox.Close;
+    end;
+  finally
+    FreeAndNil(Motivo);
+  end;
+
+  RiapriSullIncarico(DataSet, IdSuccessivo);
+end;
+
+// Mantis #183 - 2026-10-29: rimette nell'iter le richieste respinte, dopo che
+// chi le ha estese le ha corrette. Chi puo' farlo lo decide INCARICO_RIPRESENTA
+// (l'estensore, o chi ha il permesso di attivare gli incarichi).
+procedure TProgetti.Ripresenta(Incarichi: TList<integer>; const Azione: string);
+var
+  id: integer;
+  sp: TSP_incarico_Ripresenta;
+  DataSet: TzFbDataSet;
+  IdSuccessivo: integer;
+begin
+  Assert(assigned(Incarichi));
+  if Incarichi.Count = 0 then
+    exit;
+
+  if not ConfirmYesNo(Format('%s: %d richieste selezionate. Le richieste ripartono dal primo passaggio di autorizzazione. Procedere?', [Azione, Incarichi.Count])) then
+    exit;
+
+  DataSet := GetDataSet(DATASET_DA_GESTIRE);
+  IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
+
+  ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
+  try
+    sp := TSP_incarico_Ripresenta.create(WriteTrans);
+    try
+      for id in Incarichi do
+      begin
+        sp.Id_Incarico := id;
+        sp.ExecuteAndCommit;
+      end;
+    finally
+      FreeAndNil(sp);
+    end;
+  finally
+    ProgressBox.Close;
+  end;
+
+  RiapriSullIncarico(DataSet, IdSuccessivo);
 end;
 
 procedure TProgetti.AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet);

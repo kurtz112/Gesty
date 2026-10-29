@@ -78,6 +78,7 @@ type
     TimerShutdown: TTimer;
     TimerAFK: TTimer;
     TimerKill: TTimer;
+    TimerNotifiche: TTimer;
     FDEventAlerter: TFDEventAlerter;
     FDPhysFBDriverLink: TFDPhysFBDriverLink;
     IdAntiFreeze: TIdAntiFreeze;
@@ -101,6 +102,7 @@ type
     procedure FDGUIxAsyncExecuteDialogShow(Sender: TObject);
     procedure FDMoniCustomClientLinkOutput(ASender: TFDMoniClientLinkBase; const AClassName, AObjName, AMessage: string);
     procedure TimerKillTimer(Sender: TObject);
+    procedure TimerNotificheTimer(Sender: TObject);
     procedure TimerShutdownTimer(Sender: TObject);
     procedure zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);
     procedure zSystemAssignFieldOnChangeEvent(Field: TField; const EventName: string);
@@ -656,6 +658,7 @@ begin
   TimerAFK.Enabled := false;
   TimerKill.Enabled := false;
   TimerShutdown.Enabled := false;
+  TimerNotifiche.Enabled := false;
 
   for i := 0 to Screen.FormCount - 1 do
     if Screen.Forms[i] <> Application.MainForm then
@@ -1045,6 +1048,9 @@ begin
   finally
     Screen.Cursor := oldCursor;
   end;
+
+  // Mantis #183 - 2026-10-29: controllo periodico di riserva, vedi TimerNotificheTimer
+  TimerNotifiche.Enabled := true;
 end;
 
 function TConfig.StorageFileName: String;
@@ -1455,6 +1461,35 @@ procedure TConfig.TimerKillTimer(Sender: TObject);
 begin
   inherited;
   CloseApplication;
+end;
+
+// Mantis #183 - 2026-10-29: durante la sessione le notifiche arrivavano solo
+// con l'evento Firebird NOTIFICA (FDEventAlerterAlert). Gli eventi viaggiano
+// su una seconda connessione che resta muta finche' non c'e' un evento: un
+// firewall o una VPN che chiude le connessioni inattive la fa cadere senza che
+// Gesty se ne accorga, e da quel momento gli avvisi comparivano solo al
+// riavvio (Codebri, 29/10: oltre due ore di sessione solo il 41% degli avvisi
+// compariva entro un minuto). Ogni minuto si controlla comunque: l'evento resta
+// per la comparsa immediata, NotificaGiaMostrata evita il doppio avviso.
+procedure TConfig.TimerNotificheTimer(Sender: TObject);
+begin
+  if FShuttingDown or (not Database.Connected) then
+    Exit;
+
+  TimerNotifiche.Enabled := false;
+  try
+    try
+      MostraNotifiche;
+      MostraBadgeNotifiche;
+    except
+      // una rete che cade non deve aprire una finestra d'errore ogni minuto:
+      // si registra e si riprova al giro successivo
+      on E: Exception do
+        siMain.LogException(E);
+    end;
+  finally
+    TimerNotifiche.Enabled := not FShuttingDown;
+  end;
 end;
 
 procedure TConfig.zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);

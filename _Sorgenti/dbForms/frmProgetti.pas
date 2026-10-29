@@ -57,6 +57,7 @@ type
     CalendarioCorsi: TAction;
     EsportaPDFFirmatiDigitalmente: TAction;
     Procedi: TAction;
+    Respingi: TAction;
     procedure AccettaOreResidueExecute(Sender: TObject);
     procedure AggiungiStudentiStageExecute(Sender: TObject);
     procedure BudgetAggiungiRigheExecute(Sender: TObject);
@@ -73,6 +74,7 @@ type
     procedure NuovoPianoPersonaleExecute(Sender: TObject);
     procedure ProcediExecute(Sender: TObject);
     procedure RegistroStudentiExecute(Sender: TObject);
+    procedure RespingiExecute(Sender: TObject);
   private
     procedure IncarichiDaLavorare(view: TzDbView; Incarichi: TList<integer>);
   protected
@@ -239,6 +241,32 @@ begin
   end;
 
   Incarichi.Add(IdCorrente);
+end;
+
+// Mantis #183 - 2026-10-29: respinge le richieste selezionate nell'elenco
+// unico, in attesa del visto contabile o della direzione. La
+// ripresentazione invece passa da Procedi (fase RESPINTO).
+procedure TFormProgetti.RespingiExecute(Sender: TObject);
+var
+  Incarichi: TList<integer>;
+  view: TzDbView;
+begin
+  inherited;
+
+  view := getView('IncarichiDaGestire');
+
+  Incarichi := TList<integer>.Create;
+  try
+    // stesso criterio di Procedi: con la scheda aperta solo il suo incarico
+    IncarichiDaLavorare(view, Incarichi);
+    Progetti.Respingi(Incarichi);
+  finally
+    FreeAndNil(Incarichi);
+  end;
+
+  // come dopo Procedi: si riparte dalla sola riga corrente
+  view.ClearSelection;
+  view.FocusGrid;
 end;
 
 procedure TFormProgetti.CopiaMaterieExecute(Sender: TObject);

@@ -94,5 +94,11 @@ inherited FormProgetti: TFormProgetti
       ImageIndex = 123
       OnExecute = ProcediExecute
     end
+    object Respingi: TAction
+      Caption = 'Respingi'
+      Hint = 'Respinge le richieste selezionate, con il motivo'
+      ImageIndex = 1868
+      OnExecute = RespingiExecute
+    end
   end
 end

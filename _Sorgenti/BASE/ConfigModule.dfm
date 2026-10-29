@@ -105,6 +105,13 @@ inherited Config: TConfig
     Left = 72
     Top = 668
   end
+  object TimerNotifiche: TTimer
+    Enabled = False
+    Interval = 60000
+    OnTimer = TimerNotificheTimer
+    Left = 184
+    Top = 668
+  end
   object FDEventAlerter: TFDEventAlerter
     Connection = Database
     OnAlert = FDEventAlerterAlert
