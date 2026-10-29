@@ -22,30 +22,59 @@ type
 implementation
 
 uses
+  Windows,
   Types,
   IniFiles,
   Math;
 
-// Disposizione adattiva 2026-10-29: riporta il rettangolo salvato dentro l'area
-// utile del monitor piu' vicino (esclusa la barra delle applicazioni): prima lo
-// stringe se e' piu' grande, poi lo sposta se sborda. Stessa regola di
-// LoadFormPosition di zBaseLib, che non la esporta.
-function RettangoloNellAreaUtile(const Rettangolo: TRect): TRect;
+// Disposizione adattiva 2026-10-29: regole per decidere dove riaprire una form
+// a partire dai limiti salvati. Prima (rilascio 002) il rettangolo si stringeva
+// e si spostava sempre dentro il monitor piu' vicino; con i limiti di una
+// finestra salvata mentre era ridotta a icona (-32000, -32000, circa 160x28)
+// la form finiva in alto a sinistra grande come un francobollo. Ora:
+// - una misura sotto il minimo non e' credibile e si torna a quella di progetto;
+// - se la barra del titolo e' raggiungibile su un monitor la form resta dove
+//   era, stretta solo se non ci sta;
+// - altrimenti (monitor scollegato, desktop remoto) si centra sul monitor della
+//   finestra principale con la sua misura.
+const
+  LarghezzaMinimaForm = 200;
+  AltezzaMinimaForm = 150;
+  AltezzaBarraTitolo = 30;
+  LarghezzaBarraAfferrabile = 100;
+  CoordinataRidottaAIcona = -30000;
+
+function BarraDelTitoloRaggiungibile(const Rettangolo: TRect): boolean;
 var
-  Monitor: TMonitor;
-  AreaUtile: TRect;
+  I: integer;
+  Barra, Comune: TRect;
+begin
+  Result := false;
+
+  Barra := Rect(Rettangolo.Left, Rettangolo.Top, Rettangolo.Right, Rettangolo.Top + AltezzaBarraTitolo);
+
+  for I := 0 to Screen.MonitorCount - 1 do
+    if IntersectRect(Comune, Barra, Screen.Monitors[I].WorkareaRect) then
+      if (Comune.Width >= LarghezzaBarraAfferrabile) and (Comune.Height >= AltezzaBarraTitolo) then
+        Exit(true);
+end;
+
+function MonitorDellaFinestraPrincipale: TMonitor;
+begin
+  Result := nil;
+
+  if Assigned(Application.MainForm) and Application.MainForm.HandleAllocated then
+    Result := Screen.MonitorFromWindow(Application.MainForm.Handle, mdNearest);
+
+  if not Assigned(Result) then
+    Result := Screen.PrimaryMonitor;
+end;
+
+// stringe il rettangolo se e' piu' grande dell'area utile, poi lo sposta se sborda
+function RettangoloNellAreaUtile(const Rettangolo, AreaUtile: TRect): TRect;
+var
   Larghezza, Altezza: integer;
 begin
-  Result := Rettangolo;
-
-  Monitor := Screen.MonitorFromRect(Rettangolo, mdNearest);
-  if not Assigned(Monitor) then
-    Monitor := Screen.PrimaryMonitor;
-  if not Assigned(Monitor) then
-    Exit;
-
-  AreaUtile := Monitor.WorkareaRect;
-
   Larghezza := Min(Rettangolo.Width, AreaUtile.Width);
   Altezza := Min(Rettangolo.Height, AreaUtile.Height);
 
@@ -63,6 +92,50 @@ begin
 
   Result.Right := Result.Left + Larghezza;
   Result.Bottom := Result.Top + Altezza;
+end;
+
+function RettangoloCentrato(const Larghezza, Altezza: integer; const AreaUtile: TRect): TRect;
+var
+  LarghezzaUtile, AltezzaUtile: integer;
+begin
+  LarghezzaUtile := Min(Larghezza, AreaUtile.Width);
+  AltezzaUtile := Min(Altezza, AreaUtile.Height);
+
+  Result.Left := AreaUtile.Left + (AreaUtile.Width - LarghezzaUtile) div 2;
+  Result.Top := AreaUtile.Top + (AreaUtile.Height - AltezzaUtile) div 2;
+  Result.Right := Result.Left + LarghezzaUtile;
+  Result.Bottom := Result.Top + AltezzaUtile;
+end;
+
+function PosizioneDiRiapertura(const Salvato, Progettato: TRect): TRect;
+var
+  Rettangolo: TRect;
+  Monitor: TMonitor;
+begin
+  Rettangolo := Salvato;
+
+  if (Rettangolo.Width < LarghezzaMinimaForm) or (Rettangolo.Height < AltezzaMinimaForm) then
+  begin
+    Rettangolo.Width := Progettato.Width;
+    Rettangolo.Height := Progettato.Height;
+  end;
+
+  if (Rettangolo.Left > CoordinataRidottaAIcona) and (Rettangolo.Top > CoordinataRidottaAIcona) and BarraDelTitoloRaggiungibile(Rettangolo) then
+  begin
+    Monitor := Screen.MonitorFromRect(Rettangolo, mdNearest);
+    if Assigned(Monitor) then
+      Result := RettangoloNellAreaUtile(Rettangolo, Monitor.WorkareaRect)
+    else
+      Result := Rettangolo;
+  end
+  else
+  begin
+    Monitor := MonitorDellaFinestraPrincipale;
+    if Assigned(Monitor) then
+      Result := RettangoloCentrato(Rettangolo.Width, Rettangolo.Height, Monitor.WorkareaRect)
+    else
+      Result := Rettangolo;
+  end;
 end;
 
 class function TzStorage.FindSplittedControl(Splitter: TcxSplitter): TControl;
@@ -210,7 +283,11 @@ begin
       ws := wsNormal;
 
     /// ////////////////////
-    if ws = wsNormal then
+    // Disposizione adattiva 2026-10-29: una form ridotta a icona ha WindowState
+    // ancora wsNormal ma limiti fittizi (-32000, -32000, circa 160x28): salvarli
+    // la faceva riaprire minuscola o fuori dallo schermo. In quel caso si tengono
+    // i limiti salvati l'ultima volta.
+    if (ws = wsNormal) and not ((Ctrl is TForm) and Ctrl.HandleAllocated and IsIconic(Ctrl.Handle)) and (Ctrl.Left > CoordinataRidottaAIcona) and (Ctrl.Top > CoordinataRidottaAIcona) then
     begin
       IniFile.WriteInteger(Section, 'Top', Ctrl.Top);
       IniFile.WriteInteger(Section, 'Left', Ctrl.Left);
@@ -376,10 +453,11 @@ begin
     // cosi' com'erano. Una form chiusa su un monitor che ora non c'e' (desktop
     // remoto da un portatile verso un fisso con piu' monitor) si riapriva fuori
     // dallo schermo: con un dialogo modale, come la Rettifica dell'incarico, il
-    // programma sembrava bloccato senza consumare CPU. Ora per le form il
-    // rettangolo si riporta nell'area utile del monitor piu' vicino.
+    // programma sembrava bloccato senza consumare CPU. Le regole stanno in
+    // PosizioneDiRiapertura; i limiti di progetto sono quelli che la form ha
+    // prima di leggere il file.
     if Ctrl is TForm then
-      Rettangolo := RettangoloNellAreaUtile(Rettangolo);
+      Rettangolo := PosizioneDiRiapertura(Rettangolo, Ctrl.BoundsRect);
 
     Ctrl.SetBounds(Rettangolo.Left, Rettangolo.Top, Rettangolo.Width, Rettangolo.Height);
 
