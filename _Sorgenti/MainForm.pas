@@ -402,7 +402,6 @@ type
     RegistraDalProssimoAvvio: TAction;
     dxBarButtonRegistraDalProssimoAvvio: TdxBarButton;
     dxBarButtonRegistrazioneInCorso: TdxBarButton;
-    dxBarProgressTempoResiduo: TdxBarProgressItem;
     dxBarButtonSegnalibroBarra: TdxBarButton;
     dxBarButtonPausaFilmato: TdxBarButton;
     TimerRegistrazione: TTimer;
@@ -585,8 +584,6 @@ type
     procedure ApplyRestrictions;
     function GetRestrictionManager: TRestrictionManager;
   private
-    // Colore della barra del tempo residuo fuori dagli ultimi 2 minuti.
-    ColoreTempoResiduo: TColor;
     procedure StatoLogCambiato(Sender: TObject);
     procedure AggiornaBarraRegistrazione;
   private
@@ -2408,7 +2405,6 @@ begin
   // che si accende solo con il codice dell'assistenza.
   SessioneLog.VideoDisponibile := True;
   SessioneLog.OnStatoCambiato := StatoLogCambiato;
-  ColoreTempoResiduo := dxBarProgressTempoResiduo.Color;
   StatoLogCambiato(Self);
   SessioneLog.VerificaSessioneInterrotta;
 end;
@@ -2457,31 +2453,29 @@ begin
   dxBarButtonRegistrazioneInCorso.Visible := dx.Visible(Attiva or Invio);
   if Attiva then
   begin
+    // Fino al 2026-10-29 il tempo residuo stava in una barra di avanzamento
+    // accanto: su 120 minuti (o 15 di filmato) in pochi secondi restava quasi
+    // piena e sembrava ferma, e nella barra del titolo la sua scritta non si
+    // vedeva. Ora sta nella scritta del pulsante, accanto alla durata.
     Durata := SessioneLog.DurataSecondi;
-    dxBarButtonRegistrazioneInCorso.Caption := Format('%s REC %d:%.2d', [#$25CF, Durata div 60, Durata mod 60]);
+    Residuo := SessioneLog.TempoResiduo;
+    if Residuo.Secondi >= 0 then
+      dxBarButtonRegistrazioneInCorso.Caption := Format('%s REC %d:%.2d - restano %d:%.2d',
+        [#$25CF, Durata div 60, Durata mod 60, Residuo.Secondi div 60, Residuo.Secondi mod 60])
+    else
+      dxBarButtonRegistrazioneInCorso.Caption := Format('%s REC %d:%.2d', [#$25CF, Durata div 60, Durata mod 60]);
     if SessioneLog.VideoAttivo then
       dxBarButtonRegistrazioneInCorso.Hint := 'Registrazione per l''assistenza in corso: log + filmato. Premi per chiudere e segnalare.'
     else
       dxBarButtonRegistrazioneInCorso.Hint := 'Registrazione per l''assistenza in corso: log. Premi per chiudere e segnalare.';
+    if Residuo.Secondi >= 0 then
+      dxBarButtonRegistrazioneInCorso.Hint := dxBarButtonRegistrazioneInCorso.Hint + sLineBreak +
+        Format('Fra %d:%.2d %s.', [Residuo.Secondi div 60, Residuo.Secondi mod 60, Residuo.Motivo]);
   end
   else if Invio then
   begin
     dxBarButtonRegistrazioneInCorso.Caption := SessioneLog.TestoInvio;
     dxBarButtonRegistrazioneInCorso.Hint := 'Il filmato si sta caricando sul ticket. Premi per interrompere l''invio.';
-  end;
-
-  Residuo := SessioneLog.TempoResiduo;
-  dxBarProgressTempoResiduo.Visible := dx.Visible(Attiva and (Residuo.Secondi >= 0));
-  if Attiva and (Residuo.Secondi >= 0) then
-  begin
-    dxBarProgressTempoResiduo.Max := Residuo.Totale;
-    dxBarProgressTempoResiduo.Position := Min(Residuo.Secondi, Residuo.Totale);
-    dxBarProgressTempoResiduo.Caption := Format('restano %d:%.2d', [Residuo.Secondi div 60, Residuo.Secondi mod 60]);
-    dxBarProgressTempoResiduo.Hint := 'Fra ' + dxBarProgressTempoResiduo.Caption.Replace('restano ', '') + ' ' + Residuo.Motivo;
-    if SessioneLog.LimiteImminente then
-      dxBarProgressTempoResiduo.Color := clYellow
-    else
-      dxBarProgressTempoResiduo.Color := ColoreTempoResiduo;
   end;
 
   dxBarButtonSegnalibroBarra.Visible := dx.Visible(Attiva);

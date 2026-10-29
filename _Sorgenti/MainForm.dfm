@@ -1263,10 +1263,6 @@ object Main: TMain
         end
         item
           Visible = True
-          ItemName = 'dxBarProgressTempoResiduo'
-        end
-        item
-          Visible = True
           ItemName = 'dxBarButtonSegnalibroBarra'
         end
         item
@@ -2245,13 +2241,6 @@ object Main: TMain
       ImageIndex = 1017
       PaintStyle = psCaptionGlyph
       OnClick = dxBarButtonRegistrazioneInCorsoClick
-    end
-    object dxBarProgressTempoResiduo: TdxBarProgressItem
-      Caption = 'restano'
-      Category = 0
-      Visible = ivNever
-      ShowCaption = True
-      Width = 80
     end
     object dxBarButtonSegnalibroBarra: TdxBarButton
       Caption = 'Segnalibro'
