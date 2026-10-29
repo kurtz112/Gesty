@@ -121,6 +121,11 @@ type
     // si ripresenta al server solo allo scadere.
     FControlloFasciaOraria: TzControlloFasciaOraria;
     FShuttingDown: Boolean;
+    // Mantis #183 - 2026-10-29: giri falliti di fila del controllo periodico
+    // delle notifiche, per diradarlo con la rete caduta (TimerNotificheTimer).
+    FErroriNotificheConsecutivi: Integer;
+    function InterfacciaOccupata: Boolean;
+    procedure ImpostaIntervalloNotifiche;
   private
     procedure LZ_RenameDatamodule(const aOldName, aNewName: string);
     procedure LZ_RenameDataSet(const OldName, NewName: string; const ShouldSave: Boolean = false);
@@ -1050,6 +1055,8 @@ begin
   end;
 
   // Mantis #183 - 2026-10-29: controllo periodico di riserva, vedi TimerNotificheTimer
+  FErroriNotificheConsecutivi := 0;
+  ImpostaIntervalloNotifiche;
   TimerNotifiche.Enabled := true;
 end;
 
@@ -1471,9 +1478,20 @@ end;
 // riavvio (Codebri, 29/10: oltre due ore di sessione solo il 41% degli avvisi
 // compariva entro un minuto). Ogni minuto si controlla comunque: l'evento resta
 // per la comparsa immediata, NotificaGiaMostrata evita il doppio avviso.
+// Mantis #183 - 2026-10-29: il controllo gira nel thread principale, quindi con
+// la rete lenta o caduta l'interfaccia restava ferma fino al timeout di FireDAC,
+// e la scena si ripeteva ogni minuto; poteva anche scattare a meta' di
+// un'operazione, dentro l'Application.ProcessMessages di una finestra modale o
+// della barra di avanzamento. Ora il giro si salta quando l'interfaccia e'
+// occupata (InterfacciaOccupata) e, dopo un errore, l'intervallo raddoppia a
+// ogni giro fallito fino a 10 minuti e torna a 60 secondi al primo riuscito.
 procedure TConfig.TimerNotificheTimer(Sender: TObject);
 begin
   if FShuttingDown or (not Database.Connected) then
+    Exit;
+
+  // l'utente sta lavorando: si riprova al giro successivo, senza contare un errore
+  if InterfacciaOccupata then
     Exit;
 
   TimerNotifiche.Enabled := false;
@@ -1481,15 +1499,56 @@ begin
     try
       MostraNotifiche;
       MostraBadgeNotifiche;
+      FErroriNotificheConsecutivi := 0;
     except
       // una rete che cade non deve aprire una finestra d'errore ogni minuto:
-      // si registra e si riprova al giro successivo
+      // si registra e si dirada il giro successivo
       on E: Exception do
+      begin
+        inc(FErroriNotificheConsecutivi);
         siMain.LogException(E);
+      end;
     end;
   finally
+    ImpostaIntervalloNotifiche;
     TimerNotifiche.Enabled := not FShuttingDown;
   end;
+end;
+
+// Mantis #183 - 2026-10-29: vero quando una finestra modale (ShowModal, i
+// messaggi di conferma) o la barra di avanzamento di zProgressBox sono aperte.
+// Tutte disabilitano le altre finestre dell'applicazione (DisableTaskWindows,
+// la barra di avanzamento compresa, che non e' modale e quindi non si vede con
+// fsModal), per cui basta guardare se la finestra principale e' disabilitata.
+// Senza finestra principale (avvio, chiusura) l'interfaccia conta come occupata.
+function TConfig.InterfacciaOccupata: Boolean;
+begin
+  Result := (not Assigned(Application.MainForm)) or (not Application.MainForm.HandleAllocated) or (not IsWindowEnabled(Application.MainForm.Handle));
+end;
+
+// Mantis #183 - 2026-10-29: 60 secondi senza errori, poi 2, 4, 8 minuti dopo
+// altrettanti giri falliti di fila, con un massimo di 10 minuti.
+procedure TConfig.ImpostaIntervalloNotifiche;
+const
+  IntervalloBase = 60 * 1000;
+  IntervalloMassimo = 10 * 60 * 1000;
+var
+  i: Integer;
+  Intervallo: Cardinal;
+begin
+  Intervallo := IntervalloBase;
+  for i := 1 to FErroriNotificheConsecutivi do
+  begin
+    Intervallo := Intervallo * 2;
+    if Intervallo >= IntervalloMassimo then
+    begin
+      Intervallo := IntervalloMassimo;
+      Break;
+    end;
+  end;
+
+  if TimerNotifiche.Interval <> Intervallo then
+    TimerNotifiche.Interval := Intervallo;
 end;
 
 procedure TConfig.zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);
