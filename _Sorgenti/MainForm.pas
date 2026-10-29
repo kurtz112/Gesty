@@ -33,6 +33,7 @@ uses
   FireDAC.Comp.Client,
   dxStatusBar,
   dxBar,
+  dxBarExtItems,
   dxRibbonForm,
   dxSkinsCore,
   dxSkinsdxStatusBarPainter,
@@ -400,6 +401,11 @@ type
     dxBarSubItemAssistenza: TdxBarSubItem;
     RegistraDalProssimoAvvio: TAction;
     dxBarButtonRegistraDalProssimoAvvio: TdxBarButton;
+    dxBarButtonRegistrazioneInCorso: TdxBarButton;
+    dxBarProgressTempoResiduo: TdxBarProgressItem;
+    dxBarButtonSegnalibroBarra: TdxBarButton;
+    dxBarButtonPausaFilmato: TdxBarButton;
+    TimerRegistrazione: TTimer;
     TicketAssistenza: TAction;
     dxBarButtonTicketAssistenza: TdxBarButton;
     CoGe_Bilancio: TAction;
@@ -530,6 +536,10 @@ type
     procedure AdattaExecute(Sender: TObject);
     procedure AttestatiExecute(Sender: TObject);
     procedure AttivaLogExecute(Sender: TObject);
+    procedure dxBarButtonRegistrazioneInCorsoClick(Sender: TObject);
+    procedure dxBarButtonSegnalibroBarraClick(Sender: TObject);
+    procedure dxBarButtonPausaFilmatoClick(Sender: TObject);
+    procedure TimerRegistrazioneTimer(Sender: TObject);
     procedure ProfilerFBExecute(Sender: TObject);
     procedure RiconnessioneExecute(Sender: TObject);
     procedure BaseWebExecute(Sender: TObject);
@@ -575,7 +585,10 @@ type
     procedure ApplyRestrictions;
     function GetRestrictionManager: TRestrictionManager;
   private
+    // Colore della barra del tempo residuo fuori dagli ultimi 2 minuti.
+    ColoreTempoResiduo: TColor;
     procedure StatoLogCambiato(Sender: TObject);
+    procedure AggiornaBarraRegistrazione;
   private
     procedure InitTips;
     procedure InitSessioneLog;
@@ -2391,9 +2404,96 @@ begin
   // zippati diventano 2-3 MB, sotto il limite predefinito degli allegati Mantis.
   SessioneLog.DimensioneMassimaMb := 40;
   SessioneLog.DurataMassimaMinuti := 120;
+  // Gesty prevede il filmato: la finestra delle opzioni mostra la casella,
+  // che si accende solo con il codice dell'assistenza.
+  SessioneLog.VideoDisponibile := True;
   SessioneLog.OnStatoCambiato := StatoLogCambiato;
+  ColoreTempoResiduo := dxBarProgressTempoResiduo.Color;
   StatoLogCambiato(Self);
   SessioneLog.VerificaSessioneInterrotta;
+end;
+
+procedure TMain.dxBarButtonRegistrazioneInCorsoClick(Sender: TObject);
+begin
+  // Durante la registrazione chiude e segnala, come la voce di menu; durante
+  // l'invio del filmato offre di interromperlo.
+  if SessioneLog.Attiva then
+    SessioneLog.Commuta
+  else if SessioneLog.InvioInCorso then
+    if ConfirmYesNo('Interrompo l''invio del filmato dopo la parte in corso?' + sLineBreak + sLineBreak +
+      'Il ticket e il log restano; le parti non inviate restano sul computer.', mtConfirmation) then
+      SessioneLog.InterrompiInvio;
+  AggiornaBarraRegistrazione;
+end;
+
+procedure TMain.dxBarButtonSegnalibroBarraClick(Sender: TObject);
+begin
+  SessioneLog.InserisciSegnalibro;
+end;
+
+procedure TMain.dxBarButtonPausaFilmatoClick(Sender: TObject);
+begin
+  SessioneLog.PausaVideo := not SessioneLog.PausaVideo;
+  AggiornaBarraRegistrazione;
+end;
+
+procedure TMain.TimerRegistrazioneTimer(Sender: TObject);
+begin
+  AggiornaBarraRegistrazione;
+end;
+
+// Indicatori nella barra dell'area del titolo: si vedono sempre, anche con il
+// menu Assistenza chiuso, mentre la registrazione e' attiva o il filmato si
+// sta inviando. Il calcolo del tempo residuo sta in zDiagnostica.Log.
+procedure TMain.AggiornaBarraRegistrazione;
+var
+  Attiva, Invio: Boolean;
+  Durata: Integer;
+  Residuo: TzTempoResiduo;
+begin
+  Attiva := SessioneLog.Attiva;
+  Invio := SessioneLog.InvioInCorso;
+
+  dxBarButtonRegistrazioneInCorso.Visible := dx.Visible(Attiva or Invio);
+  if Attiva then
+  begin
+    Durata := SessioneLog.DurataSecondi;
+    dxBarButtonRegistrazioneInCorso.Caption := Format('%s REC %d:%.2d', [#$25CF, Durata div 60, Durata mod 60]);
+    if SessioneLog.VideoAttivo then
+      dxBarButtonRegistrazioneInCorso.Hint := 'Registrazione per l''assistenza in corso: log + filmato. Premi per chiudere e segnalare.'
+    else
+      dxBarButtonRegistrazioneInCorso.Hint := 'Registrazione per l''assistenza in corso: log. Premi per chiudere e segnalare.';
+  end
+  else if Invio then
+  begin
+    dxBarButtonRegistrazioneInCorso.Caption := SessioneLog.TestoInvio;
+    dxBarButtonRegistrazioneInCorso.Hint := 'Il filmato si sta caricando sul ticket. Premi per interrompere l''invio.';
+  end;
+
+  Residuo := SessioneLog.TempoResiduo;
+  dxBarProgressTempoResiduo.Visible := dx.Visible(Attiva and (Residuo.Secondi >= 0));
+  if Attiva and (Residuo.Secondi >= 0) then
+  begin
+    dxBarProgressTempoResiduo.Max := Residuo.Totale;
+    dxBarProgressTempoResiduo.Position := Min(Residuo.Secondi, Residuo.Totale);
+    dxBarProgressTempoResiduo.Caption := Format('restano %d:%.2d', [Residuo.Secondi div 60, Residuo.Secondi mod 60]);
+    dxBarProgressTempoResiduo.Hint := 'Fra ' + dxBarProgressTempoResiduo.Caption.Replace('restano ', '') + ' ' + Residuo.Motivo;
+    if SessioneLog.LimiteImminente then
+      dxBarProgressTempoResiduo.Color := clYellow
+    else
+      dxBarProgressTempoResiduo.Color := ColoreTempoResiduo;
+  end;
+
+  dxBarButtonSegnalibroBarra.Visible := dx.Visible(Attiva);
+  dxBarButtonPausaFilmato.Visible := dx.Visible(Attiva and SessioneLog.VideoAttivo);
+  dxBarButtonPausaFilmato.Down := SessioneLog.PausaVideo;
+  if SessioneLog.PausaVideo then
+    dxBarButtonPausaFilmato.Caption := 'Riprendi filmato'
+  else
+    dxBarButtonPausaFilmato.Caption := 'Pausa filmato';
+
+  // Il timer serve solo mentre c'e' qualcosa da aggiornare.
+  TimerRegistrazione.Enabled := Attiva or Invio;
 end;
 
 procedure TMain.SegnalibroLogExecute(Sender: TObject);
@@ -2443,6 +2543,8 @@ begin
   RegistraDalProssimoAvvio.Caption := SessioneLog.DidascaliaVoceAvvio;
   RegistraDalProssimoAvvio.Hint := SessioneLog.SuggerimentoVoceAvvio;
   RegistraDalProssimoAvvio.Checked := SessioneLog.RichiestaAvvioPresente;
+
+  AggiornaBarraRegistrazione;
 end;
 
 procedure TMain.CoGe_BilancioExecute(Sender: TObject);

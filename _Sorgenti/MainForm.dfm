@@ -1259,6 +1259,23 @@ object Main: TMain
       ItemLinks = <
         item
           Visible = True
+          ItemName = 'dxBarButtonRegistrazioneInCorso'
+        end
+        item
+          Visible = True
+          ItemName = 'dxBarProgressTempoResiduo'
+        end
+        item
+          Visible = True
+          ItemName = 'dxBarButtonSegnalibroBarra'
+        end
+        item
+          Visible = True
+          ItemName = 'dxBarButtonPausaFilmato'
+        end
+        item
+          BeginGroup = True
+          Visible = True
           ItemName = 'dxBarButtonNotifiche'
         end
         item
@@ -2220,6 +2237,40 @@ object Main: TMain
       Category = 0
       ButtonStyle = bsChecked
     end
+    object dxBarButtonRegistrazioneInCorso: TdxBarButton
+      Caption = 'REC'
+      Category = 0
+      Hint = 'Registrazione per l'#39'assistenza in corso'
+      Visible = ivNever
+      ImageIndex = 1017
+      PaintStyle = psCaptionGlyph
+      OnClick = dxBarButtonRegistrazioneInCorsoClick
+    end
+    object dxBarProgressTempoResiduo: TdxBarProgressItem
+      Caption = 'restano'
+      Category = 0
+      Visible = ivNever
+      ShowCaption = True
+      Width = 80
+    end
+    object dxBarButtonSegnalibroBarra: TdxBarButton
+      Caption = 'Segnalibro'
+      Category = 0
+      Hint = 'Segna questo momento nel log, con una riga che dice cosa e'#39' successo'
+      Visible = ivNever
+      ImageIndex = 1018
+      PaintStyle = psCaptionGlyph
+      OnClick = dxBarButtonSegnalibroBarraClick
+    end
+    object dxBarButtonPausaFilmato: TdxBarButton
+      Caption = 'Pausa filmato'
+      Category = 0
+      Hint =
+        'Sospende il filmato senza fermare il log: per le schermate che non vuoi mandare all'#39'assistenza'
+      Visible = ivNever
+      ButtonStyle = bsChecked
+      OnClick = dxBarButtonPausaFilmatoClick
+    end
     object dxBarLargeButton57: TdxBarLargeButton
       Action = Timesheet
       Category = 0
@@ -3045,6 +3096,12 @@ object Main: TMain
     OnTimer = TimerStartupTimer
     Left = 58
     Top = 395
+  end
+  object TimerRegistrazione: TTimer
+    Enabled = False
+    OnTimer = TimerRegistrazioneTimer
+    Left = 58
+    Top = 451
   end
   object ModuliStyleRepository: TcxStyleRepository
     Left = 192
