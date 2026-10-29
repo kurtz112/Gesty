@@ -14578,6 +14578,60 @@ TSP_incarico_Genera_Supplenza = class (TzStoredProc)
     property Id_Incarico_Supplenza: TNullableInt64 read fId_Incarico_Supplenza;
 end;
 
+[TStoredProcedure('INCARICO_NOTIFICA_INTERESSATI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Notifica_Interessati = class (TzStoredProc)
+  private
+    fNotifica: TNullableString;
+    fOggetto: TNullableString;
+    fMessaggio: TStringList;
+    fId_Incarico: TNullableInt64;
+  private
+    procedure SetMessaggio(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('NOTIFICA', ptInput, False)]
+    property Notifica: TNullableString read fNotifica write fNotifica;
+    //
+    [TParamAttribute('OGGETTO', ptInput, False)]
+    property Oggetto: TNullableString read fOggetto write fOggetto;
+    //
+    [TParamAttribute('MESSAGGIO', ptInput, True)]
+    property Messaggio: TStringList read fMessaggio write SetMessaggio;
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
+[TStoredProcedure('INCARICO_RESPINGI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Respingi = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+    fMotivo: TNullableString;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+    //
+    [TParamAttribute('MOTIVO', ptInput, False)]
+    property Motivo: TNullableString read fMotivo write fMotivo;
+end;
+
+[TStoredProcedure('INCARICO_RIPRESENTA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_incarico_Ripresenta = class (TzStoredProc)
+  private
+    fId_Incarico: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_INCARICO', ptInput, False)]
+    property Id_Incarico: TNullableInt64 read fId_Incarico write fId_Incarico;
+end;
+
 [TStoredProcedure('INCARICO_SET_ESTENSORE')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_incarico_Set_Estensore = class (TzStoredProc)
@@ -45140,6 +45194,24 @@ destructor TSP_incarichi_Motivazione_Get.Destroy;
 begin
   FreeAndNil(fTesto_Default);
   inherited;
+end;
+
+
+constructor TSP_incarico_Notifica_Interessati.Create;
+begin
+  inherited;
+  fMessaggio := CreateStringList;
+end;
+
+destructor TSP_incarico_Notifica_Interessati.Destroy;
+begin
+  FreeAndNil(fMessaggio);
+  inherited;
+end;
+
+procedure TSP_incarico_Notifica_Interessati.SetMessaggio(const Value: TStringList);
+begin
+  FMessaggio.Assign(Value);
 end;
 
 
