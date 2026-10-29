@@ -112,6 +112,8 @@ type
     FMonitorByPrecedente: TFDMonitorBy;
     FEventKindsPrecedenti: TFDMoniEventKinds;
     FFileMonitorPrecedente: string;
+    FAppendMonitorPrecedente: Boolean;
+    FTracingMonitorPrecedente: Boolean;
     FDisabilitaEventiDB: Boolean;
     // Fasce orarie 2026-09-18: conta i secondi restituiti dal login e
     // si ripresenta al server solo allo scadere.
@@ -2055,6 +2057,14 @@ end;
 // accensione e in spegnimento. Con Reconnect (chiude le transazioni, chiude e
 // riapre la connessione), non con Login, che ripresenta la finestra di accesso:
 // nel rilascio 003 era Login e l'utente si ritrovava a riaccedere.
+//
+// FileName, FileAppend e FileEncoding si cambiano solo a Tracing spento: il
+// tracciatore FireDAC (TFDTracer.CheckInactive) solleva un'eccezione se e'
+// attivo, ed e' Tracing := False che chiude il file. Lo spegnimento lasciava
+// Tracing acceso: l'assegnazione di FileName falliva, il Reconnect non
+// partiva e il file -firedac.txt restava aperto, cosi' lo zip della
+// registrazione non si creava. Per lo stesso motivo una seconda registrazione
+// nella stessa sessione di Gesty non riusciva piu' ad accendere il monitor.
 procedure TConfig.MonitorFireDACPerRegistrazione(AAttiva: Boolean; const AFile: string);
 begin
   if AAttiva then
@@ -2064,7 +2074,10 @@ begin
     FMonitorByPrecedente := Database.Params.MonitorBy;
     FEventKindsPrecedenti := FDMoniFlatFileClientLink.EventKinds;
     FFileMonitorPrecedente := FDMoniFlatFileClientLink.FileName;
+    FAppendMonitorPrecedente := FDMoniFlatFileClientLink.FileAppend;
+    FTracingMonitorPrecedente := FDMoniFlatFileClientLink.Tracing;
 
+    FDMoniFlatFileClientLink.Tracing := False;
     FDMoniFlatFileClientLink.FileName := AFile;
     FDMoniFlatFileClientLink.FileAppend := False;
     FDMoniFlatFileClientLink.EventKinds := FEventKindsPrecedenti + [ekVendor, ekCmdDataIn];
@@ -2079,9 +2092,17 @@ begin
       Exit;
     FMonitorRegistrazioneAttivo := False;
     Database.Params.MonitorBy := FMonitorByPrecedente;
-    FDMoniFlatFileClientLink.EventKinds := FEventKindsPrecedenti;
-    FDMoniFlatFileClientLink.FileName := FFileMonitorPrecedente;
-    Reconnect;
+    // Prima la riconnessione, cosi' la chiusura della connessione resta nella
+    // traccia; poi Tracing spento chiude il file, anche se Reconnect fallisce.
+    try
+      Reconnect;
+    finally
+      FDMoniFlatFileClientLink.Tracing := False;
+      FDMoniFlatFileClientLink.EventKinds := FEventKindsPrecedenti;
+      FDMoniFlatFileClientLink.FileName := FFileMonitorPrecedente;
+      FDMoniFlatFileClientLink.FileAppend := FAppendMonitorPrecedente;
+      FDMoniFlatFileClientLink.Tracing := FTracingMonitorPrecedente;
+    end;
   end;
 end;
 
