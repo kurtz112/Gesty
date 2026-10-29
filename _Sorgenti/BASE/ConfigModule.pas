@@ -79,6 +79,7 @@ type
     TimerAFK: TTimer;
     TimerKill: TTimer;
     TimerNotifiche: TTimer;
+    TimerPingEventi: TTimer;
     FDEventAlerter: TFDEventAlerter;
     FDPhysFBDriverLink: TFDPhysFBDriverLink;
     IdAntiFreeze: TIdAntiFreeze;
@@ -103,6 +104,7 @@ type
     procedure FDMoniCustomClientLinkOutput(ASender: TFDMoniClientLinkBase; const AClassName, AObjName, AMessage: string);
     procedure TimerKillTimer(Sender: TObject);
     procedure TimerNotificheTimer(Sender: TObject);
+    procedure TimerPingEventiTimer(Sender: TObject);
     procedure TimerShutdownTimer(Sender: TObject);
     procedure zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);
     procedure zSystemAssignFieldOnChangeEvent(Field: TField; const EventName: string);
@@ -124,8 +126,18 @@ type
     // Mantis #183 - 2026-10-29: giri falliti di fila del controllo periodico
     // delle notifiche, per diradarlo con la rete caduta (TimerNotificheTimer).
     FErroriNotificheConsecutivi: Integer;
+    // Mantis #183 - 2026-10-29: segnale di controllo del canale degli eventi
+    // (TimerPingEventiTimer): nome dell'evento riservato a questa connessione,
+    // ping inviato e non ancora tornato, momento dell'ultimo ping ricevuto.
+    FNomeEventoPing: string;
+    FPingInAttesa: Boolean;
+    FUltimoPingRicevuto: UInt64;
+    FErroriPingConsecutivi: Integer;
     function InterfacciaOccupata: Boolean;
     procedure ImpostaIntervalloNotifiche;
+    function CanaleEventiVivo: Boolean;
+    procedure InviaPingEventi;
+    procedure RiapriCanaleEventi;
   private
     procedure LZ_RenameDatamodule(const aOldName, aNewName: string);
     procedure LZ_RenameDataSet(const OldName, NewName: string; const ShouldSave: Boolean = false);
@@ -664,6 +676,7 @@ begin
   TimerKill.Enabled := false;
   TimerShutdown.Enabled := false;
   TimerNotifiche.Enabled := false;
+  TimerPingEventi.Enabled := false;
 
   for i := 0 to Screen.FormCount - 1 do
     if Screen.Forms[i] <> Application.MainForm then
@@ -1058,6 +1071,13 @@ begin
   FErroriNotificheConsecutivi := 0;
   ImpostaIntervalloNotifiche;
   TimerNotifiche.Enabled := true;
+
+  // Mantis #183 - 2026-10-29: segnale di controllo del canale degli eventi,
+  // vedi TimerPingEventiTimer. Il primo ping parte subito: finche' non torna
+  // il controllo periodico delle notifiche resta attivo.
+  FErroriPingConsecutivi := 0;
+  InviaPingEventi;
+  TimerPingEventi.Enabled := true;
 end;
 
 function TConfig.StorageFileName: String;
@@ -1089,6 +1109,13 @@ begin
 
   FDEventAlerter.Names.Add('NOTIFICA');
   FDEventAlerter.Names.Add('REFRESH_SCHEDULER');
+
+  // Mantis #183 - 2026-10-29: evento del segnale di controllo, legato al numero
+  // di questa connessione perche' ogni postazione riceva solo il proprio ping
+  FNomeEventoPing := 'PING_' + VarToStr(Database.ExecSQLScalar('SELECT CURRENT_CONNECTION FROM RDB$DATABASE'));
+  FDEventAlerter.Names.Add(FNomeEventoPing);
+  FPingInAttesa := false;
+  FUltimoPingRicevuto := 0;
 
   // TFDPhysFBConnectionDefParams(Database.Params).IbAdvanced := 'no_db_triggers=1';
   // try
@@ -1494,6 +1521,11 @@ begin
   if InterfacciaOccupata then
     Exit;
 
+  // Mantis #183 - 2026-10-29: il ping e' tornato da poco, quindi il canale degli
+  // eventi e' vivo e l'evento NOTIFICA arriva da solo: niente lettura manuale
+  if CanaleEventiVivo then
+    Exit;
+
   TimerNotifiche.Enabled := false;
   try
     try
@@ -1549,6 +1581,114 @@ begin
 
   if TimerNotifiche.Interval <> Intervallo then
     TimerNotifiche.Interval := Intervallo;
+end;
+
+// Mantis #183 - 2026-10-29: FireDAC riceve gli eventi su un clone della
+// connessione (TFDPhysIBEventAlerterBase.InternalAllocHandle) e, se quel clone
+// cade, l'ascolto si ferma in silenzio: nessuna eccezione, nessun OnAlert
+// (TIBEventThread non gestisce l'errore di isc_que_events). Ogni due minuti
+// Gesty si manda un evento riservato a questa connessione (FNomeEventoPing):
+// - se torna, il canale e' vivo e il controllo periodico delle notifiche resta
+//   fermo (CanaleEventiVivo);
+// - se al giro successivo non e' tornato, il canale si chiude e si riapre
+//   (RiapriCanaleEventi), cosi' tornano anche SHUTDOWN e le fasce orarie, che
+//   non lasciano righe da leggere; nel frattempo le notifiche le legge il
+//   TimerNotifiche.
+// Il traffico del ping tiene anche aperta la porta ausiliaria degli eventi
+// verso firewall e router che chiudono le connessioni inattive.
+procedure TConfig.TimerPingEventiTimer(Sender: TObject);
+begin
+  if FShuttingDown or (not Database.Connected) then
+    Exit;
+
+  if InterfacciaOccupata then
+    Exit;
+
+  TimerPingEventi.Enabled := false;
+  try
+    if FPingInAttesa then
+      RiapriCanaleEventi;
+
+    InviaPingEventi;
+  finally
+    TimerPingEventi.Enabled := not FShuttingDown;
+  end;
+end;
+
+// Mantis #183 - 2026-10-29: vero se il ping e' tornato entro un giro di
+// TimerPingEventi piu' mezzo minuto di margine per la consegna.
+function TConfig.CanaleEventiVivo: Boolean;
+begin
+  Result := (FUltimoPingRicevuto > 0) and (GetTickCount64 - FUltimoPingRicevuto < UInt64(TimerPingEventi.Interval) + 30 * 1000);
+end;
+
+// Mantis #183 - 2026-10-29: Signal esegue POST_EVENT sulla connessione
+// principale, con il commit automatico di FireDAC; se in quel momento c'e' una
+// transazione esplicita aperta l'evento parte solo al suo commit, e il ping
+// risulta perso: il danno e' una riapertura del canale in piu'. Un errore (rete
+// caduta) si registra e dirada i giri successivi come per le notifiche.
+procedure TConfig.InviaPingEventi;
+const
+  IntervalloBase = 2 * 60 * 1000;
+  IntervalloMassimo = 10 * 60 * 1000;
+var
+  i: Integer;
+  Intervallo: Cardinal;
+begin
+  if FNomeEventoPing = '' then
+    Exit;
+
+  try
+    FDEventAlerter.Signal(FNomeEventoPing, Null);
+    FPingInAttesa := true;
+    FErroriPingConsecutivi := 0;
+  except
+    on E: Exception do
+    begin
+      inc(FErroriPingConsecutivi);
+      siMain.LogException(E);
+    end;
+  end;
+
+  Intervallo := IntervalloBase;
+  for i := 1 to FErroriPingConsecutivi do
+  begin
+    Intervallo := Intervallo * 2;
+    if Intervallo >= IntervalloMassimo then
+    begin
+      Intervallo := IntervalloMassimo;
+      Break;
+    end;
+  end;
+
+  if TimerPingEventi.Interval <> Intervallo then
+    TimerPingEventi.Interval := Intervallo;
+end;
+
+// Mantis #183 - 2026-10-29: Active false libera il clone della connessione e il
+// suo thread degli eventi (TFDPhysEventAlerter.Unregister, InternalReleaseHandle);
+// Active true ne apre uno nuovo con gli stessi Names. Con il clone morto la
+// chiusura puo' attendere qualche secondo (TIBEvents.Stop) o sollevare un errore
+// sul socket caduto: si registra, e se il canale resta chiuso ci riprova il giro
+// successivo, perche' il ping non tornera'.
+procedure TConfig.RiapriCanaleEventi;
+begin
+  siMain.LogWarning('Canale degli eventi Firebird senza risposta al ping: riapertura');
+  try
+    FDEventAlerter.Active := false;
+  except
+    on E: Exception do
+      siMain.LogException(E);
+  end;
+
+  try
+    FDEventAlerter.Active := true;
+  except
+    on E: Exception do
+      siMain.LogException(E);
+  end;
+
+  FPingInAttesa := false;
 end;
 
 procedure TConfig.zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);
@@ -2584,6 +2724,16 @@ begin
   inherited;
   // collection
   // eventi di sistema condivisi tra tutti i client
+
+  // Mantis #183 - 2026-10-29: il ping torna, il canale e' vivo. Va gestito prima
+  // di DisabilitaEventiDB: quel segnale serve a saltare il solo SHUTDOWN inviato
+  // da questa postazione, e un ping arrivato prima lo consumerebbe al suo posto.
+  if (FNomeEventoPing <> '') and SameText(AEventName, FNomeEventoPing) then
+  begin
+    FPingInAttesa := false;
+    FUltimoPingRicevuto := GetTickCount64;
+    Exit;
+  end;
 
   if DisabilitaEventiDB then
   begin

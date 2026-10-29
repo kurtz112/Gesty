@@ -112,6 +112,13 @@ inherited Config: TConfig
     Left = 184
     Top = 668
   end
+  object TimerPingEventi: TTimer
+    Enabled = False
+    Interval = 120000
+    OnTimer = TimerPingEventiTimer
+    Left = 184
+    Top = 723
+  end
   object FDEventAlerter: TFDEventAlerter
     Connection = Database
     OnAlert = FDEventAlerterAlert
