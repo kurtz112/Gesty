@@ -156,10 +156,16 @@ begin
   IdEMailAddressItem.Name := 'Assistenza';
   IdEMailAddressItem.Address := Config.SmtpDestinatario;
 
-  // senza mittente in configurazione resta il comportamento di prima
-  // (mittente vuoto, lo decide il server dall'utente autenticato)
+  // mittente: SmtpMittente, altrimenti l'utente SMTP se e' un indirizzo.
+  // Con From vuoto il server non lo ricava dall'utente autenticato, come
+  // si pensava: la mail arrivava da MAILER-DAEMON@MISSING_DOMAIN (R-118)
   if not Config.SmtpMittente.IsEmpty then
-    IdMessage.From.Address := Config.SmtpMittente;
+    IdMessage.From.Address := Config.SmtpMittente
+  else if Config.SmtpUtente.Contains('@') then
+    IdMessage.From.Address := Config.SmtpUtente;
+
+  if not IdMessage.From.Address.IsEmpty then
+    IdMessage.From.Name := ('GestyTools ' + Config.Ente).Trim;
 end;
 
 procedure TMail.InviaMail(const Subject, Body: string);
