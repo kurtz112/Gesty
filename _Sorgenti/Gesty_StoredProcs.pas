@@ -15232,6 +15232,39 @@ TSP_notula = class (TzStoredProc)
     property Costo_Totale_Ente: TNullableDouble read fCosto_Totale_Ente;
 end;
 
+[TStoredProcedure('OBJECTS_VERIFICA', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_objects_Verifica = class (TzStoredProc)
+  private
+    fTabella: TNullableString;
+    fColonna: TNullableString;
+    fOid: TNullableInt64;
+    fClasse_Attesa: TNullableString;
+    fClasse_Trovata: TNullableString;
+  private
+    property Tabella_internal: TNullableString read fTabella write fTabella;
+    property Colonna_internal: TNullableString read fColonna write fColonna;
+    property Oid_internal: TNullableInt64 read fOid write fOid;
+    property Classe_Attesa_internal: TNullableString read fClasse_Attesa write fClasse_Attesa;
+    property Classe_Trovata_internal: TNullableString read fClasse_Trovata write fClasse_Trovata;
+  public
+    //
+    [TParamAttribute('TABELLA', ptOutput, False)]
+    property Tabella: TNullableString read fTabella;
+    //
+    [TParamAttribute('COLONNA', ptOutput, False)]
+    property Colonna: TNullableString read fColonna;
+    //
+    [TParamAttribute('OID', ptOutput, False)]
+    property Oid: TNullableInt64 read fOid;
+    //
+    [TParamAttribute('CLASSE_ATTESA', ptOutput, False)]
+    property Classe_Attesa: TNullableString read fClasse_Attesa;
+    //
+    [TParamAttribute('CLASSE_TROVATA', ptOutput, False)]
+    property Classe_Trovata: TNullableString read fClasse_Trovata;
+end;
+
 [TStoredProcedure('OBJECT_ADD', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_object_Add = class (TzStoredProc)
@@ -15260,6 +15293,38 @@ TSP_object_Delete = class (TzStoredProc)
     property Oid: TNullableInt64 read fOid write fOid;
 end;
 
+[TStoredProcedure('OBJ_CLASSES_PARENT_SCAN', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Classes_Parent_Scan = class (TzStoredProc)
+  private
+    fClass_Name: TNullableString;
+    fClasse: TNullableString;
+    fPadre_Catalogo: TNullableString;
+    fPadre_Salvato: TNullableString;
+    fEsito: TNullableString;
+  private
+    property Classe_internal: TNullableString read fClasse write fClasse;
+    property Padre_Catalogo_internal: TNullableString read fPadre_Catalogo write fPadre_Catalogo;
+    property Padre_Salvato_internal: TNullableString read fPadre_Salvato write fPadre_Salvato;
+    property Esito_internal: TNullableString read fEsito write fEsito;
+  public
+    //
+    [TParamAttribute('CLASS_NAME', ptInput, False)]
+    property Class_Name: TNullableString read fClass_Name write fClass_Name;
+    //
+    [TParamAttribute('CLASSE', ptOutput, False)]
+    property Classe: TNullableString read fClasse;
+    //
+    [TParamAttribute('PADRE_CATALOGO', ptOutput, False)]
+    property Padre_Catalogo: TNullableString read fPadre_Catalogo;
+    //
+    [TParamAttribute('PADRE_SALVATO', ptOutput, False)]
+    property Padre_Salvato: TNullableString read fPadre_Salvato;
+    //
+    [TParamAttribute('ESITO', ptOutput, False)]
+    property Esito: TNullableString read fEsito;
+end;
+
 [TStoredProcedure('OBJ_CLASS_GET', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_obj_Class_Get = class (TzStoredProc)
@@ -15275,6 +15340,33 @@ TSP_obj_Class_Get = class (TzStoredProc)
     //
     [TParamAttribute('OBJ_CLASS', ptOutput, False)]
     property Obj_Class: TNullableInt64 read fObj_Class;
+end;
+
+[TStoredProcedure('OBJ_CLASS_PARENT_SET')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Class_Parent_Set = class (TzStoredProc)
+  private
+    fClass_Name: TNullableString;
+    fPadre_Catalogo: TNullableString;
+    fPadre_Salvato: TNullableString;
+    fEsito: TNullableString;
+  private
+    property Padre_Catalogo_internal: TNullableString read fPadre_Catalogo write fPadre_Catalogo;
+    property Padre_Salvato_internal: TNullableString read fPadre_Salvato write fPadre_Salvato;
+    property Esito_internal: TNullableString read fEsito write fEsito;
+  public
+    //
+    [TParamAttribute('CLASS_NAME', ptInput, False)]
+    property Class_Name: TNullableString read fClass_Name write fClass_Name;
+    //
+    [TParamAttribute('PADRE_CATALOGO', ptOutput, False)]
+    property Padre_Catalogo: TNullableString read fPadre_Catalogo;
+    //
+    [TParamAttribute('PADRE_SALVATO', ptOutput, False)]
+    property Padre_Salvato: TNullableString read fPadre_Salvato;
+    //
+    [TParamAttribute('ESITO', ptOutput, False)]
+    property Esito: TNullableString read fEsito;
 end;
 
 [TStoredProcedure('OBJ_FILES_ADD')]
@@ -17055,6 +17147,25 @@ TSP_obj_Files_Generazione_Add = class (TzStoredProc)
     //
     [TParamAttribute('TEMPLATE_TIPO', ptInput, False)]
     property Template_Tipo: TNullableString read fTemplate_Tipo write fTemplate_Tipo;
+end;
+
+[TStoredProcedure('OBJ_FILES_IMPRONTA_SET')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Impronta_Set = class (TzStoredProc)
+  private
+    fId_Object_File: TNullableInt64;
+    fFile_Size: TNullableInt64;
+    fSha256: TNullableString;
+  public
+    //
+    [TParamAttribute('ID_OBJECT_FILE', ptInput, False)]
+    property Id_Object_File: TNullableInt64 read fId_Object_File write fId_Object_File;
+    //
+    [TParamAttribute('FILE_SIZE', ptInput, False)]
+    property File_Size: TNullableInt64 read fFile_Size write fFile_Size;
+    //
+    [TParamAttribute('SHA256', ptInput, False)]
+    property Sha256: TNullableString read fSha256 write fSha256;
 end;
 
 [TStoredProcedure('OBJ_FILES_INDICIZZA')]
