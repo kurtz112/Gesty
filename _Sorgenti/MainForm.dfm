@@ -530,11 +530,6 @@ object Main: TMain
       ShortCut = 24659
       OnExecute = SegnalibroLogExecute
     end
-    object RegistraDalProssimoAvvio: TAction
-      Caption = 'Registra dal prossimo avvio'
-      ImageIndex = 1016
-      OnExecute = RegistraDalProssimoAvvioExecute
-    end
     object TicketAssistenza: TAction
       Caption = 'Le mie segnalazioni'
       Hint = 'Stato e risposte delle richieste di assistenza inviate'
@@ -2347,15 +2342,6 @@ object Main: TMain
       SyncImageIndex = False
       ImageIndex = 1224
     end
-    object dxBarButtonSegnalibroLog: TdxBarButton
-      Action = SegnalibroLog
-      Category = 0
-    end
-    object dxBarButtonRegistraDalProssimoAvvio: TdxBarButton
-      Action = RegistraDalProssimoAvvio
-      Category = 0
-      ButtonStyle = bsChecked
-    end
     object dxBarButtonTicketAssistenza: TdxBarButton
       Action = TicketAssistenza
       Category = 0
@@ -2374,15 +2360,6 @@ object Main: TMain
           BeginGroup = True
           Visible = True
           ItemName = 'dxBarButtonAttivaLog'
-        end
-        item
-          Visible = True
-          ItemName = 'dxBarButtonSegnalibroLog'
-        end
-        item
-          BeginGroup = True
-          Visible = True
-          ItemName = 'dxBarButtonRegistraDalProssimoAvvio'
         end>
     end
     object dxBarLargeButton64: TdxBarLargeButton

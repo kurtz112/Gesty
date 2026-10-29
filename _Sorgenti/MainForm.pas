@@ -397,10 +397,7 @@ type
     dxBarLargeButton63: TdxBarLargeButton;
     AttivaLog: TAction;
     SegnalibroLog: TAction;
-    dxBarButtonSegnalibroLog: TdxBarButton;
     dxBarSubItemAssistenza: TdxBarSubItem;
-    RegistraDalProssimoAvvio: TAction;
-    dxBarButtonRegistraDalProssimoAvvio: TdxBarButton;
     dxBarButtonRegistrazioneInCorso: TdxBarButton;
     dxBarButtonSegnalibroBarra: TdxBarButton;
     dxBarButtonPausaFilmato: TdxBarButton;
@@ -559,7 +556,6 @@ type
     procedure RegistroFirmaExecute(Sender: TObject);
     procedure RegistroProtocolloExecute(Sender: TObject);
     procedure SegnalibroLogExecute(Sender: TObject);
-    procedure RegistraDalProssimoAvvioExecute(Sender: TObject);
     procedure TicketAssistenzaExecute(Sender: TObject);
     procedure WindowCascadeExecute(Sender: TObject);
     procedure WindowCloseExecute(Sender: TObject);
@@ -2404,6 +2400,12 @@ begin
   // Gesty prevede il filmato: la finestra delle opzioni mostra la casella,
   // che si accende solo con il codice dell'assistenza.
   SessioneLog.VideoDisponibile := True;
+  // ZC 29.10.2026: la voce di menu "Registra dal prossimo avvio" non c'e' piu':
+  // la prenotazione e' una casella nell'ultima pagina della procedura guidata,
+  // con le stesse scelte e la stessa nota, e "Attiva Log" offre di annullarla
+  // quando ce n'e' una in attesa. La procedura cita anche il segnalibro.
+  SessioneLog.ProssimoAvvioNellaProcedura := True;
+  SessioneLog.TestoScorciatoiaSegnalibro := 'Ctrl+Shift+S';
   SessioneLog.OnStatoCambiato := StatoLogCambiato;
   StatoLogCambiato(Self);
   SessioneLog.VerificaSessioneInterrotta;
@@ -2490,17 +2492,13 @@ begin
   TimerRegistrazione.Enabled := Attiva or Invio;
 end;
 
+// ZC 29.10.2026: l'azione resta senza voce di menu, solo per Ctrl+Shift+S. Il
+// segnalibro si mette dal pulsante accanto a REC, che si vede solo mentre la
+// registrazione e' attiva: la voce di menu c'era sempre, e da ferma rispondeva
+// solo "Nessuna registrazione in corso".
 procedure TMain.SegnalibroLogExecute(Sender: TObject);
 begin
   SessioneLog.InserisciSegnalibro;
-end;
-
-procedure TMain.RegistraDalProssimoAvvioExecute(Sender: TObject);
-begin
-  // Una sola voce: la prima pressione chiede la registrazione per il prossimo
-  // avvio, la seconda annulla la richiesta. La registrazione vera la avvia il
-  // .dpr (SessioneLog.AvviaAllAvvio) alla prossima apertura.
-  SessioneLog.CommutaRichiestaAvvio;
 end;
 
 procedure TMain.TicketAssistenzaExecute(Sender: TObject);
@@ -2523,7 +2521,6 @@ begin
   TicketAssistenza.Visible := Config.TicketAssistenzaDisponibile;
   AttivaLog.Visible := SessioneLog.Disponibile;
   SegnalibroLog.Visible := SessioneLog.Disponibile;
-  RegistraDalProssimoAvvio.Visible := SessioneLog.Disponibile;
 
   AttivaLog.Caption := SessioneLog.DidascaliaVoceMenu;
   AttivaLog.Hint := SessioneLog.SuggerimentoVoceMenu;
@@ -2531,12 +2528,6 @@ begin
   // spunta (bsChecked) e segue Checked dell'azione. Mentre e' attiva
   // l'applicazione risulta piu' lenta e l'utente deve saperlo.
   AttivaLog.Checked := SessioneLog.Attiva;
-
-  // Stesso criterio per la richiesta dal prossimo avvio: la spunta dice che
-  // alla prossima apertura la registrazione partira' da sola.
-  RegistraDalProssimoAvvio.Caption := SessioneLog.DidascaliaVoceAvvio;
-  RegistraDalProssimoAvvio.Hint := SessioneLog.SuggerimentoVoceAvvio;
-  RegistraDalProssimoAvvio.Checked := SessioneLog.RichiestaAvvioPresente;
 
   AggiornaBarraRegistrazione;
 end;
