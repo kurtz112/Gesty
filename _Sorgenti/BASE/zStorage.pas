@@ -26,6 +26,45 @@ uses
   IniFiles,
   Math;
 
+// Disposizione adattiva 2026-10-29: riporta il rettangolo salvato dentro l'area
+// utile del monitor piu' vicino (esclusa la barra delle applicazioni): prima lo
+// stringe se e' piu' grande, poi lo sposta se sborda. Stessa regola di
+// LoadFormPosition di zBaseLib, che non la esporta.
+function RettangoloNellAreaUtile(const Rettangolo: TRect): TRect;
+var
+  Monitor: TMonitor;
+  AreaUtile: TRect;
+  Larghezza, Altezza: integer;
+begin
+  Result := Rettangolo;
+
+  Monitor := Screen.MonitorFromRect(Rettangolo, mdNearest);
+  if not Assigned(Monitor) then
+    Monitor := Screen.PrimaryMonitor;
+  if not Assigned(Monitor) then
+    Exit;
+
+  AreaUtile := Monitor.WorkareaRect;
+
+  Larghezza := Min(Rettangolo.Width, AreaUtile.Width);
+  Altezza := Min(Rettangolo.Height, AreaUtile.Height);
+
+  Result.Left := Rettangolo.Left;
+  if Result.Left + Larghezza > AreaUtile.Right then
+    Result.Left := AreaUtile.Right - Larghezza;
+  if Result.Left < AreaUtile.Left then
+    Result.Left := AreaUtile.Left;
+
+  Result.Top := Rettangolo.Top;
+  if Result.Top + Altezza > AreaUtile.Bottom then
+    Result.Top := AreaUtile.Bottom - Altezza;
+  if Result.Top < AreaUtile.Top then
+    Result.Top := AreaUtile.Top;
+
+  Result.Right := Result.Left + Larghezza;
+  Result.Bottom := Result.Top + Altezza;
+end;
+
 class function TzStorage.FindSplittedControl(Splitter: TcxSplitter): TControl;
 var
   P: TPoint;
@@ -307,6 +346,7 @@ var
   IniFile: TIniFile;
   ws: TWindowState;
   Section: string;
+  Rettangolo: TRect;
 begin
   if IniFileName = '' then
     Exit;
@@ -326,10 +366,22 @@ begin
     if Ctrl is TForm then
       TForm(Ctrl).Position := poDesigned;
 
-    Ctrl.Top := IniFile.ReadInteger(Section, 'Top', Ctrl.Top);
-    Ctrl.Left := IniFile.ReadInteger(Section, 'Left', Ctrl.Left);
-    Ctrl.Height := IniFile.ReadInteger(Section, 'Height', Ctrl.Height);
-    Ctrl.Width := IniFile.ReadInteger(Section, 'Width', Ctrl.Width);
+    Rettangolo := Rect(0, 0, 0, 0);
+    Rettangolo.Left := IniFile.ReadInteger(Section, 'Left', Ctrl.Left);
+    Rettangolo.Top := IniFile.ReadInteger(Section, 'Top', Ctrl.Top);
+    Rettangolo.Width := IniFile.ReadInteger(Section, 'Width', Ctrl.Width);
+    Rettangolo.Height := IniFile.ReadInteger(Section, 'Height', Ctrl.Height);
+
+    // Disposizione adattiva 2026-10-29: prima i limiti salvati si applicavano
+    // cosi' com'erano. Una form chiusa su un monitor che ora non c'e' (desktop
+    // remoto da un portatile verso un fisso con piu' monitor) si riapriva fuori
+    // dallo schermo: con un dialogo modale, come la Rettifica dell'incarico, il
+    // programma sembrava bloccato senza consumare CPU. Ora per le form il
+    // rettangolo si riporta nell'area utile del monitor piu' vicino.
+    if Ctrl is TForm then
+      Rettangolo := RettangoloNellAreaUtile(Rettangolo);
+
+    Ctrl.SetBounds(Rettangolo.Left, Rettangolo.Top, Rettangolo.Width, Rettangolo.Height);
 
     if Ctrl is TForm then
     begin
