@@ -268,9 +268,6 @@ begin
 
   cardIncarico.zDataSet := WizInserimentoIncarico.Incarico;
   cardCorsi.zDataSet := WizInserimentoIncarico.Corsi;
-  // La card sopra la griglia dei corsi segue l'altezza dei suoi campi: senza,
-  // restava ai 270 px del DFM e mostrava la barra di scorrimento verticale
-  cardCorsi.AutoFitHeight := True;
   viewCorsi.zDataSet := WizInserimentoIncarico.Corsi;
   viewPiani.zDataSet := WizInserimentoIncarico.Piani;
   viewServizi.zDataSet := WizInserimentoIncarico.Servizi;
