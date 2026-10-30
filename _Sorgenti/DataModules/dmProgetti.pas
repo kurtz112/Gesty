@@ -63,7 +63,6 @@ type
     procedure TimeReportGetParametri(out idRisorsa, idIncarico: integer);
     procedure TimesheetAnnualeBeforeOpen(DataSet: TDataSet);
     function AttivaConFinestra(DataSet: TzFbDataSet): boolean;
-    procedure AttivaInBlocco(Incarichi: TList<integer>; const Azione: string);
     // Mantis #183 - 2026-10-19: dopo un passaggio dell'iter il cursore va
     // sull'incarico che seguiva quelli lavorati, non sul primo
     function IncaricoDopoLaSelezione(DataSet: TzFbDataSet; Incarichi: TList<integer>): integer;
@@ -1057,16 +1056,19 @@ begin
   end;
 end;
 
-// Mantis #183 - 2026-10-01: attivazione di piu' incarichi. Quelli che non
-// chiedono ne' protocollo ne' contratto passano insieme, con la data di oggi e
-// una sola conferma (a CAPAC il 42% delle autorizzazioni dell'ultimo anno);
-// gli altri passano dalla finestra di sempre, uno alla volta.
+// Mantis #183 - 2026-10-01: attivazione di piu' incarichi, uno alla volta dalla
+// finestra di sempre.
 // Mantis #183 - 2026-10-06: era AutorizzaIncarico (procedura INCARICO_AUTORIZZA,
 // ora INCARICO_ATTIVA).
+// Mantis #301 - 2026-10-30: tolta l'attivazione in blocco introdotta dal 183
+// per gli incarichi senza protocollo ne' contratto (interni, co.co.co.,
+// collegati a un incarico di massima): attivava con la data di oggi senza
+// finestra, e la data di attivazione non si poteva scegliere. CAPAC rivuole la
+// finestra per tutti.
 procedure TProgetti.AttivaIncarico(const DataSetName: string; Incarichi: TList<integer>; const Azione: string);
 var
   DataSet: TzFbDataSet;
-  InBlocco, UnoAllaVolta: TList<integer>;
+  DaAttivare: TList<integer>;
   id: integer;
   IdSuccessivo: integer;
 begin
@@ -1081,23 +1083,17 @@ begin
 
   IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
 
-  InBlocco := TList<integer>.create;
-  UnoAllaVolta := TList<integer>.create;
+  DaAttivare := TList<integer>.create;
   try
     for id in Incarichi do
       // Mantis #183 - 2026-10-19: un incarico gia' attivato (o elencato due
       // volte) non riapre la finestra del protocollo
-      if (not InBlocco.Contains(id)) and (not UnoAllaVolta.Contains(id)) then
+      if not DaAttivare.Contains(id) then
         if DataSet.LocateNonSQL('ID_INCARICO', id, []) then
           if DataSet.FieldByName('DATA_ATTIVAZIONE').IsNull then
-            if DataSet.FieldByName('RICHIEDE_PROTOCOLLO').AsBoolean or DataSet.FieldByName('RICHIEDE_CONTRATTO').AsBoolean then
-              UnoAllaVolta.Add(id)
-            else
-              InBlocco.Add(id);
+            DaAttivare.Add(id);
 
-    AttivaInBlocco(InBlocco, Azione);
-
-    for id in UnoAllaVolta do
+    for id in DaAttivare do
       if DataSet.LocateNonSQL('ID_INCARICO', id, []) then
         if not AttivaConFinestra(DataSet) then
         begin
@@ -1107,8 +1103,7 @@ begin
           break;
         end;
   finally
-    FreeAndNil(UnoAllaVolta);
-    FreeAndNil(InBlocco);
+    FreeAndNil(DaAttivare);
   end;
 
   // Mantis #183 - 2026-10-19: la riapertura toglie gli incarichi attivati; il
@@ -1193,37 +1188,6 @@ begin
     end;
   finally
     StopWait;
-  end;
-end;
-
-procedure TProgetti.AttivaInBlocco(Incarichi: TList<integer>; const Azione: string);
-var
-  id: integer;
-  sp: TSP_incarico_Attiva;
-begin
-  if Incarichi.Count = 0 then
-    exit;
-
-  if not ConfirmYesNo(Format('%s: %d incarichi senza protocollo e senza contratto, con la data di oggi. Procedere?', [Azione, Incarichi.Count])) then
-    exit;
-
-  ProgressBox.Show(Incarichi.Count, Azione, Azione, 'Attendere...');
-  try
-    sp := TSP_incarico_Attiva.create(WriteTrans);
-    try
-      for id in Incarichi do
-      begin
-        sp.Id_Incarico := id;
-        sp.Data_Attivazione := Date;
-        sp.Data_Protocollo.Clear;
-        sp.Numero_Protocollo.Clear;
-        sp.ExecuteAndCommit;
-      end;
-    finally
-      FreeAndNil(sp);
-    end;
-  finally
-    ProgressBox.Close;
   end;
 end;
 
