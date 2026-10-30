@@ -109,6 +109,13 @@ type
     function ModalitaSelezioneObsoleta(const ModalitaSelezione: string; const DataRichiesta: TDateTime): boolean;
     procedure ModalitaSelezioneChange(Sender: TField);
     procedure DataRichiestaChange(Sender: TField);
+  private
+    // ZC 30.10.2026: valori dell'incarico appena creato, per capire alla chiusura
+    // se l'utente ha scritto qualcosa
+    FValoriIniziali: TArray<Variant>;
+    function ValoreCampo(const Field: TField): Variant;
+    procedure MemorizzaValoriIniziali;
+    function IncaricoNonToccato: boolean;
   protected
     procedure CalcolaInquadramento;
   public
@@ -124,6 +131,7 @@ type
     procedure DuplicaIncarico(const aIdIncarico: integer);
     function ConfermaAnnulla: boolean;
     function ConfermaChiusura: boolean;
+    function CloseQuery: Boolean; override;
     function GetRiepilogo: string;
 
     procedure StampaIncarico;
@@ -204,6 +212,74 @@ end;
 function TWizInserimentoIncarico.ConfermaAnnulla: boolean;
 begin
   // Rollback(false, true); No, lo fa già BaseDataModule
+  result := true;
+end;
+
+// ZC 30.10.2026: prima, aprendo il wizard e chiudendolo subito (Annulla o Esci)
+// compariva "Salvo le modifiche?": l'incarico nasce in inserimento, e per
+// TBaseDataModule.isTableModified un record in inserimento e' sempre modificato,
+// anche se i valori li ha messi solo IncaricoAfterInsert. Rispondendo Si' si
+// tentava di salvare un incarico vuoto. Ora, se l'incarico e' ancora come l'ha
+// creato il wizard e nessun altro dataset e' in modifica, si scarta senza chiedere.
+function TWizInserimentoIncarico.CloseQuery: Boolean;
+begin
+  if IncaricoNonToccato then
+  begin
+    Rollback(false);
+    exit(true);
+  end;
+
+  result := inherited CloseQuery;
+end;
+
+function TWizInserimentoIncarico.ValoreCampo(const Field: TField): Variant;
+begin
+  // i BLOB si confrontano come testo: Value darebbe un array di byte
+  if Field.IsBlob then
+    result := Field.AsString
+  else
+    result := Field.Value;
+end;
+
+procedure TWizInserimentoIncarico.MemorizzaValoriIniziali;
+var
+  I: integer;
+begin
+  SetLength(FValoriIniziali, Incarico.FieldCount);
+  for I := 0 to Incarico.FieldCount - 1 do
+    FValoriIniziali[I] := ValoreCampo(Incarico.Fields[I]);
+end;
+
+function TWizInserimentoIncarico.IncaricoNonToccato: boolean;
+var
+  I: integer;
+begin
+  result := false;
+
+  if Incarico.State <> dsInsert then
+    exit;
+
+  if Length(FValoriIniziali) <> Incarico.FieldCount then
+    exit;
+
+  for I := 0 to ComponentCount - 1 do
+    if (Components[I] is TzFbDataSet) and (Components[I] <> Incarico) then
+      if TzFbDataSet(Components[I]).State in dsEditModes then
+        exit;
+
+  // porta nel record il valore del controllo in modifica; se non e' valido
+  // decide la domanda della classe base
+  try
+    Incarico.UpdateRecord;
+  except
+    exit;
+  end;
+
+  for I := 0 to Incarico.FieldCount - 1 do
+    if Incarico.Fields[I].FieldKind = fkData then
+      if not VarSameValue(ValoreCampo(Incarico.Fields[I]), FValoriIniziali[I]) then
+        exit;
+
   result := true;
 end;
 
@@ -835,6 +911,9 @@ begin
 
   /// //
   CalcolaInquadramento;
+
+  // ZC 30.10.2026: da qui in poi ogni differenza l'ha fatta l'utente (CloseQuery)
+  MemorizzaValoriIniziali;
 end;
 
 procedure TWizInserimentoIncarico.IncaricoAfterOpen(DataSet: TDataSet);
