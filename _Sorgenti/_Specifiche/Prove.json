@@ -13,7 +13,12 @@
         "ORE_RILEVATE"
       ],
       "prove": [
-        "caratterizzazione SQL 01, 03, 04 (65 casi, OUT/20261030-controllo-specifiche-e-contratto-openapi/caratterizzazione)"
+        "caratterizzazione SQL 01, 03, 04 (65 casi)"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/01-rilevamento-ore.sql",
+        "Prove/caratterizzazione/03-rilevamento-ore-seconda-parte.sql",
+        "Prove/caratterizzazione/04-rilevamento-ore-terza-parte.sql"
       ]
     },
     {
@@ -33,8 +38,12 @@
         "ORARIO_ELENCO_BIUD0"
       ],
       "prove": [
-        "caratterizzazione SQL 05, 06 (58 casi, stessa cartella)",
+        "caratterizzazione SQL 05, 06 (58 casi)",
         "interfaccia del Registro Collettivo: collaudo con zapp (R-190)"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/05-presenze-allievi.sql",
+        "Prove/caratterizzazione/06-presenze-allievi-seconda-parte.sql"
       ]
     },
     {
