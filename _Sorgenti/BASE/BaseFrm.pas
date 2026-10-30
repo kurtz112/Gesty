@@ -197,9 +197,6 @@ type
     procedure TimerToolbarsTimer(Sender: TObject);
     procedure TreeSelect(Sender: TObject);
     procedure WMSize(var M: TWMSIZE); message WM_Size;
-    procedure WMDpiChanged(var M: TWMDpi); message WM_DPICHANGED;
-    procedure LogDisposizione(const Punto: string);
-    procedure LogValoriSalvati(const Punto: string);
   protected
     ActionListController: TActionListController;
     PageControlController: TPageControlController;
@@ -449,9 +446,7 @@ begin
   LoadFormOptions;
 
   if not CtrlKey then
-    LoadFromIni
-  else
-    siBaseForm.LogMessage(Format('Disposizione %s: Ctrl premuto, impostazioni salvate non lette', [Name]));
+    LoadFromIni;
 
   ActionListController := TActionListController.Create;
   ActionListController.InitActions(Self);
@@ -1045,93 +1040,7 @@ begin
     if Assigned(barTitolo.Control) then
       MaxHeight := MaxHeight - barTitolo.Control.Height;
 
-  LogValoriSalvati('lettura');
-  LogDisposizione('prima di LoadControlFromIni');
-
   TzStorage.LoadControlFromIni(Config.StorageFileName, Self, MaxWidth, MaxHeight);
-
-  LogDisposizione('dopo LoadControlFromIni');
-end;
-
-// Diagnosi 2026-10-29 (disposizione adattiva): in desktop remoto il wizard della
-// Rettifica dell'incarico si apre nella posizione giusta ma piu' piccolo della
-// misura salvata, e la chiusura non sembra aggiornare il file. Queste righe
-// registrano posizione, misura, DPI e monitor nei punti in cui la misura puo'
-// cambiare, per trovare chi la riduce. Da togliere a diagnosi conclusa.
-procedure TBaseForm.LogDisposizione(const Punto: string);
-var
-  Schermo: TMonitor;
-  DescrizioneMonitor: string;
-begin
-  // Monitor si ricava da Handle, che crea la finestra: prima che esista si usa il
-  // rettangolo, per non cambiare l'ordine di creazione che si vuole osservare
-  if HandleAllocated then
-    Schermo := Screen.MonitorFromWindow(Handle, mdNearest)
-  else
-    Schermo := Screen.MonitorFromRect(BoundsRect, mdNearest);
-
-  if Assigned(Schermo) then
-    DescrizioneMonitor := Format('monitor %d primario=%s PPI=%d area=%d,%d %dx%d utile=%d,%d %dx%d',
-      [Schermo.MonitorNum, BoolToStr(Schermo.Primary, True), Schermo.PixelsPerInch, Schermo.Left, Schermo.Top,
-      Schermo.Width, Schermo.Height, Schermo.WorkareaRect.Left, Schermo.WorkareaRect.Top,
-      Schermo.WorkareaRect.Width, Schermo.WorkareaRect.Height])
-  else
-    DescrizioneMonitor := 'monitor non trovato';
-
-  siBaseForm.LogMessage(Format('Disposizione %s [%s]: %d,%d %dx%d client %dx%d stato=%d position=%d ' +
-    'handle=%s visibile=%s CurrentPPI=%d Scaled=%s; %s; schermo PPI=%d monitor=%d desktop=%d,%d %dx%d; file=%s',
-    [Name, Punto, Left, Top, Width, Height, ClientWidth, ClientHeight, Ord(WindowState), Ord(Position),
-    BoolToStr(HandleAllocated, True), BoolToStr(Visible, True), CurrentPPI, BoolToStr(Scaled, True),
-    DescrizioneMonitor, Screen.PixelsPerInch, Screen.MonitorCount, Screen.DesktopLeft, Screen.DesktopTop,
-    Screen.DesktopWidth, Screen.DesktopHeight, Config.StorageFileName]));
-end;
-
-procedure TBaseForm.LogValoriSalvati(const Punto: string);
-var
-  IniFile: TIniFile;
-
-  // Profili di schermo 2026-10-30: le sezioni sono due, quella del profilo
-  // corrente e quella senza profilo del formato vecchio
-  procedure LogSezione(const Sezione: string);
-  begin
-    if IniFile.SectionExists(Sezione) then
-      siBaseForm.LogMessage(Format('Disposizione %s [%s]: nel file [%s] State=%s Left=%s Top=%s Width=%s Height=%s (%s)',
-        [Name, Punto, Sezione, IniFile.ReadString(Sezione, 'State', '-'), IniFile.ReadString(Sezione, 'Left', '-'),
-        IniFile.ReadString(Sezione, 'Top', '-'), IniFile.ReadString(Sezione, 'Width', '-'),
-        IniFile.ReadString(Sezione, 'Height', '-'), Config.StorageFileName]))
-    else
-      siBaseForm.LogMessage(Format('Disposizione %s [%s]: sezione [%s] assente nel file %s',
-        [Name, Punto, Sezione, Config.StorageFileName]));
-  end;
-
-begin
-  if Config.StorageFileName = '' then
-  begin
-    siBaseForm.LogMessage(Format('Disposizione %s [%s]: nessun file delle impostazioni', [Name, Punto]));
-    Exit;
-  end;
-
-  if not FileExists(Config.StorageFileName) then
-  begin
-    siBaseForm.LogMessage(Format('Disposizione %s [%s]: il file %s non esiste', [Name, Punto, Config.StorageFileName]));
-    Exit;
-  end;
-
-  IniFile := TIniFile.Create(Config.StorageFileName);
-  try
-    LogSezione(TzStorage.NomeSezione(Self));
-    LogSezione(Name);
-  finally
-    FreeAndNil(IniFile);
-  end;
-end;
-
-procedure TBaseForm.WMDpiChanged(var M: TWMDpi);
-begin
-  siBaseForm.LogMessage(Format('Disposizione %s [WM_DPICHANGED]: nuovo PPI %d', [Name, M.YDpi]));
-  LogDisposizione('prima del cambio DPI');
-  inherited;
-  LogDisposizione('dopo il cambio DPI');
 end;
 
 procedure TBaseForm.LoadFormOptions;
@@ -1209,12 +1118,7 @@ end;
 
 procedure TBaseForm.SaveToIni;
 begin
-  LogDisposizione('prima del salvataggio');
-  LogValoriSalvati('prima del salvataggio');
-
   TzStorage.SaveControlToIni(Config.StorageFileName, Self);
-
-  LogValoriSalvati('dopo il salvataggio');
 
   if Assigned(DM) then
     if DM.zDataModule.BuildGui then
@@ -1313,8 +1217,6 @@ begin
 
   inherited;
 
-  // Diagnosi 2026-10-29: vedi LogDisposizione
-  LogDisposizione(Format('WM_SIZE tipo=%d %dx%d', [M.SizeType, M.Width, M.Height]));
 end;
 
 function TBaseForm.ShowForm(const Modal: Boolean): Boolean;
@@ -1360,7 +1262,6 @@ begin
       UpdateWait('Creazione GUI');
 
       BuildGui;
-      LogDisposizione('dopo BuildGui');
 
       UpdateWait('Apertura Datasets');
       BeforeShow;
@@ -1389,8 +1290,6 @@ begin
   finally
     StopWait;
   end;
-
-  LogDisposizione('prima di ShowModal/Show');
 
   if Modal then
     Result := ShowModal = MrOk
@@ -1459,12 +1358,10 @@ procedure TBaseForm.FormShow(Sender: TObject);
 begin
   // siBaseForm.LogVerbose('FormShow');
   RealignToolbarsDelayed;
-  LogDisposizione('OnShow');
 
   if DM.zDataModule.BuildGui then
   begin
     FormController.AfterShow;
-    LogDisposizione('dopo FormController.AfterShow');
   end;
 end;
 

@@ -140,12 +140,61 @@ begin
   end;
 end;
 
-// Profili di schermo 2026-10-30: un valore si cerca prima nella sezione del
-// profilo corrente, poi nella sezione senza profilo del formato vecchio, che
-// resta come punto di partenza per i profili non ancora salvati
-function LeggiIntero(IniFile: TIniFile; const SezioneProfilo, SezioneVecchia, Chiave: string; const Predefinito: integer): integer;
+const
+  PixelPerPollicePredefiniti = 96;
+
+// Profili di schermo 2026-10-30: una sezione di profilo e' utilizzabile solo se
+// dichiara in che PPI sono state scritte le misure (chiave PPI). Il rilascio 005
+// scriveva le sezioni di profilo senza PPI: contengono pixel presi a un PPI
+// ignoto (nel ticket Mantis #310 pixel a 96 PPI letti poi a 192, quindi form
+// dimezzate) e si scartano; chi le sovrascrive alla chiusura le ripulisce.
+function ProfiloUtilizzabile(IniFile: TIniFile; const SezioneProfilo: string): boolean;
 begin
-  Result := IniFile.ReadInteger(SezioneProfilo, Chiave, IniFile.ReadInteger(SezioneVecchia, Chiave, Predefinito));
+  Result := IniFile.ReadInteger(SezioneProfilo, 'PPI', 0) > 0;
+end;
+
+// Profili di schermo 2026-10-30: un valore che non dipende dalla scala (posizione,
+// stato) si cerca prima nella sezione del profilo corrente, se utilizzabile, poi
+// nella sezione senza profilo del formato vecchio, che resta come punto di
+// partenza per i profili non ancora salvati
+function LeggiIntero(IniFile: TIniFile; const SezioneProfilo, SezioneVecchia, Chiave: string; const UsaProfilo: boolean; const Predefinito: integer): integer;
+begin
+  if UsaProfilo and IniFile.ValueExists(SezioneProfilo, Chiave) then
+    Result := IniFile.ReadInteger(SezioneProfilo, Chiave, Predefinito)
+  else
+    Result := IniFile.ReadInteger(SezioneVecchia, Chiave, Predefinito);
+end;
+
+// Una misura (larghezza, altezza, splitter) e' in pixel fisici del PPI in cui e'
+// stata scritta: il portatile in desktop remoto e' a 192 PPI (schermo 2880x1920 al
+// 200%) e il fisso a 96, quindi 1028 pixel salvati sul fisso occupano meta' della
+// larghezza che avevano sul portatile. Si riporta al PPI attuale con
+// PPI attuale / PPI salvato; la sezione senza profilo del formato vecchio non
+// dichiara il PPI e vale 96, come ogni installazione prima dei profili.
+function LeggiMisura(IniFile: TIniFile; const SezioneProfilo, SezioneVecchia, Chiave: string; const UsaProfilo: boolean; const PixelPerPolliceAttuale, Predefinito: integer): integer;
+var
+  Sezione: string;
+  PixelPerPolliceSalvato: integer;
+begin
+  if UsaProfilo and IniFile.ValueExists(SezioneProfilo, Chiave) then
+    Sezione := SezioneProfilo
+  else if IniFile.ValueExists(SezioneVecchia, Chiave) then
+    Sezione := SezioneVecchia
+  else
+    Exit(Predefinito);
+
+  PixelPerPolliceSalvato := IniFile.ReadInteger(Sezione, 'PPI', PixelPerPollicePredefiniti);
+  if PixelPerPolliceSalvato <= 0 then
+    PixelPerPolliceSalvato := PixelPerPollicePredefiniti;
+
+  Result := MulDiv(IniFile.ReadInteger(Sezione, Chiave, Predefinito), PixelPerPolliceAttuale, PixelPerPolliceSalvato);
+end;
+
+function PixelPerPolliceDellaForm(Ctrl: TControl): integer;
+begin
+  Result := Ctrl.CurrentPPI;
+  if Result <= 0 then
+    Result := PixelPerPollicePredefiniti;
 end;
 
 // Profili di schermo 2026-10-30: prima ogni form aveva una sola sezione nel file
@@ -320,6 +369,14 @@ begin
 
   IniFile := TIniFile.Create(IniFileName);
   try
+    // Una sezione scritta senza PPI (rilascio 005) ha misure a PPI ignoto: si
+    // butta, altrimenti le chiavi che questa chiusura non riscrive (form ridotta
+    // a icona) resterebbero con il PPI nuovo e sarebbero lette alla scala sbagliata
+    if not ProfiloUtilizzabile(IniFile, Section) then
+      IniFile.EraseSection(Section);
+
+    IniFile.WriteInteger(Section, 'PPI', PixelPerPolliceDellaForm(Ctrl));
+
     if Ctrl is TForm then
     begin
       ws := TForm(Ctrl).WindowState;
@@ -412,7 +469,7 @@ const
     Ctrl.Width := tmp;
   end;
 
-  procedure LoadControls(IniFile: TIniFile; const SezioneProfilo, Section: string; aControl: TWinControl);
+  procedure LoadControls(IniFile: TIniFile; const SezioneProfilo, Section: string; const UsaProfilo: boolean; const PixelPerPolliceAttuale: integer; aControl: TWinControl);
   var
     I: integer;
     Ctrl: TControl;
@@ -437,19 +494,19 @@ const
               end;
             AlTop:
               begin
-                SetCtrlHeight(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Height', Ctrl.Height));
+                SetCtrlHeight(Ctrl, LeggiMisura(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Height', UsaProfilo, PixelPerPolliceAttuale, Ctrl.Height));
               end;
             AlBottom:
               begin
-                SetCtrlHeight(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Height', Ctrl.Height));
+                SetCtrlHeight(Ctrl, LeggiMisura(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Height', UsaProfilo, PixelPerPolliceAttuale, Ctrl.Height));
               end;
             AlLeft:
               begin
-                SetCtrlWidth(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Width', Ctrl.Width));
+                SetCtrlWidth(Ctrl, LeggiMisura(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Width', UsaProfilo, PixelPerPolliceAttuale, Ctrl.Width));
               end;
             AlRight:
               begin
-                SetCtrlWidth(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Width', Ctrl.Width));
+                SetCtrlWidth(Ctrl, LeggiMisura(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Width', UsaProfilo, PixelPerPolliceAttuale, Ctrl.Width));
               end;
             alClient:
               begin
@@ -461,7 +518,7 @@ const
         end; // Saved
 
       if aControl.Controls[I] is TWinControl then
-        LoadControls(IniFile, SezioneProfilo, Section, aControl.Controls[I] as TWinControl);
+        LoadControls(IniFile, SezioneProfilo, Section, UsaProfilo, PixelPerPolliceAttuale, aControl.Controls[I] as TWinControl);
     end;
   end;
 
@@ -470,6 +527,8 @@ var
   ws: TWindowState;
   Section: string;
   SezioneProfilo: string;
+  UsaProfilo: boolean;
+  PixelPerPolliceAttuale: integer;
   Rettangolo: TRect;
 begin
   if IniFileName = '' then
@@ -488,17 +547,23 @@ begin
 
   IniFile := TIniFile.Create(IniFileName);
   try
-    if not (IniFile.SectionExists(SezioneProfilo) or IniFile.SectionExists(Section)) then
+    UsaProfilo := ProfiloUtilizzabile(IniFile, SezioneProfilo);
+
+    if not (UsaProfilo or IniFile.SectionExists(Section)) then
       Exit;
+
+    PixelPerPolliceAttuale := PixelPerPolliceDellaForm(Ctrl);
 
     if Ctrl is TForm then
       TForm(Ctrl).Position := poDesigned;
 
     Rettangolo := Rect(0, 0, 0, 0);
-    Rettangolo.Left := LeggiIntero(IniFile, SezioneProfilo, Section, 'Left', Ctrl.Left);
-    Rettangolo.Top := LeggiIntero(IniFile, SezioneProfilo, Section, 'Top', Ctrl.Top);
-    Rettangolo.Width := LeggiIntero(IniFile, SezioneProfilo, Section, 'Width', Ctrl.Width);
-    Rettangolo.Height := LeggiIntero(IniFile, SezioneProfilo, Section, 'Height', Ctrl.Height);
+    // Left e Top restano pixel fisici del desktop, su cui decide PosizioneDiRiapertura;
+    // Width e Height si riportano al PPI attuale (vedi LeggiMisura)
+    Rettangolo.Left := LeggiIntero(IniFile, SezioneProfilo, Section, 'Left', UsaProfilo, Ctrl.Left);
+    Rettangolo.Top := LeggiIntero(IniFile, SezioneProfilo, Section, 'Top', UsaProfilo, Ctrl.Top);
+    Rettangolo.Width := LeggiMisura(IniFile, SezioneProfilo, Section, 'Width', UsaProfilo, PixelPerPolliceAttuale, Ctrl.Width);
+    Rettangolo.Height := LeggiMisura(IniFile, SezioneProfilo, Section, 'Height', UsaProfilo, PixelPerPolliceAttuale, Ctrl.Height);
 
     // Disposizione adattiva 2026-10-29: prima i limiti salvati si applicavano
     // cosi' com'erano. Una form chiusa su un monitor che ora non c'e' (desktop
@@ -517,8 +582,8 @@ begin
       ws := TForm(Ctrl).WindowState;
       TForm(Ctrl).WindowState := wsNormal;
 
-      if IniFile.ValueExists(SezioneProfilo, 'State') or IniFile.ValueExists(Section, 'State') then
-        ws := TWindowState(LeggiIntero(IniFile, SezioneProfilo, Section, 'State', integer(ws)))
+      if (UsaProfilo and IniFile.ValueExists(SezioneProfilo, 'State')) or IniFile.ValueExists(Section, 'State') then
+        ws := TWindowState(LeggiIntero(IniFile, SezioneProfilo, Section, 'State', UsaProfilo, integer(ws)))
       else
       begin
         // compatibilità con
@@ -534,7 +599,7 @@ begin
         TForm(Ctrl).WindowState := wsNormal;
     end;
 
-    LoadControls(IniFile, SezioneProfilo, Section, Ctrl);
+    LoadControls(IniFile, SezioneProfilo, Section, UsaProfilo, PixelPerPolliceAttuale, Ctrl);
   finally
     FreeAndNil(IniFile);
   end;
