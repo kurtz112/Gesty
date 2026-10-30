@@ -1089,6 +1089,21 @@ end;
 procedure TBaseForm.LogValoriSalvati(const Punto: string);
 var
   IniFile: TIniFile;
+
+  // Profili di schermo 2026-10-30: le sezioni sono due, quella del profilo
+  // corrente e quella senza profilo del formato vecchio
+  procedure LogSezione(const Sezione: string);
+  begin
+    if IniFile.SectionExists(Sezione) then
+      siBaseForm.LogMessage(Format('Disposizione %s [%s]: nel file [%s] State=%s Left=%s Top=%s Width=%s Height=%s (%s)',
+        [Name, Punto, Sezione, IniFile.ReadString(Sezione, 'State', '-'), IniFile.ReadString(Sezione, 'Left', '-'),
+        IniFile.ReadString(Sezione, 'Top', '-'), IniFile.ReadString(Sezione, 'Width', '-'),
+        IniFile.ReadString(Sezione, 'Height', '-'), Config.StorageFileName]))
+    else
+      siBaseForm.LogMessage(Format('Disposizione %s [%s]: sezione [%s] assente nel file %s',
+        [Name, Punto, Sezione, Config.StorageFileName]));
+  end;
+
 begin
   if Config.StorageFileName = '' then
   begin
@@ -1104,14 +1119,8 @@ begin
 
   IniFile := TIniFile.Create(Config.StorageFileName);
   try
-    if IniFile.SectionExists(Name) then
-      siBaseForm.LogMessage(Format('Disposizione %s [%s]: nel file State=%s Left=%s Top=%s Width=%s Height=%s (%s)',
-        [Name, Punto, IniFile.ReadString(Name, 'State', '-'), IniFile.ReadString(Name, 'Left', '-'),
-        IniFile.ReadString(Name, 'Top', '-'), IniFile.ReadString(Name, 'Width', '-'),
-        IniFile.ReadString(Name, 'Height', '-'), Config.StorageFileName]))
-    else
-      siBaseForm.LogMessage(Format('Disposizione %s [%s]: sezione assente nel file %s',
-        [Name, Punto, Config.StorageFileName]));
+    LogSezione(TzStorage.NomeSezione(Self));
+    LogSezione(Name);
   finally
     FreeAndNil(IniFile);
   end;

@@ -15,6 +15,8 @@ type
   private
     class function FindSplittedControl(Splitter: TcxSplitter): TControl;
   public
+    class function ProfiloDiSchermo: string;
+    class function NomeSezione(Ctrl: TControl): string;
     class procedure SaveControlToIni(const IniFileName: string; Ctrl: TWinControl);
     class procedure LoadControlFromIni(const IniFileName: string; Ctrl: TWinControl; const MaxWidth, MaxHeight: integer);
   end;
@@ -136,6 +138,48 @@ begin
     else
       Result := Rettangolo;
   end;
+end;
+
+// Profili di schermo 2026-10-30: un valore si cerca prima nella sezione del
+// profilo corrente, poi nella sezione senza profilo del formato vecchio, che
+// resta come punto di partenza per i profili non ancora salvati
+function LeggiIntero(IniFile: TIniFile; const SezioneProfilo, SezioneVecchia, Chiave: string; const Predefinito: integer): integer;
+begin
+  Result := IniFile.ReadInteger(SezioneProfilo, Chiave, IniFile.ReadInteger(SezioneVecchia, Chiave, Predefinito));
+end;
+
+// Profili di schermo 2026-10-30: prima ogni form aveva una sola sezione nel file
+// delle impostazioni, con posizione e misure assolute e nessun riferimento allo
+// schermo. Chi lavora in ufficio con piu' monitor e da casa sul portatile o in
+// desktop remoto sovrascriveva a ogni chiusura la disposizione dell'altro posto,
+// e al rientro la form si riapriva fuori dallo schermo (il "programma bloccato"
+// delle segnalazioni) o con misure prese a un'altra risoluzione o DPI.
+// Ora la sezione porta il profilo dello schermo: numero di monitor, misura del
+// desktop virtuale, DPI del monitor principale e RDP per la sessione remota,
+// per esempio TWizInserimentoIncaricoForm@4M-7680x1440-96 in ufficio e
+// TWizInserimentoIncaricoForm@1M-1440x960-96-RDP da casa. Ogni profilo conserva
+// la sua disposizione; il controllo di PosizioneDiRiapertura vale comunque.
+class function TzStorage.ProfiloDiSchermo: string;
+var
+  PixelPerPollice: integer;
+begin
+  if Assigned(Screen.PrimaryMonitor) then
+    PixelPerPollice := Screen.PrimaryMonitor.PixelsPerInch
+  else
+    PixelPerPollice := Screen.PixelsPerInch;
+
+  Result := Format('%dM-%dx%d-%d', [Screen.MonitorCount, Screen.DesktopWidth, Screen.DesktopHeight, PixelPerPollice]);
+
+  if GetSystemMetrics(SM_REMOTESESSION) <> 0 then
+    Result := Result + '-RDP';
+end;
+
+class function TzStorage.NomeSezione(Ctrl: TControl): string;
+begin
+  Result := '';
+
+  if Assigned(Ctrl) and (Ctrl.Name <> '') then
+    Result := Ctrl.Name + '@' + ProfiloDiSchermo;
 end;
 
 class function TzStorage.FindSplittedControl(Splitter: TcxSplitter): TControl;
@@ -268,7 +312,9 @@ begin
   if not Assigned(Ctrl) then
     Exit;
 
-  Section := Ctrl.Name;
+  // Profili di schermo 2026-10-30: si scrive solo la sezione del profilo
+  // corrente; quella senza profilo del formato vecchio non si tocca piu'
+  Section := NomeSezione(Ctrl);
   if Section = '' then
     Exit;
 
@@ -366,7 +412,7 @@ const
     Ctrl.Width := tmp;
   end;
 
-  procedure LoadControls(IniFile: TIniFile; Section: string; aControl: TWinControl);
+  procedure LoadControls(IniFile: TIniFile; const SezioneProfilo, Section: string; aControl: TWinControl);
   var
     I: integer;
     Ctrl: TControl;
@@ -391,19 +437,19 @@ const
               end;
             AlTop:
               begin
-                SetCtrlHeight(Ctrl, IniFile.ReadInteger(Section, Ctrl.Name + '_Height', Ctrl.Height));
+                SetCtrlHeight(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Height', Ctrl.Height));
               end;
             AlBottom:
               begin
-                SetCtrlHeight(Ctrl, IniFile.ReadInteger(Section, Ctrl.Name + '_Height', Ctrl.Height));
+                SetCtrlHeight(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Height', Ctrl.Height));
               end;
             AlLeft:
               begin
-                SetCtrlWidth(Ctrl, IniFile.ReadInteger(Section, Ctrl.Name + '_Width', Ctrl.Width));
+                SetCtrlWidth(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Width', Ctrl.Width));
               end;
             AlRight:
               begin
-                SetCtrlWidth(Ctrl, IniFile.ReadInteger(Section, Ctrl.Name + '_Width', Ctrl.Width));
+                SetCtrlWidth(Ctrl, LeggiIntero(IniFile, SezioneProfilo, Section, Ctrl.Name + '_Width', Ctrl.Width));
               end;
             alClient:
               begin
@@ -415,7 +461,7 @@ const
         end; // Saved
 
       if aControl.Controls[I] is TWinControl then
-        LoadControls(IniFile, Section, aControl.Controls[I] as TWinControl);
+        LoadControls(IniFile, SezioneProfilo, Section, aControl.Controls[I] as TWinControl);
     end;
   end;
 
@@ -423,6 +469,7 @@ var
   IniFile: TIniFile;
   ws: TWindowState;
   Section: string;
+  SezioneProfilo: string;
   Rettangolo: TRect;
 begin
   if IniFileName = '' then
@@ -435,19 +482,23 @@ begin
   if Section = '' then
     Exit;
 
+  // Profili di schermo 2026-10-30: si legge la sezione del profilo corrente;
+  // i valori che mancano si prendono dalla sezione senza profilo (LeggiIntero)
+  SezioneProfilo := NomeSezione(Ctrl);
+
   IniFile := TIniFile.Create(IniFileName);
   try
-    if not IniFile.SectionExists(Section) then
+    if not (IniFile.SectionExists(SezioneProfilo) or IniFile.SectionExists(Section)) then
       Exit;
 
     if Ctrl is TForm then
       TForm(Ctrl).Position := poDesigned;
 
     Rettangolo := Rect(0, 0, 0, 0);
-    Rettangolo.Left := IniFile.ReadInteger(Section, 'Left', Ctrl.Left);
-    Rettangolo.Top := IniFile.ReadInteger(Section, 'Top', Ctrl.Top);
-    Rettangolo.Width := IniFile.ReadInteger(Section, 'Width', Ctrl.Width);
-    Rettangolo.Height := IniFile.ReadInteger(Section, 'Height', Ctrl.Height);
+    Rettangolo.Left := LeggiIntero(IniFile, SezioneProfilo, Section, 'Left', Ctrl.Left);
+    Rettangolo.Top := LeggiIntero(IniFile, SezioneProfilo, Section, 'Top', Ctrl.Top);
+    Rettangolo.Width := LeggiIntero(IniFile, SezioneProfilo, Section, 'Width', Ctrl.Width);
+    Rettangolo.Height := LeggiIntero(IniFile, SezioneProfilo, Section, 'Height', Ctrl.Height);
 
     // Disposizione adattiva 2026-10-29: prima i limiti salvati si applicavano
     // cosi' com'erano. Una form chiusa su un monitor che ora non c'e' (desktop
@@ -466,8 +517,8 @@ begin
       ws := TForm(Ctrl).WindowState;
       TForm(Ctrl).WindowState := wsNormal;
 
-      if IniFile.ValueExists(Section, 'State') then
-        ws := TWindowState(IniFile.ReadInteger(Section, 'State', integer(ws)))
+      if IniFile.ValueExists(SezioneProfilo, 'State') or IniFile.ValueExists(Section, 'State') then
+        ws := TWindowState(LeggiIntero(IniFile, SezioneProfilo, Section, 'State', integer(ws)))
       else
       begin
         // compatibilità con
@@ -483,7 +534,7 @@ begin
         TForm(Ctrl).WindowState := wsNormal;
     end;
 
-    LoadControls(IniFile, Section, Ctrl);
+    LoadControls(IniFile, SezioneProfilo, Section, Ctrl);
   finally
     FreeAndNil(IniFile);
   end;
