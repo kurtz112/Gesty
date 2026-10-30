@@ -161,7 +161,6 @@
             <Form>Config</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="BASE\zStorage.pas"/>
         <DCCReference Include="DataModules\dmAgenda.pas">
             <Form>Agenda</Form>
             <DesignClass>TDataModule</DesignClass>

@@ -41,7 +41,7 @@ uses
   zDm_Images in 'BASE\zDm_Images.pas' {zDmImages: TDataModule},
   zHyperLinks in 'BASE\zHyperLinks.pas',
   ConfigModule in 'BASE\ConfigModule.pas' {Config: TDataModule},
-  zStorage in 'BASE\zStorage.pas',
+  zStorage,
   dmAgenda in 'DataModules\dmAgenda.pas' {Agenda: TDataModule},
   dmProgetti in 'DataModules\dmProgetti.pas' {Progetti: TDataModule},
   dmDocentiRiepilogoOre in 'DataModules\dmDocentiRiepilogoOre.pas' {DocentiRiepilogoOre: TDataModule},
