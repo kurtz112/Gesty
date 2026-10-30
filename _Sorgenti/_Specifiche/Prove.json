@@ -1,0 +1,108 @@
+{
+  "versione": 1,
+  "livello": "avvisa",
+  "aree": [
+    {
+      "area": "Rilevamento ore",
+      "specifica": "Rilevamento ore.md",
+      "percorsi": [
+        "dmRilevamentoOre.pas",
+        "frmRilevamentoOre.pas"
+      ],
+      "oggetti": [
+        "ORE_RILEVATE"
+      ],
+      "prove": [
+        "caratterizzazione SQL 01, 03, 04 (65 casi, OUT/20261030-controllo-specifiche-e-contratto-openapi/caratterizzazione)"
+      ]
+    },
+    {
+      "area": "Presenze allievi e registro",
+      "specifica": "Presenze allievi e registro.md",
+      "percorsi": [
+        "dmStudentiRilevamentoPresenzeAssenze.pas",
+        "frmStudentiRilevamentoPresenzeAssenze.pas",
+        "frmStudentiRilevamentoAttivitaIndividuali.pas"
+      ],
+      "oggetti": [
+        "STUDENTI_PRESENZE_COLLETTIVA",
+        "STUDENTI_PRESENZE_COLLETT_",
+        "STUDENTI_PRESENZE_INDIVIDUALE",
+        "STUDENTI_PROGETTI_AI0",
+        "ORARIO_BIU0",
+        "ORARIO_ELENCO_BIUD0"
+      ],
+      "prove": [
+        "caratterizzazione SQL 05, 06 (58 casi, stessa cartella)",
+        "interfaccia del Registro Collettivo: collaudo con zapp (R-190)"
+      ]
+    },
+    {
+      "area": "Tirocini",
+      "specifica": "Tirocini.md",
+      "percorsi": [
+        "frmRegistraPresenzeTirocini.pas"
+      ],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Autorizzazione incarichi",
+      "specifica": "Autorizzazione incarichi.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Richieste di attivazione",
+      "specifica": "Richieste di attivazione.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Firma dei contratti",
+      "specifica": "Firma dei contratti.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Trasmissione a SIUF",
+      "specifica": "Trasmissione a SIUF.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Importazione GRS",
+      "specifica": "Importazione GRS.md",
+      "percorsi": [],
+      "oggetti": [
+        "GRS_IMPORT_FILES"
+      ],
+      "prove": []
+    },
+    {
+      "area": "Importazione Untis e OmniaTime",
+      "specifica": "Importazione Untis e OmniaTime.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Timesheet",
+      "specifica": "Timesheet.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    },
+    {
+      "area": "Stampe e allegati",
+      "specifica": "Stampe e allegati.md",
+      "percorsi": [],
+      "oggetti": [],
+      "prove": []
+    }
+  ]
+}
