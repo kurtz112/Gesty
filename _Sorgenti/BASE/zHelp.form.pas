@@ -120,7 +120,6 @@ type
 
     procedure ApplyRestrictions;
     function GetRestrictionManager: TRestrictionManager;
-    procedure InitForScaling;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -175,7 +174,6 @@ begin
   RestrictionManager.AddDefaultLevel(actRicaricaPolitiche, 'Base', TAccessLevel.alNone);
 
   ActiveControl := tree;
-  InitForScaling;
 end;
 
 destructor TzHelpForm.Destroy;
@@ -483,12 +481,6 @@ end;
 procedure TzHelpForm.doGeneraHelp(HelpFileName: string; HelpSubject: IHelpSubject);
 begin
   GeneraHelp(HelpFileName, HelpSubject);
-end;
-
-procedure TzHelpForm.InitForScaling;
-begin
-  tree.Font.Size := 9;
-  dxBarManagerBar.Font.Size := 9;
 end;
 
 end.

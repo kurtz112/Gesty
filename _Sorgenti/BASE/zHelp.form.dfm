@@ -14,7 +14,6 @@ object zHelpForm: TzHelpForm
   Font.Style = [fsBold]
   Padding.Top = 3
   Position = poScreenCenter
-  Scaled = False
   ShowHint = True
   OnActivate = FormActivate
   TextHeight = 17
