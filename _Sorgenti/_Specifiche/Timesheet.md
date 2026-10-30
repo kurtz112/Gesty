@@ -2,7 +2,7 @@
 area: Timesheet
 progetto: Gesty
 aggiornato: 2026-10-30
-rilascio: OUT/20261030-specifiche-vive-dei-progetti/016
+rilascio: OUT/20261030-specifiche-vive-dei-progetti/019
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -302,7 +302,12 @@ La notula è il rapporto `Nota di collaborazione.fr3`, uno per cliente (Codebri 
 - **Allora** compare "Numero ore non specificate." e la stampa non parte
 
 ## GESTY-TIM-024 Pagina web "Timesheet"
-La pagina `timesheet` di GestyWeb legge il dataset `Risorsa.Timesheet` (`BASE_WEB_DATASETS`, sola lettura: niente inserimento, modifica o cancellazione, nessuna autorizzazione) che esegue `WEB_AREA_PERSONALE.RISORSA_TIMESHEET(:ID_SESSIONE)` sulla vista `ORE_RILEVATE_ELENCO`. Mostra tre totali (ore totali, ore validate, ore da validare), ciascuno filtro della griglia al clic, calcolati sui primi cinquemila rilevamenti restituiti. La scheda di inserimento è solo grafica: il pulsante avvisa che l'inserimento non è collegato al server e non salva niente (le procedure `RISORSA_TIMESHEET_INSERISCI`, `_MODIFICA` e `_ELIMINA` esistono nel pacchetto ma nessun dataset le usa). Il pacchetto dovrebbe restituire solo le ore dell'utente della sessione (DIV-TIM-1).
+La pagina `timesheet` di GestyWeb legge il dataset `Risorsa.Timesheet` (`BASE_WEB_DATASETS`, sola lettura: niente inserimento, modifica o cancellazione, nessuna autorizzazione) che esegue `WEB_AREA_PERSONALE.RISORSA_TIMESHEET(:ID_SESSIONE)` sulla vista `ORE_RILEVATE_ELENCO`. Mostra tre totali (ore totali, ore validate, ore da validare), ciascuno filtro della griglia al clic, calcolati sui primi cinquemila rilevamenti restituiti. La scheda di inserimento è solo grafica: il pulsante avvisa che l'inserimento non è collegato al server e non salva niente (le procedure `RISORSA_TIMESHEET_INSERISCI`, `_MODIFICA` e `_ELIMINA` esistono nel pacchetto ma nessun dataset le usa). Restituisce solo le ore della risorsa collegata all'utente della sessione (`CURRENT_ID_RISORSA_WEB()`).
+
+### Scenario: ore di un altro collaboratore
+- **Dato** due collaboratori con ore rilevate, ciascuno collegato al proprio utente
+- **Quando** il primo apre la pagina `timesheet`
+- **Allora** la griglia e i tre totali contengono solo le sue ore, mai quelle dell'altro
 
 ### Scenario: inserimento dalla pagina
 - **Dato** la pagina aperta
@@ -315,7 +320,6 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cu
 
 | Codice | Divergenza | Conseguenza |
 |---|---|---|
-| 🔴 DIV-TIM-1 | Provato sul catalogo vivo del master: `WEB_AREA_PERSONALE.RISORSA_TIMESHEET` filtra `ORE_RILEVATE_ELENCO.ID_RISORSA = 10`, con il commento "TOGLIERE DOPO SVILUPPO" e `CURRENT_ID_RISORSA_WEB()` commentato; la sessione è controllata (`WEB_CHECK_SESSIONE`) ma non usata per filtrare | Chiunque apra la pagina vede le ore della risorsa 10 e non le proprie; i tre totali della pagina sono quelli di quella risorsa. L'esposizione nei database dei clienti dipende da se il pacchetto vi è stato installato (non verificato). `RISORSA_TIMESHEET_MODIFICA` ed `_ELIMINA` filtrano invece sull'utente corrente |
 | 🟡 DIV-TIM-2 | Dedotto: `TFormTimesheet`/`TTimesheet` (menu "Timesheet") non assegnano `TimeReport_ID_Personale` né le altre variabili `TimeReport_*`, che assegnano solo scheda personale, rilevamento ore, risorse e progetti. Il rapporto ha come valore di progetto 22 (Codebri) e 89287 (CAPAC) | Dal pulsante del menu la risorsa potrebbe essere quella di prova scritta nel file del rapporto, o nessuna (nessuna riga). Il ticket 304 attribuisce la segnalazione al menu: da confermare con la sonda e con il cliente da quale schermata stampa |
 | 🟡 DIV-TIM-3 | Provato sul file: `Time Report.fr3` di CAPAC non contiene `SENZA_INCARICO` (zero occorrenze), `Timesheet.fr3` di Codebri sì. Dopo il ticket 304 `TIME_REPORT` include le ore senza incarico per tutti | CAPAC vedrà le ore senza incarico dentro i totali, senza nessun segno che le distingua; prima del ticket 304 non le vedeva affatto |
 | 🟡 DIV-TIM-4 | Provato su CODEBRI: `TIMESHEET_ELENCO_PROGETTI_X_RISORSA` parte dagli incarichi del mese. Nel 2026 ci sono 132 rilevamenti (344,25 ore, 13 risorse) su progetti in cui la persona non ha nessun incarico nel mese del rilevamento | Per quei progetti la scheda personale non offre nessun foglio: le ore compaiono solo come "Altri progetti" negli altri fogli. È la stessa famiglia del ticket 304, ma sul foglio mensile e non sul Time Report; il ticket non la tratta |
@@ -328,3 +332,5 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cu
 | 🟢 DIV-TIM-11 | Dedotto: `TIMESHEET_RIEPILOGO_ANNUALE` calcola il totale "base 100" come `FLOOR(totale × 2) / 2` (per difetto alla mezz'ora); l'analisi del 2026-09-16 lo prevedeva come somma arrotondata a un decimale. Non verificato quale delle due regole richieda l'Allegato 2 | Il totale base 100 può differire dal totale in centesimi fino a mezz'ora (20,75 diventa 20,50) |
 | 🟢 DIV-TIM-12 | Provato sulla funzione: `HOURS_BETWEEN` arrotonda ogni rilevamento al centesimo (20 minuti valgono 0,33) e i totali sommano i valori arrotondati | Tre rilevamenti di 20 minuti danno 0,99 ore e non 1; l'effetto è trascurabile (nel 2025 solo 5 rilevamenti su 7.863 non sono multipli di 15 minuti) |
 | 🟢 DIV-TIM-13 | Provato sui file: `Reports\codebri\PersonaleScheda\Timesheet Ministeriale.xlsx` e il suo `.json` leggono il dataset `Timesheet_Mensile`, eliminato dal dizionario LZ e dal database con il lavoro del 2026-09-16 | Se il modello compare fra quelli offerti, l'anteprima non trova la sorgente dei dati |
+
+**Ritirata.** DIV-TIM-1 (filtro fisso sulla risorsa 10 in `WEB_AREA_PERSONALE.RISORSA_TIMESHEET`) è stata corretta il 2026-10-30 con il rilascio `OUT/20261030-specifiche-vive-dei-progetti/019`. Il codice non si riusa.
