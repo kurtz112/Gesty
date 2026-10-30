@@ -118,7 +118,6 @@ implementation
 uses
   dmStudentiRilevamentoPresenzeAssenze,
   zDX,
-  zDm_Images,
   System.Generics.Collections,
   zSystem, zBaseLib;
 

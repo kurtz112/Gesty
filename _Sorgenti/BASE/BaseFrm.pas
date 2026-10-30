@@ -348,7 +348,6 @@ uses
   cxDropDownEdit,
   MDI_Lib,
   Init_Controls,
-  zDm_Images,
   zBaseLib,
   ConfigModule,
   zFrmInspector,

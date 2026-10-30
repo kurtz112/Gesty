@@ -40,7 +40,6 @@ type
 implementation
 
 uses
-  zDm_Images,
   dmDocumentazioneMessaggiRegistro;
 
 {$R *.dfm}

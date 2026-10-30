@@ -33,7 +33,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmDiarioSociale;
 
 {$R *.dfm}

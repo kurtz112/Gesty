@@ -106,7 +106,6 @@ implementation
 
 uses
   System.DateUtils,
-  zDm_Images,
   dmSostegno,
   zdx,
   zMsg,

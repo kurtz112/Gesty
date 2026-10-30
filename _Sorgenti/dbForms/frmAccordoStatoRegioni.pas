@@ -96,7 +96,6 @@ implementation
 
 uses
   System.StrUtils,
-  zDm_Images,
   dmAccordoStatoRegioni;
 
 {$R *.dfm}

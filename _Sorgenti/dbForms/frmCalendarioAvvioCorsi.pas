@@ -286,7 +286,6 @@ uses
   System.DateUtils,
   cxGeometry,
   dmCalendarioAvvioCorsi,
-  zDm_Images,
   zDX,
   zMsg;
 

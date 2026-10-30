@@ -269,7 +269,6 @@ uses
   cxSchedulerOutlookExchange,
   cxLookupDBGrid,
   dmOrario,
-  zDm_Images,
   zDX,
   zBaseLib,
   Gesty.Types,

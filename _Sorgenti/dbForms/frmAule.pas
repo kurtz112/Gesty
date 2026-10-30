@@ -49,7 +49,6 @@ implementation
 uses
   cxFilter,
   dmAule,
-  zDm_Images,
   zHyperLinks;
 
 {$R *.dfm}

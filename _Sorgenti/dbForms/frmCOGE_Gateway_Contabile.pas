@@ -50,7 +50,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmCOGE_Gateway_Contabile;
 
 {$R *.dfm}

@@ -28,7 +28,6 @@ uses
   zFormController,
   zFileViewer,
   Base_DataModule,
-  zDm_Images,
   zDbView;
 
 type

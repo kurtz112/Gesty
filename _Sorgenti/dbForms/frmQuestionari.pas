@@ -126,7 +126,6 @@ implementation
 
 uses
   dmQuestionari,
-  zDm_Images,
   zDX,
   zOffice.Excel.Utils,
   Gesty_Filters;

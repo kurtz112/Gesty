@@ -43,7 +43,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmCOGE_FattureElettroniche;
 
 {$R *.dfm}

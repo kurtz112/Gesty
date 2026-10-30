@@ -90,7 +90,7 @@ var
 implementation
 
 uses
-  dmRegistroStudenti, zDm_Images, zDX,   cxFilter, System.DateUtils,
+  dmRegistroStudenti, zDX,   cxFilter, System.DateUtils,
   zMsg;
 
 {$R *.dfm}

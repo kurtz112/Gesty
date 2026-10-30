@@ -67,7 +67,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmOrientamento;
 
 {$R *.dfm}

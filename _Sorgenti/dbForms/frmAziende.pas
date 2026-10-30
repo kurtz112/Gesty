@@ -131,7 +131,7 @@ var
 implementation
 
 uses
-  VCL.TMSFNCMapsCommonTypes, cxCustomData, zDm_Images, dmAziende, zDX, zBaseLib,
+  VCL.TMSFNCMapsCommonTypes, cxCustomData, dmAziende, zDX, zBaseLib,
     zDbCard, zDbRecordView, zMsg;
 
 {$R *.dfm}

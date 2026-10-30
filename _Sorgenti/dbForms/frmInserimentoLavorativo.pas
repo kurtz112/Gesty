@@ -25,7 +25,6 @@ uses
   dxBarExtItems,
   cxClasses,
   cxLabel,
-  zDm_Images,
   zFormController,
   zFileViewer;
 

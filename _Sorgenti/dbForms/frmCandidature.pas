@@ -53,7 +53,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmCandidature;
 
 {$R *.dfm}

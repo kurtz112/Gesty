@@ -87,7 +87,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmFbMonitor,
   zDX,
   System.Math,

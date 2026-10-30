@@ -48,8 +48,7 @@ type
 implementation
 
 uses
-  dmDocumentazioneRegistroFirme,
-  zDm_Images;
+  dmDocumentazioneRegistroFirme;
 
 {$R *.dfm}
 

@@ -63,7 +63,6 @@ implementation
 
 uses
   WizInserimentoPianiPersonalizzatiDM,
-  zDm_Images,
   cxDBLookupComboBox;
 
 {$R *.dfm}

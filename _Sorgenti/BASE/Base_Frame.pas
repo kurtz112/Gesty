@@ -73,7 +73,6 @@ procedure AssegnaImmaginiActionList(Proprietario: TComponent);
 implementation
 
 uses
-  zDm_Images,
   Init_Controls,
   ConfigModule,
   zStorage,

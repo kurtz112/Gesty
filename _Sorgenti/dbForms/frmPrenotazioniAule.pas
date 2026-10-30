@@ -251,7 +251,6 @@ uses
   cxLookupDBGrid,
   cxExportSchedulerLink,
   dmPrenotazioniAule,
-  zDm_Images,
   zDX,
   zBaseLib,
   Gesty.Types,

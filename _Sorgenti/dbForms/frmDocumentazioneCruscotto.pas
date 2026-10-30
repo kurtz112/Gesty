@@ -48,8 +48,7 @@ type
 implementation
 
 uses
-  dmDocumentazioneCruscotto,
-  zDm_Images;
+  dmDocumentazioneCruscotto;
 
 {$R *.dfm}
 

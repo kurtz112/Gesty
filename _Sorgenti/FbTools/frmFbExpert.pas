@@ -47,7 +47,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   ConfigModule,
   dmFbExpert;
 

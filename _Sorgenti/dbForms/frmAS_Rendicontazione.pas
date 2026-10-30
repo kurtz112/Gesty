@@ -59,7 +59,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmAS_Rendicontazione,
   zSystem;
 

@@ -75,7 +75,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmAttivitaFuoriSede,
   zDX,
   zMsg;

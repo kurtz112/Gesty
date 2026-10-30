@@ -33,7 +33,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmTimesheet;
 
 {$R *.dfm}

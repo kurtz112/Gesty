@@ -57,7 +57,6 @@ implementation
 uses
   cxFilter,
   zdx,
-  zDm_Images,
    
   dmPersonalePresenze;
 

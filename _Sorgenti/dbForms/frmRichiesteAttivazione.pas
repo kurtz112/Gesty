@@ -62,7 +62,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmRichiesteAttivazione,
   WizNuovaRichiestaAttivazioneFrm,
   Files.Lib;

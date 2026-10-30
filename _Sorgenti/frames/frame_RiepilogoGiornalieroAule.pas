@@ -137,7 +137,6 @@ uses
   System.IOUtils,
   System.Math,
   cxTLExportLink,
-  zDm_Images,
   zDX,
   zBaseLib,
   dmAule,

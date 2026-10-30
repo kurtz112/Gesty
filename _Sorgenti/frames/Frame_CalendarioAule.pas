@@ -215,7 +215,6 @@ uses
   System.Math,
   cxTLExportLink,
   cxBarEditItem,
-  zDm_Images,
   zDX,
   zBaseLib,
   dmCalendarioAule,

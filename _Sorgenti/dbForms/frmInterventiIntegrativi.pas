@@ -97,7 +97,6 @@ implementation
 
 uses
   System.DateUtils,
-  zDm_Images,
   dmInterventiIntegrativi,
   zDX,
   zMsg;

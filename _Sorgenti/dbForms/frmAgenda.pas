@@ -185,7 +185,6 @@ uses
   frmPrenotaAulaDaAgenda,
   cxSchedulerDialogs,
   cxSchedulerOutlookExchange,
-  zDm_Images,
   zdx,
   zBaseLib,
   zMsg;

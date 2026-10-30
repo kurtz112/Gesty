@@ -74,7 +74,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   zHyperLinks,
   cxFilter,
   BaseWeb.DM,

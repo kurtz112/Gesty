@@ -44,7 +44,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmFormazioneInterna;
 
 {$R *.dfm}

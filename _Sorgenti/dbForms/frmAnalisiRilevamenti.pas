@@ -49,7 +49,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmAnalisiRilevamenti;
 
 {$R *.dfm}

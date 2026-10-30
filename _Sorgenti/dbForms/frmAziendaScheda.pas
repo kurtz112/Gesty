@@ -49,7 +49,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmAziendaScheda,
   zz.files,
   Files.Lib;

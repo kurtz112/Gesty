@@ -54,7 +54,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmSIA_ServizioInclusioneAdulti,
   zHyperLinks,
   cxFilter;

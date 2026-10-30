@@ -39,7 +39,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmAssistentiSociali;
 
 {$R *.dfm}

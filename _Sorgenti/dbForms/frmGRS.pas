@@ -105,7 +105,6 @@ uses
   zDX,
   dmGRS,
   zDbView,
-  zDm_Images,
   zFrmParams,
   zBaseLib,
   dmCommon,

@@ -82,7 +82,6 @@ uses
   System.DateUtils,
   zBaseLib,
   dmPersonaleScheda,
-  zDm_Images,
    
   zDX,
   zDbCard;

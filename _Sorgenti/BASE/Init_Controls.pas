@@ -37,7 +37,6 @@ procedure Init_Ctrls(aOwner: TComponent);
 implementation
 
 uses
-  zDm_Images,
   ConfigModule,
   zFileViewer,
   dxNavBar,

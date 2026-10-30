@@ -166,7 +166,6 @@ uses
   dmRisorse,
   ConfigModule,
   zBaseLib,
-  zDm_Images,
   zdx,
   zFbDataSet,
    

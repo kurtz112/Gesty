@@ -54,7 +54,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmNotifiche,
   zHyperLinks,
   cxFilter;

@@ -201,7 +201,6 @@ uses
   System.IoUtils,
   System.Math,
   cxTLExportLink,
-  zDm_Images,
   zdx,
   zBaseLib,
   dmCalendarioDocenti,

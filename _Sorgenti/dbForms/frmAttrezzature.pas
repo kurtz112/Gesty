@@ -52,8 +52,7 @@ uses
   cxFilter,
   dmAttrezzature,
   zDbView,
-  Files.Lib,
-  zDm_Images;
+  Files.Lib;
 
 {$R *.dfm}
 

@@ -113,7 +113,6 @@ uses
   cxFilter,
   zHyperLinks,
   Files.Lib,
-  zDm_Images,
   dmAssistenzaScolastica,
   zFbDataSet,
   System.StrUtils,

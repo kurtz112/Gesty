@@ -53,8 +53,7 @@ type
 implementation
 
 uses
-  dmDocumentazioneConservazione,
-  zDm_Images;
+  dmDocumentazioneConservazione;
 
 {$R *.dfm}
 

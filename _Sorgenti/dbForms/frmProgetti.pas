@@ -97,7 +97,6 @@ uses
   dmProgetti,
   zHyperLinks,
   Files.Lib,
-  zDm_Images,
   frmParametriProtocolloIncarico,
   ConfigModule,
    

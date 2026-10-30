@@ -28,7 +28,6 @@ uses
   zDbView,
   cxCustomPivotGrid,
   dxUIAClasses,
-  zDm_Images,
   zDbPivot,
   dxLayoutcxEditAdapters,
   dxLayoutControlAdapters,

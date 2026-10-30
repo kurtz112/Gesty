@@ -112,7 +112,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmFbProfiler,
   zSystem,
   zMsg,

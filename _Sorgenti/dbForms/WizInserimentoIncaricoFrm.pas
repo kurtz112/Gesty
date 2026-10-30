@@ -116,7 +116,6 @@ implementation
 
 uses
   ConfigModule,
-  zDm_Images,
   zdx,
   WizInserimentoIncaricoDM,
   WizNuovaRichiestaAttivazioneFrm,

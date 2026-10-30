@@ -48,8 +48,7 @@ type
 implementation
 
 uses
-  dmDocumentazioneRegistroProtocollo,
-  zDm_Images;
+  dmDocumentazioneRegistroProtocollo;
 
 {$R *.dfm}
 

@@ -69,7 +69,6 @@ implementation
 uses
   cxFilter,
   dmAllegati,
-  zDm_Images,
   zRestrictions,
   zRestrictions.Types,
    

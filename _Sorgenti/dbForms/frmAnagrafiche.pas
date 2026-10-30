@@ -45,7 +45,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmAnagrafiche,
   zHyperLinks;
 

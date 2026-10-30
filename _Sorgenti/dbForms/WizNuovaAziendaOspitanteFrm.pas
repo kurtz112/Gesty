@@ -110,7 +110,7 @@ function InserisciNuovaAziendaOspitante: Integer;
 implementation
 
 uses
-  WizNuovaAziendaOspitanteDM, zCodiceFiscale, zDm_Images, ConfigModule,
+  WizNuovaAziendaOspitanteDM, zCodiceFiscale, ConfigModule,
   zBaseLib, zDbViewDlg, Files.Lib, zDX, cxFilter, zSystem,   zMsg;
 
 {$R *.dfm}

@@ -152,10 +152,6 @@
         <DCCReference Include="BASE\BaseWizrd.pas">
             <Form>BaseWizard</Form>
         </DCCReference>
-        <DCCReference Include="BASE\zDm_Images.pas">
-            <Form>zDmImages</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="BASE\zHyperLinks.pas"/>
         <DCCReference Include="BASE\ConfigModule.pas">
             <Form>Config</Form>

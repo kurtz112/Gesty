@@ -630,7 +630,6 @@ type
 
     procedure pippo;
 
-    procedure salvaimageList;
   end;
 
 var
@@ -647,7 +646,6 @@ uses
   zSystem.Patcher,
   zMsg,
   Base_DataModule,
-  zDm_Images,
   zBaseLib,
   Init_Controls,
   zRestrictions.Types,
@@ -2123,7 +2121,6 @@ var
 begin
 
   // CloneToolsDefsToGestyFilterDefs;
-  // salvaimageList;
   // ProgressBox := TProgressBox.Create(nil);
   // try
   // // /// //////////////////////////////////////////////////////////////////////
@@ -2319,67 +2316,6 @@ end;
 procedure TMain.RegistroProtocolloExecute(Sender: TObject);
 begin
   CreaForm(TFormDocumentazioneRegistroProtocollo);
-end;
-
-procedure TMain.salvaimageList;
-var
-  NomeFileTesto, DirDestinazione: string;
-  Riga: string;
-  ImageIndex: Integer;
-  Bitmap: TBitmap;
-  Parti: TArray<string>;
-  PathImmagine: string;
-begin
-
-  Exit;
-
-  NomeFileTesto := 'C:\Users\Luca\Desktop\GUI\gesty\_Sorgenti\__OUTPUT\report_contatori.txt';
-  DirDestinazione := 'C:\Users\Luca\Desktop\GUI\bmp usate';
-  // Controllo esistenza file con TFile
-  if not TFile.Exists(NomeFileTesto) then
-    raise EFileNotFoundException.Create('File sorgente non trovato.');
-
-  // Creazione cartella con TDirectory (gestisce ricorsivamente la creazione)
-  if not TDirectory.Exists(DirDestinazione) then
-    TDirectory.CreateDirectory(DirDestinazione);
-
-  Bitmap := TBitmap.Create;
-  try
-    // Leggiamo tutte le righe in un ciclo for-in usando TFile
-    for Riga in TFile.ReadAllLines(NomeFileTesto) do
-      if Riga.StartsWith('ImageIndex') then
-      begin
-        if Riga.Trim.IsEmpty then
-          Continue;
-
-        // Parsing: dividiamo la riga per spazi
-        Parti := Riga.Split([' '], TStringSplitOptions.ExcludeEmpty);
-
-        // Verifichiamo che ci sia almeno "ImageIndex" e il numero
-        if (Length(Parti) >= 2) and TryStrToInt(Parti[1], ImageIndex) then
-        begin
-          if (ImageIndex >= 0) and (ImageIndex < zDmImages.ImageList24.Count) then
-          begin
-            // Prepariamo il bitmap
-            Bitmap.SetSize(zDmImages.ImageList24.Width, zDmImages.ImageList24.Height);
-
-            // Pulizia sfondo (importante per TBitmap)
-            Bitmap.Canvas.Brush.Color := clWhite;
-            Bitmap.Canvas.FillRect(Rect(0, 0, Bitmap.Width, Bitmap.Height));
-
-            // Estrazione immagine da cxImageList
-            zDmImages.ImageList24.GetImage(ImageIndex, Bitmap);
-
-            // Costruzione percorso sicuro con TPath
-            PathImmagine := TPath.Combine(DirDestinazione, Format('Img_%d.bmp', [ImageIndex]));
-
-            Bitmap.SaveToFile(PathImmagine);
-          end;
-        end;
-      end;
-  finally
-    Bitmap.Free;
-  end;
 end;
 
 procedure TMain.AttivaLogExecute(Sender: TObject);

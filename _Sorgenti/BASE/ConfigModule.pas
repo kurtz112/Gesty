@@ -283,7 +283,6 @@ uses
   FrmApplicationInspector,
   zBaseLib,
   zCollection,
-  zDm_Images,
   zMsg,
   zz.files,
   zSystemTools,
@@ -1157,75 +1156,8 @@ var
   item: TzDomain;
   stringList: TStringList;
 
-  procedure Exp(const Name: string; imageIndex: Integer);
-  var
-    bmp: TBitmap;
-  begin
-    // 16
-    bmp := TBitmap.Create;
-    try
-      bmp.Height := 16;
-      bmp.Width := 16;
-      bmp.PixelFormat := pf32bit;
-      bmp.AlphaFormat := afIgnored;
-      zDmImages.ImageList16.GetBitmap(imageIndex, bmp);
-      bmp.SaveToFile('C:\Users\Luca\Desktop\Nuova cartella\16\' + Name.trim + '.bmp');
-    finally
-      FreeAndNil(bmp);
-    end;
-
-    // 24
-    bmp := TBitmap.Create;
-    try
-      bmp.Height := 24;
-      bmp.Width := 24;
-      bmp.PixelFormat := pf32bit;
-      bmp.AlphaFormat := afIgnored;
-      zDmImages.ImageList24.GetBitmap(imageIndex, bmp);
-      bmp.SaveToFile('C:\Users\Luca\Desktop\Nuova cartella\24\' + Name.trim + '.bmp');
-    finally
-      FreeAndNil(bmp);
-    end;
-  end;
-
 begin
   Exit;
-  Exp('Risorse                  ', 552);
-  Exp('Oggi                     ', 533);
-  Exp('Seleziona Giorno         ', 534);
-  Exp('Precedente               ', 531);
-  Exp('Successivo               ', 532);
-  Exp('Elimina                  ', 38);
-  Exp('Modifica                 ', 41);
-  Exp('Taglia                   ', 35);
-  Exp('Copia                    ', 36);
-  Exp('Incolla                  ', 37);
-  Exp('Giorno                   ', 536);
-  Exp('Settimana                ', 538);
-  Exp('Mese                     ', 539);
-  Exp('Nuova Prenotazione       ', 566);
-  Exp('Nuovo                    ', 529);
-  Exp('Esporta                  ', 82);
-  Exp('Anteprima                ', 554);
-  Exp('Nuova Ricorrenza         ', 530);
-  Exp('Oggi                     ', 533);
-  Exp('Seleziona Giorno         ', 534);
-  Exp('Settimana Successiva     ', 535);
-  Exp('agenda                   ', 543);
-  Exp('Giorno                   ', 536);
-  Exp('Settimana Lavorativa     ', 537);
-  Exp('Settimana                ', 538);
-  Exp('Mese                     ', 539);
-  Exp('Timeline                 ', 540);
-  Exp('Anno                     ', 541);
-  Exp('Gantt                    ', 542);
-  Exp('Nessun Raggruppamento    ', 544);
-  Exp('Raggruppa Per Data       ', 545);
-  Exp('Raggruppa Per Risorsa    ', 546);
-  Exp('Comprimi Fine Settimana  ', 548);
-  Exp('Solo Orario Lavorativo   ', 549);
-  Exp('Adatta Eventi            ', 550);
-  Exp('Mostra Calendario        ', 551);
 
   Exit;
 

@@ -130,7 +130,6 @@ implementation
 
 uses
   dmValutazioniRisorse,
-  zDm_Images,
   zDX,
   Winapi.ShellAPI,
   System.DateUtils,

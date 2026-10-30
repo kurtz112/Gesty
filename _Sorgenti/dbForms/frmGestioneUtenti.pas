@@ -86,7 +86,6 @@ implementation
 
 uses
   dmGestioneUtenti,
-  zDm_Images,
   MainForm,
   MDI_Lib,
   ConfigModule,

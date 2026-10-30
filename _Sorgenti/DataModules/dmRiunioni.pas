@@ -50,7 +50,7 @@ implementation
 
 uses
   System.DateUtils, System.Variants, System.UITypes, Vcl.Dialogs,  
-  zDm_Images, zOffice, zOffice.types, Gesty_StoredProcs, zBaseLib, dmCommon,
+  zOffice, zOffice.types, Gesty_StoredProcs, zBaseLib, dmCommon,
   zMsg;
 
 procedure TRiunioni.AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet);

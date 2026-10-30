@@ -270,7 +270,6 @@ uses
   System.DateUtils,
   zdx,
   zFbDataSet,
-  zDm_Images,
   zMsg,
   ConfigModule,
   zBaseLib,

@@ -141,7 +141,6 @@ implementation
 uses
   WizNuovaRichiestaAttivazioneDM,
   zCodiceFiscale,
-  zDm_Images,
   ConfigModule,
   zBaseLib,
   zDbViewDlg,

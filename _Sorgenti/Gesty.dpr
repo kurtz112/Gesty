@@ -38,7 +38,6 @@ uses
   BaseFrm in 'BASE\BaseFrm.pas' {BaseForm},
   Base_Frame in 'BASE\Base_Frame.pas' {BaseFrame: TFrame},
   BaseWizrd in 'BASE\BaseWizrd.pas' {BaseWizard},
-  zDm_Images in 'BASE\zDm_Images.pas' {zDmImages: TDataModule},
   zHyperLinks in 'BASE\zHyperLinks.pas',
   ConfigModule in 'BASE\ConfigModule.pas' {Config: TDataModule},
   zStorage,
@@ -447,7 +446,6 @@ begin
     TSmartSplashForm.UseStatusText('Stato');
     TSmartSplashForm.Show;
 
-    Application.CreateForm(TzDmImages, zDmImages);
   Application.CreateForm(Tconfig, config);
   Application.CreateForm(TCommon, Common);
   Application.CreateForm(TDataSetEvents, DataSetEvents);

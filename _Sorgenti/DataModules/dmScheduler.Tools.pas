@@ -183,7 +183,7 @@ implementation
 
 uses
   System.DateUtils, System.Variants, System.IOUtils, cxExportSchedulerLink,
-    zDm_Images, zOffice, zOffice.types, Gesty_StoredProcs,
+    zOffice, zOffice.types, Gesty_StoredProcs,
   WizInserimentoIncaricoFrm, dmCommon, ConfigModule, zMsg, Gesty.Authorizations,
   zDX;
 

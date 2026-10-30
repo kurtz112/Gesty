@@ -61,7 +61,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmAbitare_Sostegno_Scheda,
   zz.files,
   files.Lib;

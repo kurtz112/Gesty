@@ -79,7 +79,6 @@ uses
   dmStudenti,
   zHyperLinks,
   Files.Lib,
-  zDm_Images,
   WizInserimentoStudenteFrm,
   zMsg,
   zBaseLib,

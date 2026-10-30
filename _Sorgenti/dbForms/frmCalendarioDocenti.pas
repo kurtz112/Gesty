@@ -50,7 +50,7 @@ implementation
 uses
   System.DateUtils,
   zDx,
-  dmCalendarioDocenti, zDm_Images;
+  dmCalendarioDocenti;
 
 {$R *.dfm}
 { TFormCalendarioDocenti }

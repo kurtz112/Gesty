@@ -58,7 +58,6 @@ implementation
 uses
   System.IOUtils,
   dmPianiIndividuali,
-  zDm_Images,
   zHyperLinks,
   Files.Lib;
 

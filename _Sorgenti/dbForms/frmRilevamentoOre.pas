@@ -52,7 +52,6 @@ implementation
 uses
   dmRilevamentoOre,
   zDbCard,
-  zDm_Images,
   zDbView;
 
 {$R *.dfm}

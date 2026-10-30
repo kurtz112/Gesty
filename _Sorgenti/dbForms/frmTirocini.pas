@@ -133,7 +133,6 @@ uses
   System.DateUtils,
   Files.Lib,
   dmTirocini,
-  zDm_Images,
   zMsg,
   zdx,
   zHyperLinks,

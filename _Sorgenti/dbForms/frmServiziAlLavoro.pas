@@ -49,7 +49,7 @@ var
 implementation
 
 uses
-  zDm_Images, dmServiziAlLavoro, WizNuovaAziendaOspitanteFrm,   zSystem;
+  dmServiziAlLavoro, WizNuovaAziendaOspitanteFrm,   zSystem;
 
 {$R *.dfm}
 

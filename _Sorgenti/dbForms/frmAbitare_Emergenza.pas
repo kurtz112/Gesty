@@ -80,7 +80,6 @@ var
 implementation
 
 uses
-  zDm_Images,
   dmAbitare_Emergenza,
   zHyperLinks,
   cxFilter,

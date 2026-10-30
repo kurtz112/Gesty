@@ -50,7 +50,6 @@ implementation
 {$R *.dfm}
 
 uses
-  zDm_Images,
   WizTirociniDM;
 
 procedure TWizTirociniForm.CreateDataModule;

@@ -68,7 +68,6 @@ implementation
 uses
   cxFilter,
   Files.Lib,
-  zDm_Images,
   zHyperLinks,
   WizRiunioniFrm,
   dmRiunioni,

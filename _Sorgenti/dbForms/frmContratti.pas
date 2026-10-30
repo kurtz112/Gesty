@@ -56,7 +56,7 @@ var
 implementation
 
 uses
-  zDm_Images, dmContratti, zMsg;
+  dmContratti, zMsg;
 
 {$R *.dfm}
 

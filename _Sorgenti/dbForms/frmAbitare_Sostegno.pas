@@ -54,7 +54,6 @@ implementation
 
 uses
   cxFilter,
-  zDm_Images,
   dmAbitare_Sostegno,
    
   zFbDataSet,
