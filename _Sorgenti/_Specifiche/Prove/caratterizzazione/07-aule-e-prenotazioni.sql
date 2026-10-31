@@ -7,9 +7,11 @@
 -- Contesto utente simulato: CURRENT_ID_RISORSA() con RDB$SET_CONTEXT e autorizzazioni in USR_TMP_AUTHORIZATIONS
 -- (CARATT_UTENTE), come nella terza parte di Rilevamento ore. Prova le regole dei trigger e delle procedure, non il
 -- modo in cui l'applicazione costruisce il contesto.
--- Atteso = cio' che dice la specifica; per le divergenze (DIV-AUL-*) atteso = il comportamento descritto nella divergenza.
+-- Atteso = cio' che dice la specifica; per le divergenze ancora aperte (DIV-AUL-3) atteso = il comportamento descritto nella divergenza.
+-- Dal rilascio di correzione (R-194) le divergenze 1, 2, 4, 5, 6, 9, 10 e 13 sono casi di conformita': lo script va eseguito
+-- DOPO lo script Aule-R194-correzione-divergenze.sql, che cambia le procedure e i trigger provati qui.
 -- Non provati qui: AUL-001 (anagrafica), 007 (ricerche e viste), 012 (notifica), 013, 016, 017, 018 (interfaccia e viste),
--- DIV-AUL-6 (solo registrato), DIV-AUL-7, 11, 12; DIV-AUL-8 (eliminazione dal calendario) si prova con zapp sul banco.
+-- DIV-AUL-7, 11, 12; l'eliminazione dal calendario si prova con zapp sul banco.
 SET TERM ^ ;
 
 CREATE TABLE CARATT_ESITI (
@@ -44,11 +46,14 @@ CREATE PROCEDURE CARATT_UTENTE (
     RIS         BIGINT,
     INSERIMENTO BOOLEAN,
     MODIFICA    BOOLEAN,
-    DEROGA      BOOLEAN = FALSE)
+    DEROGA      BOOLEAN = FALSE,
+    GESTIONE    BOOLEAN = FALSE)
 AS
 DECLARE VARIABLE DUMMY VARCHAR(255);
 BEGIN
   DELETE FROM USR_TMP_AUTHORIZATIONS;
+  IF (:GESTIONE) THEN
+    INSERT INTO USR_TMP_AUTHORIZATIONS ("AUTHORIZATION") VALUES ('Aule.Gestione');
   IF (:INSERIMENTO) THEN
     INSERT INTO USR_TMP_AUTHORIZATIONS ("AUTHORIZATION") VALUES ('Aule.Prenotazioni.Inserimento');
   IF (:MODIFICA) THEN
@@ -328,6 +333,8 @@ BEGIN
 
   INSERT INTO ENTI_SEDI_GIORNI_CHIUSURA (ID_ENTE, ID_SEDE, DATA_CHIUSURA, MOTIVO_CHIUSURA, FESTIVO, CONSENTI_PRENOTAZIONE_AULE)
   VALUES (1492, 1499, CAST('2027-03-22' AS DATE), 'Chiusura di prova', FALSE, FALSE);
+  INSERT INTO ENTI_SEDI_GIORNI_CHIUSURA (ID_ENTE, ID_SEDE, DATA_CHIUSURA, MOTIVO_CHIUSURA, FESTIVO, CONSENTI_PRENOTAZIONE_AULE)
+  VALUES (1492, 1499, CAST('2027-03-23' AS DATE), 'Chiusura con aule consentite', FALSE, TRUE);
 END^
 
 COMMIT^
@@ -392,7 +399,7 @@ END^
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-004: sovrapposizioni fra prenotazioni; DIV-AUL-2 e DIV-AUL-3
+-- GESTY-AUL-004: sovrapposizioni fra prenotazioni; DIV-AUL-3 (fine a mezzanotte, ancora aperta)
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
@@ -413,17 +420,20 @@ BEGIN
   EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-004', 'correzione del solo oggetto', 'riuscito', NULL,
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.OGGETTO = ''Oggetto corretto'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-B', '2027-02-09', '09:00:00'));
 
-  -- DIV-AUL-2: spostamento su un'altra aula con fascia sovrapposta ma ora di inizio diversa
+  -- cambio di aula (trascinamento nel calendario): il controllo di sovrapposizione si riesegue
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-A', '2027-02-10', '09:00:00', '10:00:00', 120);
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-B', '2027-02-10', '09:30:00', '10:30:00', 120);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-2', 'cambio aula su fascia sovrapposta con inizio diverso: si salva senza avviso', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-004', 'cambio aula su fascia sovrapposta con inizio diverso', 'errore', 'Risulta un''altra',
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.AULA = ''ZT-B'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-A', '2027-02-10', '09:00:00'));
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-2', 'l''aula ZT-B risulta occupata due volte nella stessa fascia',
-      IIF(CARATT_QUANTE('ZT-B', '2027-02-10', NULL, TRUE) = 2, TRUE, FALSE), 'due prenotazioni attive sovrapposte');
-  -- stessa ora di inizio: ferma l'indice univoco
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-004', 'dopo il rifiuto la prenotazione e'' rimasta nell''aula di partenza',
+      IIF(CARATT_QUANTE('ZT-B', '2027-02-10', NULL, TRUE) = 1 AND CARATT_QUANTE('ZT-A', '2027-02-10', NULL, TRUE) = 1, TRUE, FALSE), 'una prenotazione in ognuna delle due aule');
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-A', '2027-02-18', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-004', 'cambio aula verso un''aula libera', 'riuscito', NULL,
+      'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.AULA = ''ZT-B'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-A', '2027-02-18', '09:00:00'));
+  -- stessa ora di inizio: ferma l'indice univoco, prima del controllo di sovrapposizione
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-A', '2027-02-11', '11:00:00', '12:00:00', 120);
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-B', '2027-02-11', '11:00:00', '12:00:00', 120);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-2', 'cambio aula con la stessa ora di inizio: lo ferma solo l''indice univoco', 'errore', 'UNQ1_AULE_PRENOTAZIONI',
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-004', 'cambio aula con la stessa ora di inizio: lo ferma l''indice univoco', 'errore', 'UNQ1_AULE_PRENOTAZIONI',
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.AULA = ''ZT-B'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-A', '2027-02-11', '11:00:00'));
 
   -- DIV-AUL-3: fine a mezzanotte
@@ -472,7 +482,7 @@ END^
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-006: inagibilita'; DIV-AUL-1: giorno di chiusura
+-- GESTY-AUL-006: inagibilita'; GESTY-AUL-007: giorno di chiusura
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
@@ -486,10 +496,12 @@ BEGIN
   EXECUTE PROCEDURE CARATT_LEZIONE('GESTY-AUL-006', 'lezione in un'' aula inagibile', 'errore', 'inagibile', 'ZT-I1', '2027-03-12', '09:00:00');
   EXECUTE PROCEDURE CARATT_RIUNIONE('GESTY-AUL-006', 'riunione in un''aula inagibile', 'errore', 'inagibile', 'ZT-I1', '2027-03-12', '09:00:00', '10:00:00');
 
-  -- DIV-AUL-1: la sede e' chiusa il 22/03 con prenotazioni aule non consentite
-  EXECUTE PROCEDURE CARATT_PRENOTA('DIV-AUL-1', 'prenotazione in un giorno di chiusura della sede: si salva', 'riuscito', NULL, 'ZT-CH', '2027-03-22', '09:00:00', '11:00:00', 120);
-  EXECUTE PROCEDURE CARATT_LEZIONE('DIV-AUL-1', 'lezione in un giorno di chiusura della sede: si salva', 'riuscito', NULL, 'ZT-CH', '2027-03-22', '12:00:00');
-  EXECUTE PROCEDURE CARATT_RIUNIONE('DIV-AUL-1', 'riunione in un giorno di chiusura della sede: si salva', 'riuscito', NULL, 'ZT-CH', '2027-03-22', '15:00:00', '16:00:00');
+  -- giorno di chiusura: la sede e' chiusa il 22/03 con prenotazioni aule non consentite, il 23/03 con prenotazioni consentite
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-007', 'prenotazione in un giorno di chiusura della sede', 'errore', 'La sede risulta chiusa per Chiusura di prova', 'ZT-CH', '2027-03-22', '09:00:00', '11:00:00', 120);
+  EXECUTE PROCEDURE CARATT_LEZIONE('GESTY-AUL-007', 'lezione in un giorno di chiusura della sede', 'errore', 'La sede risulta chiusa', 'ZT-CH', '2027-03-22', '12:00:00');
+  EXECUTE PROCEDURE CARATT_RIUNIONE('GESTY-AUL-007', 'riunione in un giorno di chiusura della sede', 'errore', 'La sede risulta chiusa', 'ZT-CH', '2027-03-22', '15:00:00', '16:00:00');
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-007', 'giorno di chiusura che consente le prenotazioni delle aule', 'riuscito', NULL, 'ZT-CH', '2027-03-23', '09:00:00', '11:00:00', 120);
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-007', 'giorno dopo la chiusura', 'riuscito', NULL, 'ZT-CH', '2027-03-24', '09:00:00', '11:00:00', 120);
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-007', 'il giorno di chiusura compare come occupato nell''elenco delle occupazioni',
       IIF(EXISTS(SELECT 1 FROM AULE_PRENOTAZIONI_ELENCO WHERE AULE_PRENOTAZIONI_ELENCO.ID_SEDE = 1499 AND
                 AULE_PRENOTAZIONI_ELENCO.IS_GIORNO_CHIUSURA = TRUE AND AULE_PRENOTAZIONI_ELENCO.DATA_PRENOTAZIONE = CAST('2027-03-22' AS DATE) AND
@@ -543,7 +555,7 @@ END^
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-010 e DIV-AUL-4: regole di modifica 1-4 (aule ZT-M1..M4: due prenotazioni della risorsa 120, 09-10 e 11-12)
+-- GESTY-AUL-010: regole di modifica 1-4 (aule ZT-M1..M4: due prenotazioni della risorsa 120, 09-10 e 11-12)
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, FALSE);
@@ -589,22 +601,26 @@ BEGIN
   EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-010', 'regola 4: il richiedente con il permesso di modifica', 'riuscito', NULL,
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.OGGETTO = ''Mia'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-M4', '2027-04-01', '09:00:00'));
 
-  -- DIV-AUL-4: il richiedente cambiato con se stessi supera il controllo (seconde prenotazioni, 11-12, della risorsa 120)
+  -- il richiedente cambiato con se stessi non aggira il controllo: conta il richiedente registrato (seconde prenotazioni, 11-12, della risorsa 120)
   EXECUTE PROCEDURE CARATT_UTENTE(130, TRUE, FALSE);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-4', 'regola 2: l''utente 130 senza permesso si assegna la prenotazione di 120', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-010', 'regola 2: l''utente 130 senza permesso non si assegna la prenotazione di 120', 'errore', NULL,
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.ID_RISORSA = 130 WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-M2', '2027-04-01', '11:00:00'));
   EXECUTE PROCEDURE CARATT_UTENTE(130, TRUE, TRUE);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-4', 'regola 4: l''utente 130 con permesso si assegna la prenotazione di 120', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-010', 'regola 4: l''utente 130 anche con permesso non si assegna la prenotazione di 120', 'errore', 'Solo l''utente che ha inserito',
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.ID_RISORSA = 130 WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-M4', '2027-04-01', '11:00:00'));
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-4', 'le due prenotazioni risultano ora della risorsa 130',
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-010', 'le due prenotazioni sono rimaste della risorsa 120',
       IIF((SELECT COUNT(*) FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.AULA IN ('ZT-M2', 'ZT-M4') AND AULE_PRENOTAZIONI.ORA_INIZIO = '11:00:00' AND
-           AULE_PRENOTAZIONI.ID_RISORSA = 130) = 2, TRUE, FALSE), 'richiedente cambiato');
+           AULE_PRENOTAZIONI.ID_RISORSA = 120) = 2, TRUE, FALSE), 'richiedente invariato');
+  -- il richiedente registrato, invece, puo' passare la sua prenotazione a un altro (regola 2 senza il permesso di modifica)
+  EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, FALSE);
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-010', 'regola 2: il richiedente registrato passa la prenotazione alla risorsa 130', 'riuscito', NULL,
+      'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.ID_RISORSA = 130 WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-M2', '2027-04-01', '11:00:00'));
 END^
 
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-011, DIV-AUL-5 e DIV-AUL-6: aule che richiedono autorizzazione (ZT-AUT)
+-- GESTY-AUL-011: aule che richiedono autorizzazione (ZT-AUT)
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, FALSE);
@@ -617,16 +633,25 @@ BEGIN
       IIF(EXISTS(SELECT 1 FROM AULE_PRENOTAZIONI_ELENCO WHERE AULE_PRENOTAZIONI_ELENCO.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-A', '2027-04-05', '09:00:00') AND
                 AULE_PRENOTAZIONI_ELENCO.IS_AUTORIZZATA = TRUE AND AULE_PRENOTAZIONI_ELENCO.DATA_ORA_AUTORIZZAZIONE IS NULL), TRUE, FALSE), 'IS_AUTORIZZATA vero');
 
-  -- DIV-AUL-5: l'utente 130 senza alcuna autorizzazione autorizza la prenotazione di 120
-  EXECUTE PROCEDURE CARATT_UTENTE(130, FALSE, FALSE);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-5', 'autorizzare senza alcuna autorizzazione e senza essere responsabile', 'riuscito', NULL,
+  -- l'utente 130 senza "Aule.Gestione" non autorizza, e la prenotazione resta da autorizzare
+  EXECUTE PROCEDURE CARATT_UTENTE(130, TRUE, TRUE);
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-011', 'autorizzare senza l''autorizzazione "Aule.Gestione"', 'errore', 'Aule.Gestione',
+      'EXECUTE PROCEDURE AULE_PRENOTAZIONI_AUTORIZZA(' || CARATT_ID('ZT-AUT', '2027-04-05', '09:00:00') || ', NULL)');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'dopo il rifiuto la prenotazione e'' ancora da autorizzare',
+      IIF(EXISTS(SELECT 1 FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-AUT', '2027-04-05', '09:00:00') AND
+                AULE_PRENOTAZIONI.DATA_ORA_AUTORIZZAZIONE IS NULL AND AULE_PRENOTAZIONI.ID_RESPONSABILE_AULE IS NULL), TRUE, FALSE), 'nessuna data e nessun responsabile');
+
+  -- con "Aule.Gestione" l'autorizzazione riesce e registra chi l'ha data (la persona diventa responsabile delle aule alla prima volta)
+  EXECUTE PROCEDURE CARATT_UTENTE(130, FALSE, FALSE, FALSE, TRUE);
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-011', 'autorizzare con l''autorizzazione "Aule.Gestione"', 'riuscito', NULL,
       'EXECUTE PROCEDURE AULE_PRENOTAZIONI_AUTORIZZA(' || CARATT_ID('ZT-AUT', '2027-04-05', '09:00:00') || ', NULL)');
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'dopo "Autorizza" la prenotazione risulta autorizzata con data e ora',
       IIF(EXISTS(SELECT 1 FROM AULE_PRENOTAZIONI_ELENCO WHERE AULE_PRENOTAZIONI_ELENCO.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-AUT', '2027-04-05', '09:00:00') AND
                 AULE_PRENOTAZIONI_ELENCO.IS_AUTORIZZATA = TRUE AND AULE_PRENOTAZIONI_ELENCO.DATA_ORA_AUTORIZZAZIONE IS NOT NULL), TRUE, FALSE), 'IS_AUTORIZZATA vero');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-6', 'la prenotazione e'' autorizzata ma senza responsabile',
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'il responsabile registrato e'' chi ha autorizzato (risorsa 130) e risulta fra i responsabili delle aule',
       IIF(EXISTS(SELECT 1 FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-AUT', '2027-04-05', '09:00:00') AND
-                AULE_PRENOTAZIONI.ID_RESPONSABILE_AULE IS NULL), TRUE, FALSE), 'ID_RESPONSABILE_AULE nullo');
+                AULE_PRENOTAZIONI.ID_RESPONSABILE_AULE = 130) AND
+          EXISTS(SELECT 1 FROM AULE_RESPONSABILI WHERE AULE_RESPONSABILI.ID_RESPONSABILE_AULE = 130), TRUE, FALSE), 'ID_RESPONSABILE_AULE = 130');
   -- autorizzazione ripetuta: la data non cambia (data portata a un valore noto prima della seconda chiamata)
   UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.DATA_ORA_AUTORIZZAZIONE = CAST('2027-01-01 10:00:00' AS TIMESTAMP)
   WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-AUT', '2027-04-05', '09:00:00');
@@ -640,7 +665,7 @@ END^
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-014, DIV-AUL-9 e DIV-AUL-10: copia, taglia e incolla (luglio-novembre 2027; richiedente 120, permessi pieni)
+-- GESTY-AUL-014: copia, taglia e incolla (luglio-novembre 2027; richiedente 120, permessi pieni)
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
@@ -668,13 +693,21 @@ BEGIN
                  AULE_PRENOTAZIONI.ANNULLATA = TRUE AND AULE_PRENOTAZIONI.MOTIVO_ANNULLAMENTO = 'Spostata in un''altra data od ora'), TRUE, FALSE),
       'nuova attiva e vecchia annullata');
 
-  -- DIV-AUL-9: taglia e incolla nello stesso punto (mercoledi 07/07)
+  -- taglia e incolla nello stesso punto (mercoledi 07/07): non fa nulla
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-07-07', '09:00:00', '10:00:00', 120);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-9', 'taglia e incolla nello stesso punto', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-014', 'taglia e incolla nello stesso punto', 'riuscito', NULL,
       'EXECUTE PROCEDURE AULE_PRENOTAZIONI_INCOLLA_ORA(' || CARATT_ID('ZT-INC1', '2027-07-07', '09:00:00') || ', ''2027-07-07'', ''09:00:00'', TRUE)');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-9', 'la prenotazione e'' annullata e non ne esiste una attiva al suo posto',
-      IIF(CARATT_QUANTE('ZT-INC1', '2027-07-07', '09:00:00', TRUE) = 0 AND CARATT_QUANTE('ZT-INC1', '2027-07-07', '09:00:00', FALSE) = 1, TRUE, FALSE),
-      'nessuna prenotazione attiva');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'la prenotazione e'' rimasta attiva e non ne e'' nata un''altra',
+      IIF(CARATT_QUANTE('ZT-INC1', '2027-07-07', '09:00:00', TRUE) = 1 AND CARATT_QUANTE('ZT-INC1', '2027-07-07', '09:00:00', FALSE) = 1, TRUE, FALSE),
+      'una sola prenotazione, attiva');
+  -- taglia su una destinazione gia' occupata da una prenotazione attiva alla stessa ora: la copia e'' saltata e la partenza non si annulla
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-07-13', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-07-14', '09:00:00', '10:00:00', 130);
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-014', 'taglia su una destinazione occupata dalla stessa ora', 'riuscito', NULL,
+      'EXECUTE PROCEDURE AULE_PRENOTAZIONI_INCOLLA_ORA(' || CARATT_ID('ZT-INC1', '2027-07-13', '09:00:00') || ', ''2027-07-14'', ''09:00:00'', TRUE)');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'la prenotazione di partenza e'' rimasta attiva',
+      IIF(CARATT_QUANTE('ZT-INC1', '2027-07-13', '09:00:00', TRUE) = 1 AND CARATT_QUANTE('ZT-INC1', '2027-07-14', NULL, FALSE) = 1, TRUE, FALSE),
+      'partenza attiva, destinazione invariata');
 
   -- incolla un giorno (lunedi 12/07 -> lunedi 19/07), due aule
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-07-12', '09:00:00', '10:00:00', 120);
@@ -706,30 +739,30 @@ BEGIN
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'dopo il rifiuto non e'' stato copiato nulla',
       IIF(CARATT_QUANTE('ZT-INC1', '2027-08-16', NULL, FALSE) = 1 AND CARATT_QUANTE('ZT-INC2', '2027-08-16', NULL, FALSE) = 0, TRUE, FALSE), 'una sola prenotazione in ZT-INC1, nessuna in ZT-INC2');
 
-  -- DIV-AUL-9: destinazione con una prenotazione annullata alla stessa ora (lunedi 23/08 -> lunedi 30/08)
+  -- destinazione con una prenotazione annullata alla stessa ora (lunedi 23/08 -> lunedi 30/08): non blocca la copia
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-08-23', '09:00:00', '10:00:00', 120);
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-08-30', '09:00:00', '10:00:00', 130, NULL, NULL, NULL, TRUE);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-9', 'destinazione con una prenotazione annullata alla stessa ora', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-014', 'destinazione con una prenotazione annullata alla stessa ora', 'riuscito', NULL,
       'EXECUTE PROCEDURE AULE_PRENOTAZIONI_INCOLLA_GIORN(''2027-08-23'', ''2027-08-30'')');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-9', 'la riga annullata blocca la copia: nessuna prenotazione attiva alla destinazione',
-      IIF(CARATT_QUANTE('ZT-INC1', '2027-08-30', '09:00:00', TRUE) = 0, TRUE, FALSE), 'nessuna copia attiva');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'la copia e'' nata attiva accanto alla riga annullata',
+      IIF(CARATT_QUANTE('ZT-INC1', '2027-08-30', '09:00:00', TRUE) = 1 AND CARATT_QUANTE('ZT-INC1', '2027-08-30', '09:00:00', FALSE) = 2, TRUE, FALSE), 'una attiva e una annullata');
 
-  -- DIV-AUL-9: le prenotazioni annullate vengono copiate (lunedi 06/09 -> lunedi 13/09)
+  -- le prenotazioni annullate non si copiano (lunedi 06/09 -> lunedi 13/09)
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-09-06', '09:00:00', '10:00:00', 120, NULL, NULL, NULL, TRUE);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-9', 'incolla un giorno con una prenotazione annullata', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-014', 'incolla un giorno con una prenotazione annullata', 'riuscito', NULL,
       'EXECUTE PROCEDURE AULE_PRENOTAZIONI_INCOLLA_GIORN(''2027-09-06'', ''2027-09-13'')');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-9', 'la copia nasce annullata',
-      IIF(CARATT_QUANTE('ZT-INC1', '2027-09-13', '09:00:00', FALSE) = 1 AND CARATT_QUANTE('ZT-INC1', '2027-09-13', '09:00:00', TRUE) = 0, TRUE, FALSE), 'copia annullata');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'la prenotazione annullata non e'' stata copiata',
+      IIF(CARATT_QUANTE('ZT-INC1', '2027-09-13', NULL, FALSE) = 0, TRUE, FALSE), 'nessuna copia');
 
-  -- DIV-AUL-10: incolla settimana con data di partenza non lunedi (mercoledi 22/09; la settimana inizia lunedi 20/09)
+  -- incolla settimana con data di partenza non lunedi (mercoledi 22/09; la settimana inizia lunedi 20/09 e finisce domenica 26/09)
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-09-20', '09:00:00', '10:00:00', 120);
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC2', '2027-09-27', '09:00:00', '10:00:00', 120);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-10', 'incolla settimana con data di partenza di mercoledi', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-014', 'incolla settimana con data di partenza di mercoledi', 'riuscito', NULL,
       'EXECUTE PROCEDURE AULE_PRENOTAZIONI_INCOLLA_SETT(''2027-09-22'', ''2027-10-11'')');
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'la prenotazione del lunedi della settimana di partenza va al lunedi 11/10',
       IIF(CARATT_QUANTE('ZT-INC1', '2027-10-11', '09:00:00', TRUE) = 1, TRUE, FALSE), 'copia al 11/10');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-10', 'viene copiata anche la prenotazione del lunedi 27/09 (settimana seguente), al 18/10',
-      IIF(CARATT_QUANTE('ZT-INC2', '2027-10-18', '09:00:00', TRUE) = 1, TRUE, FALSE), 'copia al 18/10');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-014', 'la prenotazione del lunedi 27/09 (settimana seguente) non viene copiata al 18/10',
+      IIF(CARATT_QUANTE('ZT-INC2', '2027-10-18', NULL, FALSE) = 0, TRUE, FALSE), 'nessuna copia al 18/10');
 
   -- incolla settimana con data di partenza lunedi: ogni prenotazione allo stesso giorno della settimana
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-INC1', '2027-11-01', '09:00:00', '10:00:00', 120);
@@ -743,7 +776,7 @@ END^
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-015 e DIV-AUL-13: prenotazione per periodo (lunedi 06/09/2027, 08/11, 06/12; lunedi 03/01/2028)
+-- GESTY-AUL-015: prenotazione per periodo (lunedi 06/09/2027, 08/11, 06/12; lunedi 03/01/2028)
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
@@ -770,20 +803,21 @@ BEGIN
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-015', 'dopo lo svuotamento le prenotazioni di quelle fasce non esistono piu''',
       IIF((SELECT COUNT(*) FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.AULA = 'ZT-PER3') = 0, TRUE, FALSE), 'nessuna prenotazione');
 
-  -- DIV-AUL-13: lo svuotamento elimina anche le prenotazioni di altri e quelle annullate
+  -- lo svuotamento elimina solo le prenotazioni attive di chi lo lancia (120): restano quella di un altro e quella annullata
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-PER5', '2027-12-06', '14:00:00', '17:00:00', 120);
-  EXECUTE PROCEDURE CARATT_NUOVA('ZT-PER5', '2027-12-13', '15:00:00', '16:00:00', 130, 'Annullata', NULL, NULL, TRUE);
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-PER5', '2027-12-13', '15:00:00', '16:00:00', 120, 'Annullata', NULL, NULL, TRUE);
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-PER5', '2027-12-20', '14:00:00', '17:00:00', 130, 'Inserita a mano da un altro');
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-13', 'svuotamento di un periodo con prenotazioni altrui e annullate', 'riuscito', NULL,
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-015', 'svuotamento di un periodo con prenotazioni altrui e annullate', 'riuscito', NULL,
       'EXECUTE PROCEDURE CARATT_PERIODO(''ZT-PER5'', ''2027-12-06'', ''2027-12-27'', TRUE, ''L'')');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-13', 'sono sparite anche la prenotazione di un altro e quella annullata',
-      IIF((SELECT COUNT(*) FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.AULA = 'ZT-PER5') = 0, TRUE, FALSE), 'nessuna prenotazione');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-015', 'e'' sparita solo la prenotazione attiva di chi ha svuotato',
+      IIF(CARATT_QUANTE('ZT-PER5', '2027-12-06', NULL, FALSE) = 0 AND CARATT_QUANTE('ZT-PER5', '2027-12-13', NULL, FALSE) = 1 AND
+          CARATT_QUANTE('ZT-PER5', '2027-12-20', NULL, FALSE) = 1, TRUE, FALSE), 'restano la annullata e quella di un altro');
 
-  -- DIV-AUL-13: con la regola di modifica 4 lo svuotamento si ferma sulla prenotazione di un altro
+  -- con la regola di modifica 4 lo svuotamento non si ferma sulla prenotazione di un altro: la lascia dov'e'
   EXECUTE PROCEDURE CARATT_NUOVA('ZT-PER4', '2028-01-03', '14:00:00', '17:00:00', 130);
-  EXECUTE PROCEDURE CARATT_ESEGUI('DIV-AUL-13', 'svuotamento con regola 4 e prenotazione di un altro', 'errore', 'Solo l''utente che ha inserito',
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-015', 'svuotamento con regola 4 e prenotazione di un altro', 'riuscito', NULL,
       'EXECUTE PROCEDURE CARATT_PERIODO(''ZT-PER4'', ''2028-01-03'', ''2028-01-03'', TRUE, ''L'')');
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-13', 'la prenotazione di un altro e'' rimasta',
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-015', 'la prenotazione di un altro e'' rimasta',
       IIF(CARATT_QUANTE('ZT-PER4', '2028-01-03', '14:00:00', FALSE) = 1, TRUE, FALSE), 'una prenotazione');
 END^
 

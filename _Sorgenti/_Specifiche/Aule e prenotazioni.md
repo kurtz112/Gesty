@@ -2,7 +2,7 @@
 area: Aule e prenotazioni
 progetto: Gesty
 aggiornato: 2026-10-31
-rilascio: OUT/20261031-caratterizzazione-aule-e-prenotazioni/001
+rilascio: OUT/20261031-caratterizzazione-aule-e-prenotazioni/002
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -25,7 +25,7 @@ Questa specifica descrive le regole che Gesty rispetta per le aule (tabella `AUL
 
 **Fuori da quest'area.** Le presenze degli allievi (`Presenze allievi e registro.md`) e il rilevamento ore (`Rilevamento ore.md`) non leggono le prenotazioni delle aule; l'unico legame con l'orario è l'aula della lezione (GESTY-AUL-016). Restano senza specifica propria: dotazioni e attrezzature delle aule (`AULE_DOTAZIONI`), la configurazione dei giorni di chiusura, l'area personale web (`WEB_AREA_PERSONALE`), le esportazioni delle aule verso GRS, Untis e Futura (`GRS_EXPORT_AULE`, `UNTIS_AULE_ADD`, `FUTURA_EXPORT_PRESENZE_AULA`) e l'assegnazione automatica dell'aula alla lezione (`ORARIO_ASSEGNA_AULA_PER_GIORNO`).
 
-**Origine.** Ricavata il 2026-10-31 dai sorgenti in `SRC\Gesty_Group\_Sorgenti` (`dmAule`, `dmPrenotazioniAule`, `dmCalendarioAule`, `dmAgenda`, `dmScheduler.Tools`, `frmAule`, `frmPrenotazioniAule`, `frmCalendarioAule`, `frmPrenotaAulaDaAgenda`, `frmGeneraPrenotazioniAule`), dai moduli LZ `Aule`, `PrenotazioniAule` e `CalendarioAule` e dai metadati del database master (fotografia del 2026-10-30 13:19: trigger, procedure, funzioni e viste citate). Provata il 2026-10-31 su una copia del database con lo script `Prove\caratterizzazione\07-aule-e-prenotazioni.sql` (118 casi, tutti coerenti con questo testo) e, per l'eliminazione dal calendario, con la sonda sul banco di Gesty; restano da provare l'interfaccia (calendario, ricerca degli orari liberi, finestra dell'agenda), le viste informative, la notifica delle prenotazioni di oggi, DIV-AUL-7, 11 e 12 e il trascinamento nel calendario (la sonda non riesce a guidarlo). Il ticket 133 (rilascio di settembre 2026) ha introdotto l'annullamento al posto della cancellazione, l'inagibilità annullabile e gli stessi controlli nella ricerca e nel salvataggio; ticket 180 per il messaggio della generazione per periodo; ticket 197 per il record rimasto in inserimento nella scheda.
+**Origine.** Ricavata il 2026-10-31 dai sorgenti in `SRC\Gesty_Group\_Sorgenti` (`dmAule`, `dmPrenotazioniAule`, `dmCalendarioAule`, `dmAgenda`, `dmScheduler.Tools`, `frmAule`, `frmPrenotazioniAule`, `frmCalendarioAule`, `frmPrenotaAulaDaAgenda`, `frmGeneraPrenotazioniAule`), dai moduli LZ `Aule`, `PrenotazioniAule` e `CalendarioAule` e dai metadati del database master (fotografia del 2026-10-30 13:19: trigger, procedure, funzioni e viste citate). Provata il 2026-10-31 su una copia del database con lo script `Prove\caratterizzazione\07-aule-e-prenotazioni.sql` (136 casi, tutti coerenti con questo testo, eseguito dopo lo script di correzione `Aule-R194-correzione-divergenze.sql` del rilascio 002) e, per l'eliminazione dal calendario, con la sonda sul banco di Gesty; restano da provare l'interfaccia (calendario, ricerca degli orari liberi, finestra dell'agenda), le viste informative, la notifica delle prenotazioni di oggi, DIV-AUL-7, 11 e 12 e il trascinamento nel calendario (la sonda non riesce a guidarlo). Le divergenze 1, 2, 4, 5, 6, 9, 10 e 13 sono state corrette con il rilascio 002 (voce R-194): i requisiti sotto descrivono già il comportamento corretto. Il ticket 133 (rilascio di settembre 2026) ha introdotto l'annullamento al posto della cancellazione, l'inagibilità annullabile e gli stessi controlli nella ricerca e nel salvataggio; ticket 180 per il messaggio della generazione per periodo; ticket 197 per il record rimasto in inserimento nella scheda.
 
 ## GESTY-AUL-001 Anagrafica dell'aula
 Un'aula (o "spazio") si identifica con il codice `AULA`, unico; ha una descrizione, un tipo (`ZZ_TIPO_AULE`), un ente e una sede (obbligatori e coerenti: la sede deve appartenere all'ente), un colore, il numero di postazioni e le regole di prenotazione (`MODIFICA_PRENOTAZIONI`, `RICHIEDE_AUTORIZZAZIONE`, `GG_LIMITE_PRENOTAZIONE`). Un'aula nuova nasce con ente e sede predefiniti dell'utente. Un'aula non attiva (`ATTIVA = FALSE`) resta nei dati e nello storico ma non compare più nel calendario delle prenotazioni, nell'elenco da cui si scelgono le aule da mostrare, nelle ricerche di orari liberi e nel calendario aule. Se cambia il codice, le prenotazioni, le inagibilità e le risorse autorizzate lo seguono.
@@ -86,7 +86,7 @@ La cancellazione fisica di una prenotazione è rifiutata con "Le prenotazioni no
 - **Allora** la prenotazione risulta annullata e non eliminata
 
 ## GESTY-AUL-004 Nessuna sovrapposizione fra prenotazioni attive
-Su una stessa aula e in uno stesso giorno due prenotazioni attive non si sovrappongono. Le fasce che si toccano senza sovrapporsi (09:00-10:00 e 10:00-11:00) sono ammesse. Le prenotazioni annullate non occupano l'aula. Non possono esistere due prenotazioni attive con la stessa aula, data e ora di inizio (indice univoco `UNQ1_AULE_PRENOTAZIONI`). Il messaggio dice "Risulta un'altra prenotazione per l'aula" con aula, data, ora di inizio e di fine e il nome del richiedente della prenotazione in conflitto. Il controllo si fa dopo la scrittura (trigger `AULE_PRENOTAZIONI_AIU0`), quindi annulla l'intero salvataggio; scatta quando la prenotazione è nuova, quando si revoca l'annullamento e quando cambiano data, ora di inizio o durata. Non scatta se si modificano soltanto oggetto, note, progetto o corso, e non scatta se la prenotazione che si salva è annullata.
+Su una stessa aula e in uno stesso giorno due prenotazioni attive non si sovrappongono. Le fasce che si toccano senza sovrapporsi (09:00-10:00 e 10:00-11:00) sono ammesse. Le prenotazioni annullate non occupano l'aula. Non possono esistere due prenotazioni attive con la stessa aula, data e ora di inizio (indice univoco `UNQ1_AULE_PRENOTAZIONI`). Il messaggio dice "Risulta un'altra prenotazione per l'aula" con aula, data, ora di inizio e di fine e il nome del richiedente della prenotazione in conflitto. Il controllo si fa dopo la scrittura (trigger `AULE_PRENOTAZIONI_AIU0`), quindi annulla l'intero salvataggio; scatta quando la prenotazione è nuova, quando si revoca l'annullamento e quando cambiano aula, data, ora di inizio o durata (lo spostamento su un'altra aula, per esempio con il trascinamento nel calendario, è quindi controllato come una prenotazione nuova nell'aula di arrivo). Non scatta se si modificano soltanto oggetto, note, progetto o corso, e non scatta se la prenotazione che si salva è annullata.
 
 ### Scenario: stessa aula, fasce sovrapposte
 - **Dato** una prenotazione attiva dell'aula A101 il 12/11 dalle 09:00 alle 11:00
@@ -113,6 +113,17 @@ Su una stessa aula e in uno stesso giorno due prenotazioni attive non si sovrapp
 - **Dato** una prenotazione già salvata
 - **Quando** si cambia solo l'oggetto
 - **Allora** il salvataggio riesce e la sovrapposizione non viene ricontrollata
+
+### Scenario: cambio di aula su una fascia sovrapposta
+- **Dato** una prenotazione di A101 il 10/02 dalle 09:00 alle 10:00 e una di A102 lo stesso giorno dalle 09:30 alle 10:30
+- **Quando** la prima si sposta su A102
+- **Allora** il salvataggio si ferma con "Risulta un'altra prenotazione per l'aula."
+- **E** la prenotazione resta in A101
+
+### Scenario: cambio di aula verso un'aula libera
+- **Dato** una prenotazione di A101 e A102 libera nella stessa fascia
+- **Quando** la prenotazione si sposta su A102
+- **Allora** il salvataggio riesce
 
 ## GESTY-AUL-005 L'aula occupata da una lezione o da una riunione
 Oltre che da una prenotazione, un'aula è occupata da una lezione dell'orario collettivo (`ORARIO` con `AULA` valorizzata e `LEZIONE_SVOLTA = TRUE`) e da una riunione con quell'aula non annullata (`STATO_RIUNIONE` diverso da `A`). Una lezione non svolta o una riunione annullata non occupano l'aula. Il controllo vale in tutte le direzioni: una prenotazione che cade su una lezione o su una riunione è rifiutata ("L'aula risulta prenotata per la formazione collettiva", "Risulta una riuione per l'aula": il messaggio contiene questo refuso); una riunione e una lezione che cadono su una prenotazione attiva sono rifiutate con "Risulta un'altra prenotazione per l'aula". Il controllo sulle lezioni scatta quando l'aula, la data, l'ora di inizio o la durata di una lezione cambiano, quello sulle riunioni a ogni salvataggio di una riunione non annullata con aula, data e ora di inizio. Due lezioni nella stessa aula e nella stessa fascia sono invece ammesse se sono di progetti o corsi diversi: serve ai corsi collegati. Nello stesso corso lo vieta già il trigger dell'orario ("Orario: sovrapposizione ora inizio/fine"), anche per aule diverse.
@@ -162,7 +173,17 @@ Un periodo di inagibilità (aula, dal giorno, al giorno, motivo, annullata sì/n
 - **Allora** il salvataggio si ferma per inagibilità
 
 ## GESTY-AUL-007 Giorni di chiusura della sede
-Una sede può avere giorni di chiusura (`ENTI_SEDI_GIORNI_CHIUSURA`). Se il giorno è segnato come "non consente prenotazione aule" (`CONSENTI_PRENOTAZIONE_AULE = FALSE`) le ricerche di orari liberi non propongono nessuna aula di quella sede in quel giorno, e il giorno compare come occupato nell'elenco delle occupazioni (`AULE_PRENOTAZIONI_ELENCO`, tipo "giorno di chiusura", dalle 00:01 alle 23:59). Il salvataggio di una prenotazione in quel giorno non è invece controllato: vedi DIV-AUL-1.
+Una sede può avere giorni di chiusura (`ENTI_SEDI_GIORNI_CHIUSURA`). Se il giorno è segnato come "non consente prenotazione aule" (`CONSENTI_PRENOTAZIONE_AULE = FALSE`) le ricerche di orari liberi non propongono nessuna aula di quella sede in quel giorno, e il giorno compare come occupato nell'elenco delle occupazioni (`AULE_PRENOTAZIONI_ELENCO`, tipo "giorno di chiusura", dalle 00:01 alle 23:59). Anche il salvataggio rispetta la chiusura: una prenotazione, una lezione o una riunione in un'aula della sede in quel giorno è rifiutata con "La sede risulta chiusa per" seguito dal motivo (stesso controllo, in `AULA_VERIFICA_SOVRAPPOSIZIONE`, delle altre regole di occupazione). Le prenotazioni, le lezioni e le riunioni già salvate in un giorno poi dichiarato di chiusura restano; il controllo scatta solo quando si salva di nuovo la riga con aula, giorno, ora o durata diversi. La generazione per periodo (GESTY-AUL-015) si ferma al primo giorno di chiusura del periodo, come per un conflitto.
+
+### Scenario: il salvataggio in un giorno di chiusura
+- **Dato** una sede chiusa il 22/03 con prenotazioni aule non consentite
+- **Quando** si inserisce una prenotazione, una lezione o una riunione per un'aula della sede il 22/03
+- **Allora** il salvataggio si ferma con "La sede risulta chiusa per" e il motivo della chiusura
+
+### Scenario: chiusura che consente le prenotazioni del giorno dopo
+- **Dato** la stessa sede, con il 23/03 segnato come chiusura che consente le prenotazioni delle aule
+- **Quando** si inserisce una prenotazione per il 23/03 o per il 24/03
+- **Allora** il salvataggio riesce
 
 ### Scenario: la ricerca salta il giorno di chiusura
 - **Dato** una sede chiusa il 25/12 con prenotazioni aule non consentite
@@ -230,7 +251,7 @@ Inserire una prenotazione richiede l'autorizzazione "Aule.Prenotazioni.Inserimen
 | 3 | Chi ha "Aule.Prenotazioni.Modifica" |
 | 4 | Il richiedente, e solo se ha anche "Aule.Prenotazioni.Modifica" |
 
-Per il valore 4 un altro utente riceve "Solo l'utente che ha inserito la prenotazione può modificarla". "Richiedente" è la risorsa collegata all'utente (`CURRENT_ID_RISORSA`). Il controllo vale anche per la cancellazione e per le operazioni che modificano righe esistenti (taglia e sposta). Il permesso "Aule.Gestione" è definito ma non è applicato (DIV-AUL-5).
+Per il valore 4 un altro utente riceve "Solo l'utente che ha inserito la prenotazione può modificarla". "Richiedente" è la risorsa collegata all'utente (`CURRENT_ID_RISORSA`); nelle regole 2 e 4 conta il richiedente **registrato** sulla prenotazione, non quello che si sta scrivendo: chi cambia il richiedente di una prenotazione altrui con la propria risorsa è fermato come per qualunque altra modifica, mentre il richiedente registrato può passare la sua prenotazione a un altro. In inserimento non c'è un richiedente registrato e vale quello indicato. Il controllo vale anche per la cancellazione e per le operazioni che modificano righe esistenti (taglia e sposta). Il permesso "Aule.Gestione" serve per autorizzare le prenotazioni (GESTY-AUL-011).
 
 ### Scenario: aula che accetta tutti
 - **Dato** un'aula con `MODIFICA_PRENOTAZIONI = 1`
@@ -253,8 +274,18 @@ Per il valore 4 un altro utente riceve "Solo l'utente che ha inserito la prenota
 - **Quando** salva una nuova prenotazione
 - **Allora** il salvataggio si ferma per mancanza di autorizzazione
 
+### Scenario: prenotazione altrui presa in carico
+- **Dato** un'aula con valore 2 (o 4) e una prenotazione della risorsa 120
+- **Quando** l'utente della risorsa 130, senza il permesso di modifica (o con, per il valore 4), imposta come richiedente la propria risorsa
+- **Allora** il salvataggio si ferma e il richiedente resta la risorsa 120
+
+### Scenario: richiedente che passa la prenotazione
+- **Dato** un'aula con valore 2 e una prenotazione della risorsa 120
+- **Quando** l'utente della risorsa 120, senza il permesso di modifica, imposta come richiedente la risorsa 130
+- **Allora** il salvataggio riesce
+
 ## GESTY-AUL-011 Aule che richiedono autorizzazione
-Un'aula con `RICHIEDE_AUTORIZZAZIONE = TRUE` ha prenotazioni che nascono "da autorizzare". Una prenotazione è considerata autorizzata (`IS_AUTORIZZATA`) se l'aula non richiede autorizzazione, oppure se la data e l'ora di autorizzazione sono valorizzate. L'elenco Autorizzazioni (form Aule) mostra le prenotazioni di oggi e future, di aule che richiedono autorizzazione; l'azione "Autorizza" chiede conferma ("Autorizzare le prenotazioni selezionate?") e autorizza le righe selezionate una per una. Autorizzare registra la data e l'ora; una prenotazione già autorizzata non cambia. Se il responsabile dell'autorizzazione viene indicato, la data si compila da sola; se viene tolto, la data si azzera. Dalla scheda della prenotazione si può inviare una mail di richiesta all'indirizzo `CONFIG.EMAIL_AUTORIZZAZIONE_AULE`, con aula, giorno, ore, richiedente, oggetto e progetto; la mail non parte se la prenotazione è già autorizzata, se l'aula non richiede autorizzazione, se è annullata o se i parametri di posta non sono configurati.
+Un'aula con `RICHIEDE_AUTORIZZAZIONE = TRUE` ha prenotazioni che nascono "da autorizzare". Una prenotazione è considerata autorizzata (`IS_AUTORIZZATA`) se l'aula non richiede autorizzazione, oppure se la data e l'ora di autorizzazione sono valorizzate. L'elenco Autorizzazioni (form Aule) mostra le prenotazioni di oggi e future, di aule che richiedono autorizzazione; l'azione "Autorizza" chiede conferma ("Autorizzare le prenotazioni selezionate?") e autorizza le righe selezionate una per una. Autorizzare richiede l'autorizzazione "Aule.Gestione" (senza, la procedura `AULE_PRENOTAZIONI_AUTORIZZA` si ferma con il messaggio di mancata autorizzazione e la prenotazione resta da autorizzare) e registra la data e l'ora e il **responsabile**: la persona che autorizza, che alla prima volta viene inserita fra i responsabili delle aule (`AULE_RESPONSABILI`) se è una persona del personale; se l'utente non è collegato a una persona, o non è del personale, l'autorizzazione è rifiutata con un messaggio che lo dice. Una prenotazione già autorizzata non cambia. Se il responsabile dell'autorizzazione viene indicato, la data si compila da sola; se viene tolto, la data si azzera. Dalla scheda della prenotazione si può inviare una mail di richiesta all'indirizzo `CONFIG.EMAIL_AUTORIZZAZIONE_AULE`, con aula, giorno, ore, richiedente, oggetto e progetto; la mail non parte se la prenotazione è già autorizzata, se l'aula non richiede autorizzazione, se è annullata o se i parametri di posta non sono configurati.
 
 ### Scenario: prenotazione di un'aula con autorizzazione
 - **Dato** un'aula con `RICHIEDE_AUTORIZZAZIONE = TRUE`
@@ -262,9 +293,16 @@ Un'aula con `RICHIEDE_AUTORIZZAZIONE = TRUE` ha prenotazioni che nascono "da aut
 - **Allora** la prenotazione risulta non autorizzata (`IS_AUTORIZZATA = FALSE`) e compare nell'elenco Autorizzazioni
 
 ### Scenario: autorizzazione
-- **Dato** una prenotazione futura non autorizzata
+- **Dato** una prenotazione futura non autorizzata e un utente con "Aule.Gestione"
 - **Quando** l'utente la seleziona nell'elenco Autorizzazioni e conferma
 - **Allora** `DATA_ORA_AUTORIZZAZIONE` è valorizzata e `IS_AUTORIZZATA` è vero
+- **E** `ID_RESPONSABILE_AULE` è la persona che ha autorizzato, ora presente fra i responsabili delle aule
+
+### Scenario: autorizzazione senza il permesso
+- **Dato** una prenotazione futura non autorizzata e un utente senza "Aule.Gestione"
+- **Quando** tenta di autorizzarla
+- **Allora** l'operazione si ferma per mancanza di autorizzazione
+- **E** la prenotazione resta senza data di autorizzazione e senza responsabile
 
 ### Scenario: autorizzazione ripetuta
 - **Dato** una prenotazione già autorizzata
@@ -318,7 +356,7 @@ La form Prenotazioni Aule mostra un calendario con una colonna per ogni aula sel
 - **Allora** lo spostamento è rifiutato (stessa aula, data e ora di inizio, o sovrapposizione) e nel database la prenotazione non cambia
 
 ## GESTY-AUL-014 Copia, taglia e incolla
-Dal calendario si possono copiare e incollare una prenotazione, tutte le prenotazioni di un giorno, tutte quelle di una settimana, o tagliare e incollare una prenotazione. Le azioni si chiamano "Copia Prenotazione", "Copia Prenotazioni Giorno", "Copia Prenotazioni Settimana", "Taglia Prenotazione", "Incolla Prenotazioni". Le copie nascono con lo stesso richiedente, aula, oggetto, progetto, corso e visibilità dell'originale, nell'orario di destinazione; per una sola prenotazione la durata è conservata e l'ora iniziale è quella dove si incolla. Dove nella stessa aula e allo stesso giorno esiste già una prenotazione con la stessa ora di inizio, la copia di quella riga viene saltata. Se una copia si sovrappone ad altro, il controllo di GESTY-AUL-004 ferma l'intero incolla. Il taglio crea la nuova prenotazione e annulla la vecchia con il motivo "Spostata in un'altra data od ora". Incollare un giorno sullo stesso giorno, o una settimana sulla stessa settimana, non fa nulla. Copia di una settimana: ogni prenotazione va allo stesso giorno della settimana di destinazione.
+Dal calendario si possono copiare e incollare una prenotazione, tutte le prenotazioni di un giorno, tutte quelle di una settimana, o tagliare e incollare una prenotazione. Le azioni si chiamano "Copia Prenotazione", "Copia Prenotazioni Giorno", "Copia Prenotazioni Settimana", "Taglia Prenotazione", "Incolla Prenotazioni". Le copie nascono con lo stesso richiedente, aula, oggetto, progetto, corso e visibilità dell'originale, nell'orario di destinazione; per una sola prenotazione la durata è conservata e l'ora iniziale è quella dove si incolla. Si copiano solo le prenotazioni attive (le annullate restano dov'erano) e le note non si copiano. Dove nella stessa aula e allo stesso giorno esiste già una prenotazione **attiva** con la stessa ora di inizio, la copia di quella riga viene saltata; una prenotazione annullata nella destinazione non conta. Se una copia si sovrappone ad altro, il controllo di GESTY-AUL-004 ferma l'intero incolla. Il taglio crea la nuova prenotazione e annulla la vecchia con il motivo "Spostata in un'altra data od ora", ma solo se la nuova è stata creata: se la copia è saltata (destinazione già occupata alla stessa ora) la prenotazione di partenza resta com'è, e tagliare e incollare nello stesso punto non fa nulla. Incollare un giorno sullo stesso giorno, o una settimana sulla stessa settimana, non fa nulla. Copia di una settimana: la settimana di partenza va dal lunedì alla domenica della data indicata e ogni prenotazione va allo stesso giorno della settimana di destinazione; le prenotazioni dei giorni della settimana seguente non si copiano anche se la data di partenza non è un lunedì. Incollare un giorno o una settimana copia le prenotazioni di tutte le aule, anche di quelle di cui l'utente non vede il calendario.
 
 ### Scenario: incolla una prenotazione
 - **Dato** una prenotazione copiata di 2 ore
@@ -340,13 +378,38 @@ Dal calendario si possono copiare e incollare una prenotazione, tutte le prenota
 - **Quando** si incolla il 10/11 sul 17/11
 - **Allora** la riga di A101 è saltata e le altre vengono copiate
 
+### Scenario: destinazione con una prenotazione annullata
+- **Dato** una prenotazione del 23/08 di A101 alle 09:00 e una prenotazione annullata del 30/08 di A101 alle 09:00
+- **Quando** si incolla il 23/08 sul 30/08
+- **Allora** nasce una prenotazione attiva del 30/08 alle 09:00, accanto a quella annullata
+
+### Scenario: prenotazione annullata non copiata
+- **Dato** una prenotazione annullata del 06/09
+- **Quando** si copia il giorno e lo si incolla sul 13/09
+- **Allora** non nasce nessuna prenotazione del 13/09
+
+### Scenario: taglia e incolla nello stesso punto
+- **Dato** una prenotazione di A101 del 07/07 alle 09:00
+- **Quando** la si taglia e la si incolla il 07/07 alle 09:00
+- **Allora** la prenotazione resta attiva e non ne nasce un'altra
+
+### Scenario: taglia su una destinazione occupata
+- **Dato** una prenotazione di A101 del 13/07 alle 09:00 e un'altra prenotazione attiva di A101 del 14/07 alle 09:00
+- **Quando** la prima si taglia e si incolla il 14/07 alle 09:00
+- **Allora** la copia è saltata e la prenotazione del 13/07 resta attiva
+
+### Scenario: incolla settimana da un mercoledì
+- **Dato** prenotazioni di lunedì 20/09 e di lunedì 27/09 e la data di partenza mercoledì 22/09
+- **Quando** si incolla la settimana sulla settimana del lunedì 11/10
+- **Allora** nasce la prenotazione dell'11/10 e non quella del 18/10
+
 ### Scenario: copia sovrapposta ad altro
 - **Dato** una prenotazione del 10/11 di A101 dalle 09:00 alle 11:00 e una del 17/11 di A101 dalle 10:00 alle 12:00
 - **Quando** si incolla il 10/11 sul 17/11
 - **Allora** l'intero incolla si ferma per sovrapposizione e nulla viene copiato
 
 ## GESTY-AUL-015 Prenotazione per periodo
-Il comando "Prenotazione periodo" (barra del calendario) genera molte prenotazioni insieme per un'aula: si indicano aula (di norma quella selezionata, altrimenti la prima), oggetto, progetto e corso facoltativi, il periodo (di partenza quello visibile), i giorni della settimana da includere (lunedì-venerdì di partenza) e per ciascuno l'ora di inizio e di fine (di partenza 08:00-12:00). Verifiche prima di lanciare: aula, oggetto (salvo lo svuotamento), data inizio e fine, data inizio non dopo la fine, ora inizio minore dell'ora fine per ogni giorno scelto. Per ogni giorno scelto del periodo, prima si controlla che l'aula sia libera e poi si inserisce la prenotazione con richiedente l'utente collegato; il primo conflitto ferma l'intera generazione e nessun giorno resta inserito a metà, con il messaggio di GESTY-AUL-004. Con "Eliminazione prenotazioni" (svuotamento) non si inserisce nulla: si eliminano fisicamente tutte le prenotazioni dell'aula, attive e annullate, che si sovrappongono alle fasce dei giorni scelti, dopo la domanda "Si desidera eliminare le prenotazioni preesistenti?".
+Il comando "Prenotazione periodo" (barra del calendario) genera molte prenotazioni insieme per un'aula: si indicano aula (di norma quella selezionata, altrimenti la prima), oggetto, progetto e corso facoltativi, il periodo (di partenza quello visibile), i giorni della settimana da includere (lunedì-venerdì di partenza) e per ciascuno l'ora di inizio e di fine (di partenza 08:00-12:00). Verifiche prima di lanciare: aula, oggetto (salvo lo svuotamento), data inizio e fine, data inizio non dopo la fine, ora inizio minore dell'ora fine per ogni giorno scelto. Per ogni giorno scelto del periodo, prima si controlla che l'aula sia libera e poi si inserisce la prenotazione con richiedente l'utente collegato; il primo conflitto ferma l'intera generazione e nessun giorno resta inserito a metà, con il messaggio di GESTY-AUL-004. Con "Eliminazione prenotazioni" (svuotamento) non si inserisce nulla: si eliminano fisicamente le prenotazioni **attive** dell'aula **richieste dall'utente che lancia lo svuotamento** che si sovrappongono alle fasce dei giorni scelti, dopo la domanda "Si desidera eliminare le prenotazioni preesistenti?". Le prenotazioni di altre persone e quelle annullate (la traccia di chi aveva rinunciato) non si toccano, e per questo lo svuotamento non si ferma più alle regole di modifica delle prenotazioni altrui.
 
 ### Scenario: generazione settimanale
 - **Dato** l'aula A101, il periodo 02/11-27/11 e lunedì e mercoledì dalle 14:00 alle 17:00
@@ -363,6 +426,16 @@ Il comando "Prenotazione periodo" (barra del calendario) genera molte prenotazio
 - **Dato** prenotazioni di A101 lunedì 14:00-17:00 per quattro settimane
 - **Quando** si lancia lo svuotamento con lunedì 14:00-17:00 sullo stesso periodo e si risponde sì
 - **Allora** le prenotazioni di quelle fasce non esistono più
+
+### Scenario: svuotamento con prenotazioni altrui e annullate
+- **Dato** nel periodo una prenotazione attiva dell'utente, una annullata dell'utente e una attiva di un altro, tutte sulle fasce scelte
+- **Quando** l'utente lancia lo svuotamento
+- **Allora** sparisce solo la prenotazione attiva dell'utente
+
+### Scenario: svuotamento con la regola di modifica 4
+- **Dato** un'aula con regola di modifica 4 e una prenotazione di un altro nella fascia
+- **Quando** l'utente lancia lo svuotamento
+- **Allora** l'operazione riesce senza errore e la prenotazione dell'altro resta
 
 ### Scenario: ora di fine non valida
 - **Dato** un giorno scelto con inizio 17:00 e fine 14:00
@@ -478,22 +551,14 @@ L'orario collettivo e le prenotazioni condividono lo stesso insieme di regole di
 
 ## Divergenze note
 
-Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cui due parti del codice applicano la stessa regola in modo diverso. Si correggono nella voce R-194 di `Attivita Rinviate.md`; con la correzione il requisito si aggiorna e questa sezione si accorcia. Le righe sono state provate il 2026-10-31 (script `07-aule-e-prenotazioni.sql`), tranne DIV-AUL-7, 11 e 12, che derivano dalla lettura del codice e restano da provare; non si decide qui se un comportamento sia un difetto.
+Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cui due parti del codice applicano la stessa regola in modo diverso. Si correggono nella voce R-194 di `Attivita Rinviate.md`; con la correzione il requisito si aggiorna e questa sezione si accorcia (le divergenze 1, 2, 4, 5, 6, 9, 10 e 13 sono state corrette con il rilascio 002 e non compaiono più; la 8 era stata smentita dalla prova). DIV-AUL-3 è stata provata il 2026-10-31 (script `07-aule-e-prenotazioni.sql`); DIV-AUL-7, 11 e 12 derivano dalla lettura del codice e restano da provare. Non si decide qui se un comportamento sia un difetto: per DIV-AUL-7 serve prima un'analisi.
 
 | Codice | Divergenza | Conseguenza |
 |---|---|---|
-| DIV-AUL-1 | `AULA_VERIFICA_SOVRAPPOSIZIONE` non controlla i giorni di chiusura della sede: li guardano solo le ricerche di orari liberi (`AULE_CERCA_SLOT_LIBERI_RISORSA`) e le viste (`AULE_PRENOTAZIONI_ELENCO`, `AULE_ELENCO_SOVRAPPOSIZIONI`, `AULE_RIEPILOGO_UTILIZZO`). Il ticket 133 ha allineato ricerca e salvataggio su lezioni, riunioni e inagibilità ma non sulle chiusure | Una prenotazione, una lezione o una riunione si salva in un giorno di chiusura che la ricerca non propone; il giorno compare poi in "Elenco Sovrapposizioni" come conflitto |
-| DIV-AUL-2 | Il controllo di sovrapposizione di `AULE_PRENOTAZIONI_AIU0` riparte se cambiano annullamento, data, ora di inizio o durata, **non** se cambia l'aula. Lo sposta di una prenotazione su un'altra aula (trascinamento nel calendario, che scrive anche `AULA`) è fermato solo dall'indice univoco sulla stessa ora di inizio | Una prenotazione trascinata su un'altra aula con fascia sovrapposta ma ora di inizio diversa si salva senza avviso; l'aula risulta occupata due volte. Provata: con la stessa ora di inizio lo ferma solo l'indice univoco |
 | DIV-AUL-3 | Il vincolo ammette `ORA_FINE = 00:00`, ma `OVERLAP_TIME(inizio1, fine1, inizio2, fine2)` confronta con la fine numerica: una fine a mezzanotte vale "prima di ogni inizio", quindi non è mai in conflitto; la durata calcolata da `MINUTES_BETWEEN` vale 0 (non 120, e non negativa come si era dedotto) | Una prenotazione serale che finisce a mezzanotte non blocca nulla e non è bloccata da nulla (provato: 22:00-00:00 e 23:00-00:00 nella stessa aula si salvano entrambe); la ricerca slot finisce comunque entro le 23:59 |
-| DIV-AUL-4 | Nella modifica, `AULE_PRENOTAZIONI_BUD0` controlla il richiedente con il valore **nuovo** (`NEW.ID_RISORSA`) e non con quello registrato. Con le regole 2 e 4 un utente che cambia il richiedente di una prenotazione altrui con la propria risorsa supera il controllo e la prende in carico | Il controllo "solo il richiedente" si aggira se la scheda lascia modificare il richiedente (da verificare nella scheda LZ `Aule.Aule_Prenotazioni`). Provata sul database con le regole 2 e 4; resta da vedere se la scheda lascia cambiare il richiedente |
-| DIV-AUL-5 | L'autorizzazione "Aule.Gestione" (`AUTH.AULE_PRENOTAZIONI_GESTIONE`, colonna `USR_DEFAULT_AUTHORIZATIONS.AULE_PRENOTAZIONI_GESTIONE`) non è richiesta da nessun trigger, procedura o menu del dizionario LZ. Anche "Autorizza" non verifica chi la esegue: né un'autorizzazione, né che l'utente sia un responsabile (`AULE_RESPONSABILI`) | Chiunque apra l'elenco Autorizzazioni può autorizzare qualunque prenotazione. Provata: un utente senza alcuna autorizzazione e non responsabile autorizza |
-| DIV-AUL-6 | `dmAule.Autorizza` chiama `AULE_PRENOTAZIONI_AUTORIZZA` senza valorizzare `ID_RESPONSABILE_AULE`, e la procedura scrive il parametro così com'è | La prenotazione risulta autorizzata (data e ora) ma senza responsabile: `RESPONSABILE_AULA` resta vuoto e non si sa chi ha autorizzato. Il trigger si accorge solo di cambi del responsabile, quindi non lo compila. Provata |
 | DIV-AUL-7 | Il flag `NOTIFICA_RICHIESTA_AI_RESPONSAB` non è letto da nessun oggetto: la richiesta di autorizzazione parte solo se qualcuno invia a mano la mail, a un solo indirizzo di configurazione (`CONFIG.EMAIL_AUTORIZZAZIONE_AULE`) | Spuntare il flag nell'aula non ha alcun effetto; i responsabili non ricevono nulla |
-| DIV-AUL-9 | `AULE_PRENOTAZIONI_INCOLLA_ORA/GIORN/SETT` saltano la destinazione se esiste una riga con stessa aula, data e ora di inizio, anche annullata, mentre l'indice univoco ignora le annullate; copiano anche le prenotazioni annullate (restano annullate) e non le note; incolla giorno e settimana copiano **tutte** le aule, anche quelle non visibili; il richiedente resta quello dell'originale. Nel taglio, l'annullamento della riga di partenza avviene anche quando la copia è stata saltata | Una prenotazione annullata nel giorno di destinazione impedisce di incollarci sopra una prenotazione valida; incollare un giorno può duplicare prenotazioni di aule di cui l'utente non vede il calendario; tagliare e incollare nella stessa aula, data e ora (la riga di partenza è la riga "esistente") annulla la prenotazione senza crearne una nuova. Provati sul banco tutti i punti, anche l'ultimo |
-| DIV-AUL-10 | `AULE_PRENOTAZIONI_INCOLLA_SETT` calcola la fine della settimana di partenza come `SRC_DATA + 6 giorni` ma l'inizio come lunedì della settimana | Se la data di partenza non è un lunedì, vengono copiate anche le prenotazioni dei primi giorni della settimana seguente, spostate della stessa differenza. Provata con data di partenza di mercoledì; dipende dalla data passata dall'interfaccia |
 | DIV-AUL-11 | Le prenotazioni annullate compaiono in più punti: in `CALENDARIO_AULE` (form Calendario Aule) e in `CALENDARIO_AGENDA_PERSONALE` (agenda del richiedente) non c'è il filtro `ANNULLATA`, che invece c'è in `CALENDARIO_PRENOTAZIONE_AULE`; nell'elenco `AULE_ELENCO_SOVRAPPOSIZIONI` una prenotazione annullata è segnalata come sovrapposta. Inoltre `CALENDARIO_PRENOTAZIONE_AULE` mostra le lezioni senza guardare `LEZIONE_SVOLTA`, mentre ricerche e salvataggio ignorano le lezioni non svolte | Una prenotazione annullata continua a occupare visivamente l'aula nel Calendario Aule e nell'agenda personale, ma non nel calendario delle prenotazioni; ricerche e salvataggio la ignorano. Una lezione non svolta appare nel calendario come se occupasse l'aula, che invece si può prenotare |
 | DIV-AUL-12 | `AULE_ELENCO_SOVRAPPOSIZIONI` segnala una sovrapposizione se prenotazione e lezione cadono nello stesso **giorno** sulla stessa aula, senza confrontare le fasce orarie; non filtra le inagibilità annullate; il ramo "inagibilità" di `AULE_PRENOTAZIONI_ELENCO` non filtra `ANNULLATA = 'N'` (`AULE_RIEPILOGO_UTILIZZO` invece lo fa) | L'elenco mostra come conflitti casi che il salvataggio accetta (stesso giorno, fasce diverse) e come inagibili periodi annullati nelle occupazioni; il filtro del ticket 133 sta in `AULA_VERIFICA_SOVRAPPOSIZIONE`, `AULA_LIBERA` e nel riepilogo, non in queste due viste |
-| DIV-AUL-13 | `AULE_PRENOTA_PERIODO` con lo svuotamento cancella **tutte** le prenotazioni dell'aula che si sovrappongono alle fasce scelte, anche quelle inserite a mano da altri e quelle annullate; la cancellazione passa comunque da `AULE_PRENOTAZIONI_BUD0`, quindi le regole di modifica 2-4 (GESTY-AUL-010) valgono anche per lo svuotamento | Il commento del ticket 133 parla di "righe generate", ma la procedura non distingue le generate dalle altre. Chi può prenotare ma non modificare le prenotazioni altrui vede lo svuotamento fermarsi al primo giorno con una prenotazione altrui, con annullamento dell'intera operazione. Provata: con la regola 4 si ferma, con la regola 1 elimina anche prenotazioni altrui e annullate |
 
 <!-- footer -->
 ---
