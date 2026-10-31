@@ -47,6 +47,26 @@
       ]
     },
     {
+      "area": "Budget",
+      "specifica": "Budget.md",
+      "percorsi": [
+        "dmBudget.pas",
+        "frmBudget.pas"
+      ],
+      "oggetti": [
+        "COAN_",
+        "PROGETTI_TIPI_INCARICO_DETAIL",
+        "CAN_SEE_BUDGET"
+      ],
+      "prove": [
+        "caratterizzazione SQL 07 (25 casi, su copia di CAPAC: ogni lancio fa quattro elaborazioni complete, circa 20 minuti)",
+        "interfaccia (caselle di ricerca, doppio clic, DIV-BUD-8): collaudo con zapp (R-195)"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/07-budget.sql"
+      ]
+    },
+    {
       "area": "Tirocini",
       "specifica": "Tirocini.md",
       "percorsi": [
