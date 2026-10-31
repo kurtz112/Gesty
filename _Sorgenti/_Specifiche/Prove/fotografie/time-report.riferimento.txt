@@ -1,0 +1,13 @@
+﻿-- Riferimento scritto da zCollaudo il 2026-10-31 19:27, non modificare a mano.
+-- Prima riga: nomi delle colonne. Poi una riga per caso, colonne separate da ";".
+CASO ; RIGHE ; ORE ; SENZA_INCARICO ; IMPRONTA
+01 nessun filtro ; 29 ; 76 ; 1 ; 94415691524712306545
+02 filtro progetto ; 12 ; 34 ; 0 ; 49169622634236690460
+03 progetto con ora senza incarico ; 4 ; 12 ; 1 ; 17339715962403342164
+04 filtro tipo incarico ; 29 ; 76 ; 1 ; 94415691524712306545
+05 filtro incarico (esclude le ore senza) ; 1 ; 2 ; 0 ; 7539568655182896917
+06 stampa per mese su tre mesi ; 213 ; 484.5 ; 1 ; 598146820441346057801
+07 altra risorsa, cinque progetti ; 40 ; 157.5 ; 0 ; 78600656451355646216
+08 giorno finale mancante ; 0 ; 0 ; 0 ; 0
+09 risorsa -1 ; 0 ; 0 ; 0 ; 0
+10 primi due giorni dell'anno ; 2 ; 4 ; 0 ; 5086469050952180666
