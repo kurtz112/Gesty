@@ -29160,6 +29160,7 @@ TSP_time_Report = class (TzStoredProc)
     fTimbro: TPicture;
     fFirma_Come: TNullableString;
     fRaggruppamento: TNullableString;
+    fSenza_Incarico: TNullableBoolean;
   private
     property Id_Risorsa_internal: TNullableInt64 read fId_Risorsa write fId_Risorsa;
     property Nominativo_O_Ragione_Sociale_internal: TNullableString read fNominativo_O_Ragione_Sociale write fNominativo_O_Ragione_Sociale;
@@ -29185,6 +29186,7 @@ TSP_time_Report = class (TzStoredProc)
     property Direttore_internal: TNullableString read fDirettore write fDirettore;
     property Firma_Come_internal: TNullableString read fFirma_Come write fFirma_Come;
     property Raggruppamento_internal: TNullableString read fRaggruppamento write fRaggruppamento;
+    property Senza_Incarico_internal: TNullableBoolean read fSenza_Incarico write fSenza_Incarico;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -29300,6 +29302,9 @@ TSP_time_Report = class (TzStoredProc)
     //
     [TParamAttribute('RAGGRUPPAMENTO', ptOutput, False)]
     property Raggruppamento: TNullableString read fRaggruppamento;
+    //
+    [TParamAttribute('SENZA_INCARICO', ptOutput, False)]
+    property Senza_Incarico: TNullableBoolean read fSenza_Incarico;
 end;
 
 [TStoredProcedure('TIME_REPORT_LK_PROGETTI', True)]
