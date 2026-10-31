@@ -103,8 +103,18 @@
       "area": "Timesheet",
       "specifica": "Timesheet.md",
       "percorsi": [],
-      "oggetti": [],
-      "prove": []
+      "oggetti": [
+        "TIME_REPORT"
+      ],
+      "prove": [
+        "fotografia (golden master) di TIME_REPORT, 10 casi: confronto con il riferimento, non con la specifica"
+      ],
+      "fotografie": [
+        {
+          "script": "Prove/fotografie/time-report.sql",
+          "riferimento": "Prove/fotografie/time-report.riferimento.txt"
+        }
+      ]
     },
     {
       "area": "Stampe e allegati",
