@@ -122,6 +122,35 @@
       "percorsi": [],
       "oggetti": [],
       "prove": []
+    },
+    {
+      "area": "Aule e prenotazioni",
+      "specifica": "Aule e prenotazioni.md",
+      "percorsi": [
+        "dmAule.pas",
+        "dmPrenotazioniAule.pas",
+        "dmCalendarioAule.pas",
+        "dmAgenda.pas",
+        "dmScheduler.Tools.pas",
+        "frmAule.pas",
+        "frmPrenotazioniAule.pas",
+        "frmCalendarioAule.pas",
+        "frmPrenotaAulaDaAgenda.pas",
+        "frmGeneraPrenotazioniAule.pas"
+      ],
+      "oggetti": [
+        "AULE_PRENOTAZIONI",
+        "AULE_PRENOTA_PERIODO",
+        "AULA_VERIFICA_SOVRAPPOSIZIONE",
+        "AULE_INAGIBILITA"
+      ],
+      "prove": [
+        "caratterizzazione SQL 07 (118 casi)",
+        "eliminazione dal calendario: collaudo con zapp il 2026-10-31 (annulla senza errore); trascinamento: la sonda non riesce a guidarlo"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/07-aule-e-prenotazioni.sql"
+      ]
     }
   ]
 }
