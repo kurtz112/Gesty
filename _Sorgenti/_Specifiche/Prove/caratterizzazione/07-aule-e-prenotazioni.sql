@@ -7,12 +7,14 @@
 -- Contesto utente simulato: CURRENT_ID_RISORSA() con RDB$SET_CONTEXT e autorizzazioni in USR_TMP_AUTHORIZATIONS
 -- (CARATT_UTENTE), come nella terza parte di Rilevamento ore. Prova le regole dei trigger e delle procedure, non il
 -- modo in cui l'applicazione costruisce il contesto.
--- Atteso = cio' che dice la specifica; per le divergenze ancora aperte (DIV-AUL-3) atteso = il comportamento descritto nella divergenza.
+-- Atteso = cio' che dice la specifica (tutte le divergenze di R-194 sono ormai corrette: nessun caso aperto).
 -- Dal rilascio di correzione (R-194) le divergenze 1, 2, 4, 5, 6, 9, 10 e 13 sono casi di conformita': lo script va eseguito
 -- DOPO lo script Aule-R194-correzione-divergenze.sql, che cambia le procedure e i trigger provati qui.
--- Non provati qui: AUL-001 (anagrafica), 007 (ricerche e viste), 012 (notifica), 013, 016, 017, 018 (interfaccia e viste),
--- DIV-AUL-11, 12; l'eliminazione dal calendario si prova con zapp sul banco.
+-- Non provati qui: AUL-001 (anagrafica), 007 (ricerche), 012 (notifica), 013, 016, 017, 018 (interfaccia);
+-- l'eliminazione dal calendario si prova con zapp sul banco.
 -- Dal rilascio 003 anche DIV-AUL-7 e' corretta (avviso ai responsabili): lo script va eseguito dopo Aule-R194-notifica-ai-responsabili.sql.
+-- Dal rilascio 004 anche DIV-AUL-3 (fine a mezzanotte), DIV-AUL-11 e 12 (calendari e viste) e i giorni di chiusura saltati nella
+-- generazione per periodo: lo script va eseguito dopo Aule-R194-calendari-viste-mezzanotte.sql.
 SET TERM ^ ;
 
 CREATE TABLE CARATT_ESITI (
@@ -324,6 +326,8 @@ BEGIN
   EXECUTE PROCEDURE CARATT_AULA('ZT-PER3');
   EXECUTE PROCEDURE CARATT_AULA('ZT-PER4', '4');
   EXECUTE PROCEDURE CARATT_AULA('ZT-PER5');
+  EXECUTE PROCEDURE CARATT_AULA('ZT-PER6');
+  EXECUTE PROCEDURE CARATT_AULA('ZT-CAL');
 
   INSERT INTO AULE_INAGIBILITA (AULA, MOTIVO_INAGIBILITA, DAL_GIORNO, AL_GIORNO, ANNULLATA)
   VALUES ('ZT-I1', 'Lavori impianto elettrico', CAST('2027-03-10' AS DATE), CAST('2027-03-14' AS DATE), 'N');
@@ -400,7 +404,7 @@ END^
 COMMIT^
 
 ------------------------------------------------------------------------------------------------------------
--- GESTY-AUL-004: sovrapposizioni fra prenotazioni; DIV-AUL-3 (fine a mezzanotte, ancora aperta)
+-- GESTY-AUL-004: sovrapposizioni fra prenotazioni, compresa la fine a mezzanotte (00:00 vale fine giornata)
 EXECUTE BLOCK AS
 BEGIN
   EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
@@ -437,12 +441,18 @@ BEGIN
   EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-004', 'cambio aula con la stessa ora di inizio: lo ferma l''indice univoco', 'errore', 'UNQ1_AULE_PRENOTAZIONI',
       'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.AULA = ''ZT-B'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-A', '2027-02-11', '11:00:00'));
 
-  -- DIV-AUL-3: fine a mezzanotte
-  EXECUTE PROCEDURE CARATT_PRENOTA('DIV-AUL-3', 'prenotazione 22:00-00:00', 'riuscito', NULL, 'ZT-A', '2027-02-12', '22:00:00', '00:00:00', 120);
-  EXECUTE PROCEDURE CARATT_PRENOTA('DIV-AUL-3', 'seconda prenotazione 23:00-00:00 sulla stessa aula: non e'' in conflitto', 'riuscito', NULL, 'ZT-A', '2027-02-12', '23:00:00', '00:00:00', 130);
-  EXECUTE PROCEDURE CARATT_CONTROLLA('DIV-AUL-3', 'la durata calcolata di 22:00-00:00 vale 0 (non 120)',
-      IIF((SELECT AULE_PRENOTAZIONI.DURATA FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-A', '2027-02-12', '22:00:00')) = 0, TRUE, FALSE),
-      'DURATA uguale a 0');
+  -- fine a mezzanotte (00:00 = fine giornata)
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-004', 'prenotazione 22:00-00:00', 'riuscito', NULL, 'ZT-A', '2027-02-12', '22:00:00', '00:00:00', 120);
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-004', 'la durata di 22:00-00:00 vale 120 minuti',
+      IIF((SELECT AULE_PRENOTAZIONI.DURATA FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-A', '2027-02-12', '22:00:00')) = 120, TRUE, FALSE),
+      'DURATA uguale a 120');
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-004', 'seconda prenotazione 23:00-00:00 sulla stessa aula: in conflitto', 'errore', 'Risulta un''altra', 'ZT-A', '2027-02-12', '23:00:00', '00:00:00', 130);
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-004', 'prenotazione 21:00-23:00 che si sovrappone a quella che finisce a mezzanotte', 'errore', 'Risulta un''altra', 'ZT-A', '2027-02-12', '21:00:00', '23:00:00', 130);
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-004', 'prenotazione 20:00-22:00 contigua a quella che finisce a mezzanotte', 'riuscito', NULL, 'ZT-A', '2027-02-12', '20:00:00', '22:00:00', 130);
+  EXECUTE PROCEDURE CARATT_RIUNIONE('GESTY-AUL-005', 'riunione 23:00-23:30 su una prenotazione che finisce a mezzanotte', 'errore', 'Risulta un''altra', 'ZT-A', '2027-02-12', '23:00:00', '23:30:00');
+  EXECUTE PROCEDURE CARATT_LEZIONE('GESTY-AUL-005', 'lezione 23:00-24:00 su una prenotazione che finisce a mezzanotte', 'errore', 'Risulta un''altra', 'ZT-A', '2027-02-12', '23:00:00');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-016', 'la ricerca non dichiara libera la fascia 22:30-23:00 occupata da una prenotazione fino a mezzanotte',
+      IIF(AULA_LIBERA('ZT-A', '2027-02-12', '22:30:00', '23:00:00') = FALSE, TRUE, FALSE), 'AULA_LIBERA falso');
 END^
 
 COMMIT^
@@ -796,6 +806,14 @@ BEGIN
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-015', 'nessun giorno prima del conflitto e'' rimasto inserito',
       IIF((SELECT COUNT(*) FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.AULA = 'ZT-PER2') = 1, TRUE, FALSE), 'resta solo la prenotazione preesistente');
 
+  -- giorno di chiusura della sede (lunedi 22/03/2027, prenotazioni non consentite): si salta, gli altri giorni si generano
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-015', 'generazione lunedi-venerdi che attraversa un giorno di chiusura della sede', 'riuscito', NULL,
+      'EXECUTE PROCEDURE CARATT_PERIODO(''ZT-PER6'', ''2027-03-22'', ''2027-03-26'', FALSE, ''LV'')');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-015', 'il giorno di chiusura e'' saltato e gli altri quattro giorni sono generati',
+      IIF(CARATT_QUANTE('ZT-PER6', '2027-03-22', NULL, FALSE) = 0 AND
+          (SELECT COUNT(*) FROM AULE_PRENOTAZIONI WHERE AULE_PRENOTAZIONI.AULA = 'ZT-PER6' AND AULE_PRENOTAZIONI.ANNULLATA = FALSE) = 4, TRUE, FALSE),
+      'nessuna prenotazione il 22/03 e quattro in tutto');
+
   -- svuotamento: quattro lunedi di ZT-PER3 generati da 120
   EXECUTE PROCEDURE CARATT_ESEGUI('PREPARAZIONE', 'generazione per lo svuotamento', 'riuscito', NULL,
       'EXECUTE PROCEDURE CARATT_PERIODO(''ZT-PER3'', ''2027-12-06'', ''2027-12-27'', FALSE, ''L'')');
@@ -869,6 +887,91 @@ BEGIN
       IIF(NOT EXISTS(SELECT 1 FROM NOTIFICHE WHERE NOTIFICHE.NOTIFICA = 'AUTORIZZAZIONE_AULA' AND
                      NOTIFICHE.TAG_ID IN (CARATT_ID('ZT-NOT0', '2027-05-03', '09:00:00'), CARATT_ID('ZT-A', '2027-05-04', '09:00:00'))), TRUE, FALSE),
       'nessuna notifica');
+END^
+
+COMMIT^
+
+------------------------------------------------------------------------------------------------------------
+-- GESTY-AUL-013 e 018: calendari e viste con prenotazioni annullate e lezioni non svolte (aula ZT-CAL, febbraio 2028)
+EXECUTE BLOCK AS
+BEGIN
+  EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
+
+  -- 07/02: una prenotazione attiva, una annullata, una lezione svolta e una non svolta
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-CAL', '2028-02-07', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-CAL', '2028-02-07', '11:00:00', '12:00:00', 120, NULL, NULL, NULL, TRUE);
+  EXECUTE PROCEDURE CARATT_LEZIONE('PREPARAZIONE', 'lezione svolta in ZT-CAL il 07/02 alle 13:00', 'riuscito', NULL, 'ZT-CAL', '2028-02-07', '13:00:00');
+  EXECUTE PROCEDURE CARATT_LEZIONE('PREPARAZIONE', 'lezione non svolta in ZT-CAL il 07/02 alle 15:00', 'riuscito', NULL, 'ZT-CAL', '2028-02-07', '15:00:00', FALSE);
+
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-013', 'Calendario Aule: la prenotazione attiva compare',
+      IIF(EXISTS(SELECT 1 FROM CALENDARIO_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1, '08:00:00', '23:00:00', 30, FALSE) WHERE
+                CALENDARIO_AULE.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-07', '09:00:00')), TRUE, FALSE), 'evento presente');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-013', 'Calendario Aule: la prenotazione annullata non compare',
+      IIF(NOT EXISTS(SELECT 1 FROM CALENDARIO_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1, '08:00:00', '23:00:00', 30, FALSE) WHERE
+                    CALENDARIO_AULE.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-07', '11:00:00')), TRUE, FALSE), 'evento assente');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'Calendario Aule: la lezione svolta compare',
+      IIF(EXISTS(SELECT 1 FROM CALENDARIO_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1, '08:00:00', '23:00:00', 30, FALSE) WHERE
+                CALENDARIO_AULE.ID_ORARIO = (SELECT ORARIO.ID_ORARIO FROM ORARIO WHERE ORARIO.AULA = 'ZT-CAL' AND ORARIO.DATA_LEZIONE = CAST('2028-02-07' AS DATE) AND ORARIO.ORA_INIZIO = '13:00:00')), TRUE, FALSE), 'evento presente');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'Calendario Aule: la lezione non svolta non compare',
+      IIF(NOT EXISTS(SELECT 1 FROM CALENDARIO_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1, '08:00:00', '23:00:00', 30, FALSE) WHERE
+                    CALENDARIO_AULE.ID_ORARIO = (SELECT ORARIO.ID_ORARIO FROM ORARIO WHERE ORARIO.AULA = 'ZT-CAL' AND ORARIO.DATA_LEZIONE = CAST('2028-02-07' AS DATE) AND ORARIO.ORA_INIZIO = '15:00:00')), TRUE, FALSE), 'evento assente');
+
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-013', 'calendario delle prenotazioni: la lezione svolta compare',
+      IIF(EXISTS(SELECT 1 FROM CALENDARIO_PRENOTAZIONE_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1) WHERE
+                CALENDARIO_PRENOTAZIONE_AULE.ID_ORARIO = (SELECT ORARIO.ID_ORARIO FROM ORARIO WHERE ORARIO.AULA = 'ZT-CAL' AND ORARIO.DATA_LEZIONE = CAST('2028-02-07' AS DATE) AND ORARIO.ORA_INIZIO = '13:00:00')), TRUE, FALSE), 'evento presente');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-013', 'calendario delle prenotazioni: la lezione non svolta non compare',
+      IIF(NOT EXISTS(SELECT 1 FROM CALENDARIO_PRENOTAZIONE_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1) WHERE
+                    CALENDARIO_PRENOTAZIONE_AULE.ID_ORARIO = (SELECT ORARIO.ID_ORARIO FROM ORARIO WHERE ORARIO.AULA = 'ZT-CAL' AND ORARIO.DATA_LEZIONE = CAST('2028-02-07' AS DATE) AND ORARIO.ORA_INIZIO = '15:00:00')), TRUE, FALSE), 'evento assente');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-013', 'calendario delle prenotazioni: la prenotazione annullata non compare',
+      IIF(NOT EXISTS(SELECT 1 FROM CALENDARIO_PRENOTAZIONE_AULE(CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE), 'ZT-CAL', -1) WHERE
+                    CALENDARIO_PRENOTAZIONE_AULE.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-07', '11:00:00')), TRUE, FALSE), 'evento assente');
+
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-017', 'agenda del richiedente: la prenotazione attiva compare',
+      IIF(EXISTS(SELECT 1 FROM CALENDARIO_AGENDA_PERSONALE(120, CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE)) WHERE
+                CALENDARIO_AGENDA_PERSONALE.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-07', '09:00:00')), TRUE, FALSE), 'evento presente');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-017', 'agenda del richiedente: la prenotazione annullata non compare',
+      IIF(NOT EXISTS(SELECT 1 FROM CALENDARIO_AGENDA_PERSONALE(120, CAST('2028-02-07' AS DATE), CAST('2028-02-07' AS DATE)) WHERE
+                    CALENDARIO_AGENDA_PERSONALE.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-07', '11:00:00')), TRUE, FALSE), 'evento assente');
+
+  -- 09/02: prenotazione e lezione svolta nello stesso giorno ma in fasce diverse: non e'' una sovrapposizione
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-CAL', '2028-02-09', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_LEZIONE('PREPARAZIONE', 'lezione svolta in ZT-CAL il 09/02 alle 11:00', 'riuscito', NULL, 'ZT-CAL', '2028-02-09', '11:00:00');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'elenco sovrapposizioni: fasce diverse nello stesso giorno non sono segnalate',
+      IIF(NOT EXISTS(SELECT 1 FROM AULE_ELENCO_SOVRAPPOSIZIONI WHERE AULE_ELENCO_SOVRAPPOSIZIONI.AULA = 'ZT-CAL' AND
+                    AULE_ELENCO_SOVRAPPOSIZIONI.DATA_PRENOTAZIONE = CAST('2028-02-09' AS DATE)), TRUE, FALSE), 'nessuna riga');
+
+  -- 14/02: giorno dichiarato di chiusura dopo che le righe c''erano gia'' (prenotazione attiva e annullata, lezione svolta e non svolta)
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-CAL', '2028-02-14', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-CAL', '2028-02-14', '11:00:00', '12:00:00', 120, NULL, NULL, NULL, TRUE);
+  EXECUTE PROCEDURE CARATT_LEZIONE('PREPARAZIONE', 'lezione non svolta in ZT-CAL il 14/02 alle 13:00', 'riuscito', NULL, 'ZT-CAL', '2028-02-14', '13:00:00', FALSE);
+  EXECUTE PROCEDURE CARATT_LEZIONE('PREPARAZIONE', 'lezione svolta in ZT-CAL il 14/02 alle 15:00', 'riuscito', NULL, 'ZT-CAL', '2028-02-14', '15:00:00');
+  -- la vista delle sovrapposizioni mostra solo le lezioni con un docente
+  UPDATE ORARIO SET ORARIO.ID_DOCENTE = 120 WHERE ORARIO.AULA = 'ZT-CAL' AND ORARIO.DATA_LEZIONE = CAST('2028-02-14' AS DATE);
+  INSERT INTO ENTI_SEDI_GIORNI_CHIUSURA (ID_ENTE, ID_SEDE, DATA_CHIUSURA, MOTIVO_CHIUSURA, FESTIVO, CONSENTI_PRENOTAZIONE_AULE)
+  VALUES (1492, 1499, CAST('2028-02-14' AS DATE), 'Chiusura dichiarata dopo', FALSE, FALSE);
+
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'elenco sovrapposizioni: la prenotazione attiva nel giorno di chiusura e'' segnalata',
+      IIF(EXISTS(SELECT 1 FROM AULE_ELENCO_SOVRAPPOSIZIONI WHERE AULE_ELENCO_SOVRAPPOSIZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-14', '09:00:00') AND
+                AULE_ELENCO_SOVRAPPOSIZIONI.GIORNO_CHIUSURA = TRUE), TRUE, FALSE), 'riga con GIORNO_CHIUSURA');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'elenco sovrapposizioni: la prenotazione annullata non e'' segnalata',
+      IIF(NOT EXISTS(SELECT 1 FROM AULE_ELENCO_SOVRAPPOSIZIONI WHERE AULE_ELENCO_SOVRAPPOSIZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-14', '11:00:00')), TRUE, FALSE), 'nessuna riga');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'elenco sovrapposizioni: la lezione svolta nel giorno di chiusura e'' segnalata',
+      IIF(EXISTS(SELECT 1 FROM AULE_ELENCO_SOVRAPPOSIZIONI WHERE AULE_ELENCO_SOVRAPPOSIZIONI.AULA = 'ZT-CAL' AND AULE_ELENCO_SOVRAPPOSIZIONI.IS_COLLETTIVA = TRUE AND
+                AULE_ELENCO_SOVRAPPOSIZIONI.DATA_PRENOTAZIONE = CAST('2028-02-14' AS DATE) AND AULE_ELENCO_SOVRAPPOSIZIONI.ORA_INIZIO = '15:00:00'), TRUE, FALSE), 'riga della lezione');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'elenco sovrapposizioni: la lezione non svolta non e'' segnalata',
+      IIF(NOT EXISTS(SELECT 1 FROM AULE_ELENCO_SOVRAPPOSIZIONI WHERE AULE_ELENCO_SOVRAPPOSIZIONI.AULA = 'ZT-CAL' AND AULE_ELENCO_SOVRAPPOSIZIONI.IS_COLLETTIVA = TRUE AND
+                    AULE_ELENCO_SOVRAPPOSIZIONI.DATA_PRENOTAZIONE = CAST('2028-02-14' AS DATE) AND AULE_ELENCO_SOVRAPPOSIZIONI.ORA_INIZIO = '13:00:00'), TRUE, FALSE), 'nessuna riga');
+
+  -- 15/02: inagibilita'' annullata dichiarata dopo la prenotazione: non e'' una sovrapposizione
+  EXECUTE PROCEDURE CARATT_NUOVA('ZT-CAL', '2028-02-15', '09:00:00', '10:00:00', 120);
+  INSERT INTO AULE_INAGIBILITA (AULA, MOTIVO_INAGIBILITA, DAL_GIORNO, AL_GIORNO, ANNULLATA)
+  VALUES ('ZT-CAL', 'Lavori annullati', CAST('2028-02-15' AS DATE), CAST('2028-02-15' AS DATE), 'S');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-018', 'elenco sovrapposizioni: un''inagibilita'' annullata non segnala la prenotazione',
+      IIF(NOT EXISTS(SELECT 1 FROM AULE_ELENCO_SOVRAPPOSIZIONI WHERE AULE_ELENCO_SOVRAPPOSIZIONI.ID_PRENOTAZIONE_AULA = CARATT_ID('ZT-CAL', '2028-02-15', '09:00:00')), TRUE, FALSE), 'nessuna riga');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-007', 'elenco occupazioni: i periodi di inagibilita'' annullati non compaiono',
+      IIF(NOT EXISTS(SELECT 1 FROM AULE_PRENOTAZIONI_ELENCO WHERE AULE_PRENOTAZIONI_ELENCO.IS_INAGIBILITA = TRUE AND AULE_PRENOTAZIONI_ELENCO.AULA = 'ZT-I2'), TRUE, FALSE), 'nessuna riga per ZT-I2');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-007', 'elenco occupazioni: i periodi di inagibilita'' validi compaiono (cinque giorni per ZT-I1)',
+      IIF((SELECT COUNT(*) FROM AULE_PRENOTAZIONI_ELENCO WHERE AULE_PRENOTAZIONI_ELENCO.IS_INAGIBILITA = TRUE AND AULE_PRENOTAZIONI_ELENCO.AULA = 'ZT-I1') = 5, TRUE, FALSE), 'cinque righe per ZT-I1');
 END^
 
 COMMIT^
