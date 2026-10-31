@@ -11,7 +11,8 @@
 -- Dal rilascio di correzione (R-194) le divergenze 1, 2, 4, 5, 6, 9, 10 e 13 sono casi di conformita': lo script va eseguito
 -- DOPO lo script Aule-R194-correzione-divergenze.sql, che cambia le procedure e i trigger provati qui.
 -- Non provati qui: AUL-001 (anagrafica), 007 (ricerche e viste), 012 (notifica), 013, 016, 017, 018 (interfaccia e viste),
--- DIV-AUL-7, 11, 12; l'eliminazione dal calendario si prova con zapp sul banco.
+-- DIV-AUL-11, 12; l'eliminazione dal calendario si prova con zapp sul banco.
+-- Dal rilascio 003 anche DIV-AUL-7 e' corretta (avviso ai responsabili): lo script va eseguito dopo Aule-R194-notifica-ai-responsabili.sql.
 SET TERM ^ ;
 
 CREATE TABLE CARATT_ESITI (
@@ -819,6 +820,55 @@ BEGIN
       'EXECUTE PROCEDURE CARATT_PERIODO(''ZT-PER4'', ''2028-01-03'', ''2028-01-03'', TRUE, ''L'')');
   EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-015', 'la prenotazione di un altro e'' rimasta',
       IIF(CARATT_QUANTE('ZT-PER4', '2028-01-03', '14:00:00', FALSE) = 1, TRUE, FALSE), 'una prenotazione');
+END^
+
+COMMIT^
+
+------------------------------------------------------------------------------------------------------------
+-- GESTY-AUL-011: avviso ai responsabili per le prenotazioni da autorizzare (aule ZT-NOT con il flag, ZT-NOT0 senza)
+EXECUTE BLOCK AS
+DECLARE VARIABLE RESPONSABILE BIGINT;
+BEGIN
+  EXECUTE PROCEDURE CARATT_UTENTE(120, TRUE, TRUE);
+
+  -- il responsabile e' la prima persona del personale che ha un utente
+  RESPONSABILE = (SELECT FIRST 1 USR_UTENTI.ID_ANAGRAFICA FROM USR_UTENTI INNER JOIN PERSONALE ON PERSONALE.ID_PERSONALE = USR_UTENTI.ID_ANAGRAFICA
+                  ORDER BY USR_UTENTI.USER_ID);
+  IF (NOT EXISTS(SELECT 1 FROM AULE_RESPONSABILI WHERE AULE_RESPONSABILI.ID_RESPONSABILE_AULE = :RESPONSABILE)) THEN
+    INSERT INTO AULE_RESPONSABILI (ID_RESPONSABILE_AULE) VALUES (:RESPONSABILE);
+
+  EXECUTE PROCEDURE CARATT_AULA('ZT-NOT', '1', TRUE);
+  EXECUTE PROCEDURE CARATT_AULA('ZT-NOT0', '1', TRUE);
+  UPDATE AULE SET AULE.NOTIFICA_RICHIESTA_AI_RESPONSAB = TRUE WHERE AULE.AULA = 'ZT-NOT';
+
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-011', 'prenotazione in un''aula con il flag di notifica ai responsabili', 'riuscito', NULL, 'ZT-NOT', '2027-05-03', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'ogni utente collegato a un responsabile riceve un solo avviso "Prenotazione da autorizzare"',
+      IIF((SELECT COUNT(*) FROM NOTIFICHE WHERE NOTIFICHE.NOTIFICA = 'AUTORIZZAZIONE_AULA' AND NOTIFICHE.TAG_ID = CARATT_ID('ZT-NOT', '2027-05-03', '09:00:00') AND
+           NOTIFICHE.USER_ID_DESTINATARIO IN (SELECT USR_UTENTI.USER_ID FROM USR_UTENTI WHERE USR_UTENTI.ID_ANAGRAFICA = :RESPONSABILE)) =
+          (SELECT COUNT(*) FROM USR_UTENTI WHERE USR_UTENTI.ID_ANAGRAFICA = :RESPONSABILE), TRUE, FALSE),
+      'un avviso per ogni utente della persona');
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'l''avviso arriva solo agli utenti dei responsabili',
+      IIF(NOT EXISTS(SELECT 1 FROM NOTIFICHE WHERE NOTIFICHE.NOTIFICA = 'AUTORIZZAZIONE_AULA' AND NOTIFICHE.TAG_ID = CARATT_ID('ZT-NOT', '2027-05-03', '09:00:00') AND
+                     NOTIFICHE.USER_ID_DESTINATARIO NOT IN (SELECT USR_UTENTI.USER_ID FROM USR_UTENTI INNER JOIN AULE_RESPONSABILI ON
+                                                            AULE_RESPONSABILI.ID_RESPONSABILE_AULE = USR_UTENTI.ID_ANAGRAFICA)), TRUE, FALSE),
+      'nessun altro destinatario');
+
+  -- correzione del solo oggetto: nessun secondo avviso
+  EXECUTE PROCEDURE CARATT_ESEGUI('GESTY-AUL-011', 'correzione dell''oggetto della prenotazione da autorizzare', 'riuscito', NULL,
+      'UPDATE AULE_PRENOTAZIONI SET AULE_PRENOTAZIONI.OGGETTO = ''Corretto'' WHERE AULE_PRENOTAZIONI.ID_PRENOTAZIONE_AULA = ' || CARATT_ID('ZT-NOT', '2027-05-03', '09:00:00'));
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'dopo la correzione dell''oggetto non parte un secondo avviso',
+      IIF((SELECT COUNT(*) FROM NOTIFICHE WHERE NOTIFICHE.NOTIFICA = 'AUTORIZZAZIONE_AULA' AND NOTIFICHE.TAG_ID = CARATT_ID('ZT-NOT', '2027-05-03', '09:00:00') AND
+           NOTIFICHE.USER_ID_DESTINATARIO IN (SELECT USR_UTENTI.USER_ID FROM USR_UTENTI WHERE USR_UTENTI.ID_ANAGRAFICA = :RESPONSABILE)) =
+          (SELECT COUNT(*) FROM USR_UTENTI WHERE USR_UTENTI.ID_ANAGRAFICA = :RESPONSABILE), TRUE, FALSE),
+      'sempre un solo avviso per utente');
+
+  -- aula che richiede autorizzazione ma senza il flag, e aula che non richiede autorizzazione: nessun avviso
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-011', 'prenotazione in un''aula che richiede autorizzazione ma senza il flag', 'riuscito', NULL, 'ZT-NOT0', '2027-05-03', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_PRENOTA('GESTY-AUL-011', 'prenotazione in un''aula che non richiede autorizzazione', 'riuscito', NULL, 'ZT-A', '2027-05-04', '09:00:00', '10:00:00', 120);
+  EXECUTE PROCEDURE CARATT_CONTROLLA('GESTY-AUL-011', 'nessun avviso per le prenotazioni senza il flag o senza richiesta di autorizzazione',
+      IIF(NOT EXISTS(SELECT 1 FROM NOTIFICHE WHERE NOTIFICHE.NOTIFICA = 'AUTORIZZAZIONE_AULA' AND
+                     NOTIFICHE.TAG_ID IN (CARATT_ID('ZT-NOT0', '2027-05-03', '09:00:00'), CARATT_ID('ZT-A', '2027-05-04', '09:00:00'))), TRUE, FALSE),
+      'nessuna notifica');
 END^
 
 COMMIT^
