@@ -3203,6 +3203,17 @@ TSP_aule_Prenotazioni_Incolla_Sett = class (TzStoredProc)
     property Dest_Data: TNullableDate read fDest_Data write fDest_Data;
 end;
 
+[TStoredProcedure('AULE_PRENOTAZIONI_NOTIFICA_RESPONSABILI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_aule_Prenotazioni_Notifica_Responsabili = class (TzStoredProc)
+  private
+    fId_Prenotazione_Aula: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_PRENOTAZIONE_AULA', ptInput, False)]
+    property Id_Prenotazione_Aula: TNullableInt64 read fId_Prenotazione_Aula write fId_Prenotazione_Aula;
+end;
+
 [TStoredProcedure('AULE_PRENOTA_PERIODO')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_aule_Prenota_Periodo = class (TzStoredProc)
