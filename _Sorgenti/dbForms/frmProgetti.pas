@@ -75,6 +75,7 @@ type
     procedure ProcediExecute(Sender: TObject);
     procedure RegistroStudentiExecute(Sender: TObject);
     procedure RespingiExecute(Sender: TObject);
+    procedure RespingiUpdate(Sender: TObject);
   private
     procedure IncarichiDaLavorare(view: TzDbView; Incarichi: TList<integer>);
   protected
@@ -93,6 +94,7 @@ implementation
 
 uses
   System.UITypes,
+  Data.DB,
   cxFilter,
   dmProgetti,
   zHyperLinks,
@@ -266,6 +268,33 @@ begin
   // come dopo Procedi: si riparte dalla sola riga corrente
   view.ClearSelection;
   view.FocusGrid;
+end;
+
+// Mantis #183 - 2026-11-01: il comando Respingi e' disattivato quando la riga
+// corrente non e' in attesa del visto contabile o della direzione, invece di
+// far comparire il messaggio dopo il clic. Conta solo la riga corrente: la
+// selezione di piu' righe di fasi diverse la ferma ancora TProgetti.Respingi.
+procedure TFormProgetti.RespingiUpdate(Sender: TObject);
+var
+  view: TzDbView;
+  DataSet: TzFbDataSet;
+  CampoFase: TField;
+begin
+  Respingi.Enabled := true;
+
+  view := getView('IncarichiDaGestire');
+  if not assigned(view) then
+    exit;
+
+  DataSet := view.zDataSet;
+  if (not assigned(DataSet)) or (not DataSet.Active) or DataSet.IsEmpty then
+    exit;
+
+  CampoFase := DataSet.FindField('FASE');
+  if not assigned(CampoFase) then
+    exit;
+
+  Respingi.Enabled := SameText(CampoFase.AsString, 'FINANZIARIA') or SameText(CampoFase.AsString, 'DIREZIONE');
 end;
 
 procedure TFormProgetti.CopiaMaterieExecute(Sender: TObject);

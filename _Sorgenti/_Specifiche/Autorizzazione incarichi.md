@@ -187,7 +187,7 @@ Nelle fasi `FINANZIARIA` e `DIREZIONE` chi ha l'autorizzazione di quella fase pu
 
 L'avviso "Richiesta di incarico respinta", con fase, autore e motivo, va a estensore, a chi ha inserito la richiesta, al responsabile del progetto, al responsabile del settore aziendale del progetto e agli iscritti all'avviso, mai a chi respinge.
 
-Dall'elenco si respingono più richieste insieme con un solo motivo, purché tutte nella stessa fase.
+Dall'elenco si respingono più richieste insieme con un solo motivo, purché tutte nella stessa fase. Il comando Respingi è disattivato quando la riga corrente non è in fase `FINANZIARIA` o `DIREZIONE`; il controllo guarda la sola riga corrente, e una selezione di fasi miste si ferma comunque con il messaggio sotto.
 
 ### Scenario: respingimento del Direttore dopo il visto
 - **Dato** un incarico esterno di Codebri con visto, in fase `DIREZIONE`

@@ -99,6 +99,7 @@ inherited FormProgetti: TFormProgetti
       Hint = 'Respinge le richieste selezionate, con il motivo'
       ImageIndex = 1868
       OnExecute = RespingiExecute
+      OnUpdate = RespingiUpdate
     end
   end
 end
