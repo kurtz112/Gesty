@@ -1588,8 +1588,15 @@ function TBaseForm.HelpScreenShot: TBitmap;
     end;
   end;
 
+var
+  AmministratoreDisattivato: Boolean;
 begin
-  Config.zSystem.ForceAdmin(false);
+  // Cattura senza amministratore 2026-11-01: prima ForceAdmin(false) e poi
+  // ForceAdmin(True) rendeva amministratore chiunque catturasse la form.
+  // IsAdminDisabled nasconde le parti da amministratore e poi rimette lo
+  // stato di prima, senza toccare chi e' amministratore.
+  AmministratoreDisattivato := Config.zSystem.IsAdminDisabled;
+  Config.zSystem.IsAdminDisabled := True;
   try
     UpdateActions;
     Application.ProcessMessages;
@@ -1600,7 +1607,7 @@ begin
     // Result := getScreenCapture(False);
     Result := GetScreenShot;
   finally
-    Config.zSystem.ForceAdmin(True);
+    Config.zSystem.IsAdminDisabled := AmministratoreDisattivato;
   end;
 end;
 
