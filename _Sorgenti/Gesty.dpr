@@ -459,7 +459,8 @@ begin
       Application.CreateForm(TMain, Main);
 
       // finally
-      TSmartSplashForm.Hide;
+      // Mantis #7056 - 2026-11-02: la schermata viene chiusa da
+      // TMain.FormShow, dopo il lavoro di apertura della finestra.
       // end;
     end;
 

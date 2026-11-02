@@ -1480,7 +1480,13 @@ end;
 
 procedure TMain.FormShow(Sender: TObject);
 begin
+  // Mantis #7056 - 2026-11-02: la schermata di avvio resta a video durante
+  // il lavoro di apertura e si chiude prima delle azioni di avvio, che
+  // possono aprire finestre proprie.
+  TSmartSplashForm.Update('Apertura sessione');
   InitSessioneLog;
+
+  TSmartSplashForm.Hide;
 
   Config.Autorun(ModuliActions);
 
