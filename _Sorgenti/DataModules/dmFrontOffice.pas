@@ -36,6 +36,8 @@ type
     procedure Front_Office_ContattiNewRecord(DataSet: TDataSet);
     procedure Front_Office_ContattiAggiornaBlocco(DataSet: TDataSet);
     procedure Front_Office_Ambiti_Int_RisorseAfterPost(DataSet: TDataSet);
+    procedure Front_Office_Contatti_TicketAfterCreateFields(DataSet: TDataSet);
+    procedure Front_Office_Contatti_TicketDATA_RISPOSTAChanged(Sender: TField);
 
     procedure AggiornaBloccoCampi(DataSet: TDataSet);
     procedure ElencoDestinatariAperti(Ticket: TzFbDataSet; Destinatari: TList<Int64>);
@@ -946,8 +948,28 @@ begin
     DataSet.AfterCancel := Front_Office_ContattiAggiornaBlocco;
   end
   else
-    if SameText(DataSetName, 'Front_Office_Ambiti_Int_Risorse') then
-      DataSet.AfterPost := Front_Office_Ambiti_Int_RisorseAfterPost;
+    if SameText(DataSetName, 'Front_Office_Contatti_Ticket') then
+      // Mantis #313 - 2026-11-02: Fornita Risposta si spunta appena si scrive la Data Risposta
+      DataSet.OnAfterCreateFields := Front_Office_Contatti_TicketAfterCreateFields
+    else
+      if SameText(DataSetName, 'Front_Office_Ambiti_Int_Risorse') then
+        DataSet.AfterPost := Front_Office_Ambiti_Int_RisorseAfterPost;
+end;
+
+procedure TFrontOffice.Front_Office_Contatti_TicketAfterCreateFields(DataSet: TDataSet);
+begin
+  // Mantis #313 - 2026-11-02: FORNITA_RISPOSTA e' calcolata dal database e cambierebbe solo dopo
+  // il salvataggio; il gestore la spunta subito in modifica
+  if Assigned(DataSet.FindField('DATA_RISPOSTA')) and Assigned(DataSet.FindField('FORNITA_RISPOSTA')) then
+    DataSet.FieldByName('DATA_RISPOSTA').OnChange := Front_Office_Contatti_TicketDATA_RISPOSTAChanged;
+end;
+
+procedure TFrontOffice.Front_Office_Contatti_TicketDATA_RISPOSTAChanged(Sender: TField);
+var
+  DataSet: TzFbDataSet;
+begin
+  DataSet := Sender.DataSet as TzFbDataSet;
+  DataSet.SetFieldValue('FORNITA_RISPOSTA', not Sender.IsNull);
 end;
 
 procedure TFrontOffice.Front_Office_ContattiNewRecord(DataSet: TDataSet);

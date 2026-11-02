@@ -53,7 +53,10 @@ begin
     DataSet.OnNewRecord := NotificheInviateNewRecord
   else
     if SameText(DataSetName, 'Front_Office_Contatti') then
-      DataSet.OnNewRecord := Front_Office_ContattiAfterCreateFields;
+      // Mantis #313 - 2026-11-02: il gestore era agganciato a OnNewRecord e scattava solo sui record
+      // nuovi; aprendo un ticket esistente la casella Fornita Risposta non si spuntava scrivendo la
+      // Data Risposta. Ora si aggancia alla creazione dei campi, valida per ogni record.
+      DataSet.OnAfterCreateFields := Front_Office_ContattiAfterCreateFields;
 end;
 
 procedure TNotifiche.NotificheInviateNewRecord(DataSet: TDataSet);
