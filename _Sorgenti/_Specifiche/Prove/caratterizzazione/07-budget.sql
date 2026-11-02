@@ -485,8 +485,12 @@ BEGIN
     Y = (SELECT SUM(ORE_RILEVATE.ORE * ORE_RILEVATE.COSTO_ORARIO) FROM ORE_RILEVATE
              INNER JOIN INCARICHI ON INCARICHI.ID_INCARICO = ORE_RILEVATE.ID_INCARICO
              INNER JOIN PROGETTI ON PROGETTI.ID_PROGETTO = INCARICHI.ID_PROGETTO
+         -- 02.11.2026: DATA + 0 impedisce l'uso dell'indice ORE_RILEVATE_IDX1. Con l'OR su due intervalli aperti il motore
+         -- leggeva dall'indice, per ognuno dei circa 64.000 incarichi, tutte le ore sopra o sotto la data: il blocco durava
+         -- 1.413 secondi su 1.564 di tutta la prova. Cosi' si legge per incarico dall'indice della chiave esterna e si filtra
+         -- la data sulle righe lette: stesso risultato, pochi secondi.
          WHERE PROGETTI.COAN_ATTIVO = TRUE AND INCARICHI.ID_INCARICO_MASTER IS NULL AND
-               (ORE_RILEVATE.DATA < PROGETTI.DATA_INIZIO_PROGETTO OR ORE_RILEVATE.DATA > PROGETTI.DATA_FINE_PROGETTO));
+               (ORE_RILEVATE.DATA + 0 < PROGETTI.DATA_INIZIO_PROGETTO OR ORE_RILEVATE.DATA + 0 > PROGETTI.DATA_FINE_PROGETTO));
     Z = (SELECT SUM(ORE_RILEVATE.ORE * ORE_RILEVATE.COSTO_ORARIO) FROM ORE_RILEVATE
              INNER JOIN INCARICHI ON INCARICHI.ID_INCARICO = ORE_RILEVATE.ID_INCARICO
              INNER JOIN PROGETTI ON PROGETTI.ID_PROGETTO = INCARICHI.ID_PROGETTO
