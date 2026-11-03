@@ -1,8 +1,8 @@
 ---
 area: Importazione GRS
 progetto: Gesty
-aggiornato: 2026-10-30
-rilascio: OUT/20261030-specifiche-vive-dei-progetti/014
+aggiornato: 2026-11-03
+rilascio: Ticket_Gesty/314 - problema ore registrate trasferite senza alcun incarico- err/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -166,7 +166,7 @@ La presenza di un'ora cade sulla lezione dello stesso progetto e corso, nello st
 - **Allora** nasce la lezione 14:30-15:30 nel corso dell'allievo, con la tipologia del file
 
 ## GESTY-GRS-012 Incarico del docente sulla lezione
-Se la lezione non ha incarico, l'importazione cerca per il docente un incarico di formazione collettiva sul progetto, valido alla data, collegato al corso se la riga ne ha uno, con ore residue: prima fra quelli con la stessa materia della lezione, poi fra tutti; a parità vince quello iniziato prima. Gli incarichi a ore esaurite non si scelgono, anche se ammettono il superamento delle ore (diverso dal sostegno, GESTY-GRS-016). Lo stesso vale per il codocente. Le lezioni rimaste senza incarico compaiono in "Incarichi mancanti", da cui si apre l'inserimento guidato dell'incarico ("Genera incarico"), che poi viene agganciato alla lezione.
+Se la lezione non ha incarico, l'importazione cerca per il docente un incarico di formazione collettiva sul progetto, valido alla data, collegato al corso se la riga ne ha uno, con ore residue: prima fra quelli con la stessa materia della lezione, poi fra tutti; a parità vince quello iniziato prima. Gli incarichi a ore esaurite non si scelgono, anche se ammettono il superamento delle ore (diverso dal sostegno, GESTY-GRS-016). Lo stesso vale per il codocente. Le lezioni rimaste senza incarico compaiono in "Incarichi mancanti", da cui si apre l'inserimento guidato dell'incarico ("Genera incarico"), che poi viene agganciato alla lezione. L'incarico si cerca solo quando la lezione nasce o si importa: ogni notte il controllo `CRON_VERIFICA_INCARICHI_MANCANTI` (chiamato da `CRON`) ripassa le lezioni svolte fino a oggi, dal 01/09/2025, con docente e senza incarico, e aggancia quello che oggi le copre con la stessa ricerca dell'importazione (`ORARIO_AGGANCIA_INCARICHI_MANCANTI`, ticket 314). Salta le lezioni di supplenza e non tocca il codocente (DIV-GRS-16). Se dopo il passaggio restano lezioni scoperte, il Centro Notifiche avvisa gli iscritti all'avviso "Lezioni svolte senza incarico" (a CAPAC: Alessio Sabrina, Marinoni Serena, Faelli Joyce) con il numero e i docenti interessati; l'avviso non si ripete finché il numero non cambia, e comunque dopo sette giorni.
 
 ### Scenario: materia dell'incarico
 - **Dato** un docente con due incarichi sul progetto, uno di MATEMATICA e uno senza materia, entrambi con ore residue
@@ -177,6 +177,11 @@ Se la lezione non ha incarico, l'importazione cerca per il docente un incarico d
 - **Dato** un docente con un solo incarico sul progetto e nessuna ora residua
 - **Quando** si elabora una sua lezione
 - **Allora** la lezione resta senza incarico e compare in "Incarichi mancanti"
+
+### Scenario: incarico creato dopo l'importazione
+- **Dato** 72 lezioni di un docente importate dal 05/10 al 29/10 senza incarico, e un incarico inserito il 30/10 che le copre con ore residue
+- **Quando** passa il controllo notturno
+- **Allora** le 72 lezioni prendono quell'incarico, escono da "Incarichi mancanti" e passano in "Rilevamenti mancanti", da cui "Genera rilevamento" crea le ore del docente (il controllo notturno non ha un utente con login e non le genera: il trigger delle ore rilevate rifiuta "Utente non abilitato al rilevamento ore")
 
 ## GESTY-GRS-013 Supplenza
 Quando la lezione esistente ha un docente (o un codocente) diverso da quello del file e la lezione si sovrascrive, il docente del file è un supplente, e l'incarico si sceglie così:
@@ -281,7 +286,7 @@ Un file si può rielaborare ("Elabora") quante volte serve, per esempio dopo ave
 - **Allora** l'eliminazione si ferma con "Inconguenza registrazione GRS: presenza non generata." (ticket 275)
 
 ## GESTY-GRS-022 Elenchi di controllo
-Per ogni file la sezione GRS mostra righe, presenze generate da ogni riga (con docente dell'incarico e del rilevamento), differenze con Gesty, progetti, studenti e docenti non trovati, studenti non abbinati (riconosciuti ma non iscritti al progetto alla data), righe senza materia o contenuti, righe senza incarico, righe non valide; e, su tutti i file, lezioni svolte senza incarico e lezioni svolte fino a oggi con incarico e senza rilevamento. Gli elenchi non modificano nulla.
+Per ogni file la sezione GRS mostra righe, presenze generate da ogni riga (con docente dell'incarico e del rilevamento), differenze con Gesty, progetti, studenti e docenti non trovati, studenti non abbinati (riconosciuti ma non iscritti al progetto alla data), righe senza materia o contenuti, righe senza incarico, righe non valide; e, su tutti i file, lezioni svolte senza incarico e lezioni svolte fino a oggi con incarico e senza rilevamento. Gli elenchi non modificano nulla. "Incarichi mancanti" mostra solo le lezioni fino a oggi (le future non sono ancora svolte) e una colonna **Motivo** che dice perché la lezione è scoperta: incarico disponibile e in attesa del controllo notturno, nessun incarico del docente sul progetto, incarico che non copre la data, ore esaurite, supplenza, docente mancante, anno formativo precedente al 2025/2026 (non verificato) (ticket 314).
 
 ### Scenario: studente non abbinato
 - **Dato** un allievo riconosciuto dal codice fiscale ma non iscritto alla classe del file alla data della lezione
@@ -317,6 +322,7 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cu
 | DIV-GRS-13 | Nella supplenza il passaggio del rilevamento al supplente, se non riesce (rilevamento validato, legato a un'altra regola), viene ignorato: il rilevamento si stacca dalla lezione e resta del titolare (dedotto) | Il titolare conserva un'ora validata di una lezione che risulta tenuta dal supplente, e il supplente riceve un rilevamento suo |
 | DIV-GRS-14 | Eliminando un file, sulle lezioni nate da un'importazione dell'orario si cancella sempre il rilevamento corrente della lezione, anche se il docente non era cambiato; le supplenze generate dal file restano, e i rilevamenti dei codocenti non si toccano (dedotto) | Il titolare perde il rilevamento della sua lezione finché non lo si rigenera; restano incarichi di supplenza senza ore |
 | DIV-GRS-15 | Le presenze importate su una lezione segnata non svolta in Gesty si scrivono senza avviso, e il confronto non segnala la differenza (dedotto) | Il file del registro dice che la lezione si è tenuta, Gesty che non si è tenuta: l'ora non va a SIUF (GESTY-SIU-005) e non genera rilevamento, senza che nessuno lo veda |
+| DIV-GRS-16 | Il riaggancio notturno (ticket 314) cerca l'incarico del solo docente principale: l'incarico dei codocenti (`ID_INCARICO_COD_1..3`) e le lezioni di supplenza restano com'erano. Non genera i rilevamenti ore, perché il trigger `ORE_RILEVATE_BIU0` richiede un utente con login. L'elenco "Incarichi mancanti" filtra però sul solo docente principale | Le lezioni con codocente scoperto non compaiono in "Incarichi mancanti" e non si riagganciano da sole; dopo il riaggancio le ore del docente non esistono finché qualcuno non preme "Genera rilevamento" in "Rilevamenti mancanti" |
 
 <!-- footer -->
 ---
