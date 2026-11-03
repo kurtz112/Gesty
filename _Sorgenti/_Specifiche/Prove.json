@@ -58,8 +58,9 @@
         "PROGETTI_TIPI_INCARICO_DETAIL",
         "CAN_SEE_BUDGET"
       ],
+      "madre": "_Database/_copie/CAPAC-caratterizzazione.fdb",
       "prove": [
-        "caratterizzazione SQL 07 (25 casi, su copia di CAPAC: ogni lancio fa quattro elaborazioni complete, circa 20 minuti)",
+        "caratterizzazione SQL 07 (25 casi, SOLO su copia di CAPAC: i dati attesi, per esempio il corso 132415 con ricavi 26.000 e 24.500, esistono solo li'; sulla copia di Gesty i ricavi sono 0 e 7 casi differiscono per questo. Lanciare collaudo_specifiche con madre=_Database\\_copie\\CAPAC-caratterizzazione.fdb. Ogni lancio fa quattro elaborazioni complete)",
         "interfaccia (caselle di ricerca, doppio clic, DIV-BUD-8): collaudo con zapp (R-195)"
       ],
       "caratterizzazione": [
