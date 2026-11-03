@@ -88,6 +88,12 @@ type
     // EsistonoUtentiCollegati conta anche IBExpert, GestyScript e le
     // utilita' pianificate: ognuno tiene aperto il file del database.
     function AltriCollegamenti(Elenco: TStrings): Integer;
+    // Chiude lato server tutti i collegamenti diversi da quello di
+    // GestyTools (DELETE FROM MON$ATTACHMENTS), anche quelli che lo shutdown
+    // non raggiunge: programmi con l'exe in memoria che non ascoltano
+    // l'evento, collegamenti senza sessione di Gesty, sessioni rimaste
+    // appese. Restituisce quanti ne ha chiusi.
+    function DisconnettiAltriCollegamenti: Integer;
   public
     procedure ExecStoredProc(Params: Variant);
   public
@@ -299,6 +305,27 @@ begin
   end;
 
   Result := Elenco.Count;
+end;
+
+function TConnection.DisconnettiAltriCollegamenti: Integer;
+var
+  Query: TFDQuery;
+begin
+  Log.ToFile('DisconnettiAltriCollegamenti');
+
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := FDConnection;
+    // stesso criterio di AltriCollegamenti: fuori i thread interni del
+    // server e il collegamento di GestyTools stesso
+    Query.SQL.Text := 'DELETE FROM MON$ATTACHMENTS ' + 'WHERE MON$ATTACHMENTS.MON$SYSTEM_FLAG <> 1 AND MON$ATTACHMENTS.MON$ATTACHMENT_ID <> CURRENT_CONNECTION';
+    Query.ExecSQL;
+    Result := Query.RowsAffected;
+  finally
+    FreeAndNil(Query);
+  end;
+
+  Log.ToFile('DisconnettiAltriCollegamenti: chiusi ' + Result.ToString);
 end;
 
 procedure TConnection.ExecStoredProc(Params: Variant);

@@ -205,6 +205,10 @@ type
     // Lo shutdown scollega gli utenti; il blocco impedisce che rientrino
     // mentre si aggiorna. Restituisce il testo da accodare al messaggio
     function BloccaDopoShutdown: string;
+    // Dopo lo shutdown: se qualcuno e' rimasto collegato (anche senza
+    // comparire nella pagina Utenti) lo elenca e, su conferma, chiude i
+    // collegamenti lato server
+    procedure ProponiDisconnessioneForzata;
   public
   end;
 
@@ -378,6 +382,38 @@ begin
   AggiornaPulsantiBlocco;
 end;
 
+procedure TMainForm.ProponiDisconnessioneForzata;
+var
+  collegamenti: TStringList;
+  chiusi: Integer;
+begin
+  collegamenti := TStringList.Create;
+  try
+    // legge i collegamenti dal server, non dall'elenco della pagina Utenti:
+    // chi ha l'exe in memoria senza una sessione di Gesty li' non compare
+    if Connection.AltriCollegamenti(collegamenti) = 0 then
+      Exit;
+
+    if not ConfirmYesNo('Risultano ancora collegamenti al database:' + sLineBreak + collegamenti.Text.TrimRight + sLineBreak + sLineBreak +
+        'Chiuderli ora dal server? Chi lavora perde le modifiche non salvate.', mtWarning) then
+      Exit;
+  finally
+    FreeAndNil(collegamenti);
+  end;
+
+  StartWait('Attendere...', True);
+  try
+    chiusi := Connection.DisconnettiAltriCollegamenti;
+    Connection.UtentiAttiviActive := False;
+    Connection.UtentiAttiviActive := True;
+  finally
+    StopWait;
+  end;
+
+  gridUtentiAttiviDBTableView.ApplyBestFit();
+  ConfirmOk(Format('Collegamenti chiusi: %d.', [chiusi]));
+end;
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   IdOpenSSLSetLibPath(ExtractFilePath(ParamStr(0)));
@@ -496,24 +532,9 @@ begin
 
   if Wizard.ActivePage = pageUtenti then
   begin
-    // utenti ancora collegati: propone lo shutdown applicativo e resta sulla pagina
-    if Connection.EsistonoUtentiCollegati then
-    begin
-
-      if ConfirmYesNo('Risultano utenti collegati al database.' + sLineBreak + 'Eseguire lo shutdown per scollegarli?', mtWarning) then
-      begin
-        StartWait('Attendere...', True);
-        try
-          Connection.Shutdown;
-        finally
-          StopWait;
-        end;
-
-        ConfirmOk('Shutdown in corso: attendere che gli utenti si scolleghino, poi aggiornare l''elenco.' + BloccaDopoShutdown);
-      end;
-
-      Exit(False);
-    end;
+    // gli utenti collegati non fermano piu' il passaggio: lo shutdown e la
+    // chiusura dei collegamenti restano a disposizione dai pulsanti della
+    // pagina, e lo script di aggiornamento ha il suo avviso (pagina Backup DB)
 
     // exe ancora in uso: mostra chi lo blocca e chiede conferma
     if UpdateEngine.ExeInUso then
@@ -594,7 +615,12 @@ begin
   if UpdateEngine.VerificaDatabase(rapporto) then
     ConfirmOk(rapporto)
   else
+  begin
     ConfirmOk(rapporto, mtWarning);
+
+    // file ancora aperto: spesso e' un collegamento rimasto sul server
+    ProponiDisconnessioneForzata;
+  end;
 
   // l'elenco della pagina Utenti e' stato riletto dalla verifica
   gridUtentiAttiviDBTableView.ApplyBestFit();
@@ -689,6 +715,9 @@ begin
     end;
 
     ConfirmOk('Shutdown in corso.' + BloccaDopoShutdown);
+
+    // chi non ha sentito l'evento resta collegato: si propone di chiuderlo
+    ProponiDisconnessioneForzata;
   end;
 end;
 
