@@ -8679,6 +8679,13 @@ TSP_cron = class (TzStoredProc)
   public
 end;
 
+[TStoredProcedure('CRON_VERIFICA_INCARICHI_MANCANTI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_cron_Verifica_Incarichi_Mancanti = class (TzStoredProc)
+  private
+  public
+end;
+
 [TStoredProcedure('CRON_VERIFICA_SCADENZA_PIP')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_cron_Verifica_Scadenza_Pip = class (TzStoredProc)
@@ -20202,6 +20209,40 @@ TSP_openapi_Verifiche_Partite_Iva_Get = class (TzStoredProc)
     //
     [TParamAttribute('VALID', ptOutput, False)]
     property Valid: TNullableBoolean read fValid;
+end;
+
+[TStoredProcedure('ORARIO_AGGANCIA_INCARICHI_MANCANTI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_orario_Aggancia_Incarichi_Mancanti = class (TzStoredProc)
+  private
+    fId_Progetto: TNullableInt64;
+    fId_Risorsa: TNullableInt64;
+    fData_Dal: TNullableDate;
+    fGenera_Rilevamenti: TNullableBoolean;
+    fLezioni_Agganciate: TNullableInt64;
+    fRilevamenti_Generati: TNullableInt64;
+  private
+    property Lezioni_Agganciate_internal: TNullableInt64 read fLezioni_Agganciate write fLezioni_Agganciate;
+    property Rilevamenti_Generati_internal: TNullableInt64 read fRilevamenti_Generati write fRilevamenti_Generati;
+  public
+    //
+    [TParamAttribute('ID_PROGETTO', ptInput, False)]
+    property Id_Progetto: TNullableInt64 read fId_Progetto write fId_Progetto;
+    //
+    [TParamAttribute('ID_RISORSA', ptInput, False)]
+    property Id_Risorsa: TNullableInt64 read fId_Risorsa write fId_Risorsa;
+    //
+    [TParamAttribute('DATA_DAL', ptInput, False)]
+    property Data_Dal: TNullableDate read fData_Dal write fData_Dal;
+    //
+    [TParamAttribute('GENERA_RILEVAMENTI', ptInput, False)]
+    property Genera_Rilevamenti: TNullableBoolean read fGenera_Rilevamenti write fGenera_Rilevamenti;
+    //
+    [TParamAttribute('LEZIONI_AGGANCIATE', ptOutput, False)]
+    property Lezioni_Agganciate: TNullableInt64 read fLezioni_Agganciate;
+    //
+    [TParamAttribute('RILEVAMENTI_GENERATI', ptOutput, False)]
+    property Rilevamenti_Generati: TNullableInt64 read fRilevamenti_Generati;
 end;
 
 [TStoredProcedure('ORARIO_ASSEGNA_AULA_PER_GIORNO')]
