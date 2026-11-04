@@ -159,6 +159,8 @@ type
       IdNotifica: Integer; // = ID_NOTIFICA (oggi era il solo AlertWindow.Tag)
       TagId: Integer; // da NOTIFICHE.TAG_ID
       TagStr: string; // da NOTIFICHE.TAG_STR
+      // Mantis #324 - 2026-11-04: tipo della notifica, per aprire la schermata giusta al clic
+      Notifica: string; // da NOTIFICHE.NOTIFICA
       UserClicked: Boolean; // distingue click reale da chiusura di massa (NotificheLette)
     end;
   private
@@ -1951,6 +1953,7 @@ begin
         Info.IdNotifica := id;
         Info.TagId := TagId;
         Info.TagStr := TagStr;
+        Info.Notifica := DataSet.FieldByName('NOTIFICA').AsString;
         ListaNotifiche.Add(Info);
 
         sp.Id_Notifica := id;
@@ -2576,7 +2579,13 @@ begin
       end;
 
       if Info.UserClicked and SameText(Info.TagStr, 'TICKET') and (Info.TagId > 0) then
-        HyperLinks.doHyperLink(self, 'TICKET', Info.TagId);
+        HyperLinks.doHyperLink(self, 'TICKET', Info.TagId)
+      else
+        // Mantis #324 - 2026-11-04: l'avviso delle lezioni senza incarico era solo un testo, e da li'
+        // non si arrivava alle lezioni. Il clic apre "Incarichi mancanti" (TFormGRS.SetPK): TAG_ID
+        // vale l'utente che ha inserito le lezioni nell'avviso personale, 0 in quello agli iscritti.
+        if Info.UserClicked and SameText(Info.Notifica, 'LEZIONI_SENZA_INCARICO') then
+          HyperLinks.doHyperLink(self, 'LEZIONI_SENZA_INCARICO', Info.TagId);
 
       ListaNotifiche.Delete(idx); // OwnsObjects=true -> libera anche Info
 

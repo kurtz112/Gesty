@@ -1,8 +1,8 @@
 ---
 area: Importazione GRS
 progetto: Gesty
-aggiornato: 2026-11-03
-rilascio: Ticket_Gesty/314 - problema ore registrate trasferite senza alcun incarico- err/001
+aggiornato: 2026-11-04
+rilascio: Ticket_Gesty/324 - problema ore registrate trasferite senza alcun incarico- err/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -166,7 +166,17 @@ La presenza di un'ora cade sulla lezione dello stesso progetto e corso, nello st
 - **Allora** nasce la lezione 14:30-15:30 nel corso dell'allievo, con la tipologia del file
 
 ## GESTY-GRS-012 Incarico del docente sulla lezione
-Se la lezione non ha incarico, l'importazione cerca per il docente un incarico di formazione collettiva sul progetto, valido alla data, collegato al corso se la riga ne ha uno, con ore residue: prima fra quelli con la stessa materia della lezione, poi fra tutti; a parità vince quello iniziato prima. Gli incarichi a ore esaurite non si scelgono, anche se ammettono il superamento delle ore (diverso dal sostegno, GESTY-GRS-016). Lo stesso vale per il codocente. Le lezioni rimaste senza incarico compaiono in "Incarichi mancanti", da cui si apre l'inserimento guidato dell'incarico ("Genera incarico"), che poi viene agganciato alla lezione. L'incarico si cerca solo quando la lezione nasce o si importa: ogni notte il controllo `CRON_VERIFICA_INCARICHI_MANCANTI` (chiamato da `CRON`) ripassa le lezioni svolte fino a oggi, dal 01/09/2025, con docente e senza incarico, e aggancia quello che oggi le copre con la stessa ricerca dell'importazione (`ORARIO_AGGANCIA_INCARICHI_MANCANTI`, ticket 314). Salta le lezioni di supplenza e non tocca il codocente (DIV-GRS-16). Se dopo il passaggio restano lezioni scoperte, il Centro Notifiche avvisa gli iscritti all'avviso "Lezioni svolte senza incarico" (a CAPAC: Alessio Sabrina, Marinoni Serena, Faelli Joyce) con il numero e i docenti interessati; l'avviso non si ripete finché il numero non cambia, e comunque dopo sette giorni.
+Se la lezione non ha incarico, l'importazione cerca per il docente un incarico di formazione collettiva sul progetto, valido alla data, collegato al corso se la riga ne ha uno, con ore residue: prima fra quelli con la stessa materia della lezione, poi fra tutti; a parità vince quello iniziato prima. Gli incarichi a ore esaurite non si scelgono, anche se ammettono il superamento delle ore (diverso dal sostegno, GESTY-GRS-016). Lo stesso vale per il codocente. Le lezioni rimaste senza incarico compaiono in "Incarichi mancanti", da cui si apre l'inserimento guidato dell'incarico ("Genera incarico"), che poi viene agganciato alla lezione. L'incarico si cerca solo quando la lezione nasce o si importa: ogni notte il controllo `CRON_VERIFICA_INCARICHI_MANCANTI` (chiamato da `CRON`) ripassa le lezioni svolte fino a oggi, dal 01/09/2025, con docente e senza incarico, e aggancia quello che oggi le copre con la stessa ricerca dell'importazione (`ORARIO_AGGANCIA_INCARICHI_MANCANTI`, ticket 314). Salta le lezioni di supplenza e non tocca il codocente (DIV-GRS-16). Se dopo il passaggio restano lezioni scoperte, il Centro Notifiche avvisa gli iscritti all'avviso "Lezioni svolte senza incarico" (a CAPAC: Alessio Sabrina, Marinoni Serena, Faelli Joyce) con il numero e i docenti interessati; l'avviso non si ripete finché il numero non cambia, e comunque dopo sette giorni. Ogni utente che ha inserito lezioni rimaste scoperte (chi ha elaborato il file GRS o scritto l'orario) riceve inoltre un avviso personale con le sole lezioni sue, con la stessa regola di ripetizione, purché sia attivo, non sia un utente di servizio e non sia già iscritto all'avviso generale. L'avviso conta le lezioni della vista `ORARIO_LEZIONI_SENZA_INCARICO` (svolte, fino a oggi, dal 01/09/2025, con docente e senza incarico); il clic sull'avviso apre "Incarichi mancanti" con le stesse lezioni, e per l'avviso personale con le sole lezioni dell'utente (ticket 324).
+
+### Scenario: dall'avviso all'elenco
+- **Dato** un avviso "Lezioni svolte senza incarico: 9" nel Centro Notifiche
+- **Quando** l'utente fa clic sull'avviso
+- **Allora** si apre "Incarichi mancanti" con le stesse 9 lezioni, ciascuna con il suo motivo (ticket 324)
+
+### Scenario: avviso a chi ha inserito le lezioni
+- **Dato** 6 lezioni scoperte inserite in orario da un'operatrice che non è iscritta all'avviso, e 3 inserite da un'iscritta
+- **Quando** gira il controllo notturno
+- **Allora** gli iscritti ricevono l'avviso di tutte le 9 lezioni; l'operatrice riceve "Lezioni inserite da te senza incarico: 6", e il clic le apre l'elenco con le sole sue 6; l'iscritta non riceve un secondo avviso (ticket 324)
 
 ### Scenario: materia dell'incarico
 - **Dato** un docente con due incarichi sul progetto, uno di MATEMATICA e uno senza materia, entrambi con ore residue
@@ -286,7 +296,7 @@ Un file si può rielaborare ("Elabora") quante volte serve, per esempio dopo ave
 - **Allora** l'eliminazione si ferma con "Inconguenza registrazione GRS: presenza non generata." (ticket 275)
 
 ## GESTY-GRS-022 Elenchi di controllo
-Per ogni file la sezione GRS mostra righe, presenze generate da ogni riga (con docente dell'incarico e del rilevamento), differenze con Gesty, progetti, studenti e docenti non trovati, studenti non abbinati (riconosciuti ma non iscritti al progetto alla data), righe senza materia o contenuti, righe senza incarico, righe non valide; e, su tutti i file, lezioni svolte senza incarico e lezioni svolte fino a oggi con incarico e senza rilevamento. Gli elenchi non modificano nulla. "Incarichi mancanti" mostra solo le lezioni fino a oggi (le future non sono ancora svolte) e una colonna **Motivo** che dice perché la lezione è scoperta: incarico disponibile e in attesa del controllo notturno, nessun incarico del docente sul progetto, incarico che non copre la data, ore esaurite, supplenza, docente mancante, anno formativo precedente al 2025/2026 (non verificato) (ticket 314).
+Per ogni file la sezione GRS mostra righe, presenze generate da ogni riga (con docente dell'incarico e del rilevamento), differenze con Gesty, progetti, studenti e docenti non trovati, studenti non abbinati (riconosciuti ma non iscritti al progetto alla data), righe senza materia o contenuti, righe senza incarico, righe non valide; e, su tutti i file, lezioni svolte senza incarico e lezioni svolte fino a oggi con incarico e senza rilevamento. Gli elenchi non modificano nulla. "Incarichi mancanti" mostra solo le lezioni fino a oggi (le future non sono ancora svolte) e una colonna **Motivo** che dice perché la lezione è scoperta: incarico disponibile e in attesa del controllo notturno, lezione di sostegno messa in orario (il sostegno si registra con le ore di sostegno, GESTY-GRS-016, e nessun incarico di formazione la coprirà mai: va tolta dall'orario), nessun incarico del docente sul progetto, incarico che non copre la data, ore esaurite, supplenza, docente mancante, anno formativo precedente al 2025/2026 (non verificato) (ticket 314, 324). Di norma l'elenco mostra le stesse lezioni che conta l'avviso (dal 01/09/2025, con docente); il filtro "Anche anni precedenti" aggiunge quelle più vecchie e quelle senza docente. La colonna "Inserita da" dice chi ha inserito la lezione (ticket 324).
 
 ### Scenario: studente non abbinato
 - **Dato** un allievo riconosciuto dal codice fiscale ma non iscritto alla classe del file alla data della lezione

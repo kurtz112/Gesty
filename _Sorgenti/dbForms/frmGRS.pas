@@ -88,6 +88,7 @@ type
     procedure CambiaStatoDifformitaSelezionate(const Stato: string);
   protected
     procedure SetupComponent(const DataSetName: String; Component: TComponent); override;
+    procedure SetPK(const Value: Variant); override;
     procedure CreateDataModule; override;
     procedure DestroyDataModule; override;
   public
@@ -110,6 +111,7 @@ uses
   dmCommon,
   ConfigModule,
   Gesty.Authorizations,
+  zHyperLinks,
   zMsg;
 {$R *.dfm}
 
@@ -432,6 +434,33 @@ begin
   end;
 end;
 
+// Mantis #324 - 2026-11-04: aperta dal clic sull'avviso delle lezioni svolte senza incarico
+// (TConfig.dxAlertWindowManagerClose). Mostra "Incarichi mancanti"; con un utente (avviso
+// personale) solo le lezioni che quell'utente ha inserito, con 0 (avviso agli iscritti) tutte.
+procedure TFormGRS.SetPK(const Value: Variant);
+var
+  view: TzDbView;
+begin
+  inherited;
+
+  if not PkMode then
+    Exit;
+
+  if not SameText(PkField, 'LEZIONI_SENZA_INCARICO') then
+    Exit;
+
+  SelectedDataSetName := 'IncarichiMancanti';
+
+  view := GetView('IncarichiMancanti');
+  if Assigned(view) then
+  begin
+    view.ClearFilter(false);
+
+    if Value > 0 then
+      view.AddFilterCondition('USER_ID_INSERIMENTO', foEqual, Value);
+  end;
+end;
+
 procedure TFormGRS.CooperazioneApplicativaExecute(Sender: TObject);
 begin
   inherited;
@@ -451,5 +480,10 @@ begin
   inherited;
   CooperazioneApplicativa.Visible := Config.zSystem.Authorizhed(Gesty_Authorizations.SIUF_COOPERAZIONE_APPLICATIVA);
 end;
+
+initialization
+
+// Mantis #324 - 2026-11-04: il clic sull'avviso LEZIONI_SENZA_INCARICO apre questa form
+HyperLinks.RegisterHandler('LEZIONI_SENZA_INCARICO', TFormGRS);
 
 end.
