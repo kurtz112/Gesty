@@ -104,13 +104,14 @@ BEGIN
         'righe per progetto ' || :RIGHE_PROGETTO || ', per esercizio ' || :RIGHE_ESERCIZIO, :RIGHE_PROGETTO = 0 AND :RIGHE_ESERCIZIO = 0);
 END^
 
--- GESTY-BUD-018 e DIV-BUD-6: margine = ricavi - costi se i ricavi sono maggiori di zero, altrimenti 0
+-- GESTY-BUD-018 e DIV-BUD-6: margine = ricavi - costi sempre (dal 31.10.2026, rilascio OUT/20261031-specifica-budget/003:
+-- prima era 0 quando i ricavi erano zero). Un progetto con costi e senza ricavi ha quindi margine negativo.
 EXECUTE BLOCK AS
 DECLARE VARIABLE MSG VARCHAR(1000);
 DECLARE VARIABLE DIVERSI INTEGER;
 DECLARE VARIABLE IN_PERDITA INTEGER;
 DECLARE VARIABLE SENZA_RICAVI INTEGER;
-DECLARE VARIABLE SENZA_RICAVI_MARGINE_ZERO INTEGER;
+DECLARE VARIABLE SENZA_RICAVI_MARGINE_NEGATIVO INTEGER;
 BEGIN
   MSG = NULL;
   BEGIN
@@ -121,24 +122,24 @@ BEGIN
                   WHERE COAN_COSTI_RICAVI_PER_PROGETTO.RICAVI_CONSUNTIVO > 0 AND COAN_COSTI_RICAVI_PER_PROGETTO.MARGINE_CONSUNTIVO < 0);
     SENZA_RICAVI = (SELECT COUNT(*) FROM COAN_COSTI_RICAVI_PER_PROGETTO
                     WHERE COAN_COSTI_RICAVI_PER_PROGETTO.COSTI_CONSUNTIVO > 0 AND COAN_COSTI_RICAVI_PER_PROGETTO.RICAVI_CONSUNTIVO = 0);
-    SENZA_RICAVI_MARGINE_ZERO = (SELECT COUNT(*) FROM COAN_COSTI_RICAVI_PER_PROGETTO
-                                 WHERE COAN_COSTI_RICAVI_PER_PROGETTO.COSTI_CONSUNTIVO > 0 AND COAN_COSTI_RICAVI_PER_PROGETTO.RICAVI_CONSUNTIVO = 0 AND
-                                       COAN_COSTI_RICAVI_PER_PROGETTO.MARGINE_CONSUNTIVO = 0);
+    SENZA_RICAVI_MARGINE_NEGATIVO = (SELECT COUNT(*) FROM COAN_COSTI_RICAVI_PER_PROGETTO
+                                     WHERE COAN_COSTI_RICAVI_PER_PROGETTO.COSTI_CONSUNTIVO > 0 AND COAN_COSTI_RICAVI_PER_PROGETTO.RICAVI_CONSUNTIVO = 0 AND
+                                           ABS(COAN_COSTI_RICAVI_PER_PROGETTO.MARGINE_CONSUNTIVO + COAN_COSTI_RICAVI_PER_PROGETTO.COSTI_CONSUNTIVO) <= 0.01);
   WHEN ANY DO
     MSG = SUBSTRING(RDB$ERROR(MESSAGE) FROM 1 FOR 1000);
   END
   IF (MSG IS NOT NULL) THEN
   BEGIN
     EXECUTE PROCEDURE CARATT_ERRORE('GESTY-BUD-018', 'margine consuntivo con ricavi maggiori di zero = ricavi - costi', :MSG);
-    EXECUTE PROCEDURE CARATT_ERRORE('DIV-BUD-6', 'progetti con costi e senza ricavi: margine zero e non perdita', :MSG);
+    EXECUTE PROCEDURE CARATT_ERRORE('DIV-BUD-6', 'progetti con costi e senza ricavi: margine negativo, uguale ai costi cambiati di segno', :MSG);
   END
   ELSE
   BEGIN
     EXECUTE PROCEDURE CARATT_VERIFICA('GESTY-BUD-018', 'margine consuntivo con ricavi maggiori di zero = ricavi - costi',
         'righe diverse ' || :DIVERSI || ', progetti in perdita con ricavi ' || :IN_PERDITA, :DIVERSI = 0 AND :IN_PERDITA > 0);
-    EXECUTE PROCEDURE CARATT_VERIFICA('DIV-BUD-6', 'progetti con costi e senza ricavi: margine zero e non perdita',
-        'progetti con costi e senza ricavi ' || :SENZA_RICAVI || ', di cui con margine zero ' || :SENZA_RICAVI_MARGINE_ZERO,
-        :SENZA_RICAVI > 0 AND :SENZA_RICAVI = :SENZA_RICAVI_MARGINE_ZERO);
+    EXECUTE PROCEDURE CARATT_VERIFICA('DIV-BUD-6', 'progetti con costi e senza ricavi: margine negativo, uguale ai costi cambiati di segno',
+        'progetti con costi e senza ricavi ' || :SENZA_RICAVI || ', di cui con margine uguale a meno i costi ' || :SENZA_RICAVI_MARGINE_NEGATIVO,
+        :SENZA_RICAVI > 0 AND :SENZA_RICAVI = :SENZA_RICAVI_MARGINE_NEGATIVO);
   END
 END^
 
