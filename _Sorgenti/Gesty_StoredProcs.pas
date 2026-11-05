@@ -15163,6 +15163,21 @@ TSP_notifiche_Letta = class (TzStoredProc)
     property Id_Notifica: TNullableInt64 read fId_Notifica write fId_Notifica;
 end;
 
+[TStoredProcedure('NOTIFICHE_LEZIONI_SENZA_INCARICO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_notifiche_Lezioni_Senza_Incarico = class (TzStoredProc)
+  private
+    fUser_Id_Destinatario: TNullableInt64;
+    fLezioni_Agganciate: TNullableInt64;
+  public
+    //
+    [TParamAttribute('USER_ID_DESTINATARIO', ptInput, False)]
+    property User_Id_Destinatario: TNullableInt64 read fUser_Id_Destinatario write fUser_Id_Destinatario;
+    //
+    [TParamAttribute('LEZIONI_AGGANCIATE', ptInput, False)]
+    property Lezioni_Agganciate: TNullableInt64 read fLezioni_Agganciate write fLezioni_Agganciate;
+end;
+
 [TStoredProcedure('NOTIFICHE_NUMERO_NOTIFICHE_DA_LEGGERE', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_notifiche_Numero_Notifiche_Da_Leggere = class (TzStoredProc)
