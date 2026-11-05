@@ -79,9 +79,18 @@
     {
       "area": "Autorizzazione incarichi",
       "specifica": "Autorizzazione incarichi.md",
-      "percorsi": [],
-      "oggetti": [],
-      "prove": []
+      "percorsi": [
+        "dmProgetti.pas",
+        "frmProgetti.pas"
+      ],
+      "oggetti": [
+        "INCARICHI_ELENCO",
+        "INCARICHI_FASE_ESEGUIBILE",
+        "INCARICO_ATTIVAZIONE_RICHIESTA"
+      ],
+      "prove": [
+        "elenco Incarichi Da Gestire (GESTY-AUT-012, Mantis #326 e #281), DA SCRIVERE come caratterizzazione SQL sulla SQL_Select di Progetti.IncarichiDaGestire, su copia di CAPAC: richiesta esterna inserita oggi con inizio 400 giorni fa -> compare in ATTIVAZIONE; inizio e inserimento 400 giorni fa -> non compare; dipendente con inizio 30 giorni fa -> compare; incarico attivato -> non compare"
+      ]
     },
     {
       "area": "Richieste di attivazione",

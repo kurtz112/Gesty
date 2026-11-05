@@ -1,8 +1,8 @@
 ---
 area: Autorizzazione incarichi
 progetto: Gesty
-aggiornato: 2026-10-30
-rilascio: OUT/20261030-specifiche-vive-dei-progetti/011
+aggiornato: 2026-11-05
+rilascio: Ticket_Gesty/326 - incarichi non presenti tra quelli da autorizzare gestire/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -244,7 +244,7 @@ Eliminare una richiesta non attivata e senza protocollo è permesso all'estensor
 ## GESTY-AUT-012 Elenco "Incarichi Da Gestire"
 Un solo elenco raccoglie le richieste su cui l'utente ha qualcosa da fare. Mostra gli incarichi:
 - non attivati;
-- con data di inizio negli ultimi 365 giorni;
+- con data di inizio negli ultimi 365 giorni, oppure inseriti negli ultimi 365 giorni (`INCARICHI.USR_DATA_INS`): una richiesta inserita a posteriori con inizio più vecchio compare lo stesso (ticket 326). La data della richiesta non conta, perché chi inserisce a posteriori la retrodata insieme all'inizio;
 - esterni, e anche ai dipendenti dove `CONFIG.ATTIVAZIONE_INCARICHI_INTERNI` è vero (CAPAC sì, Codebri no: ticket 281);
 - in una fase per cui l'utente ha l'autorizzazione (`FINANZIARIA`, `DIREZIONE`, `ATTIVAZIONE`, e `RESPINTO` per chi ha `Incarichi.Attivazione`), oppure respinti e di cui l'utente è l'estensore.
 
@@ -273,9 +273,14 @@ Gli incarichi attivati, quelli in firma e quelli scaduti con ore residue non son
 - **Allora** l'incarico esce dall'elenco e il cursore è sul successivo, unica riga selezionata (ticket 183, collaudo del 19/10)
 
 ### Scenario: richiesta vecchia
-- **Dato** una richiesta non attivata con inizio 400 giorni fa
+- **Dato** una richiesta non attivata con inizio 400 giorni fa, inserita 400 giorni fa
 - **Quando** si apre l'elenco
 - **Allora** non compare (vedi DIV-AUT-7)
+
+### Scenario: richiesta retrodatata
+- **Dato** una richiesta per un collaboratore esterno di CAPAC inserita oggi, con data della richiesta e inizio 400 giorni fa
+- **Quando** si apre l'elenco
+- **Allora** compare in fase `ATTIVAZIONE` e si può attivare (ticket 326: incarichi 513690 e 513691, inseriti il 24/10/2026 con inizio 23/09/2025)
 
 ## GESTY-AUT-013 Chi vede gli importi
 Compenso e costo di un incarico li vedono l'estensore, la risorsa stessa se non è dipendente, il responsabile del progetto, chi ha `Incarichi.VisualizzaImporti` e chi ha `Incarichi.Supervisore` (`CAN_SEE_IMPORTI_INCARICHI`). Gli altri li vedono vuoti; se salvano l'incarico, compenso e costo restano quelli di prima senza avviso, così una modifica di altri campi non tocca la cifra che non vedono. Chi vista deve quindi vedere gli importi (a Codebri Macrì li vede per il gruppo "Visualizzazione Importi"). Parametro di ricavo e costi effettivi si vedono e si scrivono solo con l'autorizzazione `Budget`; con la stessa autorizzazione si cambia "Consenti superamento ore" del progetto (ticket 190).
@@ -362,7 +367,7 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti o i ticket dico
 | DIV-AUT-4 | `INCARICO_AUTORIZZAZIONE_FINANZIARIA` e `INCARICO_AUTORIZZAZIONE_DIREZIONE` non controllano il respingimento | Chiamate su una richiesta `RESPINTO` registrano il passaggio; la richiesta resta respinta, ma alla ripresentazione salta quel passaggio. Dall'elenco non succede (per `RESPINTO` Procedi ripresenta); resta aperto a ogni altro canale |
 | DIV-AUT-5 | Il permesso sull'autorizzazione della direzione si controlla solo in modifica (`UPDATING`), e il trigger non verifica che ci sia la finanziaria richiesta: lo fa solo la procedura. La vista `INCARICHI_ELENCO` accetta `TIPO_AUTORIZZAZIONE_DIREZIONE` in inserimento e in modifica | Un inserimento con `'M'` nasce autorizzato dalla direzione senza permesso e senza visto; una modifica diretta del campo da parte di chi ha il permesso salta il visto. In interfaccia il campo è in sola lettura in tutte le schede: il rischio riguarda importazioni e altri canali |
 | DIV-AUT-6 | La motivazione obbligatoria è controllata solo dalla procedura guidata, non dal database | Una richiesta esterna inserita da un'altra strada (scheda, importazione) nasce senza motivazione a Codebri |
-| DIV-AUT-7 | L'elenco esclude le richieste con inizio oltre 365 giorni fa; a Codebri esclude per sempre gli incarichi ai dipendenti, che restano in fase `ATTIVAZIONE` (ticket 281) | Una richiesta vecchia non attivata sparisce da ogni elenco di lavoro senza essere attivata, respinta o chiusa. Per i dipendenti di Codebri va chiesto se ore e stampe dipendono dall'attivazione |
+| DIV-AUT-7 | L'elenco esclude le richieste con inizio e inserimento oltre 365 giorni fa (fino al ticket 326 bastava l'inizio, e una richiesta inserita a posteriori non compariva mai); a Codebri esclude per sempre gli incarichi ai dipendenti, che restano in fase `ATTIVAZIONE` (ticket 281) | Una richiesta vecchia non attivata sparisce da ogni elenco di lavoro senza essere attivata, respinta o chiusa. Per i dipendenti di Codebri va chiesto se ore e stampe dipendono dall'attivazione |
 | DIV-AUT-8 | Gli incarichi senza protocollo né contratto si attivano in blocco con la data del giorno, senza finestra. CAPAC chiede la finestra di sempre (ticket 301); la proposta (finestra per tutti, oppure domanda a tre vie) aspetta la scelta del cliente e non è nel codice | Si perde la scelta della data di attivazione: a CAPAC dal 19/10 nessun dipendente è stato attivato (311 in attesa) e l'incarico 505906 ha la data del giorno invece di quella scelta |
 | DIV-AUT-9 | Un incarico attivato che richiede il contratto ma non ha nessuna pratica di firma è `IN_CORSO`: non esiste una fase "contratto da generare" (ticket 282) | Se l'anteprima del contratto si chiude senza Firma, l'incarico non compare in nessun elenco di lavoro: a CAPAC 20 casi su 206 dal 01 al 22/10 |
 | DIV-AUT-10 | In `INCARICHI_ELENCO` il settore mostrato è quello dell'incarico, ma il responsabile di settore si calcola dal settore del progetto; anche l'avviso di respingimento usa il settore del progetto | Se incarico e progetto hanno settori diversi, l'elenco mostra un responsabile che non è quello del settore indicato. Da verificare sui dati se il caso esiste |
