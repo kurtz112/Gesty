@@ -67,6 +67,14 @@ type
     // sull'incarico che seguiva quelli lavorati, non sul primo
     function IncaricoDopoLaSelezione(DataSet: TzFbDataSet; Incarichi: TList<integer>): integer;
     procedure RiapriSullIncarico(DataSet: TzFbDataSet; const IdIncarico: integer);
+    // Mantis #329 - 2026-11-07: gli incarichi attivati escono dall'elenco da
+    // gestire con un filtro in memoria, senza rileggerlo dal database
+    procedure TogliDallElenco(DataSet: TzFbDataSet; Attivati: TList<integer>; const IdIncarico: integer);
+    procedure IncarichiDaGestireFilterRecord(DataSet: TDataSet; var Accept: boolean);
+    procedure IncarichiDaGestireBeforeOpen(DataSet: TDataSet);
+  private
+    FIncarichiAttivati: TList<integer>;
+    FIncarichiDaGestireBeforeOpen: TDataSetNotifyEvent;
   protected
     procedure AfterCreateDataSet(Const DataSetName: string; DataSet: TzFbDataSet); override;
 
@@ -138,6 +146,10 @@ const
 
 procedure TProgetti.DataModuleCreate(Sender: TObject);
 begin
+  // Mantis #329 - 2026-11-07: creato prima di inherited, nel caso che
+  // l'elenco da gestire nasca gia' durante la creazione del modulo
+  FIncarichiAttivati := TList<integer>.create;
+
   inherited;
 
   DocentiIncarichiSelezionati := TList<integer>.create;
@@ -218,6 +230,7 @@ procedure TProgetti.DataModuleDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(DocentiIncarichiSelezionati);
+  FreeAndNil(FIncarichiAttivati);
 end;
 
 // Mantis #183 - 2026-10-02: era Verificato (procedura INCARICO_VERIFICATO)
@@ -507,6 +520,15 @@ begin
       begin
       end
       else
+        // Mantis #329 - 2026-11-07: filtro in memoria degli incarichi appena
+        // attivati, azzerato a ogni nuova lettura dell'elenco
+        if sameText(DataSetName, DATASET_DA_GESTIRE) then
+        begin
+          FIncarichiDaGestireBeforeOpen := DataSet.BeforeOpen;
+          DataSet.BeforeOpen := IncarichiDaGestireBeforeOpen;
+          DataSet.OnFilterRecord := IncarichiDaGestireFilterRecord;
+        end
+        else
         // riepilogo annuale delle risorse (Allegato 2): l'anno lo sceglie l'utente nella vista,
         // la testata lo eredita
         if sameText(DataSetName, 'Timesheet_Intestazione') or
@@ -1069,6 +1091,7 @@ procedure TProgetti.AttivaIncarico(const DataSetName: string; Incarichi: TList<i
 var
   DataSet: TzFbDataSet;
   DaAttivare: TList<integer>;
+  Attivati: TList<integer>;
   id: integer;
   IdSuccessivo: integer;
 begin
@@ -1083,6 +1106,7 @@ begin
 
   IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
 
+  Attivati := TList<integer>.create;
   DaAttivare := TList<integer>.create;
   try
     for id in Incarichi do
@@ -1095,22 +1119,28 @@ begin
 
     for id in DaAttivare do
       if DataSet.LocateNonSQL('ID_INCARICO', id, []) then
-        if not AttivaConFinestra(DataSet) then
+        if AttivaConFinestra(DataSet) then
+          Attivati.Add(id)
+        else
         begin
           // Mantis #183 - 2026-10-19: annullato dall'utente, il cursore resta
           // sull'incarico annullato; i successivi restano da attivare
           IdSuccessivo := id;
           break;
         end;
+
+    // Mantis #183 - 2026-10-19: gli incarichi attivati escono dall'elenco; il
+    // cursore va su quello che li seguiva [richiesta di Paolo]. RecNo non
+    // bastava: era la posizione prima dei Locate e contava solo le righe gia'
+    // lette dal server.
+    // Mantis #329 - 2026-11-07: non si riapre piu' l'elenco: rileggerlo
+    // costava secondi, tanto piu' quanto l'incarico stava in fondo (gli
+    // interni arretrati). Le righe attivate si nascondono in memoria.
+    TogliDallElenco(DataSet, Attivati, IdSuccessivo);
   finally
     FreeAndNil(DaAttivare);
+    FreeAndNil(Attivati);
   end;
-
-  // Mantis #183 - 2026-10-19: la riapertura toglie gli incarichi attivati; il
-  // cursore va su quello che li seguiva [richiesta di Paolo]. RecNo non
-  // bastava: era la posizione prima dei Locate e contava solo le righe gia'
-  // lette dal server.
-  RiapriSullIncarico(DataSet, IdSuccessivo);
 end;
 
 // Mantis #183 - 2026-10-19: l'incarico su cui riportare il cursore dopo un
@@ -1189,6 +1219,53 @@ begin
   finally
     StopWait;
   end;
+end;
+
+// Mantis #329 - 2026-11-07: toglie dall'elenco gli incarichi attivati senza
+// riaprirlo e porta il cursore sull'incarico indicato (se non c'e', o e' -1,
+// sulla prima riga). Il filtro si riaccende per farlo rivalutare: lavora sulle
+// righe gia' lette e su quelle che arrivano dopo, senza tornare dal server.
+// Un incarico attivato nel frattempo da un altro utente resta visibile fino
+// alla prossima lettura; Procedi su di lui si ferma su "gia' attivato".
+procedure TProgetti.TogliDallElenco(DataSet: TzFbDataSet; Attivati: TList<integer>; const IdIncarico: integer);
+var
+  id: integer;
+begin
+  DataSet.DisableControls;
+  try
+    for id in Attivati do
+      if not FIncarichiAttivati.Contains(id) then
+        FIncarichiAttivati.Add(id);
+
+    if Attivati.Count > 0 then
+    begin
+      DataSet.Filtered := false;
+      DataSet.Filtered := true;
+    end;
+
+    if (IdIncarico = -1) or (not DataSet.LocateNonSQL('ID_INCARICO', IdIncarico, [])) then
+      DataSet.First;
+  finally
+    DataSet.EnableControls;
+  end;
+end;
+
+procedure TProgetti.IncarichiDaGestireFilterRecord(DataSet: TDataSet; var Accept: boolean);
+begin
+  Accept := (not assigned(FIncarichiAttivati)) or
+    (not FIncarichiAttivati.Contains(DataSet.FieldByName('ID_INCARICO').AsInteger));
+end;
+
+// Ogni nuova lettura dal database (Aggiorna, filtro della griglia, altri
+// passaggi dell'iter) ha gia' tolto gli attivati: il filtro in memoria si spegne
+procedure TProgetti.IncarichiDaGestireBeforeOpen(DataSet: TDataSet);
+begin
+  if assigned(FIncarichiAttivati) then
+    FIncarichiAttivati.Clear;
+  DataSet.Filtered := false;
+
+  if assigned(FIncarichiDaGestireBeforeOpen) then
+    FIncarichiDaGestireBeforeOpen(DataSet);
 end;
 
 // La finestra di sempre (data, protocollo, parametro di ricavo) sull'incarico

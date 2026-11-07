@@ -1,8 +1,8 @@
 ---
 area: Autorizzazione incarichi
 progetto: Gesty
-aggiornato: 2026-11-05
-rilascio: Ticket_Gesty/326 - incarichi non presenti tra quelli da autorizzare gestire/001
+aggiornato: 2026-11-07
+rilascio: Ticket_Gesty/329 - TEMPI AUTORIZZAZIONE INCARICHI INTERNI/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -136,9 +136,7 @@ La esegue chi ha `Incarichi.Attivazione` (ma vedi DIV-AUT-2). L'incarico non dev
 
 L'attivazione registra data e utente, il protocollo (solo per gli incarichi non collegati a un incarico di massima), il parametro di ricavo specifico e, dove la finanziaria non è una fase propria, anche la finanziaria con la stessa data e lo stesso utente. Se il progetto non ha ancora una riga di budget per quel tipo di incarico, la crea a importo zero con le ore attribuite. Avvisa gli iscritti a "Incarico attivato".
 
-Dall'elenco l'attivazione segue due strade secondo l'inquadramento (`ZZ_TIPO_INQUADRAMENTO`):
-- se l'incarico richiede protocollo o contratto, una finestra per incarico chiede data di attivazione, protocollo (se richiesto) e parametro di ricavo; dopo, se l'incarico richiede il contratto e l'utente ha la stampa automatica, si apre l'anteprima del contratto, da cui parte la firma;
-- se non richiede né protocollo né contratto (a CAPAC dipendenti, interinali, stage, co.co.co. e ogni incarico collegato a un incarico di massima), una sola conferma per tutti i selezionati e la data di attivazione è quella del giorno (vedi DIV-AUT-8).
+Dall'elenco ogni incarico selezionato passa dalla sua finestra, che chiede data di attivazione, protocollo (solo se l'inquadramento, `ZZ_TIPO_INQUADRAMENTO`, lo richiede) e parametro di ricavo. Vale anche per gli incarichi senza protocollo né contratto (a CAPAC dipendenti, interinali, stage, co.co.co. e ogni incarico collegato a un incarico di massima), che fino al ticket 301 si attivavano in blocco con la data del giorno. Dopo la finestra, se l'incarico richiede il contratto e l'utente ha la stampa automatica, si apre l'anteprima del contratto, da cui parte la firma.
 
 ### Scenario: direzione mancante
 - **Dato** un incarico in attesa della direzione
@@ -153,8 +151,8 @@ Dall'elenco l'attivazione segue due strade secondo l'inquadramento (`ZZ_TIPO_INQ
 ### Scenario: incarico senza protocollo né contratto
 - **Dato** un incarico a un dipendente di CAPAC, fase `ATTIVAZIONE`
 - **Quando** si preme Procedi
-- **Allora** compare "Attiva incarico: 1 incarichi senza protocollo e senza contratto, con la data di oggi. Procedere?"
-- **E** con Sì l'incarico è attivato con la data del giorno; con No resta da attivare e il cursore passa al successivo (ticket 301)
+- **Allora** compare la finestra di attivazione, con i campi del protocollo spenti
+- **E** con OK l'incarico è attivato con la data scelta; con Annulla resta da attivare e il cursore resta su di lui (ticket 301)
 
 ### Scenario: annullamento nella finestra
 - **Dato** tre incarichi selezionati che richiedono protocollo
@@ -248,7 +246,7 @@ Un solo elenco raccoglie le richieste su cui l'utente ha qualcosa da fare. Mostr
 - esterni, e anche ai dipendenti dove `CONFIG.ATTIVAZIONE_INCARICHI_INTERNI` è vero (CAPAC sì, Codebri no: ticket 281);
 - in una fase per cui l'utente ha l'autorizzazione (`FINANZIARIA`, `DIREZIONE`, `ATTIVAZIONE`, e `RESPINTO` per chi ha `Incarichi.Attivazione`), oppure respinti e di cui l'utente è l'estensore.
 
-L'ordine è per fase, poi dalla richiesta più recente. Il comando Procedi esegue il passaggio della fase sugli incarichi selezionati (o sul solo incarico corrente, con la scheda aperta); la selezione deve essere tutta in una fase. Ogni passaggio chiede conferma e registra un incarico alla volta: se uno si ferma, quelli prima restano registrati. Dopo il passaggio l'elenco si riapre e il cursore va sul primo incarico che seguiva la selezione e non ne faceva parte, altrimenti sul più vicino che la precede.
+L'ordine è per fase, poi dalla richiesta più recente. Il comando Procedi esegue il passaggio della fase sugli incarichi selezionati (o sul solo incarico corrente, con la scheda aperta); la selezione deve essere tutta in una fase. Ogni passaggio chiede conferma e registra un incarico alla volta: se uno si ferma, quelli prima restano registrati. Dopo il passaggio il cursore va sul primo incarico che seguiva la selezione e non ne faceva parte, altrimenti sul più vicino che la precede. Dopo l'autorizzazione finanziaria, quella della direzione, il respingimento e la ripresentazione l'elenco si rilegge dal database; dopo l'attivazione no: gli incarichi attivati escono dall'elenco già caricato, senza rileggerlo (ticket 329, GESTY-AUT-019). Un incarico attivato nel frattempo da un altro utente resta quindi visibile fino al prossimo Aggiorna; Procedi su di lui si ferma con "L'incarico risulta già attivato."
 
 Gli incarichi attivati, quelli in firma e quelli scaduti con ore residue non sono in questo elenco: hanno la gestione dei contratti e l'elenco "Incarichi scaduti con ore residue".
 
@@ -355,6 +353,13 @@ L'elenco si apre in pochi secondi e non blocca l'interfaccia più del necessario
 - **Quando** lo si apre con la registrazione dei tempi attiva
 - **Allora** la lettura della struttura (`BuildFields`) dura meno di 50 ms e la query si esegue una volta sola (ticket 183)
 
+Dopo un'attivazione l'elenco non si rilegge (GESTY-AUT-012). Rileggerlo costava circa 1 secondo fisso più 8,6 ms per ogni riga da scorrere per tornare sull'incarico successivo: sulla copia di CAPAC del 06/11, con 460 righe, circa 2 secondi per un esterno in cima e 5 per un dipendente arretrato in fondo (ticket 329).
+
+### Scenario: attivazione in fondo all'elenco
+- **Dato** l'elenco di CAPAC con oltre 450 righe e il cursore su un incarico a un dipendente fra le ultime
+- **Quando** lo si attiva dalla finestra
+- **Allora** alla chiusura della finestra l'incarico è già uscito dall'elenco e il cursore è sul successivo, senza la rotellina "Attendere..." della rilettura (ticket 329)
+
 ## Divergenze note
 
 Punti in cui il codice di oggi non mantiene ciò che i requisiti o i ticket dicono, o in cui un controllo scritto non scatta davvero. Raccolte in R-182; con la correzione il requisito si aggiorna e questa sezione si accorcia.
@@ -368,7 +373,7 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti o i ticket dico
 | DIV-AUT-5 | Il permesso sull'autorizzazione della direzione si controlla solo in modifica (`UPDATING`), e il trigger non verifica che ci sia la finanziaria richiesta: lo fa solo la procedura. La vista `INCARICHI_ELENCO` accetta `TIPO_AUTORIZZAZIONE_DIREZIONE` in inserimento e in modifica | Un inserimento con `'M'` nasce autorizzato dalla direzione senza permesso e senza visto; una modifica diretta del campo da parte di chi ha il permesso salta il visto. In interfaccia il campo è in sola lettura in tutte le schede: il rischio riguarda importazioni e altri canali |
 | DIV-AUT-6 | La motivazione obbligatoria è controllata solo dalla procedura guidata, non dal database | Una richiesta esterna inserita da un'altra strada (scheda, importazione) nasce senza motivazione a Codebri |
 | DIV-AUT-7 | L'elenco esclude le richieste con inizio e inserimento oltre 365 giorni fa (fino al ticket 326 bastava l'inizio, e una richiesta inserita a posteriori non compariva mai); a Codebri esclude per sempre gli incarichi ai dipendenti, che restano in fase `ATTIVAZIONE` (ticket 281) | Una richiesta vecchia non attivata sparisce da ogni elenco di lavoro senza essere attivata, respinta o chiusa. Per i dipendenti di Codebri va chiesto se ore e stampe dipendono dall'attivazione |
-| DIV-AUT-8 | Gli incarichi senza protocollo né contratto si attivano in blocco con la data del giorno, senza finestra. CAPAC chiede la finestra di sempre (ticket 301); la proposta (finestra per tutti, oppure domanda a tre vie) aspetta la scelta del cliente e non è nel codice | Si perde la scelta della data di attivazione: a CAPAC dal 19/10 nessun dipendente è stato attivato (311 in attesa) e l'incarico 505906 ha la data del giorno invece di quella scelta |
+| DIV-AUT-8 | **Ritirata** (ticket 301, verificato nel codice il 07/11 con il ticket 329): l'attivazione in blocco senza finestra non c'è più, ogni incarico passa dalla finestra (GESTY-AUT-006) | — |
 | DIV-AUT-9 | Un incarico attivato che richiede il contratto ma non ha nessuna pratica di firma è `IN_CORSO`: non esiste una fase "contratto da generare" (ticket 282) | Se l'anteprima del contratto si chiude senza Firma, l'incarico non compare in nessun elenco di lavoro: a CAPAC 20 casi su 206 dal 01 al 22/10 |
 | DIV-AUT-10 | In `INCARICHI_ELENCO` il settore mostrato è quello dell'incarico, ma il responsabile di settore si calcola dal settore del progetto; anche l'avviso di respingimento usa il settore del progetto | Se incarico e progetto hanno settori diversi, l'elenco mostra un responsabile che non è quello del settore indicato. Da verificare sui dati se il caso esiste |
 | DIV-AUT-11 | Procedi e `INCARICHI_FASE_ESEGUIBILE` gestiscono le fasi della firma e delle ore residue, ma l'elenco mostra solo incarichi non attivati (dal 19/10, ticket 183) | Quei rami non si raggiungono dall'elenco; la tabella delle fasi del ticket 183 li indica ancora come lavorabili da lì |
