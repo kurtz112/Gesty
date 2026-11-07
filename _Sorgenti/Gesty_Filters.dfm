@@ -101,6 +101,26 @@ inherited GestyFilterDefs: TGestyFilterDefs
     Left = 120
     Top = 555
   end
+  object lkSia_Macrogruppi: TzFbDataSet
+    FetchOptions.AssignedValues = [evDetailDelay]
+    FetchOptions.DetailDelay = 300
+    UpdateOptions.AssignedValues = [uvAutoCommitUpdates]
+    ActivationMode = amManual
+    AutoCommit = False
+    TableName = 'SIA_MACROGRUPPI'
+    Left = 40
+    Top = 478
+  end
+  object lkSia_Comuni: TzFbDataSet
+    FetchOptions.AssignedValues = [evDetailDelay]
+    FetchOptions.DetailDelay = 300
+    UpdateOptions.AssignedValues = [uvAutoCommitUpdates]
+    ActivationMode = amManual
+    AutoCommit = False
+    TableName = 'SIA_COMUNI'
+    Left = 40
+    Top = 555
+  end
   object lkSedi: TzFbDataSet
     FetchOptions.AssignedValues = [evDetailDelay]
     FetchOptions.DetailDelay = 300

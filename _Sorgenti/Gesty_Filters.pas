@@ -46,6 +46,8 @@ type
     lkAS_Comuni: TzFbDataSet;
     lkAbitareSost_Comuni: TzFbDataSet;
     lkAbitareEmergenza_Comuni: TzFbDataSet;
+    lkSia_Macrogruppi: TzFbDataSet;
+    lkSia_Comuni: TzFbDataSet;
     lkSportelliSAL: TzFbDataSet;
     lkFigureProfessionali: TzFbDataSet;
     lkMansioniAziendali: TzFbDataSet;
@@ -195,6 +197,30 @@ type
   // Lookup: lkAbitareEmergenza_Comuni → BELFIORE / COMUNE
 
   TAbitareEmergenzaComuniBarFilter = class(TzToolFilter)
+  public
+    class function FilterName: string; override;
+    function Description: string; override;
+    procedure Apply(Component: TComponent; DataSet: TzFbDataSet); override;
+    class procedure InitProperties(Props: TcxImageComboBoxProperties);
+  end;
+
+  // ── SIA Macrogruppi ──────────────────────────────────────────────────────────
+  // Lookup: lkSia_Macrogruppi → MACROGRUPPO_SIA / DESC_MACROGRUPPO_SIA
+
+  TSiaMacrogruppiBarFilter = class(TzToolFilter)
+  public
+    class function FilterName: string; override;
+    function Description: string; override;
+    procedure Apply(Component: TComponent; DataSet: TzFbDataSet); override;
+    class procedure InitProperties(Props: TcxImageComboBoxProperties);
+  end;
+
+  // ── SIA Comuni ───────────────────────────────────────────────────────────────
+  // Lookup: lkSia_Comuni → BELFIORE / COMUNE
+  // Il parametro predefinito e' COMUNE_SIA, il nome del campo negli interventi;
+  // sui finanziamenti la vista LZ indica BELFIORE in FieldName.
+
+  TSiaComuniBarFilter = class(TzToolFilter)
   public
     class function FilterName: string; override;
     function Description: string; override;
@@ -942,6 +968,96 @@ begin
     Combo.EditValue := Null;
 end;
 
+// ── TSiaMacrogruppiBarFilter ──────────────────────────────────────────────────
+
+class procedure TSiaMacrogruppiBarFilter.InitProperties(Props: TcxImageComboBoxProperties);
+begin
+  InitFromDataSet(Props, GestyFilters.lkSia_Macrogruppi, 'MACROGRUPPO_SIA', 'DESC_MACROGRUPPO_SIA');
+end;
+
+class function TSiaMacrogruppiBarFilter.FilterName: string;
+begin
+  Result := 'SiaMacrogruppo';
+end;
+
+function TSiaMacrogruppiBarFilter.Description: string;
+begin
+  Result := 'Filtro macrogruppo SIA (default: nessun filtro)';
+end;
+
+procedure TSiaMacrogruppiBarFilter.Apply(Component: TComponent; DataSet: TzFbDataSet);
+var
+  Bar: TdxBar;
+  Combo: TcxBarEditItem;
+  ComboProps: TcxImageComboBoxProperties;
+const
+  ComboName = ToolFilterPrefix + 'Sia_Macrogruppo';
+begin
+  Bar := GetToolbar(Component);
+  if not Assigned(Bar) then
+    Exit;
+  if TzDxBarHelper.ItemExists(Bar, ComboName) then
+    Exit;
+
+  Combo := TzDxBarHelper.CreateCombo(Bar, ComboName, FilterCaption('Macrogruppo:'), FilterHint('macrogruppo'), FilterPosition);
+  ComboProps := Combo.Properties as TcxImageComboBoxProperties;
+
+  InitProperties(ComboProps);
+
+  Combo.Tag := NativeInt(DataSet);
+  SetFilterWidth(Combo, Combo.Width + 150);
+  BindFilter(Combo, FilterFieldName('MACROGRUPPO_SIA'));
+  if InitialValue = ivCustom then
+    Combo.EditValue := CustomEditValue
+  else
+    Combo.EditValue := Null;
+end;
+
+// ── TSiaComuniBarFilter ───────────────────────────────────────────────────────
+
+class procedure TSiaComuniBarFilter.InitProperties(Props: TcxImageComboBoxProperties);
+begin
+  InitFromDataSet(Props, GestyFilters.lkSia_Comuni, 'BELFIORE', 'COMUNE');
+end;
+
+class function TSiaComuniBarFilter.FilterName: string;
+begin
+  Result := 'SiaComune';
+end;
+
+function TSiaComuniBarFilter.Description: string;
+begin
+  Result := 'Filtro comune SIA (default: nessun filtro)';
+end;
+
+procedure TSiaComuniBarFilter.Apply(Component: TComponent; DataSet: TzFbDataSet);
+var
+  Bar: TdxBar;
+  Combo: TcxBarEditItem;
+  ComboProps: TcxImageComboBoxProperties;
+const
+  ComboName = ToolFilterPrefix + 'Sia_Comune';
+begin
+  Bar := GetToolbar(Component);
+  if not Assigned(Bar) then
+    Exit;
+  if TzDxBarHelper.ItemExists(Bar, ComboName) then
+    Exit;
+
+  Combo := TzDxBarHelper.CreateCombo(Bar, ComboName, FilterCaption('Comune:'), FilterHint('comune'), FilterPosition);
+  ComboProps := Combo.Properties as TcxImageComboBoxProperties;
+
+  InitProperties(ComboProps);
+
+  Combo.Tag := NativeInt(DataSet);
+  SetFilterWidth(Combo, Combo.Width + 150);
+  BindFilter(Combo, FilterFieldName('COMUNE_SIA'));
+  if InitialValue = ivCustom then
+    Combo.EditValue := CustomEditValue
+  else
+    Combo.EditValue := Null;
+end;
+
 // ── TSportelloSALBarFilter ────────────────────────────────────────────────────
 
 class procedure TSportelloSALBarFilter.InitProperties(Props: TcxImageComboBoxProperties);
@@ -1256,6 +1372,8 @@ TzToolFilterRegistry.Register(TSettoreAziendaleBarFilter);
 TzToolFilterRegistry.Register(TASComuniBarFilter);
 TzToolFilterRegistry.Register(TAbitareSostegnoComuniBarFilter);
 TzToolFilterRegistry.Register(TAbitareEmergenzaComuniBarFilter);
+TzToolFilterRegistry.Register(TSiaMacrogruppiBarFilter);
+TzToolFilterRegistry.Register(TSiaComuniBarFilter);
 TzToolFilterRegistry.Register(TSportelloSALBarFilter);
 TzToolFilterRegistry.Register(TPickListBarFilter);
 TzToolFilterRegistry.Register(TBooleanBarFilter);
