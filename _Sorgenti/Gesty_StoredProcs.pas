@@ -4349,6 +4349,40 @@ TSP_aziende_Tutor_Crea = class (TzStoredProc)
     property Id_Contatto: TNullableInt64 read fId_Contatto write fId_Contatto;
 end;
 
+[TStoredProcedure('BANDI_CONTROLLA_AUTORIZZAZIONE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_bandi_Controlla_Autorizzazione = class (TzStoredProc)
+  private
+    fAutorizzazione: TNullableString;
+  public
+    //
+    [TParamAttribute('AUTORIZZAZIONE', ptInput, False)]
+    property Autorizzazione: TNullableString read fAutorizzazione write fAutorizzazione;
+end;
+
+[TStoredProcedure('BANDI_DA_VALUTARE', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_bandi_Da_Valutare = class (TzStoredProc)
+  private
+    fId_Bando: TNullableInt64;
+    fLivello_Valutazione: TNullableString;
+    fDesc_Livello_Valutazione: TNullableString;
+  private
+    property Id_Bando_internal: TNullableInt64 read fId_Bando write fId_Bando;
+    property Livello_Valutazione_internal: TNullableString read fLivello_Valutazione write fLivello_Valutazione;
+    property Desc_Livello_Valutazione_internal: TNullableString read fDesc_Livello_Valutazione write fDesc_Livello_Valutazione;
+  public
+    //
+    [TParamAttribute('ID_BANDO', ptOutput, False)]
+    property Id_Bando: TNullableInt64 read fId_Bando;
+    //
+    [TParamAttribute('LIVELLO_VALUTAZIONE', ptOutput, False)]
+    property Livello_Valutazione: TNullableString read fLivello_Valutazione;
+    //
+    [TParamAttribute('DESC_LIVELLO_VALUTAZIONE', ptOutput, False)]
+    property Desc_Livello_Valutazione: TNullableString read fDesc_Livello_Valutazione;
+end;
+
 [TStoredProcedure('BANDO_DOCENTI_GET_DATA_STAMPA', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_bando_Docenti_Get_Data_Stampa = class (TzStoredProc)
@@ -4364,6 +4398,92 @@ TSP_bando_Docenti_Get_Data_Stampa = class (TzStoredProc)
     //
     [TParamAttribute('DATA_STAMPA', ptOutput, False)]
     property Data_Stampa: TNullableDate read fData_Stampa;
+end;
+
+[TStoredProcedure('BANDO_LIVELLI_IN_ATTESA', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_bando_Livelli_In_Attesa = class (TzStoredProc)
+  private
+    fId_Bando: TNullableInt64;
+    fLivello_Valutazione: TNullableString;
+    fDesc_Livello_Valutazione: TNullableString;
+    fOrdine: TNullableInt64;
+    fAutorizzazione: TNullableString;
+    fResponsabile_Settore: TNullableBoolean;
+  private
+    property Livello_Valutazione_internal: TNullableString read fLivello_Valutazione write fLivello_Valutazione;
+    property Desc_Livello_Valutazione_internal: TNullableString read fDesc_Livello_Valutazione write fDesc_Livello_Valutazione;
+    property Ordine_internal: TNullableInt64 read fOrdine write fOrdine;
+    property Autorizzazione_internal: TNullableString read fAutorizzazione write fAutorizzazione;
+    property Responsabile_Settore_internal: TNullableBoolean read fResponsabile_Settore write fResponsabile_Settore;
+  public
+    //
+    [TParamAttribute('ID_BANDO', ptInput, False)]
+    property Id_Bando: TNullableInt64 read fId_Bando write fId_Bando;
+    //
+    [TParamAttribute('LIVELLO_VALUTAZIONE', ptOutput, False)]
+    property Livello_Valutazione: TNullableString read fLivello_Valutazione;
+    //
+    [TParamAttribute('DESC_LIVELLO_VALUTAZIONE', ptOutput, False)]
+    property Desc_Livello_Valutazione: TNullableString read fDesc_Livello_Valutazione;
+    //
+    [TParamAttribute('ORDINE', ptOutput, False)]
+    property Ordine: TNullableInt64 read fOrdine;
+    //
+    [TParamAttribute('AUTORIZZAZIONE', ptOutput, False)]
+    property Autorizzazione: TNullableString read fAutorizzazione;
+    //
+    [TParamAttribute('RESPONSABILE_SETTORE', ptOutput, False)]
+    property Responsabile_Settore: TNullableBoolean read fResponsabile_Settore;
+end;
+
+[TStoredProcedure('BANDO_NOTIFICA_DA_VALUTARE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_bando_Notifica_Da_Valutare = class (TzStoredProc)
+  private
+    fId_Bando: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_BANDO', ptInput, False)]
+    property Id_Bando: TNullableInt64 read fId_Bando write fId_Bando;
+end;
+
+[TStoredProcedure('BANDO_PARERE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_bando_Parere = class (TzStoredProc)
+  private
+    fId_Bando: TNullableInt64;
+    fLivello_Valutazione: TNullableString;
+    fEsito: TNullableString;
+    fMotivazione: TNullableString;
+  public
+    //
+    [TParamAttribute('ID_BANDO', ptInput, False)]
+    property Id_Bando: TNullableInt64 read fId_Bando write fId_Bando;
+    //
+    [TParamAttribute('LIVELLO_VALUTAZIONE', ptInput, False)]
+    property Livello_Valutazione: TNullableString read fLivello_Valutazione write fLivello_Valutazione;
+    //
+    [TParamAttribute('ESITO', ptInput, False)]
+    property Esito: TNullableString read fEsito write fEsito;
+    //
+    [TParamAttribute('MOTIVAZIONE', ptInput, False)]
+    property Motivazione: TNullableString read fMotivazione write fMotivazione;
+end;
+
+[TStoredProcedure('BANDO_RIAPRI_VALUTAZIONE')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_bando_Riapri_Valutazione = class (TzStoredProc)
+  private
+    fId_Bando: TNullableInt64;
+    fMotivo: TNullableString;
+  public
+    //
+    [TParamAttribute('ID_BANDO', ptInput, False)]
+    property Id_Bando: TNullableInt64 read fId_Bando write fId_Bando;
+    //
+    [TParamAttribute('MOTIVO', ptInput, False)]
+    property Motivo: TNullableString read fMotivo write fMotivo;
 end;
 
 [TStoredProcedure('BLOB_SPLIT_LINES', True)]
@@ -8682,6 +8802,13 @@ end;
 [TStoredProcedure('CRON_VERIFICA_INCARICHI_MANCANTI')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_cron_Verifica_Incarichi_Mancanti = class (TzStoredProc)
+  private
+  public
+end;
+
+[TStoredProcedure('CRON_VERIFICA_SCADENZA_BANDI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_cron_Verifica_Scadenza_Bandi = class (TzStoredProc)
   private
   public
 end;
@@ -31144,6 +31271,17 @@ TSP_usr_Totp_Codici_Recupero_Imposta = class (TzStoredProc)
     property Numero_Codici: TNullableInt64 read fNumero_Codici;
 end;
 
+[TStoredProcedure('USR_TOTP_DISATTIVA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Disattiva = class (TzStoredProc)
+  private
+    fCodice: TNullableString;
+  public
+    //
+    [TParamAttribute('CODICE', ptInput, False)]
+    property Codice: TNullableString read fCodice write fCodice;
+end;
+
 [TStoredProcedure('USR_TOTP_REGISTRA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Totp_Registra = class (TzStoredProc)
@@ -31163,6 +31301,39 @@ TSP_usr_Totp_Registra = class (TzStoredProc)
     //
     [TParamAttribute('INDIRIZZO_OTPAUTH', ptOutput, False)]
     property Indirizzo_Otpauth: TNullableString read fIndirizzo_Otpauth;
+end;
+
+[TStoredProcedure('USR_TOTP_REGOLE', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Totp_Regole = class (TzStoredProc)
+  private
+    fModalita: TNullableString;
+    fOtp_Utente: TNullableBoolean;
+    fAttivazione_Consentita: TNullableBoolean;
+    fDisattivazione_Consentita: TNullableBoolean;
+    fRegistrazione_Obbligatoria: TNullableBoolean;
+  private
+    property Modalita_internal: TNullableString read fModalita write fModalita;
+    property Otp_Utente_internal: TNullableBoolean read fOtp_Utente write fOtp_Utente;
+    property Attivazione_Consentita_internal: TNullableBoolean read fAttivazione_Consentita write fAttivazione_Consentita;
+    property Disattivazione_Consentita_internal: TNullableBoolean read fDisattivazione_Consentita write fDisattivazione_Consentita;
+    property Registrazione_Obbligatoria_internal: TNullableBoolean read fRegistrazione_Obbligatoria write fRegistrazione_Obbligatoria;
+  public
+    //
+    [TParamAttribute('MODALITA', ptOutput, False)]
+    property Modalita: TNullableString read fModalita;
+    //
+    [TParamAttribute('OTP_UTENTE', ptOutput, False)]
+    property Otp_Utente: TNullableBoolean read fOtp_Utente;
+    //
+    [TParamAttribute('ATTIVAZIONE_CONSENTITA', ptOutput, False)]
+    property Attivazione_Consentita: TNullableBoolean read fAttivazione_Consentita;
+    //
+    [TParamAttribute('DISATTIVAZIONE_CONSENTITA', ptOutput, False)]
+    property Disattivazione_Consentita: TNullableBoolean read fDisattivazione_Consentita;
+    //
+    [TParamAttribute('REGISTRAZIONE_OBBLIGATORIA', ptOutput, False)]
+    property Registrazione_Obbligatoria: TNullableBoolean read fRegistrazione_Obbligatoria;
 end;
 
 [TStoredProcedure('USR_TOTP_STATO', True)]
@@ -31423,6 +31594,23 @@ TSP_usr_Utenti_Consultazioni_Add = class (TzStoredProc)
     property Computer: TNullableString read fComputer write fComputer;
 end;
 
+[TStoredProcedure('USR_UTENTI_DISATTIVA_CESSATI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Utenti_Disattiva_Cessati = class (TzStoredProc)
+  private
+    fId_Risorsa: TNullableInt64;
+    fUtenti_Disattivati: TNullableInt64;
+  private
+    property Utenti_Disattivati_internal: TNullableInt64 read fUtenti_Disattivati write fUtenti_Disattivati;
+  public
+    //
+    [TParamAttribute('ID_RISORSA', ptInput, False)]
+    property Id_Risorsa: TNullableInt64 read fId_Risorsa write fId_Risorsa;
+    //
+    [TParamAttribute('UTENTI_DISATTIVATI', ptOutput, False)]
+    property Utenti_Disattivati: TNullableInt64 read fUtenti_Disattivati;
+end;
+
 [TStoredProcedure('USR_UTENTI_SETTINGS_EXISTS', True)]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_usr_Utenti_Settings_Exists = class (TzStoredProc)
@@ -31598,6 +31786,17 @@ TSP_usr_Verifica_Token_Otp = class (TzStoredProc)
     //
     [TParamAttribute('ERROR_MESSAGE', ptOutput, False)]
     property Error_Message: TNullableString read fError_Message;
+end;
+
+[TStoredProcedure('USR_WEB_SESSIONE_ADOTTA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_usr_Web_Sessione_Adotta = class (TzStoredProc)
+  private
+    fId_Sessione: TNullableInt64;
+  public
+    //
+    [TParamAttribute('ID_SESSIONE', ptInput, False)]
+    property Id_Sessione: TNullableInt64 read fId_Sessione write fId_Sessione;
 end;
 
 [TStoredProcedure('VER_AFTER_DDL_UPDATE')]

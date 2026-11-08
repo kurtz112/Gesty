@@ -181,6 +181,27 @@
       "caratterizzazione": [
         "Prove/caratterizzazione/07-aule-e-prenotazioni.sql"
       ]
+    },
+    {
+      "area": "Progettazione bandi",
+      "specifica": "Progettazione bandi.md",
+      "percorsi": [
+        "dmBandi.pas",
+        "frmBandi.pas"
+      ],
+      "oggetti": [
+        "BANDI",
+        "BANDO_",
+        "ZZ_BANDI_LIVELLI_VALUTAZIONE",
+        "CRON_VERIFICA_SCADENZA_BANDI"
+      ],
+      "prove": [
+        "caratterizzazione SQL 08 (48 casi)",
+        "interfaccia del modulo: collaudo con zapp (GESTY-BAN-012)"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/08-progettazione-bandi.sql"
+      ]
     }
   ]
 }

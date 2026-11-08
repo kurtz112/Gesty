@@ -28,7 +28,14 @@ uses
 
 type
   TFormBandi = class(TBaseForm)
+    ActionList: TActionList;
+    ParereFavorevole: TAction;
+    ParereContrario: TAction;
+    RiapriValutazione: TAction;
     procedure FormCreate(Sender: TObject);
+    procedure ParereContrarioExecute(Sender: TObject);
+    procedure ParereFavorevoleExecute(Sender: TObject);
+    procedure RiapriValutazioneExecute(Sender: TObject);
   private
   protected
     procedure CreateDataModule; override;
@@ -64,6 +71,26 @@ begin
   inherited;
   Caption := 'Bandi';
   ReportGroup := 'Bandi';
+end;
+
+// I comandi compaiono sulle viste tramite le ToolActions del dizionario LZ
+
+procedure TFormBandi.ParereFavorevoleExecute(Sender: TObject);
+begin
+  inherited;
+  Bandi.ParereFavorevole;
+end;
+
+procedure TFormBandi.ParereContrarioExecute(Sender: TObject);
+begin
+  inherited;
+  Bandi.ParereContrario;
+end;
+
+procedure TFormBandi.RiapriValutazioneExecute(Sender: TObject);
+begin
+  inherited;
+  Bandi.RiapriValutazione;
 end;
 
 end.
