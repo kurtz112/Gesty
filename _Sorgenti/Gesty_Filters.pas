@@ -295,6 +295,7 @@ type
 implementation
 
 uses
+  Vcl.Graphics,
   ConfigModule,
   zDX,
   zBaseLib,
@@ -359,6 +360,42 @@ begin
   finally
     DataSet.Active := False;
   end;
+end;
+
+// ZC 08.11.2026: larghezza del filtro ricavata dalle voci invece che fissa.
+// Prima i filtri SIA nascevano larghi Combo.Width + 150 qualunque fosse il loro
+// contenuto, e sulla barra degli interventi occupavano piu' spazio del necessario.
+// Ora la larghezza e' quella della descrizione piu' lunga fra le voci ('Tutti'
+// compresa) piu' lo spazio del pulsante a tendina, in pixel logici a 96 DPI:
+// SetFilterWidth la riporta poi alla scala corrente della barra. La misura usa
+// il carattere della barra e la sua risoluzione (Font.PixelsPerInch), cosi' il
+// risultato non dipende dal DPI del monitor. Una larghezza scritta nel
+// dizionario (ToolFilters.Width) resta prioritaria.
+function LarghezzaDalleVoci(Combo: TcxBarEditItem; Props: TcxImageComboBoxProperties): Integer;
+const
+  SpazioPulsante = 34;
+var
+  Misura: TBitmap;
+  Indice: Integer;
+  Larghezza: Integer;
+begin
+  Result := 0;
+  Misura := TBitmap.Create;
+  try
+    if Assigned(Combo.BarManager) then
+      Misura.Canvas.Font.Assign(Combo.BarManager.Font);
+    for Indice := 0 to Props.Items.Count - 1 do
+    begin
+      Larghezza := Misura.Canvas.TextWidth(Props.Items[Indice].Description);
+      if Larghezza > Result then
+        Result := Larghezza;
+    end;
+    if Misura.Canvas.Font.PixelsPerInch > 0 then
+      Result := Round(Result * 96 / Misura.Canvas.Font.PixelsPerInch);
+  finally
+    Misura.Free;
+  end;
+  Result := Result + SpazioPulsante;
 end;
 
 // ── TAnnoFormativoBarFilter ───────────────────────────────────────────────────
@@ -1005,7 +1042,7 @@ begin
   InitProperties(ComboProps);
 
   Combo.Tag := NativeInt(DataSet);
-  SetFilterWidth(Combo, Combo.Width + 150);
+  SetFilterWidth(Combo, LarghezzaDalleVoci(Combo, ComboProps));
   BindFilter(Combo, FilterFieldName('MACROGRUPPO_SIA'));
   if InitialValue = ivCustom then
     Combo.EditValue := CustomEditValue
@@ -1050,7 +1087,7 @@ begin
   InitProperties(ComboProps);
 
   Combo.Tag := NativeInt(DataSet);
-  SetFilterWidth(Combo, Combo.Width + 150);
+  SetFilterWidth(Combo, LarghezzaDalleVoci(Combo, ComboProps));
   BindFilter(Combo, FilterFieldName('COMUNE_SIA'));
   if InitialValue = ivCustom then
     Combo.EditValue := CustomEditValue
