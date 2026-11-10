@@ -227,6 +227,10 @@ type
     // presenze studenti congelate (o, per le colonne complessive Stato
     // Presenza/FAD, se lo e' almeno un'ora della giornata)
     function IsOraBloccata(const Column: TcxTreeListColumn): Boolean;
+    // Mantis #336 - 2026-11-10: come IsOraBloccata, ma se l'ora e' bloccata avvisa
+    // l'utente e ridisegna la riga con i valori veri del database (la modifica
+    // appena fatta nella casella non e' stata salvata)
+    function RifiutaSeOraBloccata(const Column: TcxTreeListColumn): Boolean;
   private
     procedure doCaricaProgetto(var Message: TMessage); message cmd_CaricaProgetto;
     procedure CaricaProgetto;
@@ -438,6 +442,23 @@ begin
     // colonna complessiva (Stato Presenza / FAD): bloccata se lo e'
     // almeno un'ora della giornata
     result := RegistroStudenti.RegistroCollettivo.BloccaStudenti;
+end;
+
+// Mantis #336 - 2026-11-10: dopo la firma le presenze restano bloccate anche se la
+// firma viene tolta; prima la modifica veniva scartata in silenzio e la casella
+// restava con un valore che nel database non c'era (flag FAD tolto ma ancora
+// presente, rielaborazione SIUF con la fascia ancora FAD)
+function TFrameRegistroCollettivo.RifiutaSeOraBloccata(const Column: TcxTreeListColumn): Boolean;
+begin
+  Result := IsOraBloccata(Column);
+
+  if Result then
+  begin
+    MessageDlg('Le presenze di questa ora risultano bloccate: la modifica non '#232' stata salvata.' + sLineBreak +
+      'Per modificarle serve lo sblocco delle presenze (comando Sblocca Presenze, riservato a chi ha l'#39'autorizzazione).',
+      mtWarning, [mbOK], 0);
+    PostMessage(Self.Handle, cmd_DisplayTree, 0, 0);
+  end;
 end;
 
 procedure TFrameRegistroCollettivo.InitStyles;
@@ -1130,7 +1151,8 @@ var
   StatoPresenza: TStatoPresenza;
 begin
   // Mantis #47 - 2026-07-28: gate per singola ora (era: BloccaStudenti globale)
-  if IsOraBloccata(treeRegistro.FocusedColumn) then
+  // Mantis #336 - 2026-11-10: con avviso e ridisegno invece dell'uscita silenziosa
+  if RifiutaSeOraBloccata(treeRegistro.FocusedColumn) then
     exit;
 
   Studente := SelectedStudente;
@@ -1157,7 +1179,8 @@ var
   IsFAD: Boolean;
 begin
   // Mantis #47 - 2026-07-28: gate per singola ora (era: BloccaStudenti globale)
-  if IsOraBloccata(treeRegistro.FocusedColumn) then
+  // Mantis #336 - 2026-11-10: con avviso e ridisegno invece dell'uscita silenziosa
+  if RifiutaSeOraBloccata(treeRegistro.FocusedColumn) then
     exit;
 
   Studente := SelectedStudente;
@@ -1184,7 +1207,8 @@ var
   Ora: integer;
   Calcolare: Boolean;
 begin
-  if IsOraBloccata(treeRegistro.FocusedColumn) then
+  // Mantis #336 - 2026-11-10: con avviso e ridisegno invece dell'uscita silenziosa
+  if RifiutaSeOraBloccata(treeRegistro.FocusedColumn) then
     exit;
 
   Studente := SelectedStudente;
@@ -1213,7 +1237,8 @@ var
   s: String;
 begin
   // Mantis #47 - 2026-07-28: gate per singola ora (era: BloccaStudenti globale)
-  if IsOraBloccata(treeRegistro.FocusedColumn) then
+  // Mantis #336 - 2026-11-10: con avviso e ridisegno invece dell'uscita silenziosa
+  if RifiutaSeOraBloccata(treeRegistro.FocusedColumn) then
     exit;
 
   s := TcxComboBox(Sender).EditValue;
