@@ -589,6 +589,11 @@ type
     procedure CenterImage;
     procedure LoadImage;
   private
+    // ZC 10.11.2026: riempimento rimandato di galleria e selettore degli skin
+    FTimerSelettoriSkin: TTimer;
+    procedure InitSelettoriSkin;
+    procedure TimerSelettoriSkinTimer(Sender: TObject);
+  private
     procedure CaricaSkin(ASkinName: string);
     procedure InitSkin;
   private
@@ -1385,21 +1390,42 @@ begin
 end;
 
 procedure TMain.InitSkin;
-var
-  Skin: string;
+begin
+  // ZC 10.11.2026: la galleria "Seleziona Aspetto" e il selettore "Colori"
+  // leggono ciascuno tutto Gesty.skinres (27 MB): misurati 0,26-0,38 s nella
+  // creazione della finestra principale, prima che compaia. Si riempiono in
+  // InitSelettoriSkin, dopo che la finestra e' comparsa. Lo skin salvato e'
+  // gia' attivo dalla schermata di avvio (TzSecurity.LoadSkinFromIni): non si
+  // riapplica qui con CaricaSkin, che rileggerebbe il file (misurati 115 ms).
+  dx.SkinPaletteName := Config.zSystem.SkinPaletteName;
+
+  if not Assigned(FTimerSelettoriSkin) then
+  begin
+    FTimerSelettoriSkin := TTimer.Create(Self);
+    FTimerSelettoriSkin.Enabled := false;
+    FTimerSelettoriSkin.Interval := 50;
+    FTimerSelettoriSkin.OnTimer := TimerSelettoriSkinTimer;
+  end;
+
+  // Un timer e non TThread.ForceQueue: Windows consegna WM_TIMER solo a coda
+  // vuota, dopo il primo WM_PAINT, quindi la finestra e' gia' disegnata
+  // quando galleria e selettore si riempiono
+  FTimerSelettoriSkin.Enabled := true;
+end;
+
+procedure TMain.TimerSelettoriSkinTimer(Sender: TObject);
+begin
+  FTimerSelettoriSkin.Enabled := false;
+  InitSelettoriSkin;
+end;
+
+procedure TMain.InitSelettoriSkin;
 begin
   // La galleria nasce nascosta nel DFM: solo InitSkinChooserGalleryItem la rende
   // visibile, e senza questa chiamata non c'e' piu' modo di scegliere l'aspetto
   dx.InitSkinChooserGalleryItem(dxSkinChooserGalleryItem);
 
-  // blocco da eliminare
-  // Skin := Config.zSystem.SkinName;
-  // CaricaSkin(Skin);
-
-  // \fine blocco
-
   dx.InitRibbonSkinSelector(dxRibbonSkinSelector);
-  dx.SkinPaletteName := Config.zSystem.SkinPaletteName;
 
   if not Config.zSystem.SkinName.IsEmpty then
     dxRibbonSkinSelector.SetSkin(Config.zSystem.SkinName, Config.zSystem.SkinPaletteName);

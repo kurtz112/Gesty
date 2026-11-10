@@ -115,7 +115,6 @@ uses
   frmAllegati in 'dbForms\frmAllegati.pas' {FormAllegati},
   frmRegistraPresenzeTirocini in 'Varie\frmRegistraPresenzeTirocini.pas' {FormRegistraPresenzeTirocini},
   Gesty.Types in 'Varie\Gesty.Types.pas',
-  dmDataSetEvents in 'DataModules\dmDataSetEvents.pas' {DataSetEvents: TDataModule},
   dmGRS in 'DataModules\dmGRS.pas' {GRS: TDataModule},
   frmGRS in 'dbForms\frmGRS.pas' {FormGRS},
   frmInail in 'dbForms\frmInail.pas' {FormInail},
@@ -448,7 +447,6 @@ begin
 
   Application.CreateForm(Tconfig, config);
   Application.CreateForm(TCommon, Common);
-  Application.CreateForm(TDataSetEvents, DataSetEvents);
   Application.CreateForm(TEventHandler, EventHandler);
   Application.CreateForm(TSchedulerTools, SchedulerTools);
   Application.CreateForm(TeSignAnyWhereEngine, eSignAnyWhereEngine);

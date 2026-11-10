@@ -382,10 +382,6 @@
             <Form>FormRegistraPresenzeTirocini</Form>
         </DCCReference>
         <DCCReference Include="Varie\Gesty.Types.pas"/>
-        <DCCReference Include="DataModules\dmDataSetEvents.pas">
-            <Form>DataSetEvents</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="DataModules\dmGRS.pas">
             <Form>GRS</Form>
             <DesignClass>TDataModule</DesignClass>

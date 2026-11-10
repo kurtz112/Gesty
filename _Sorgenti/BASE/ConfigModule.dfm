@@ -38,7 +38,6 @@ inherited Config: TConfig
     zMaps = <>
     zTatukMaps = <>
     OnHyperLink = zSystemHyperLink
-    OnAssignDataSetEvent = zSystemAssignDataSetEvent
     OnAssignFieldOnChangeEvent = zSystemAssignFieldOnChangeEvent
     zFbDatabase = Database
     zFbTransaction = DefaultWriteTrans

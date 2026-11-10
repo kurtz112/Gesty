@@ -1,2 +1,0 @@
-inherited DataSetEvents: TDataSetEvents
-end

@@ -106,7 +106,6 @@ type
     procedure TimerNotificheTimer(Sender: TObject);
     procedure TimerPingEventiTimer(Sender: TObject);
     procedure TimerShutdownTimer(Sender: TObject);
-    procedure zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);
     procedure zSystemAssignFieldOnChangeEvent(Field: TField; const EventName: string);
     procedure zSystemHyperLink(Sender: TObject; FieldName: string; Value: Variant);
   private
@@ -297,7 +296,6 @@ uses
   Gesty_StoredProcs,
   zNet.Tls,
   zz.SplashWait,
-  dmDataSetEvents,
   zOffice.Types,
   zOffice.Mail.Utils,
   dmEventHandler,
@@ -1623,14 +1621,6 @@ begin
   end;
 
   FPingInAttesa := false;
-end;
-
-procedure TConfig.zSystemAssignDataSetEvent(DataSet: TzFbDataSet; DataSetEventKind: TDataSetEventKind; const EventName: string);
-begin
-  inherited;
-
-  if Assigned(DataSetEvents) then
-    DataSetEvents.AssignDataSetEvent(DataSet, DataSetEventKind, EventName);
 end;
 
 procedure TConfig.CheckVersioneEseguibile;
