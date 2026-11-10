@@ -55,6 +55,8 @@ dcu/
 Win32/
 Win64/
 
+MetaData.dfm
+
 # zBuilder e Windows
 *.zbtmp
 Thumbs.db
