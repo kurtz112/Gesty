@@ -142,7 +142,6 @@ inherited Config: TConfig
   end
   object FDMoniRemoteClientLink: TFDMoniRemoteClientLink
     EventKinds = [ekError, ekConnConnect, ekConnTransact, ekCmdPrepare, ekCmdExecute, ekComponent, ekSQL]
-    Tracing = True
     Left = 253
     Top = 295
   end

@@ -2212,6 +2212,12 @@ begin
 
   if EditFbMonitor(MonitorBy, FDMoniRemoteClientLink, FDMoniFlatFileClientLink, FDMoniCustomClientLink) then
   begin
+    // ZC 10.11.2026: il monitor remoto non e' piu' acceso nel DFM. Con
+    // Tracing acceso fin dal caricamento di Config, FireDAC tentava a ogni
+    // avvio la connessione a FDMonitor su 127.0.0.1:8050 e, senza FDMonitor
+    // in ascolto, Windows impiegava circa 2 secondi a rifiutarla. Si accende
+    // solo quando l'utente sceglie il monitor remoto, e si spegne negli altri casi.
+    FDMoniRemoteClientLink.Tracing := MonitorBy = TFDMonitorBy.mbRemote;
     Database.Params.MonitorBy := MonitorBy;
     Login;
   end;
