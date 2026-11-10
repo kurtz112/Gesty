@@ -136,6 +136,7 @@
         <DCCReference Include="X:\Druido\LIB\dxSpreadSheetReportDesigner.pas"/>
         <DCCReference Include="BASE\MDI_Lib.pas"/>
         <DCCReference Include="Varie\Files.Lib.pas"/>
+        <DCCReference Include="Varie\Files.ImportErrors.pas"/>
         <DCCReference Include="Gesty_StoredProcs.pas"/>
         <DCCReference Include="BASE\Init_Controls.pas"/>
         <DCCReference Include="BASE\Base_DataModule.pas">

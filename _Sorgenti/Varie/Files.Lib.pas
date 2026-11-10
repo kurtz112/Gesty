@@ -37,6 +37,7 @@ uses
   zBaseLib,
   Gesty_StoredProcs,
   zMsg,
+  Files.ImportErrors,
   zz.Files,
   zOffice.Ocr,
   zOffice.Pdf.Utils,
@@ -327,11 +328,15 @@ begin
   // registrare l'allegato, invece di scoprire il problema solo alla successiva visualizzazione.
   if SameText(ExtractFileExt(FileName), '.pdf') then
   begin
+    // Mantis #338 - 2026-11-10: distinto errore di apertura file da PDF non valido
+    if not TFile.Exists(FileName) then
+      raise Exception.Create(MessaggioFileNonRaggiungibile(FileName));
+
     try
       OversizedFound := FindOversizedPdfPage(FileName, OversizedPageIndex, OversizedWidthIn, OversizedHeightIn);
     except
       on e: Exception do
-        raise Exception.CreateFmt('Impossibile importare "%s": il file non e'' un PDF valido o e'' danneggiato (%s).', [ExtractFileName(FileName), e.Message]);
+        raise Exception.Create(MessaggioErroreImportazionePdf(FileName, e));
     end;
 
     if OversizedFound then

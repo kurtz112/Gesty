@@ -115,7 +115,9 @@
         <DCCReference Include="Test.SIUF.Validator.pas"/>
         <DCCReference Include="Test.SIUF.Builder.pas"/>
         <DCCReference Include="Test.SIUF.Client.pas"/>
+        <DCCReference Include="Test.Files.ImportErrors.pas"/>
         <DCCReference Include="..\..\_Sorgenti\Varie\Gesty.Types.pas"/>
+        <DCCReference Include="..\..\_Sorgenti\Varie\Files.ImportErrors.pas"/>
         <DCCReference Include="..\..\_Sorgenti\Varie\ValutazioniPrestazioni.types.pas"/>
         <DCCReference Include="..\..\_Sorgenti\BASE\AI\zAI.Tools.pas"/>
         <DCCReference Include="..\..\_Sorgenti\BASE\AI\zAI.Protocol.pas"/>

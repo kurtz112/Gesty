@@ -36,9 +36,12 @@ uses
   Test.SIUF.Validator in 'Test.SIUF.Validator.pas',
   Test.SIUF.Builder in 'Test.SIUF.Builder.pas',
   Test.SIUF.Client in 'Test.SIUF.Client.pas',
+  // importazione allegati PDF
+  Test.Files.ImportErrors in 'Test.Files.ImportErrors.pas',
   // unit sotto test
   Gesty.Types in '..\..\_Sorgenti\Varie\Gesty.Types.pas',
   ValutazioniPrestazioni.types in '..\..\_Sorgenti\Varie\ValutazioniPrestazioni.types.pas',
+  Files.ImportErrors in '..\..\_Sorgenti\Varie\Files.ImportErrors.pas',
   zAI.Tools in '..\..\_Sorgenti\BASE\AI\zAI.Tools.pas',
   zAI.Protocol in '..\..\_Sorgenti\BASE\AI\zAI.Protocol.pas',
   zAI.Protocol.OpenAI in '..\..\_Sorgenti\BASE\AI\zAI.Protocol.OpenAI.pas',

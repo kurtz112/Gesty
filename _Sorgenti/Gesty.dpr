@@ -32,6 +32,7 @@ uses
   zz.SplashWait,
   MDI_Lib in 'BASE\MDI_Lib.pas',
   Files.Lib in 'Varie\Files.Lib.pas',
+  Files.ImportErrors in 'Varie\Files.ImportErrors.pas',
   Gesty_StoredProcs in 'Gesty_StoredProcs.pas',
   Init_Controls in 'BASE\Init_Controls.pas',
   Base_DataModule in 'BASE\Base_DataModule.pas' {BaseDataModule: TDataModule},
