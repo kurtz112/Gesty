@@ -12,6 +12,10 @@
       "oggetti": [
         "ORE_RILEVATE"
       ],
+      "database_di_partenza": "_Database/Gesty.fdb",
+      "requisiti": [
+        "tabella:ORE_RILEVATE"
+      ],
       "prove": [
         "caratterizzazione SQL 01, 03, 04 (65 casi)"
       ],
@@ -37,6 +41,10 @@
         "ORARIO_BIU0",
         "ORARIO_ELENCO_BIUD0"
       ],
+      "database_di_partenza": "_Database/Gesty.fdb",
+      "requisiti": [
+        "tabella:STUDENTI_PRESENZE_COLLETTIVA"
+      ],
       "prove": [
         "caratterizzazione SQL 05, 06 (58 casi)",
         "interfaccia del Registro Collettivo: collaudo con zapp (R-190)"
@@ -58,9 +66,17 @@
         "PROGETTI_TIPI_INCARICO_DETAIL",
         "CAN_SEE_BUDGET"
       ],
-      "madre": "_Database/_copie/CAPAC-caratterizzazione.fdb",
+      "database_di_partenza": "_Database/CAPAC.fdb",
+      "requisiti": [
+        "procedura:COAN_ELABORA",
+        "riga:PROGETTI.ID_PROGETTO=132415",
+        "riga:PROGETTI.ID_PROGETTO=441090",
+        "riga:PROGETTI.ID_PROGETTO=494593",
+        "riga:PROGETTI.ID_PROGETTO=494717",
+        "riga:PROGETTI.ID_PROGETTO=472722"
+      ],
       "prove": [
-        "caratterizzazione SQL 07 (25 casi, SOLO su copia di CAPAC: i dati attesi, per esempio il corso 132415 con ricavi 26.000 e 24.500, esistono solo li'; sulla copia di Gesty i ricavi sono 0 e 7 casi differiscono per questo. Lanciare collaudo_specifiche con madre=_Database\\_copie\\CAPAC-caratterizzazione.fdb. Ogni lancio fa quattro elaborazioni complete)",
+        "caratterizzazione SQL 07 (25 casi, SOLO su CAPAC: i dati attesi, per esempio il corso 132415 con ricavi 26.000 e 24.500, esistono solo li'; su un altro database la prova non parte e dice cosa manca. Ogni lancio fa quattro elaborazioni complete, circa 20 minuti)",
         "interfaccia (caselle di ricerca, doppio clic, DIV-BUD-8): collaudo con zapp (R-195)"
       ],
       "caratterizzazione": [
@@ -136,6 +152,10 @@
       "oggetti": [
         "TIME_REPORT"
       ],
+      "database_di_partenza": "_Database/Gesty.fdb",
+      "requisiti": [
+        "procedura:TIME_REPORT"
+      ],
       "prove": [
         "fotografia (golden master) di TIME_REPORT, 10 casi: confronto con il riferimento, non con la specifica"
       ],
@@ -174,8 +194,18 @@
         "AULA_VERIFICA_SOVRAPPOSIZIONE",
         "AULE_INAGIBILITA"
       ],
+      "database_di_partenza": "_Database/CAPAC.fdb",
+      "requisiti": [
+        "procedura:AULA_VERIFICA_SOVRAPPOSIZIONE~OVERLAP_TIME_FINE_GIORNO",
+        "procedura:AULE_PRENOTAZIONI_NOTIFICA_RESPONSABILI",
+        "riga:ENTI_SEDI.ID_SEDE=1499",
+        "riga:PROGETTI.ID_PROGETTO=470701",
+        "riga:RISORSE.ID_RISORSA=120",
+        "riga:RISORSE.ID_RISORSA=130",
+        "riga:RISORSE.ID_RISORSA=1158"
+      ],
       "prove": [
-        "caratterizzazione SQL 07 (118 casi)",
+        "caratterizzazione SQL 07 (173 casi, SOLO su CAPAC: ente 1492, sede 1499, richiedenti 120 e 130, progetto 470701 sono scritti nello script e in Codebri non esistono; con le correzioni dei rilasci 003 e 004 gia' nel database)",
         "eliminazione dal calendario: collaudo con zapp il 2026-10-31 (annulla senza errore); trascinamento: la sonda non riesce a guidarlo"
       ],
       "caratterizzazione": [
@@ -194,6 +224,11 @@
         "BANDO_",
         "ZZ_BANDI_LIVELLI_VALUTAZIONE",
         "CRON_VERIFICA_SCADENZA_BANDI"
+      ],
+      "database_di_partenza": "_Database/CODEBRI.fdb",
+      "requisiti": [
+        "tabella:ENTI_PROMOTORI",
+        "colonna:BANDI.IMPORTO_MASSIMO_FINANZIAMENTO"
       ],
       "prove": [
         "caratterizzazione SQL 08 (48 casi)",
