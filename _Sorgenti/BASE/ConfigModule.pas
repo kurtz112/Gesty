@@ -144,8 +144,10 @@ type
     procedure LZ_ChangeSqlToken(const OldToken, NewToken: string; const ShouldSave: Boolean = false);
     property DisabilitaEventiDB: Boolean read FDisabilitaEventiDB;
   private
+    FAccessibilita: Boolean;
     FMaxMinutiInattivita: Integer;
     procedure InitAFK;
+    procedure InitAccessibilita;
     Procedure CloseApplication;
 
     procedure InitMantis;
@@ -239,6 +241,9 @@ type
   public
     procedure pippo;
   public
+    // Misure di accessibilita' (legge 4/2004, EN 301549) attive per l'utente
+    // corrente: campo USR_UTENTI.ACCESSIBILITA, letto dopo l'accesso
+    property Accessibilita: Boolean read FAccessibilita;
     property MaxMinutiInattivita: Integer read FMaxMinutiInattivita;
     procedure MostraBadgeNotifiche;
     procedure NotificheLette;
@@ -483,6 +488,7 @@ begin
     Load_GMAPS_API_KEY;
 
     InitAFK;
+    InitAccessibilita;
 
     /// /////////////////////////////////
 
@@ -908,6 +914,24 @@ begin
     zSystem.SaveZip(csAll, '');
   finally
     FreeAndNil(src);
+  end;
+end;
+
+procedure TConfig.InitAccessibilita;
+var
+  Valore: Variant;
+begin
+  // Senza il campo (database non ancora aggiornato) o senza utente le misure
+  // restano spente: l'accessibilita' non deve mai impedire l'avvio.
+  FAccessibilita := false;
+
+  try
+    Valore := Database.ExecSQLScalar('SELECT USR_UTENTI.ACCESSIBILITA FROM USR_UTENTI WHERE USR_UTENTI.USER_ID = CURRENT_USER_ID()');
+
+    if not VarIsNull(Valore) then
+      FAccessibilita := Valore;
+  except
+    FAccessibilita := false;
   end;
 end;
 

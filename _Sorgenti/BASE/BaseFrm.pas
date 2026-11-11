@@ -78,7 +78,8 @@ uses
   zOffice.Reports.BatchController,
   SmartInspect.Vcl,
   SmartInspect.Vcl.SiAuto,
-  zOffice.MultiViewer;
+  zOffice.MultiViewer,
+  zMenuAzioniTastiera;
 
 type
   // TBaseForm = class(TdxRibbonForm, IRestriction)
@@ -224,6 +225,7 @@ type
     procedure HideToolbars;
     procedure InitFrame(Frame: TBaseFrame; aParent: TWinControl);
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
     procedure LoadFromIni; virtual;
     function PkMode: Boolean;
@@ -1008,9 +1010,32 @@ begin
           // Key := 0;
         end;
       end;
+    Vk_F10:
+      // 2026-11-11: F10 apre il menu delle azioni delle barre (vedi KeyUp), solo
+      // per gli utenti con il flag Accessibilita'. Il tasto si consuma gia' qui,
+      // cosi' non arriva ad altri gestori
+      if (Shift = []) and Config.Accessibilita then
+        Key := 0;
   end;
 
   inherited KeyDown(Key, Shift);
+end;
+
+procedure TBaseForm.KeyUp(var Key: Word; Shift: TShiftState);
+begin
+  // 2026-11-11: uso da tastiera (legge 4/2004, EN 301549 cap. 11). I pulsanti
+  // delle barre della form, delle schede e delle viste non prendono il fuoco:
+  // F10 li elenca in un menu che si naviga con frecce, Invio ed Esc. Attivo solo
+  // per gli utenti con USR_UTENTI.ACCESSIBILITA. Il menu si apre al rilascio del
+  // tasto: con F10 Windows entra nel suo "modo menu" proprio al rilascio, e
+  // consumare il tasto qui lo evita.
+  if (Key = Vk_F10) and (Shift = []) and Config.Accessibilita then
+  begin
+    Key := 0;
+    MostraMenuAzioniTastiera(Self);
+  end;
+
+  inherited KeyUp(Key, Shift);
 end;
 
 procedure TBaseForm.lblTitoloDblClick(Sender: TObject);
