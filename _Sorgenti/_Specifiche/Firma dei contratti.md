@@ -1,8 +1,8 @@
 ---
 area: Firma dei contratti
 progetto: Gesty
-aggiornato: 2026-10-30
-rilascio: OUT/20261030-specifiche-vive-dei-progetti/009
+aggiornato: 2026-11-11
+rilascio: Ticket_Gesty/341 - QUESTIONI DA RISOLVERE/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -302,6 +302,24 @@ Gesty non versa i documenti firmati in conservazione presso Namirial: il versame
 - **Quando** il cliente la inoltra
 - **Allora** non c'è nulla da correggere in Gesty: il lavoro va fatto ripetere a Namirial
 
+## GESTY-FIR-022 Avviso dei contratti non firmati all'inizio dell'incarico
+Ogni notte la procedura `CRON` richiama `CRON_VERIFICA_CONTRATTI_NON_FIRMATI` (ticket 341). Un contratto (`CON`) è "non firmato" se per l'incarico esiste almeno una pratica di firma e nessuna è conclusa (stato `F`): vale quindi anche per una pratica scaduta (`S`) o respinta (`R`) che nessuno ha rimandato in firma, oltre che per quelle in approvazione (`I`), approvate ma non inviate (`A`) o in attesa del docente (`D`). Gli incarichi respinti non contano. Dopo mezzogiorno il controllo guarda gli incarichi che iniziano il giorno dopo, così l'avviso è già visibile la mattina in cui il docente deve firmare; prima di mezzogiorno guarda quelli che iniziano oggi. Se il giorno controllato è un sabato, l'elenco arriva fino al lunedì. L'avviso (`CONTRATTI_NON_FIRMATI`) va a chi lo ha sottoscritto, con l'elenco di docente, progetto, data di inizio e stato della pratica (fino a trenta righe, poi solo il numero degli altri); lo stesso elenco non si ripete nello stesso giorno. Non si avvisano i contratti mai messi in firma: per l'incarico non esiste nessuna pratica, quindi non si può sapere se un contratto era dovuto.
+
+### Scenario: contratto inviato e non ancora firmato
+- **Dato** un incarico che inizia domani con una pratica in stato `D`
+- **Quando** gira la `CRON` di notte
+- **Allora** i sottoscrittori ricevono l'avviso "Contratti con firma digitale non firmati: 1" con il nome del docente
+
+### Scenario: contratto firmato in tempo
+- **Dato** un incarico che inizia domani con una pratica in stato `F`
+- **Quando** gira la `CRON`
+- **Allora** nessun avviso
+
+### Scenario: busta scaduta e mai rimandata
+- **Dato** un incarico che inizia domani la cui unica pratica è in stato `S`
+- **Quando** gira la `CRON`
+- **Allora** l'avviso lo elenca come "busta scaduta, da rimandare in firma"
+
 ## Divergenze note
 
 Punti in cui il codice o i dati di oggi non mantengono ciò che i requisiti o i ticket dicono, o in cui due parti applicano la stessa regola in modo diverso. Raccolti in R-180. Con la correzione il requisito si aggiorna e questa sezione si accorcia.
@@ -320,6 +338,7 @@ Punti in cui il codice o i dati di oggi non mantengono ciò che i requisiti o i 
 | DIV-FIR-10 | Su CAPAC la policy `Visualizzazione Contratti Firmati` apre allegati firmati di Risorse, riepilogo ed esportazione, ma non `Progetti.Docenti_Incarichi_Allegati`; la richiesta del ticket 289 era "visionare", la policy dà `W` | Chi è nel gruppo non vede i contratti firmati dalla scheda docenti del progetto; può modificarne o cancellarne le righe se il dataset lo permette |
 | DIV-FIR-11 | Nella verifica dello stato (GESTY-FIR-011) un errore su una busta interrompe il giro: le pratiche successive non vengono interrogate. Lo stesso errore incrementa `TENTATIVI`, che conta così anche le verifiche e non solo gli invii | Una busta problematica blocca l'aggiornamento di tutte le altre fino a quando non si risolve; il numero dei tentativi non dice più quante volte si è provato a inviare |
 | DIV-FIR-12 | I messaggi di `OBJ_FIRME_ELETTRONICHE_CHECK_RISORSA` dicono "Telefono invio non trovata." e "Nominativo legale rappresentante non trovata." anche quando il firmatario è un collaboratore | L'operatore cerca il dato sbagliato nell'anagrafica sbagliata |
+| DIV-FIR-13 | La scadenza della busta presso il fornitore è fissa, contata dall'invio (`EXPIRATION_IN_SECONDS_AFTER_SENDING`: 14 giorni su CAPAC), e non dipende dalla data di inizio dell'incarico (ticket 341) | Un docente può firmare anche dopo l'inizio dell'incarico, come ha rilevato la Regione su un percorso di Innovaprofessioni. Il solo avviso di GESTY-FIR-022 lo segnala, non lo impedisce |
 
 <!-- footer -->
 ---
