@@ -28,7 +28,7 @@ Questa specifica descrive il modulo Bandi di Gesty (menu «Bandi», form `TFormB
 **Origine.** Foglio dell'Ufficio Progetti di Codebri del 2026-06-26 e offerta tecnica del 2026-07-19 (`OUT\20261107-modulo-progettazione-bandi-codebri`). Le regole sono provate da `Prove\caratterizzazione\08-progettazione-bandi.sql`, tranne GESTY-BAN-012.
 
 ## GESTY-BAN-001 Autorizzazioni
-Inserire, modificare ed eliminare bandi, candidature e partner richiede `Bandi.Gestione`. Gli enti finanziatori sono un'anagrafica condivisa con altri moduli (Abitare, SIA): inserirli non richiede `Bandi.Gestione`, così chi lavora in quei moduli può crearli senza il permesso dei bandi. `Bandi.Supervisore` serve per riaprire una valutazione, per modificare i livelli, per modificare una candidatura chiusa e per eliminare una candidatura presentata. Essere amministratore non esenta dal controllo.
+Inserire, modificare ed eliminare bandi, candidature e partner richiede `Bandi.Gestione`. Gli enti finanziatori sono un'anagrafica condivisa con altri moduli (Abitare, SIA): inserirli, modificarli ed eliminarli non richiede `Bandi.Gestione`, così chi lavora in quei moduli può gestirli senza il permesso dei bandi. L'eliminazione non è mai a catena: un ente usato da un bando, da un finanziamento di Abitare o di SIA non si elimina e l'operazione va in errore. `Bandi.Supervisore` serve per riaprire una valutazione, per modificare i livelli, per modificare una candidatura chiusa e per eliminare una candidatura presentata. Essere amministratore non esenta dal controllo.
 
 ### Scenario: inserimento senza autorizzazione
 - **Dato** un utente senza `Bandi.Gestione`
@@ -39,6 +39,16 @@ Inserire, modificare ed eliminare bandi, candidature e partner richiede `Bandi.G
 - **Dato** un utente senza `Bandi.Gestione`
 - **Quando** inserisce un ente finanziatore
 - **Allora** l'inserimento riesce
+
+### Scenario: eliminazione di un ente finanziatore usato
+- **Dato** un ente finanziatore collegato a un bando
+- **Quando** un utente, anche senza `Bandi.Gestione`, tenta di eliminarlo
+- **Allora** l'operazione va in errore e l'ente resta
+
+### Scenario: eliminazione di un ente finanziatore non usato
+- **Dato** un ente finanziatore non collegato a niente
+- **Quando** un utente senza `Bandi.Gestione` lo elimina
+- **Allora** l'eliminazione riesce
 
 ## GESTY-BAN-002 Dati del bando
 Un bando ha ente finanziatore e titolo obbligatori. Il territorio Comunale o Altro richiede la descrizione. La data ultima per i pareri non può seguire la scadenza del bando. La tipologia del fondo usa le stesse fonti di finanziamento dei progetti.
