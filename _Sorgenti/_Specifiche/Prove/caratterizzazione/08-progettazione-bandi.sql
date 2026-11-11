@@ -27,8 +27,11 @@ CREATE PROCEDURE CARATT_REGISTRA (
     ESITO     VARCHAR(10) = NULL)
 AS
 BEGIN
-  INSERT INTO CARATT_ESITI (REQUISITO, CASO, ATTESO, ESITO, MESSAGGIO)
-  VALUES (:REQUISITO, :CASO, :ATTESO, COALESCE(:ESITO, IIF(:MSG IS NULL, 'riuscito', 'errore')), :MSG);
+  -- ZC 11.11.2026: transazione autonoma, cosi' i casi annotati prima di un eventuale fermo dello script non si
+  -- perdono con il rollback e zCollaudo li legge comunque (prima un fermo cancellava tutti gli esiti gia' registrati)
+  IN AUTONOMOUS TRANSACTION DO
+    INSERT INTO CARATT_ESITI (REQUISITO, CASO, ATTESO, ESITO, MESSAGGIO)
+    VALUES (:REQUISITO, :CASO, :ATTESO, COALESCE(:ESITO, IIF(:MSG IS NULL, 'riuscito', 'errore')), :MSG);
 END^
 
 -- Utente simulato: risorsa, utente e autorizzazioni (nomi separati da punto e virgola)
