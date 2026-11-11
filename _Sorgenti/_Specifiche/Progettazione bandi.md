@@ -1,7 +1,7 @@
 ---
 area: Progettazione bandi
 progetto: Gesty
-aggiornato: 2026-11-07
+aggiornato: 2026-11-11
 rilascio: OUT/20261107-modulo-progettazione-bandi-codebri/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
@@ -28,12 +28,17 @@ Questa specifica descrive il modulo Bandi di Gesty (menu «Bandi», form `TFormB
 **Origine.** Foglio dell'Ufficio Progetti di Codebri del 2026-06-26 e offerta tecnica del 2026-07-19 (`OUT\20261107-modulo-progettazione-bandi-codebri`). Le regole sono provate da `Prove\caratterizzazione\08-progettazione-bandi.sql`, tranne GESTY-BAN-012.
 
 ## GESTY-BAN-001 Autorizzazioni
-Inserire, modificare ed eliminare bandi, enti finanziatori, candidature e partner richiede `Bandi.Gestione`. `Bandi.Supervisore` serve per riaprire una valutazione, per modificare i livelli, per modificare una candidatura chiusa e per eliminare una candidatura presentata. Essere amministratore non esenta dal controllo.
+Inserire, modificare ed eliminare bandi, candidature e partner richiede `Bandi.Gestione`. Gli enti finanziatori sono un'anagrafica condivisa con altri moduli (Abitare, SIA): inserirli non richiede `Bandi.Gestione`, così chi lavora in quei moduli può crearli senza il permesso dei bandi. `Bandi.Supervisore` serve per riaprire una valutazione, per modificare i livelli, per modificare una candidatura chiusa e per eliminare una candidatura presentata. Essere amministratore non esenta dal controllo.
 
 ### Scenario: inserimento senza autorizzazione
 - **Dato** un utente senza `Bandi.Gestione`
 - **Quando** inserisce un bando
 - **Allora** l'operazione si ferma con "Autorizzazione Bandi.Gestione necessaria per questa operazione."
+
+### Scenario: ente finanziatore senza autorizzazione
+- **Dato** un utente senza `Bandi.Gestione`
+- **Quando** inserisce un ente finanziatore
+- **Allora** l'inserimento riesce
 
 ## GESTY-BAN-002 Dati del bando
 Un bando ha ente finanziatore e titolo obbligatori. Il territorio Comunale o Altro richiede la descrizione. La data ultima per i pareri non può seguire la scadenza del bando. La tipologia del fondo usa le stesse fonti di finanziamento dei progetti.
