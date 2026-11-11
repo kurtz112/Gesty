@@ -291,6 +291,7 @@ uses
   zCollection,
   zMsg,
   zz.files,
+  zz.Accessibilita,
   zSystemTools,
   zOffice,
   zHyperLinks,
@@ -932,6 +933,17 @@ begin
       FAccessibilita := Valore;
   except
     FAccessibilita := false;
+  end;
+
+  // ZC 11.11.2026: con il flag l'utente ha anche UI Automation di DevExpress,
+  // cosi' il lettore di schermo legge il nome dei campi senza -accessibilita
+  // nel collegamento. Qui, dopo l'accesso e prima della finestra principale:
+  // vale per tutte le finestre che si aprono da ora (non per quella di
+  // accesso, gia' chiusa). -accessibilita:no resta piu' forte del flag.
+  if FAccessibilita then
+  begin
+    AccendiAccessibilitaPerUtente(true);
+    siMain.LogMessage(DescrizioneAccessibilita);
   end;
 end;
 

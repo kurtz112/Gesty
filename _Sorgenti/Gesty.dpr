@@ -30,6 +30,7 @@ uses
   zBaseLib,
   zSystem,
   zz.SplashWait,
+  zz.Accessibilita,
   MDI_Lib in 'BASE\MDI_Lib.pas',
   Files.Lib in 'Varie\Files.Lib.pas',
   Files.ImportErrors in 'Varie\Files.ImportErrors.pas',
@@ -419,6 +420,17 @@ begin
     // TdxVisualRefinements.ApplyLightStyle;
     UseLatestCommonDialogs := true;
     dxUseStandardMessageDialogs := false;
+
+    // Accessibilita' per i lettori di schermo (legge 4/2004, linee guida AgID):
+    // UI Automation dei controlli DevExpress si accende da sola se c'e' un
+    // lettore di schermo in funzione (Narrator compreso), oppure con
+    // -accessibilita nel collegamento; -accessibilita:no la spegne. Prima di
+    // Application.Initialize, perche' deve valere gia' per la finestra di
+    // accesso. Dopo l'accesso la accende anche il flag Accessibilita'
+    // dell'utente (TConfig.InitAccessibilita). Regola completa in
+    // zz.Accessibilita.
+    ConfiguraAccessibilita;
+    siMain.LogMessage(DescrizioneAccessibilita);
 
     Application.Initialize;
     Application.Title := 'Gesty';
