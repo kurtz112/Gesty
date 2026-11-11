@@ -113,6 +113,7 @@ type
     Esci: TAction;
     AggiornaProgressivi: TAction;
     Sistema: TAction;
+    EseguiAzione: TAction;
     WindowCloseAll: TAction;
     Login: TAction;
     LoadZip: TAction;
@@ -464,6 +465,7 @@ type
     procedure CalendarioDocentiExecute(Sender: TObject);
     procedure BudgetExecute(Sender: TObject);
     procedure SistemaExecute(Sender: TObject);
+    procedure EseguiAzioneExecute(Sender: TObject);
     procedure EsciExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -969,6 +971,64 @@ procedure TMain.AggiornaProgressiviExecute(Sender: TObject);
 begin
   if ConfirmOkCancel('Aggiornare i progressivi ?') then
     Config.zSystem.UpdateGenerators;
+end;
+
+// Come in WT: elenco delle azioni del programma, da cui scegliere quella da eseguire (Ctrl+Maiusc+F6),
+// utile a chi usa solo la tastiera. Compaiono solo le azioni attive e visibili all'utente.
+procedure TMain.EseguiAzioneExecute(Sender: TObject);
+var
+  NomeAzione: String;
+  ElencoAzioni: TProc<TInputDialog>;
+  Azione: TContainedAction;
+begin
+  ElencoAzioni := procedure(InputDialog: TInputDialog)
+    var
+      ComboAzioni: TcxImageComboBox;
+      Voce: TcxImageComboBoxItem;
+      Ordinate: TStringList;
+      Lista: TActionList;
+      Candidata: TContainedAction;
+      Indice: Integer;
+    begin
+      ComboAzioni := TcxImageComboBox(InputDialog.cxCustomEdit);
+      Ordinate := TStringList.Create;
+      try
+        Ordinate.CaseSensitive := False;
+        for Lista in [ActionList, ModuliActions] do
+          for Candidata in Lista do
+            if (Candidata <> EseguiAzione) and (Candidata is TCustomAction) and
+              TCustomAction(Candidata).Enabled and TCustomAction(Candidata).Visible and
+              (Trim(Candidata.Name) <> '') and (Trim(TCustomAction(Candidata).Caption) <> '') then
+              Ordinate.AddObject(StringReplace(TCustomAction(Candidata).Caption, '&', '', [rfReplaceAll]), Candidata);
+        Ordinate.Sort;
+
+        ComboAzioni.ActiveProperties.Items.BeginUpdate;
+        try
+          for Indice := 0 to Ordinate.Count - 1 do
+          begin
+            Candidata := TContainedAction(Ordinate.Objects[Indice]);
+            Voce := ComboAzioni.ActiveProperties.Items.Add;
+            Voce.Description := Ordinate[Indice];
+            Voce.Value := Candidata.Name;
+            Voce.ImageIndex := Candidata.ImageIndex;
+          end;
+        finally
+          ComboAzioni.ActiveProperties.Items.EndUpdate;
+        end;
+      finally
+        Ordinate.Free;
+      end;
+      if ComboAzioni.ActiveProperties.Items.Count > 0 then
+        ComboAzioni.ItemIndex := 0;
+    end;
+
+  NomeAzione := '';
+  if InputCombo('Azione', 'Azione', NomeAzione, nil, dx.Immagini, True, True, ElencoAzioni) then
+  begin
+    Azione := FindComponent(NomeAzione) as TContainedAction;
+    if Assigned(Azione) then
+      Azione.Execute;
+  end;
 end;
 
 procedure TMain.SistemaExecute(Sender: TObject);

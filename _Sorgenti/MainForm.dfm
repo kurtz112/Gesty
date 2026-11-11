@@ -329,6 +329,12 @@ object Main: TMain
       ImageIndex = 1217
       OnExecute = SistemaExecute
     end
+    object EseguiAzione: TAction
+      Caption = 'Esegui Azione'
+      ImageIndex = 1160
+      ShortCut = 24693
+      OnExecute = EseguiAzioneExecute
+    end
     object WindowCloseAll: TAction
       Category = 'Window'
       Caption = 'Chiudi Tutto'
