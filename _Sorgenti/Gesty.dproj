@@ -66,9 +66,9 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_MajorVer>2026</VerInfo_MajorVer>
         <VerInfo_MinorVer>11</VerInfo_MinorVer>
-        <VerInfo_Release>10</VerInfo_Release>
-        <VerInfo_Build>2</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Luca Zebro;FileDescription=$(MSBuildProjectName);FileVersion=2026.11.10.2;InternalName=Gesty;LegalCopyright=Luca Zebro;LegalTrademarks=Gesty;OriginalFilename=Gesty;ProductName=$(MSBuildProjectName);ProductVersion=2026.11.10.2;Comments=;ProgramID=it.lucazebro.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Release>11</VerInfo_Release>
+        <VerInfo_Build>0</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=Luca Zebro;FileDescription=$(MSBuildProjectName);FileVersion=2026.11.11.0;InternalName=Gesty;LegalCopyright=Luca Zebro;LegalTrademarks=Gesty;OriginalFilename=Gesty;ProductName=$(MSBuildProjectName);ProductVersion=2026.11.11.0;Comments=;ProgramID=it.lucazebro.$(MSBuildProjectName)</VerInfo_Keys>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
