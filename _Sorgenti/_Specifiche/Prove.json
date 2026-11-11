@@ -227,7 +227,7 @@
       ],
       "database_di_partenza": "_Database/CODEBRI.fdb",
       "requisiti": [
-        "tabella:ENTI_PROMOTORI",
+        "tabella:ENTI_FINANZIATORI",
         "colonna:BANDI.IMPORTO_MASSIMO_FINANZIAMENTO"
       ],
       "prove": [
