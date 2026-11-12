@@ -2,7 +2,7 @@
 area: Rilevamento ore
 progetto: Gesty
 aggiornato: 2026-11-12
-rilascio: Ticket_Gesty/345 - rilevamento ore/001
+rilascio: Ticket_Gesty/346 - elenco/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -23,7 +23,7 @@ Questa specifica descrive le regole che Gesty rispetta quando si inseriscono, mo
 
 **Fuori da quest'area**, con una specifica propria quando un lavoro le toccherà: presenze degli allievi, blocco del registro e periodi trasmessi a SIUF; importazioni GRS, Untis e OmniaTime (qui compare solo il rilevamento che generano); timesheet e stampe.
 
-**Origine.** Ricavata il 2026-10-30 dal codice del database master e dalle preanalisi dei ticket 28, 30, 37, 53, 135, 199, 214, 219, 220, 221, 234, 271, 272, 277, 279, 296, 304, 307. Aggiornata il 2026-11-12 con il ticket 345 (GESTY-RIL-006, DIV-RIL-3).
+**Origine.** Ricavata il 2026-10-30 dal codice del database master e dalle preanalisi dei ticket 28, 30, 37, 53, 135, 199, 214, 219, 220, 221, 234, 271, 272, 277, 279, 296, 304, 307. Aggiornata il 2026-11-12 con il ticket 345 (GESTY-RIL-006, DIV-RIL-3) e con il ticket 346 (GESTY-RIL-022).
 
 ## GESTY-RIL-001 Chi rileva
 Ogni rilevamento ha un rilevatore. Se non è indicato, è la risorsa collegata all'utente che sta lavorando; un utente senza risorsa collegata non può rilevare ore.
@@ -271,6 +271,24 @@ In agenda i rilevamenti compaiono solo se lo strato "Rilevamenti" è attivo. È 
 - **Dato** un utente che ha spento lo strato dei rilevamenti
 - **Quando** riapre l'agenda
 - **Allora** i rilevamenti non compaiono finché non lo riaccende
+
+## GESTY-RIL-022 Elenco delle ore non validate
+L'autorizzazione al pagamento prende solo le ore validate e non segnala quelle rimaste fuori. Per non perdere nessuno, in Risorse, gruppo Controlli, la voce "Ore Non Validate" (ticket 346) mostra una riga per ente, risorsa, anno e mese quando nel mese c'è almeno un'ora non validata, oppure almeno un'ora validata che nessuna autorizzazione non annullata contiene. Per ogni riga: ore e numero di rilevamenti non validati, prima e ultima data non validata, ore senza incarico (che non si possono validare, GESTY-RIL-008), ore validate non ancora autorizzate. Le ore validate su un incarico collegato a un master non contano fra le non autorizzate, perché l'autorizzazione le paga attraverso il master. Si filtra per ente, mese, anno e dipendente; "dipendente" è l'inquadramento congelato sull'ora e, in mancanza, quello dell'incarico. L'elenco è di sola lettura: si valida da "Rilevamenti Per Settore Aziendale".
+
+### Scenario: collaboratore con ore non validate
+- **Dato** un collaboratore con 10 ore a ottobre su un progetto dell'ente A, 4 delle quali non validate
+- **Quando** si apre "Ore Non Validate" con ente A, ottobre e l'anno
+- **Allora** compare una riga per lui con 4 ore non validate
+
+### Scenario: tutto validato e autorizzato
+- **Dato** un collaboratore con tutte le ore di ottobre validate e comprese in un'autorizzazione non annullata
+- **Quando** si apre "Ore Non Validate" su ottobre
+- **Allora** il collaboratore non compare
+
+### Scenario: ore validate senza autorizzazione
+- **Dato** un collaboratore con 8 ore di ottobre validate su un incarico principale e nessuna autorizzazione che le contenga
+- **Quando** si apre "Ore Non Validate" su ottobre
+- **Allora** compare una riga per lui con 0 ore non validate e 8 ore validate non autorizzate
 
 ## Divergenze note
 
