@@ -167,7 +167,6 @@ type
     procedure ApplicaAggiornamentoExecute(Sender: TObject);
     procedure BackupExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
     procedure CartelleCondiviseExecute(Sender: TObject);
     procedure CopiaFisicaDBExecute(Sender: TObject);
     procedure CronExecute(Sender: TObject);
@@ -718,50 +717,6 @@ begin
 
     // chi non ha sentito l'evento resta collegato: si propone di chiuderlo
     ProponiDisconnessioneForzata;
-  end;
-end;
-
-procedure TMainForm.Button7Click(Sender: TObject);
-const
-  // Mantis: nessuno - pulizia OpenSSL. Token Dropbox di prova gia' presente
-  // nel sorgente originale: da revocare/ruotare, non e' compito di questa modifica.
-  FDropBoxAppAccessToken = 'sl.BHzyZvqrtLu5Odbs5FG0kb_Kx0SDJHEH-kQbSVZ2BETjeIHwNoH98U7slS7_2KZZwzDp0m3-Lr-6_JFSu5PV_NGMMXOB7q4hnCC9RtkS61rGVcHPypG5G5fm1IKFf-nj4nC9O18';
-  FHTTPRequestURL = 'https://content.dropboxapi.com/2/files/upload';
-  FDropBoxBaseAppPath = 'zUpdate';
-  Timeout = 5000;
-var
-  http: TNetHTTPClient;
-  Risposta: IHTTPResponse;
-  FStream: TFileStream;
-  FHTTPResponse: String;
-  SourceFileName: String;
-  DropBoxFileName: String;
-
-begin
-  SourceFileName := 'C:\Users\Luca\Desktop\Getting started with pCloud.pdf';
-  DropBoxFileName := 'test.pdf';
-
-  try
-    FStream := TFileStream.Create(SourceFileName, fmOpenRead or fmShareDenyWrite);
-    try
-      http := TNetHTTPClient.Create(nil);
-      try
-        http.ConnectionTimeout := Timeout;
-        http.CustomHeaders['Authorization'] := 'Bearer ' + FDropBoxAppAccessToken;
-        http.CustomHeaders['Dropbox-API-Arg'] := '{"path": "' + FDropBoxBaseAppPath + DropBoxFileName + '"}';
-        http.CustomHeaders['Content-Type'] := 'application/octet-stream';
-        Risposta := http.Post(FHTTPRequestURL, FStream);
-        FHTTPResponse := Risposta.ContentAsString;
-      finally
-        http.Free;
-      end;
-    finally
-      FStream.Free;
-    end;
-  except
-    on E: Exception do
-    begin
-    end;
   end;
 end;
 
