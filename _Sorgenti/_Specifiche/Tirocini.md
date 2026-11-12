@@ -47,12 +47,29 @@ Un tirocinio nuovo nasce curriculare (`TIPO_TIROCINIO = 'C'`), con durata in ore
 - **Allora** il tirocinio si salva con `MAX_ORE_GIORNALIERE = 8` e `MAX_ORE_SETTIMANALE = 36`
 
 ## GESTY-TIR-003 Ore massime giornaliere e settimanali
-`MAX_ORE_GIORNALIERE` e `MAX_ORE_SETTIMANALE` sono dati del progetto formativo del tirocinio: si conservano, si mostrano e si passano all'area web dello stage (`WEB_STAGE_ELENCO_TIROCINI`). **Non limitano** il calendario né le presenze: un giorno di calendario o di presenze può superarle senza che il programma lo segnali (DIV-TIR-5).
+`MAX_ORE_GIORNALIERE` e `MAX_ORE_SETTIMANALE` sono dati del progetto formativo del tirocinio: si conservano, si mostrano e si passano all'area web dello stage (`WEB_STAGE_ELENCO_TIROCINI`). **Non limitano** il calendario né le presenze: un giorno di calendario o di presenze può superarle senza che il programma lo segnali (DIV-TIR-5 per i due campi).
+
+**Controllo delle 40 ore settimanali (Mantis #344).** Indipendente dai due campi sopra, la procedura selezionabile `STUDENTI_TIROCINI_ORE_OLTRE_TETTO(DAL_GIORNO, AL_GIORNO, FILTRO_ID_STUDENTE, TETTO_ORE)` somma, per ogni allievo e per ogni settimana da lunedì a domenica, le ore di **presenza** (`ORE_PRESENZA`: presente e da calcolare; le assenze, giustificate o no, non contano) di **tutti i suoi tirocini**, e restituisce le settimane che superano il tetto (40 ore se `TETTO_ORE` è vuoto). Il periodo chiesto si allarga alle settimane intere che tocca. È una **segnalazione, non un blocco**: le presenze restano scritte. La usano due punti: a fine "Genera Presenze" (`TTirocini.SegnalaSettimaneOltreTetto`) un avviso elenca le settimane oltre il tetto dell'allievo del tirocinio, e la voce Controlli "Settimane Oltre Il Tetto" del modulo Tirocini elenca tutti gli allievi, con filtro per anno e mese (del lunedì).
 
 ### Scenario: giornata più lunga del massimo
 - **Dato** un tirocinio con al massimo 8 ore al giorno
 - **Quando** il calendario prevede per un giorno tre fasce per 9 ore complessive
 - **Allora** il calendario si salva e le presenze generate contano 9 ore
+
+### Scenario: settimana di 40 ore
+- **Dato** un allievo con presenze di 8 ore da lunedì a venerdì
+- **Quando** si cercano le settimane oltre il tetto
+- **Allora** la settimana non compare
+
+### Scenario: settimana di 41 ore
+- **Dato** lo stesso allievo con un'ora in più il sabato
+- **Quando** si cercano le settimane oltre il tetto, anche solo per il sabato
+- **Allora** compare una riga dal lunedì alla domenica con 41 ore e 1 ora in eccesso
+
+### Scenario: avviso a fine generazione
+- **Dato** un allievo le cui presenze generate portano una settimana oltre 40 ore
+- **Quando** si preme "Genera Presenze" e la generazione finisce
+- **Allora** compare un avviso con il nominativo, le settimane e le ore, e le presenze restano scritte
 
 ## GESTY-TIR-004 Stato del tirocinio
 Lo stato non si scrive: si calcola ogni volta da date e periodi (`STUDENTI_TIROCINI_GET_STATO`). Prima della data di inizio il tirocinio è programmato (`P`), fra inizio e fine è attivo (`A`), dopo la fine è chiuso (`C`). Mentre è attivo, se oggi cade in un periodo di sospensione è sospeso (`S`), se cade in un periodo di interruzione è interrotto (`I`).
@@ -264,7 +281,7 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cu
 | DIV-TIR-2 | La generazione delle presenze ignora l'indicazione "attivo" del giorno di calendario: guarda solo se la fascia ha un orario. Il trigger del calendario, quando un giorno viene disattivato, svuota lo stato ma lascia gli orari, e la generazione ripiega su "presente" | Un giorno disattivato a mano con gli orari ancora scritti produce presenze "presente": le ore previste (GESTY-TIR-011) lo escludono, le ore effettive lo contano (già annotato nel ticket 251) |
 | DIV-TIR-3 | Il calendario esclude dai giorni attivi solo le sospensioni (`TIPO_PERIODO = 'S'`), le presenze rifiutano sospensioni e interruzioni; anche l'elaborazione delle indennità esclude solo i mesi sospesi | Un'interruzione dentro un calendario già generato con orari fa fermare tutta la generazione della settimana con "Il tirocinio risulta interrotto alla data indicata."; l'indennità del mese interrotto nasce comunque |
 | DIV-TIR-4 | Le ore previste (`CALENDARIO_TOTALI` nella vista `STUDENTI_TIROCINI_ELENCO`, `STUDENTI_TIROCINI_INDENNITA_DETAIL`) sommano tutte le righe del calendario, anche quelle fuori dalle date del tirocinio. La generazione del calendario ora resta entro le date ma non cancella le righe che stanno fuori | Le righe rimaste da un calendario generato male (ticket 34: 2027-2029) o da una data di fine anticipata gonfiano le ore previste e la percentuale di frequenza, e compaiono nelle estrazioni |
-| DIV-TIR-5 | `MAX_ORE_GIORNALIERE` e `MAX_ORE_SETTIMANALE` non sono letti da nessun controllo: né nel database (unici usi: tabella, vista, trigger della vista, `WEB_STAGE_ELENCO_TIROCINI`) né nel codice Delphi | Il nome dei campi fa pensare a un tetto che il programma non applica; va deciso se il tetto serve (GESTY-TIR-003) |
+| DIV-TIR-5 | `MAX_ORE_GIORNALIERE` e `MAX_ORE_SETTIMANALE` non sono letti da nessun controllo: né nel database (unici usi: tabella, vista, trigger della vista, `WEB_STAGE_ELENCO_TIROCINI`) né nel codice Delphi | Il nome dei campi fa pensare a un tetto che il programma non applica; va deciso se il tetto serve (GESTY-TIR-003). Dal Mantis #344 le 40 ore settimanali per allievo sono controllate da `STUDENTI_TIROCINI_ORE_OLTRE_TETTO` con un tetto proprio (40), senza leggere questi due campi: restano da decidere per il singolo tirocinio |
 | DIV-TIR-6 | Il trigger `STUDENTI_TIROCINI_ELENCO_BIUD0` passa alla tabella i campi con predefinito (`MAX_ORE_GIORNALIERE`, `MAX_ORE_SETTIMANALE`, documenti, `BUONO_PASTO`, ...) anche quando sono vuoti, quindi il predefinito della tabella non scatta mai: l'unica difesa è il programma, che rimette i predefiniti del dizionario LZ prima del nuovo record (correzione in `zFbDataSet.pas`, ticket 153). Nella scheda "Tirocinio" `MAX_ORE_GIORNALIERE` è ancora nascosto | Ogni scrittura sulla vista che non passi dal dataset di Gesty (importazioni, area web, procedure future) con quei campi vuoti fallisce con `validation error for column "STUDENTI_TIROCINI"."MAX_ORE_GIORNALIERE"` (ticket 62, 96, 116, 153); l'operatore non vede il valore che verrà salvato |
 | DIV-TIR-7 | Su `STUDENTI_TIROCINI` nessun vincolo o trigger controlla che la data di inizio non sia successiva alla data di fine (i periodi invece lo controllano) | Un tirocinio con le date invertite si salva; il calendario generato e le presenze restano vuoti senza un messaggio. Da verificare se la scheda LZ lo impedisce |
 | DIV-TIR-8 | `STUDENTI_TIROCINI_PRIMO_GG_SCAD` cerca il primo giorno del calendario senza presenze senza guardare se il giorno è attivo; il calendario ha una riga per ogni giorno | Il "primo giorno non rilevato" può essere un sabato o una domenica non lavorati, o un giorno di chiusura, già prima della vera lacuna |

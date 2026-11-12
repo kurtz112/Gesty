@@ -87,10 +87,18 @@
       "area": "Tirocini",
       "specifica": "Tirocini.md",
       "percorsi": [
-        "frmRegistraPresenzeTirocini.pas"
+        "frmRegistraPresenzeTirocini.pas",
+        "dmTirocini.pas"
       ],
-      "oggetti": [],
-      "prove": []
+      "oggetti": [
+        "STUDENTI_TIROCINI_ORE_OLTRE_TETTO"
+      ],
+      "prove": [
+        "caratterizzazione SQL 10 (ore settimanali di stage, GESTY-TIR-003, Mantis #344): il database di partenza deve avere la procedura STUDENTI_TIROCINI_ORE_OLTRE_TETTO; non provati l'avviso a fine Genera Presenze e l'elenco Settimane Oltre Il Tetto (interfaccia): collaudo con zapp"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/10-ore-settimanali-stage.sql"
+      ]
     },
     {
       "area": "Autorizzazione incarichi",

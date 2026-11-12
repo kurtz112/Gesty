@@ -94,6 +94,7 @@ type
     procedure GeneraCalendarioStage;
     procedure ApriRendicontazioneTirocinio;
     procedure GeneraPresenze;
+    procedure SegnalaSettimaneOltreTetto(const IdStudente: integer; const DalGiorno, AlGiorno: TDateTime);
     procedure SelezionaPrimoGiornoNonRendicontato;
   public
     procedure CreaUtenteSistemaStudente;
@@ -789,6 +790,64 @@ begin
 
   ReopenDataSet('RendicontazioneSettimanale');
   ReopenDataSet('RendicontazioneSettimanaleDettaglio');
+
+  // Mantis #344 - 2026-11-12: a generazione finita si controlla che l'allievo non superi le ore
+  // settimanali di stage (40, somma di tutti i suoi tirocini). E' una segnalazione: le presenze
+  // restano scritte, perche' un blocco sull'ora in eccesso annullerebbe anche i giorni regolari.
+  SegnalaSettimaneOltreTetto(Tirocini.FieldByName('ID_STUDENTE').AsInteger, RendicontazioneParams.DataInizio, RendicontazioneParams.GetDataFine);
+end;
+
+procedure TTirocini.SegnalaSettimaneOltreTetto(const IdStudente: integer; const DalGiorno, AlGiorno: TDateTime);
+const
+  MassimoSettimaneElencate = 10;
+var
+  OreOltreTetto: TzFbDataSet;
+  ElencoSettimane: string;
+  Nominativo: string;
+  SettimaneSegnalate: integer;
+begin
+  // Mantis #344 - 2026-11-12: la procedura somma le ore di presenza dell'allievo per settimana
+  // (lunedi-domenica) su tutti i suoi tirocini e restituisce solo le settimane oltre il tetto.
+  OreOltreTetto := GetDataSet('OreOltreTettoStudente');
+  OreOltreTetto.RevertSQL(false);
+  OreOltreTetto.ParamByName('DAL_GIORNO').AsDate := DalGiorno;
+  OreOltreTetto.ParamByName('AL_GIORNO').AsDate := AlGiorno;
+  OreOltreTetto.ParamByName('ID_STUDENTE').AsInteger := IdStudente;
+  OreOltreTetto.Active := true;
+  try
+    ElencoSettimane := '';
+    Nominativo := '';
+    SettimaneSegnalate := 0;
+
+    OreOltreTetto.First;
+    while not OreOltreTetto.Eof do
+    begin
+      Inc(SettimaneSegnalate);
+      Nominativo := OreOltreTetto.FieldByName('NOMINATIVO_STUDENTE').AsString;
+
+      if SettimaneSegnalate <= MassimoSettimaneElencate then
+        ElencoSettimane := ElencoSettimane + #13#10 +
+          Format('dal %s al %s: %s ore (massimo %s)',
+                 [FormatDateTime('dd/mm/yyyy', OreOltreTetto.FieldByName('LUNEDI').AsDateTime),
+                  FormatDateTime('dd/mm/yyyy', OreOltreTetto.FieldByName('DOMENICA').AsDateTime),
+                  FormatFloat('0.##', OreOltreTetto.FieldByName('ORE_SETTIMANA').AsFloat),
+                  FormatFloat('0.##', OreOltreTetto.FieldByName('TETTO').AsFloat)]);
+
+      OreOltreTetto.Next;
+    end;
+
+    if SettimaneSegnalate = 0 then
+      Exit;
+
+    if SettimaneSegnalate > MassimoSettimaneElencate then
+      ElencoSettimane := ElencoSettimane + #13#10 + Format('... e altre %d settimane', [SettimaneSegnalate - MassimoSettimaneElencate]);
+
+    ConfirmOk(Format('Attenzione: %s supera le ore settimanali di stage consentite (somma di tutti i suoi tirocini, da lunedi a domenica):%s',
+                     [Nominativo, ElencoSettimane]) + #13#10#13#10 +
+              'Le presenze sono state generate comunque: verificare i giorni indicati.', mtWarning);
+  finally
+    OreOltreTetto.Active := false;
+  end;
 end;
 
 function TTirocini.IdTirocinioSelezionato: integer;
