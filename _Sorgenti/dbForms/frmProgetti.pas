@@ -44,6 +44,7 @@ type
     ActionList: TActionList;
     ModificaEstensore: TAction;
     AccettaOreResidue: TAction;
+    RilevaOreIncarico: TAction;
     CopiaMaterie: TAction;
     NuovoPianoPersonale: TAction;
     IscrizioneStudenti: TAction;
@@ -59,6 +60,7 @@ type
     Procedi: TAction;
     Respingi: TAction;
     procedure AccettaOreResidueExecute(Sender: TObject);
+    procedure RilevaOreIncaricoExecute(Sender: TObject);
     procedure AggiungiStudentiStageExecute(Sender: TObject);
     procedure BudgetAggiungiRigheExecute(Sender: TObject);
     procedure BudgetCopiaDaAltroProgettoExecute(Sender: TObject);
@@ -317,6 +319,15 @@ begin
   finally
     FreeAndNil(Incarichi);
   end;
+end;
+
+// Mantis #347 - 2026-11-12: apre la scheda del rilevamento gia' compilata con i
+// dati dell'incarico corrente dell'elenco delle ore residue, per registrare le
+// ore al posto di un collaboratore che non ha un utente
+procedure TFormProgetti.RilevaOreIncaricoExecute(Sender: TObject);
+begin
+  inherited;
+  Progetti.RilevaOreIncarico('IncarichiScadutiConOreResidue');
 end;
 
 procedure TFormProgetti.ModificaEstensoreExecute(Sender: TObject);

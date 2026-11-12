@@ -89,6 +89,8 @@ type
     procedure AttivaIncarico(const DataSetName: string; Incarichi: TList<integer>; const Azione: string);
     procedure ModificaEstensore(const DataSetName: string);
     procedure AccettaOreResidue(const DataSetName: string; Incarichi: TList<integer>);
+    // Mantis #347 - 2026-11-12: rilevamento delle ore residue al posto del collaboratore
+    procedure RilevaOreIncarico(const DataSetName: string);
     // Mantis #183 - 2026-10-29: respingimento di una richiesta in attesa del
     // visto contabile o della direzione, e sua ripresentazione dopo la correzione
     procedure Respingi(Incarichi: TList<integer>);
@@ -134,6 +136,7 @@ uses
   WizInserimentoIncaricoFrm,
   zMsg,
   dmCommon,
+  dmScheduler.Tools,
   Gesty.Types,
   Files.Lib,
   zOffice.Reports;
@@ -738,6 +741,73 @@ begin
   // Mantis #183 - 2026-10-19: Reopen tornava sul segnalibro di un incarico
   // uscito dall'elenco
   RiapriSullIncarico(DataSet, IdSuccessivo);
+end;
+
+// Mantis #347 - 2026-11-12: un collaboratore senza utente (relatore di un
+// convegno) non rileva le proprie ore, e il suo incarico resta scaduto con ore
+// residue anche se la prestazione e' stata svolta. Accettare le ore residue lo
+// chiude, ma lascia zero ore fatte e zero costi rilevati. Qui si apre la scheda
+// del rilevamento gia' compilata con i dati dell'incarico corrente: chi la
+// conferma registra le ore al posto del collaboratore, e l'incarico si chiude
+// da solo quando il residuo arriva a zero.
+procedure TProgetti.RilevaOreIncarico(const DataSetName: string);
+var
+  DataSet: TzFbDataSet;
+  Incarichi: TList<integer>;
+  IdIncarico: integer;
+  IdSuccessivo: integer;
+  IdRisorsa: integer;
+  Nominativo: string;
+  IdProgetto: integer;
+  TipoIncarico: string;
+  Materia: variant;
+  DataRilevamento: TDate;
+  OreResidue: double;
+begin
+  DataSet := GetDataSet(DataSetName);
+  if (not assigned(DataSet)) or (not DataSet.Active) or DataSet.IsEmpty then
+    exit;
+
+  if not assigned(SchedulerTools) then
+    exit;
+
+  IdIncarico := DataSet.FieldByName('ID_INCARICO').AsInteger;
+  IdRisorsa := DataSet.FieldByName('ID_RISORSA').AsInteger;
+  Nominativo := DataSet.FieldByName('NOMINATIVO_O_RAGIONE_SOCIALE').AsString;
+  IdProgetto := DataSet.FieldByName('ID_PROGETTO').AsInteger;
+  TipoIncarico := DataSet.FieldByName('TIPO_INCARICO').AsString;
+  Materia := DataSet.FieldByName('MATERIA').Value;
+  // l'ultimo giorno dell'incarico: per quelli di un giorno solo e' il giorno
+  // della prestazione, per gli altri una proposta da correggere nella scheda
+  DataRilevamento := DateOf(DataSet.FieldByName('DATA_FINE_INCARICO').AsDateTime);
+  OreResidue := DataSet.FieldByName('TOTALE_ORE_RESIDUE').AsFloat;
+
+  if OreResidue <= 0 then
+  begin
+    ConfirmOk('L''incarico ' + IdIncarico.ToString + ' non ha ore residue.');
+    exit;
+  end;
+
+  Incarichi := TList<integer>.create;
+  try
+    Incarichi.Add(IdIncarico);
+    IdSuccessivo := IncaricoDopoLaSelezione(DataSet, Incarichi);
+  finally
+    FreeAndNil(Incarichi);
+  end;
+
+  // IncaricoDopoLaSelezione sposta il cursore
+  DataSet.LocateNonSQL('ID_INCARICO', IdIncarico, []);
+
+  if not SchedulerTools.RilevaOreIncarico(IdRisorsa, Nominativo, IdProgetto, TipoIncarico, Materia, DataRilevamento, OreResidue) then
+    exit;
+
+  // se le ore rilevate non coprono il residuo l'incarico resta nell'elenco e il
+  // cursore con lui; se e' uscito si passa a quello che lo seguiva
+  RiapriSullIncarico(DataSet, IdIncarico);
+  if DataSet.FieldByName('ID_INCARICO').AsInteger <> IdIncarico then
+    if IdSuccessivo <> -1 then
+      DataSet.LocateNonSQL('ID_INCARICO', IdSuccessivo, []);
 end;
 
 procedure TProgetti.CopiaMaterie;

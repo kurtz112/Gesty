@@ -117,6 +117,9 @@ type
     procedure RilevamentoOreNewRecord(DataSet: TDataSet);
   private
     DisableRilevamentoFieldChanged: boolean;
+    // Mantis #347 - 2026-11-12: titolo della scheda quando le ore sono di un altro
+    TitoloRilevamentoIncarico: string;
+    procedure cardRilevamentoIncaricoBeforeExecute(Dialog: TzDbCardForm);
     procedure RilevamentoOreGetDettagliPresenza(DataSet: TDataSet);
     procedure RilevamentoDataChanged(Sender: TField);
     procedure RilevamentoNumeroOreChanged(Sender: TField);
@@ -154,6 +157,9 @@ type
     function EliminaFuoriSede(params: TEventoParams): boolean;
   public
     function ApriEvento(params: TEventoParams): boolean;
+
+    // Mantis #347 - 2026-11-12: scheda del rilevamento gia' compilata con i dati di un incarico
+    function RilevaOreIncarico(const IdRisorsa: integer; const Nominativo: string; const IdProgetto: integer; const TipoIncarico: string; const Materia: variant; const Data: TDate; const Ore: double): boolean;
 
     function UpdateEvento(params: TEventoParams): boolean;
 
@@ -454,6 +460,85 @@ begin
     RilevamentoOre.Cancel;
     RilevamentoOre.Active := False;
   end;
+end;
+
+// Mantis #347 - 2026-11-12: apre la scheda del rilevamento in inserimento, gia'
+// compilata con risorsa, progetto, tipo, materia e giorno di un incarico, e con
+// un orario che copre le ore indicate. Serve a chi rileva le ore al posto di un
+// collaboratore che non ha un utente (relatori occasionali): l'incarico scaduto
+// con ore residue si chiude confermando la scheda. L'orario e' una proposta, dalle
+// 9 e per otto ore al massimo: chi conferma lo corregge con quello vero. L'incarico lo ricava la scheda
+// stessa da INCARICHI_GET_PRESENZE, come per ogni altro rilevamento.
+function TSchedulerTools.RilevaOreIncarico(const IdRisorsa: integer; const Nominativo: string; const IdProgetto: integer; const TipoIncarico: string; const Materia: variant; const Data: TDate; const Ore: double): boolean;
+const
+  MINUTI_INIZIO_PROPOSTO = 9 * 60;
+  MINUTI_GIORNATA_PROPOSTA = 8 * 60;
+var
+  MinutiInizio: integer;
+  MinutiDurata: integer;
+begin
+  result := False;
+
+  MinutiDurata := Round(Ore * 60);
+  if MinutiDurata <= 0 then
+    exit;
+
+  // un rilevamento sta in un giorno solo: un residuo oltre le otto ore e' di
+  // un incarico di piu' giorni e si rileva una giornata alla volta. Dopo la
+  // conferma l'incarico resta nell'elenco con il residuo che manca
+  if MinutiDurata > MINUTI_GIORNATA_PROPOSTA then
+    MinutiDurata := MINUTI_GIORNATA_PROPOSTA;
+
+  MinutiInizio := MINUTI_INIZIO_PROPOSTO;
+
+  RilevamentoOre.RevertSql(False);
+  RilevamentoOre.ParamByName('ID_RILEVAMENTO_ORE').AsInteger := -1;
+
+  RilevamentoOre.Active := true;
+  try
+    RilevamentoOre.Append;
+
+    // senza i gestori di OnChange: il cambio di progetto svuoterebbe il tipo
+    // di incarico appena scritto
+    DisableRilevamentoFieldChanged := true;
+    try
+      RilevamentoOre.FieldByName('ID_RISORSA').AsInteger := IdRisorsa;
+      RilevamentoOre.FieldByName('ID_PROGETTO').AsInteger := IdProgetto;
+      RilevamentoOre.FieldByName('TIPO_INCARICO').AsString := TipoIncarico;
+      if not VarIsNull(Materia) then
+        RilevamentoOre.FieldByName('MATERIA').Value := Materia;
+    finally
+      DisableRilevamentoFieldChanged := False;
+    end;
+
+    RilevamentoOre.FieldByName('DATA').AsDateTime := Data;
+    RilevamentoOre.FieldByName('ORA_INIZIO').AsDateTime := TimeOf(IncMinute(0, MinutiInizio));
+    // con l'ora di fine la scheda calcola le ore e cerca l'incarico
+    RilevamentoOre.FieldByName('ORA_FINE').AsDateTime := TimeOf(IncMinute(0, MinutiInizio + MinutiDurata));
+
+    cardRilevamento.ReadOnly := False;
+
+    // la scheda non mostra la risorsa, perche' dall'agenda e' sempre chi sta
+    // lavorando: qui e' un altro, e il suo nome va nel titolo. La form rilegge
+    // il titolo dal dizionario a ogni apertura (TzDbCardForm.LoadProps): lo si
+    // cambia subito dopo, in OnBeforeExecute
+    TitoloRilevamentoIncarico := Nominativo;
+    cardRilevamento.OnBeforeExecute := cardRilevamentoIncaricoBeforeExecute;
+    try
+      result := cardRilevamento.Execute;
+    finally
+      cardRilevamento.OnBeforeExecute := nil;
+    end;
+  finally
+    RilevamentoOre.Cancel;
+    RilevamentoOre.Active := False;
+  end;
+end;
+
+procedure TSchedulerTools.cardRilevamentoIncaricoBeforeExecute(Dialog: TzDbCardForm);
+begin
+  if TitoloRilevamentoIncarico <> '' then
+    Dialog.Caption := Dialog.Caption + ' - ' + TitoloRilevamentoIncarico;
 end;
 
 function TSchedulerTools.ApriRiunione(params: TEventoParams): boolean;

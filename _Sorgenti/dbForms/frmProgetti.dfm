@@ -28,6 +28,12 @@ inherited FormProgetti: TFormProgetti
       ImageIndex = 1258
       OnExecute = AccettaOreResidueExecute
     end
+    object RilevaOreIncarico: TAction
+      Caption = 'Rileva Ore'
+      Hint = 'Registra le ore residue al posto del collaboratore'
+      ImageIndex = 1030
+      OnExecute = RilevaOreIncaricoExecute
+    end
     object CopiaMaterie: TAction
       Caption = 'Copia Materie'
       ImageIndex = 1245

@@ -1,8 +1,8 @@
 ---
 area: Autorizzazione incarichi
 progetto: Gesty
-aggiornato: 2026-11-07
-rilascio: Ticket_Gesty/326 - incarichi non presenti tra quelli da autorizzare gestire/003
+aggiornato: 2026-11-12
+rilascio: Ticket_Gesty/347 - info collaboratori estetni - scadute con ore residue/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -336,6 +336,25 @@ Un incarico scaduto con ore residue resta in fase `ORE_RESIDUE` finché chi ha `
 - **Dato** tre incarichi scaduti con ore residue selezionati
 - **Quando** si accettano le ore residue
 - **Allora** compare "Accettare le ore residue dei 3 incarichi selezionati?" e, con Sì, tutti e tre sono `CHIUSO`
+
+Accettare le ore residue dichiara che il residuo non verrà svolto: l'incarico si chiude con le ore rilevate che aveva, anche zero. Quando invece la prestazione è stata svolta ma il collaboratore non ha un utente e non può rilevare le proprie ore (relatori occasionali di un convegno), dallo stesso elenco il comando "Rileva Ore" apre la scheda del rilevamento già compilata per l'incarico corrente: risorsa, progetto, tipo di incarico, materia, ultimo giorno dell'incarico e un orario dalle 9 che copre le ore residue, fino a otto. Il titolo della scheda porta il nome del collaboratore. Chi conferma risulta come rilevatore; valgono tutte le regole del rilevamento (`Rilevamento ore.md`). Se le ore rilevate coprono il residuo l'incarico è `CHIUSO` senza altri passaggi ed esce dall'elenco; altrimenti resta nell'elenco con il residuo che manca, e il cursore resta su di lui (ticket 347).
+
+### Scenario: relatore senza utente
+- **Dato** un incarico occasionale di un giorno, 3 ore, scaduto, a una risorsa senza utente, con zero ore rilevate
+- **Quando** dall'elenco "Incarichi scaduti con ore residue" si preme "Rileva Ore" e si conferma la scheda
+- **Allora** la scheda si apre con il giorno dell'incarico e l'orario 09:00-12:00
+- **E** dopo la conferma l'incarico ha 3 ore rilevate, completamento 100%, fase `CHIUSO`, ed esce dall'elenco
+
+### Scenario: residuo oltre una giornata
+- **Dato** un incarico scaduto con 26 ore residue
+- **Quando** si preme "Rileva Ore" e si conferma la scheda senza cambiare l'orario
+- **Allora** la scheda propone 09:00-17:00 dell'ultimo giorno dell'incarico
+- **E** dopo la conferma l'incarico resta nell'elenco con 18 ore residue
+
+### Scenario: scheda annullata
+- **Dato** un incarico scaduto con ore residue
+- **Quando** si preme "Rileva Ore" e si annulla la scheda
+- **Allora** non si registra nessun rilevamento e l'elenco resta com'è
 
 ## GESTY-AUT-018 Una copia non eredita le autorizzazioni
 Duplicando un incarico nella procedura guidata, la copia non porta nessuna autorizzazione né l'utente che l'ha data, né attivazione o protocollo: nasce all'inizio del ciclo (ticket 183, difetto D4).
