@@ -170,8 +170,24 @@
       "area": "Stampe e allegati",
       "specifica": "Stampe e allegati.md",
       "percorsi": [],
-      "oggetti": [],
-      "prove": []
+      "oggetti": [
+        "OBJ_FILES_ELENCO_BUD0",
+        "OBJ_FILES_COPY",
+        "RICHIESTE_ATTIV_VERIFICA_ALLEG",
+        "CRON_VERIFICA_DOCUMENTI_IN_SCADENZA"
+      ],
+      "database_di_partenza": "_Database/CAPAC.fdb",
+      "requisiti": [
+        "colonna:OBJ_FILES.DATA_SCADENZA_DOCUMENTO",
+        "colonna:ZZ_TIPO_ALLEGATI.DATA_SCADENZA_OBBLIGATORIA"
+      ],
+      "prove": [
+        "caratterizzazione SQL 09 (17 casi, GESTY-STA-021..024; dopo lo script GESTY-341-documenti-scadenza.sql del rilascio 003 del ticket 341)",
+        "scheda allegati e guida di attivazione: collaudo con zapp"
+      ],
+      "caratterizzazione": [
+        "Prove/caratterizzazione/09-documenti-in-scadenza.sql"
+      ]
     },
     {
       "area": "Aule e prenotazioni",

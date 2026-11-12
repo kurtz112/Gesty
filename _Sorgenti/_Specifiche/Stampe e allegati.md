@@ -1,8 +1,8 @@
 ---
 area: Stampe e allegati
 progetto: Gesty
-aggiornato: 2026-10-30
-rilascio: OUT/20261030-specifiche-vive-dei-progetti/017
+aggiornato: 2026-11-12
+rilascio: Ticket_Gesty/341 - QUESTIONI DA RISOLVERE/003
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -234,6 +234,49 @@ Il pannello dei filtri del Controllo Periodico (Mese, Anno, Progetto) compare ne
 - **Dato** un utente non amministratore senza accesso al dataset del Controllo Periodico
 - **Quando** apre Elenco Incarichi dalla scheda Risorse
 - **Allora** la griglia occupa tutta la larghezza e nessun pannello filtri vuoto compare a sinistra
+
+## GESTY-STA-021 Data di fine validità dei documenti allegati
+Un allegato può avere una **data di fine validità** (`OBJ_FILES.DATA_SCADENZA_DOCUMENTO`, facoltativa e generica: carta d'identità, patente, permesso di soggiorno, certificati). Per quali tipi di allegato la data è richiesta lo decide la configurazione, non il codice: `ZZ_TIPO_ALLEGATI.DATA_SCADENZA_OBBLIGATORIA`, acceso oggi solo per `CARTA D'IDENTITA` (ticket 341, richiesta 4, richiesta da Paolo Stefani di CAPAC). La vista `OBJ_FILES_ELENCO` espone la data e il campo calcolato `SCADUTO`. L'obbligo vale per l'inserimento **manuale**: il file si importa senza tipo (`ImportObjFile` chiama `OBJ_FILES_ADD` senza tipo) e il tipo si assegna dopo dalla griglia degli allegati, cioè con una modifica sulla vista; il trigger `OBJ_FILES_ELENCO_BUD0` rifiuta il salvataggio, con il messaggio "Indicare la data di scadenza del documento", quando il tipo diventa uno di quelli che la richiedono (o quando si cancella una data già inserita) e la data manca. Non si blocca mai un ingresso automatico (candidature, portale, copie fra richiesta e risorsa): usano `OBJ_FILES_ADD` e `OBJ_FILES_COPY`, che non passano dalla vista. Un allegato annullato o eliminato non richiede la data. Le carte già allegate prima del rilascio restano senza data, senza bonifica automatica, e si possono modificare (note, descrizione) senza essere costretti a inserirla.
+Nella scheda risorsa, nella richiesta di attivazione e nella guida di nuova richiesta la colonna si chiama **Valido Fino Al** (patch LZ `GESTY-341-20261112b`).
+
+### Scenario: carta d'identità assegnata senza data
+- **Dato** un allegato appena importato dalla scheda di una risorsa, senza tipo
+- **Quando** l'utente sceglie il tipo "CARTA D'IDENTITA" e salva senza compilare "Valido Fino Al"
+- **Allora** il salvataggio è rifiutato con "Indicare la data di scadenza del documento"; con la data compilata riesce
+
+### Scenario: ingresso automatico
+- **Dato** una candidatura che porta una carta d'identità senza data
+- **Quando** la candidatura diventa risorsa
+- **Allora** l'allegato entra senza data e senza errore; compare nell'avviso come "senza data"
+
+## GESTY-STA-022 La copia dell'allegato porta la data
+`OBJ_FILES_COPY`, `RICHIESTE_ATTIV_COPIA_FILE` e `RICHIESTA_ATTIV_GENERA_RISORSA` copiano anche `DATA_SCADENZA_DOCUMENTO` quando si copia un allegato (dalla richiesta di attivazione alla risorsa, o fra entità). Le procedure che registrano il file con `OBJ_FILES_ADD` aggiornano la data subito dopo, perché `OBJ_FILES_ADD` non cambia firma. Una nuova versione dello stesso documento (`OBJ_FILES_VERSIONE_ADD`) **non** eredita la data: la scadenza va indicata di nuovo.
+
+### Scenario: dalla richiesta alla risorsa
+- **Dato** una richiesta di attivazione con la carta d'identità valida fino al 2028-11-12
+- **Quando** la richiesta diventa risorsa
+- **Allora** l'allegato della risorsa ha la stessa data
+
+## GESTY-STA-023 Guida di attivazione: la data degli allegati richiesti
+`RICHIESTE_ATTIV_VERIFICA_ALLEG` segnala come mancante, nel messaggio "Mancano i seguenti allegati", ogni tipo che richiede la data e ha un allegato senza data ("CARTA D'IDENTITA (indicare la data di scadenza del documento)"). La carta d'identità non è fra gli allegati **richiesti** dalla guida (`RICHIESTE_ATTIVAZIONE_PERSONALE` è falso): se l'operatore la carica, la data si pretende; se non la carica, la guida prosegue. Per renderla sempre richiesta basta accendere `RICHIESTE_ATTIVAZIONE_PERSONALE` per quel tipo (configurazione, nessuna modifica al programma).
+
+### Scenario: carta caricata nella guida senza data
+- **Dato** una richiesta di attivazione con un allegato "CARTA D'IDENTITA" senza data
+- **Quando** l'utente prova ad avanzare dalla pagina Allegati
+- **Allora** compare "Mancano i seguenti allegati" con la carta e l'indicazione di inserire la data
+
+## GESTY-STA-024 Avviso notturno dei documenti in scadenza
+La procedura `CRON_VERIFICA_DOCUMENTI_IN_SCADENZA`, richiamata da `CRON`, manda la notifica `DOCUMENTO_IN_SCADENZA` ai sottoscrittori (sottoscrizione notifiche dell'utente, come per gli altri avvisi). Riguarda le sole **persone** (`TIPO_RISORSA = 'P'`) con un incarico non respinto che finisce oggi o dopo (in corso o futuro) e i tipi con `DATA_SCADENZA_OBBLIGATORIA`. Per ogni coppia risorsa/tipo conta la data più lontana fra gli allegati non annullati né eliminati e compone quattro elenchi (fino a 30 righe ciascuno, poi il conteggio): **scaduti** (data passata), **in scadenza** (entro `CONFIG.GG_AVVISO_SCADENZA_DOCUMENTI` giorni, predefinito 30), **senza data** (allegato presente, nessuna data) e **mancanti** (nessun allegato). Lo stesso elenco (conteggi e somma di controllo, in `NOTIFICHE.TAG_STR`) non si ripete se è stato già avvisato negli ultimi 7 giorni: l'avviso si rinnova solo se l'elenco cambia o dopo una settimana. Un errore nel controllo non annulla gli altri controlli della `CRON`.
+
+### Scenario: carta scaduta
+- **Dato** una risorsa con un incarico in corso e la carta d'identità scaduta da 5 giorni
+- **Quando** gira la `CRON`
+- **Allora** i sottoscrittori ricevono un avviso con la risorsa fra gli scaduti; alla seconda esecuzione con lo stesso elenco non ne arriva un altro
+
+### Scenario: carta valida
+- **Dato** la stessa risorsa con la carta valida per oltre 30 giorni
+- **Quando** gira la `CRON`
+- **Allora** la risorsa non compare in nessun elenco
 
 ## Divergenze note
 
