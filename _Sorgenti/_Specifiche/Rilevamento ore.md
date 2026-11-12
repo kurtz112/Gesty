@@ -2,7 +2,7 @@
 area: Rilevamento ore
 progetto: Gesty
 aggiornato: 2026-11-12
-rilascio: Ticket_Gesty/346 - elenco/001
+rilascio: Ticket_Gesty/346 - elenco/002
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -273,12 +273,17 @@ In agenda i rilevamenti compaiono solo se lo strato "Rilevamenti" è attivo. È 
 - **Allora** i rilevamenti non compaiono finché non lo riaccende
 
 ## GESTY-RIL-022 Elenco delle ore non validate
-L'autorizzazione al pagamento prende solo le ore validate e non segnala quelle rimaste fuori. Per non perdere nessuno, in Risorse, gruppo Controlli, la voce "Ore Non Validate" (ticket 346) mostra una riga per ente, risorsa, anno e mese quando nel mese c'è almeno un'ora non validata, oppure almeno un'ora validata che nessuna autorizzazione non annullata contiene. Per ogni riga: ore e numero di rilevamenti non validati, prima e ultima data non validata, ore senza incarico (che non si possono validare, GESTY-RIL-008), ore validate non ancora autorizzate. Le ore validate su un incarico collegato a un master non contano fra le non autorizzate, perché l'autorizzazione le paga attraverso il master. Si filtra per ente, mese, anno e dipendente; "dipendente" è l'inquadramento congelato sull'ora e, in mancanza, quello dell'incarico. L'elenco è di sola lettura: si valida da "Rilevamenti Per Settore Aziendale".
+L'autorizzazione al pagamento prende solo le ore validate e non segnala quelle rimaste fuori. Per non perdere nessuno, in Risorse, gruppo Controlli, la voce "Ore Non Validate" (ticket 346) mostra una riga per ente, risorsa, progetto, corso, anno e mese quando in quel progetto e corso nel mese c'è almeno un'ora non validata, oppure almeno un'ora validata che nessuna autorizzazione non annullata contiene. Il corso è quello indicato sul rilevamento ed è vuoto quando il rilevamento non ne ha: in quel caso le ore del progetto stanno su una riga sola. Il totale di una risorsa nel mese è la somma delle sue righe. Per ogni riga: id e denominazione del progetto, id e descrizione completa del corso, ore e numero di rilevamenti non validati, prima e ultima data non validata, ore senza incarico (che non si possono validare, GESTY-RIL-008), ore validate non ancora autorizzate. Le ore validate su un incarico collegato a un master non contano fra le non autorizzate, perché l'autorizzazione le paga attraverso il master. Si filtra per ente, mese, anno e dipendente; "dipendente" è l'inquadramento congelato sull'ora e, in mancanza, quello dell'incarico. L'elenco è di sola lettura: si valida da "Rilevamenti Per Settore Aziendale".
 
 ### Scenario: collaboratore con ore non validate
 - **Dato** un collaboratore con 10 ore a ottobre su un progetto dell'ente A, 4 delle quali non validate
 - **Quando** si apre "Ore Non Validate" con ente A, ottobre e l'anno
 - **Allora** compare una riga per lui con 4 ore non validate
+
+### Scenario: ore non validate su due progetti
+- **Dato** un collaboratore con 4 ore non validate a ottobre sul progetto P1 e 6 sul progetto P2, dello stesso ente, tutte senza corso
+- **Quando** si apre "Ore Non Validate" su ottobre
+- **Allora** compaiono due righe per lui, una per progetto, con 4 e 6 ore non validate e il corso vuoto
 
 ### Scenario: tutto validato e autorizzato
 - **Dato** un collaboratore con tutte le ore di ottobre validate e comprese in un'autorizzazione non annullata
