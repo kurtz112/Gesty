@@ -34,7 +34,7 @@ const
 type
   TzFirmaESignAnyWhereProvider = class(TzFirmaProviderBase)
   private
-    procedure ApplicaConfigurazioneEngine;
+    procedure ApplicaConfigurazioneEngine(const ScadenzaSecondi: Int64 = 0);
     procedure ApplicaFirmatariEngine(const Documento: TzFirmaDocumento);
     function StatoDaEnvelopeStatus(const EnvelopeStatus: string): string;
   public
@@ -73,7 +73,7 @@ begin
     raise EzFirmaErrore.Create('eSignAnyWhere: validazione della connessione fallita');
 end;
 
-procedure TzFirmaESignAnyWhereProvider.ApplicaConfigurazioneEngine;
+procedure TzFirmaESignAnyWhereProvider.ApplicaConfigurazioneEngine(const ScadenzaSecondi: Int64);
 
   function ParametroBoolean(const Chiave: string; const Default: Boolean): Boolean;
   begin
@@ -96,7 +96,18 @@ begin
   eSignAnyWhereEngine.params.FirstReminderInDays := ParametroIntero('FIRST_REMINDER_IN_DAYS', 1);
   eSignAnyWhereEngine.params.ReminderResendIntervalInDays := ParametroIntero('REMINDER_RESEND_INTERVAL_IN_DAYS', 1);
   eSignAnyWhereEngine.params.BeforeExpirationInDays := ParametroIntero('BEFORE_EXPIRATION_IN_DAYS', 3);
-  eSignAnyWhereEngine.params.ExpirationInSecondsAfterSending := ParametroIntero('EXPIRATION_IN_SECONDS_AFTER_SENDING', 2419200);
+  eSignAnyWhereEngine.params.ExpirationInSecondsAfterSending := ParametroIntero('EXPIRATION_IN_SECONDS_AFTER_SENDING', FIRMA_SCADENZA_PREDEFINITA_SECONDI);
+
+  // Mantis #341 - 2026-11-12: il documento puo' chiedere una scadenza piu' breve di quella
+  // configurata (contratti: entro la fine del giorno di inizio dell'incarico). Con una
+  // scadenza breve i promemoria si spengono: Namirial li rifiuta (ERR0176) se non ci stanno
+  // prima della scadenza.
+  if ScadenzaSecondi > 0 then
+  begin
+    eSignAnyWhereEngine.params.ExpirationInSecondsAfterSending := Integer(ScadenzaSecondi);
+    if not FirmaPromemoriaAmmessi(ScadenzaSecondi, eSignAnyWhereEngine.params.BeforeExpirationInDays) then
+      eSignAnyWhereEngine.params.Reminder := False;
+  end;
 
   if not FConfigurazione.Parametro('EMAIL_CONFIGURATION_SUBJECT').IsEmpty then
     eSignAnyWhereEngine.params.EmailConfigurationSubject := FConfigurazione.Parametro('EMAIL_CONFIGURATION_SUBJECT');
@@ -169,7 +180,7 @@ begin
   if Documento.FullFileName.IsEmpty or not TFile.Exists(Documento.FullFileName) then
     raise EzFirmaErrore.CreateFmt('File da firmare non trovato: "%s"', [Documento.FullFileName]);
 
-  ApplicaConfigurazioneEngine;
+  ApplicaConfigurazioneEngine(Documento.ScadenzaSecondi);
 
   eSignAnyWhereEngine.params.EnvelopeName := ExtractFileName(Documento.FullFileName);
   eSignAnyWhereEngine.params.Ident := Documento.IdObjectFile.ToString;

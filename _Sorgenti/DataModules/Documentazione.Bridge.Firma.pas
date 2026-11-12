@@ -55,6 +55,7 @@ type
     function ConfigurazioneRecente: Boolean;
     function CreaProvider(IdFirmaRegistrazione: Int64; IdTenant: Int64): IzFirmaProvider;
     function EnteDellOggetto(const Oid, IdObjectFile: Int64): Int64;
+    function ScadenzaBustaSecondi(IdFirmaRegistrazione: Int64): Int64;
     procedure RegistraErrore(IdFirmaRegistrazione: Int64; E: Exception);
   public
     destructor Destroy; override;
@@ -76,6 +77,10 @@ type
     // approvazione interna
     procedure ApprovaRegistrazione(IdFirmaRegistrazione: Int64; const UserId: string);
     procedure RespingiRegistrazione(IdFirmaRegistrazione: Int64; const UserId: string; const Motivo: string);
+
+    // Mantis #341 - 2026-11-12: annulla una pratica approvata e non ancora inviata
+    // (stati I e A, mai D: la busta presso il fornitore non viene toccata)
+    procedure AnnullaRegistrazione(IdFirmaRegistrazione: Int64; const UserId: string; const Motivo: string);
 
     // invia la busta al fornitore (stato 'A' -> 'D'); in caso di errore la
     // registrazione resta ritentabile. La variante con i firmatari serve ai
@@ -422,6 +427,71 @@ begin
   end;
 end;
 
+procedure TDocumentazioneBridgeFirma.AnnullaRegistrazione(IdFirmaRegistrazione: Int64; const UserId: string; const Motivo: string);
+var
+  sp: TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_ANNULLA;
+begin
+  sp := GetSP<TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_ANNULLA>();
+  try
+    sp.Id_Firma_Registrazione := IdFirmaRegistrazione;
+    sp.User_Id := UserId.ToInt64;
+    sp.Motivo.text := Motivo;
+    sp.ExecuteAndCommit;
+  finally
+    FreeAndNil(sp);
+  end;
+end;
+
+// Mantis #341 - 2026-11-12: secondi di validita' da dare alla busta. Per i contratti il
+// termine e' la fine del giorno di inizio dell'incarico (calcolata dal database, con il
+// suo orologio), con tetto la scadenza configurata nei parametri del fornitore. Se il
+// termine e' gia' passato la pratica passa in S con il motivo scritto e si solleva
+// EzFirmaScaduta: nessuna chiamata a Namirial. Va chiamata con la configurazione gia'
+// caricata (dopo CreaProvider).
+function TDocumentazioneBridgeFirma.ScadenzaBustaSecondi(IdFirmaRegistrazione: Int64): Int64;
+var
+  spScadenza: TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_SCADENZA;
+  spScaduta: TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_SCADUTA_PRIMA_INVIO;
+  Massimo: Int64;
+  HaLimite: Boolean;
+  SecondiResidui: Int64;
+  Motivo: string;
+begin
+  Massimo := StrToInt64Def(FConfigurazione.Parametro('EXPIRATION_IN_SECONDS_AFTER_SENDING'), FIRMA_SCADENZA_PREDEFINITA_SECONDI);
+
+  spScadenza := GetSP<TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_SCADENZA>();
+  try
+    spScadenza.Id_Firma_Registrazione := IdFirmaRegistrazione;
+    spScadenza.ExecuteWithoutCommit;
+    HaLimite := not spScadenza.Secondi_Residui.IsNull;
+    if HaLimite then
+      SecondiResidui := spScadenza.Secondi_Residui.Value
+    else
+      SecondiResidui := 0;
+  finally
+    FreeAndNil(spScadenza);
+  end;
+
+  result := FirmaCalcolaScadenzaSecondi(HaLimite, SecondiResidui, Massimo);
+
+  if HaLimite and (result = 0) then
+  begin
+    spScaduta := GetSP<TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_SCADUTA_PRIMA_INVIO>();
+    try
+      spScaduta.Id_Firma_Registrazione := IdFirmaRegistrazione;
+      spScaduta.ExecuteAndCommit;
+      Motivo := spScaduta.Messaggio.Text.Trim;
+    finally
+      FreeAndNil(spScaduta);
+    end;
+
+    if Motivo.IsEmpty then
+      Motivo := 'La pratica di firma non è più inviabile: il termine per firmare è scaduto.';
+
+    raise EzFirmaScaduta.Create(Motivo);
+  end;
+end;
+
 procedure TDocumentazioneBridgeFirma.RegistraErrore(IdFirmaRegistrazione: Int64; E: Exception);
 var
   sp: TSP_OBJ_FILES_FIRMA_REGISTRAZIONE_ERRORE;
@@ -507,6 +577,11 @@ begin
   documento.Firmatari := Firmatari;
 
   provider := CreaProvider(IdFirmaRegistrazione, Ente);
+
+  // Mantis #341 - 2026-11-12: scadenza della busta legata al documento (contratti:
+  // fine del giorno di inizio dell'incarico). Fuori dal try: una pratica scaduta e'
+  // gia' stata chiusa dalla procedura e non e' un errore da ritentare
+  documento.ScadenzaSecondi := ScadenzaBustaSecondi(IdFirmaRegistrazione);
 
   // la registrazione esiste GIA' (idempotenza): la chiamata al fornitore
   // sta fuori da ogni transazione locale

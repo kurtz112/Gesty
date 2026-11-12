@@ -35,8 +35,10 @@ type
     Approva: TAction;
     Respingi: TAction;
     Invia: TAction;
+    AnnullaContratto: TAction;
     AggiornaStato: TAction;
     procedure AggiornaStatoExecute(Sender: TObject);
+    procedure AnnullaContrattoExecute(Sender: TObject);
     procedure ApprovaExecute(Sender: TObject);
     procedure InviaExecute(Sender: TObject);
     procedure RespingiExecute(Sender: TObject);
@@ -164,6 +166,20 @@ begin
 
   if assigned(lista) then
     Contratti.Invia(lista);
+end;
+
+// Mantis #341 - 2026-11-12: annulla i contratti approvati e non ancora inviati; quelli
+// gia' inviati a Namirial non si annullano da qui
+procedure TFormContratti.AnnullaContrattoExecute(Sender: TObject);
+var
+  lista: TList<Integer>;
+begin
+  inherited;
+
+  lista := GetSelected('ContrattiDaInviare');
+
+  if assigned(lista) then
+    Contratti.Annulla(lista);
 end;
 
 procedure TFormContratti.AggiornaStatoExecute(Sender: TObject);

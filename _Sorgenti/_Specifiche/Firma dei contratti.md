@@ -1,8 +1,8 @@
 ---
 area: Firma dei contratti
 progetto: Gesty
-aggiornato: 2026-11-11
-rilascio: Ticket_Gesty/341 - QUESTIONI DA RISOLVERE/001
+aggiornato: 2026-11-12
+rilascio: Ticket_Gesty/341 - QUESTIONI DA RISOLVERE/002
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -21,7 +21,7 @@ carattere_titoli: "Calibri Light"
 
 Questa specifica descrive le regole che Gesty rispetta quando un contratto (incarico, tipo documento `CON`) o un incarico di massima (tipo documento `CDM`) viene mandato in firma elettronica presso il fornitore (oggi eSignAnyWhere di Namirial), approvato, respinto, inviato, verificato, scaricato nella versione firmata, consultato ed eliminato. Descrive il comportamento atteso, non il codice.
 
-Le regole stanno in tre posti. Nel database: procedure `OBJ_FILES_FIRMA_REGISTRAZIONE_ADD`, `_APPROVA`, `_RESPINGI`, `_INVIATA`, `_FIRMATA`, `_SCADUTA`, `_RESPINTA_FORNITORE`, `_ERRORE`, `OBJ_FILES_FIRMA_CONTRATTI_AMMESSA`, `OBJ_FILES_FIRMA_CONTRATTI_FIRMATARI`, `OBJ_FIRME_ELETTRONICHE_CHECK_RISORSA`, `OBJ_FILES_FIRMA_REGISTRAZIONI_ELIMINA`, `OBJECT_DELETE`, trigger `INCARICHI_AD0`, `INCARICHI_DI_MASSIMA_AD0`, `PERSONALE_ELENCO_BIUD0`, `RISORSE_BI0`, vista `OBJ_FILES_ELENCO`. Nel programma: ponte `TDocumentazioneBridgeFirma`, motore `TDocumentazioneFirmaElettronica`, controller `TDocumentazioneReportActionsController` e `TCommon.FirmaElettronicaController`, form `TFormContratti`. In zPack: il fornitore astratto (`zDocumentale.Firma.*`) e la barra delle azioni documentali (`zOffice.Reports.*`).
+Le regole stanno in tre posti. Nel database: procedure `OBJ_FILES_FIRMA_REGISTRAZIONE_ADD`, `_APPROVA`, `_RESPINGI`, `_ANNULLA`, `_SCADENZA`, `_SCADUTA_PRIMA_INVIO`, `_INVIATA`, `_FIRMATA`, `_SCADUTA`, `_RESPINTA_FORNITORE`, `_ERRORE`, `OBJ_FILES_FIRMA_CONTRATTI_AMMESSA`, `OBJ_FILES_FIRMA_CONTRATTI_FIRMATARI`, `OBJ_FIRME_ELETTRONICHE_CHECK_RISORSA`, `OBJ_FILES_FIRMA_REGISTRAZIONI_ELIMINA`, `OBJECT_DELETE`, trigger `INCARICHI_AD0`, `INCARICHI_DI_MASSIMA_AD0`, `PERSONALE_ELENCO_BIUD0`, `RISORSE_BI0`, vista `OBJ_FILES_ELENCO`. Nel programma: ponte `TDocumentazioneBridgeFirma`, motore `TDocumentazioneFirmaElettronica`, controller `TDocumentazioneReportActionsController` e `TCommon.FirmaElettronicaController`, form `TFormContratti`. In zPack: il fornitore astratto (`zDocumentale.Firma.*`) e la barra delle azioni documentali (`zOffice.Reports.*`).
 
 **Fuori da quest'area**, con una specifica propria quando un lavoro le toccherà: protocollo e conservazione dei documenti (`OBJ_FILES` in generale), invio PEC, fatture, firma delle convenzioni e dei contratti di fornitura (stesso motore, regole non verificate qui), il vecchio circuito di firma `OBJ_FIRME_ELETTRONICHE` (citato solo dove pesa ancora).
 
@@ -34,11 +34,11 @@ Ogni invio in firma è una pratica (`OBJ_FILES_FIRMA_REGISTRAZIONI`) legata all'
 | Codice | Descrizione | Innesco | Transizioni ammesse | Spiegazione logica |
 |---|---|---|---|---|
 | `I` | Inserita, in approvazione | Firma dall'anteprima del contratto | `A`, `R` | I contratti passano da un controllo interno prima di partire verso il fornitore |
-| `A` | Approvata | Approva nella coda "da approvare" | `D` | Pronta per l'invio, non ancora partita |
+| `A` | Approvata | Approva nella coda "da approvare" | `D`, `R`, `S` | Pronta per l'invio, non ancora partita; si può annullare (`R`) o scade se l'incarico inizia prima dell'invio (`S`) |
 | `D` | In firma | Invio riuscito al fornitore | `F`, `R`, `S` | La busta esiste presso il fornitore e aspetta i firmatari |
 | `F` | Firmata | Verifica dello stato: busta completata | nessuna | Versione firmata e verbale scaricati |
 | `R` | Respinta | Respinta interna, o rifiuto/annullamento presso il fornitore | nessuna | Chiusa: si può aprire una pratica nuova |
-| `S` | Scaduta | Verifica dello stato: busta scaduta | nessuna | Chiusa: si può aprire una pratica nuova |
+| `S` | Scaduta | Verifica dello stato: busta scaduta presso il fornitore; oppure invio di una pratica il cui incarico è già iniziato | nessuna | Chiusa: si può aprire una pratica nuova, ma solo se l'incarico non è ancora iniziato (GESTY-FIR-010) |
 
 ## GESTY-FIR-001 La firma dipende dal fornitore dell'ente del documento
 La firma è disponibile solo se l'ente a cui appartiene il documento ha un fornitore di firma attivo (`OBJ_FILES_FIRMA_CONFIGURAZIONE.ATTIVO`). L'ente è quello del progetto per un incarico e quello dell'incarico di massima per un incarico di massima (`OBJ_FILES_FIRMA_ENTE_GET`), non l'ente di lavoro dell'utente. Invio e verifica della busta usano le credenziali dell'ente della pratica. La configurazione si rilegge al più una volta al minuto.
@@ -147,6 +147,18 @@ Per `CON` e `CDM`, prima che la pratica nasca e di nuovo al momento dell'invio, 
 ## GESTY-FIR-009 Approvazione e respinta interna
 Nella form Contratti, la coda "da approvare" elenca le pratiche in stato `I`. Approvare porta la pratica in `A` e registra chi approva e quando. Respingere porta la pratica in `R`, con `RESPINTA` vero, chi respinge e quando. Entrambe le azioni chiedono conferma e lavorano su tutte le righe selezionate, con una barra di avanzamento che si può annullare.
 
+Nella coda "da inviare" (stato `A`) l'azione "Annulla Contratto" porta le pratiche selezionate in `R`, con `RESPINTA` vero, chi annulla, quando e il motivo "Annullata dall'operatore prima dell'invio." (ticket 341). Si annullano solo le pratiche non ancora inviate (`I`, `A`): per una busta già inviata (`D`) la procedura rifiuta l'annullo, perché la busta resterebbe attiva presso il fornitore e il docente potrebbe ancora firmarla.
+
+### Scenario: annullo di un contratto approvato e non inviato
+- **Dato** una pratica in stato `A` nella coda "da inviare"
+- **Quando** si preme Annulla Contratto e si conferma
+- **Allora** passa in `R` con il motivo scritto e un nuovo invio in firma dello stesso contratto è ammesso (GESTY-FIR-007)
+
+### Scenario: annullo di una busta già inviata
+- **Dato** una pratica in stato `D`
+- **Quando** se ne chiede l'annullo
+- **Allora** la procedura si ferma con "Si possono annullare solo le pratiche non ancora inviate a Namirial." e la pratica non cambia
+
 ### Scenario: approvazione di due contratti
 - **Dato** due pratiche in stato `I` selezionate
 - **Quando** si preme Approva e si conferma "Si desidera approvare i 2 contratti selezionati?"
@@ -159,6 +171,20 @@ Nella form Contratti, la coda "da approvare" elenca le pratiche in stato `I`. Ap
 
 ## GESTY-FIR-010 Invio al fornitore
 La coda "da inviare" elenca le pratiche in stato `A`. All'invio i firmatari si ricalcolano sui dati di quel momento, nell'ordine: Direttore dell'ente in carica alla data (obbligatorio, firma remota), Legale Rappresentante in carica (se c'è, firma remota), la risorsa del contratto come "Docente" (firma con codice OTP). Si invia solo una pratica approvata. Se l'invio riesce la pratica passa in `D`, conserva l'identificativo della busta e conta un tentativo in più; se il fornitore rifiuta, il messaggio d'errore resta sulla pratica, il tentativo si conta e lo stato non cambia.
+
+**Scadenza della busta (ticket 341).** Per un contratto (`CON`) il docente deve firmare entro l'inizio dell'incarico: la busta scade alle 23:59:59 del giorno di `INCARICHI.DATA_INIZIO_INCARICO`, contate sull'orologio del database dal momento dell'invio. Il tetto è la scadenza configurata nei parametri del fornitore (`EXPIRATION_IN_SECONDS_AFTER_SENDING`, 14 giorni su CAPAC): se l'incarico inizia fra più giorni, vale il tetto. L'incarico di massima (`CDM`) non ha questo limite e usa sempre la scadenza configurata. Con una scadenza più breve di `BEFORE_EXPIRATION_IN_DAYS` + 1 giorni i promemoria del fornitore vengono spenti, perché Namirial altrimenti rifiuta la busta con l'errore ERR0176.
+
+L'incarico non può essere già iniziato (data di inizio precedente a oggi): la pratica non nasce, l'azione Firma si ferma con "L'incarico è già iniziato: il contratto doveva essere firmato entro la data di inizio e non si può più inviare a firma.". Se l'incarico inizia mentre la pratica aspetta (stato `I` o `A`), all'invio la pratica passa in `S` con il messaggio "Scaduta prima dell'invio: l'incarico è iniziato il gg/mm/aaaa e il contratto non è più firmabile. Non è stata inviata a Namirial.", senza chiamare il fornitore; l'invio delle altre pratiche selezionate continua e a fine giro i motivi si mostrano in un solo errore.
+
+### Scenario: incarico che inizia fra poche ore
+- **Dato** una pratica in stato `A` per un incarico che inizia oggi
+- **Quando** la si invia
+- **Allora** la busta parte con scadenza a fine giornata, senza promemoria
+
+### Scenario: incarico già iniziato
+- **Dato** una pratica in stato `A` il cui incarico è iniziato ieri
+- **Quando** la si invia
+- **Allora** passa in `S` con il messaggio di scadenza prima dell'invio e il fornitore non viene chiamato
 
 ### Scenario: direttore non in carica
 - **Dato** un ente senza direttore in carica alla data odierna
@@ -187,7 +213,7 @@ La coda "da inviare" elenca le pratiche in stato `A`. All'invio i firmatari si r
 |---|---|
 | `Completed` | `F`: versione firmata e verbale scaricati (GESTY-FIR-012) |
 | `Rejected`, `Canceled` | `R`: respinta dal firmatario o annullata, senza utente interno; il messaggio riporta lo stato del fornitore |
-| `Expired` | `S` |
+| `Expired` | `S`, con il messaggio "Scaduta presso Namirial: il docente non ha firmato entro il termine." |
 | altro | resta `D`; si aggiorna solo lo stato grezzo del fornitore |
 
 Una pratica che non è in `D` non viene interrogata. Un errore del fornitore resta registrato sulla pratica.
@@ -338,7 +364,7 @@ Punti in cui il codice o i dati di oggi non mantengono ciò che i requisiti o i 
 | DIV-FIR-10 | Su CAPAC la policy `Visualizzazione Contratti Firmati` apre allegati firmati di Risorse, riepilogo ed esportazione, ma non `Progetti.Docenti_Incarichi_Allegati`; la richiesta del ticket 289 era "visionare", la policy dà `W` | Chi è nel gruppo non vede i contratti firmati dalla scheda docenti del progetto; può modificarne o cancellarne le righe se il dataset lo permette |
 | DIV-FIR-11 | Nella verifica dello stato (GESTY-FIR-011) un errore su una busta interrompe il giro: le pratiche successive non vengono interrogate. Lo stesso errore incrementa `TENTATIVI`, che conta così anche le verifiche e non solo gli invii | Una busta problematica blocca l'aggiornamento di tutte le altre fino a quando non si risolve; il numero dei tentativi non dice più quante volte si è provato a inviare |
 | DIV-FIR-12 | I messaggi di `OBJ_FIRME_ELETTRONICHE_CHECK_RISORSA` dicono "Telefono invio non trovata." e "Nominativo legale rappresentante non trovata." anche quando il firmatario è un collaboratore | L'operatore cerca il dato sbagliato nell'anagrafica sbagliata |
-| DIV-FIR-13 | La scadenza della busta presso il fornitore è fissa, contata dall'invio (`EXPIRATION_IN_SECONDS_AFTER_SENDING`: 14 giorni su CAPAC), e non dipende dalla data di inizio dell'incarico (ticket 341) | Un docente può firmare anche dopo l'inizio dell'incarico, come ha rilevato la Regione su un percorso di Innovaprofessioni. Il solo avviso di GESTY-FIR-022 lo segnala, non lo impedisce |
+| DIV-FIR-13 | Il legame fra scadenza della busta e inizio dell'incarico (GESTY-FIR-010) vale per i contratti `CON`. L'incarico di massima (`CDM`) non ha una data di inizio sul documento e conserva la scadenza fissa del fornitore (`EXPIRATION_IN_SECONDS_AFTER_SENDING`: 14 giorni su CAPAC) | Un incarico di massima può essere firmato anche dopo l'inizio delle attività che copre. Se serve, la regola va estesa quando si stabilisce da quale data far dipendere la scadenza |
 
 <!-- footer -->
 ---

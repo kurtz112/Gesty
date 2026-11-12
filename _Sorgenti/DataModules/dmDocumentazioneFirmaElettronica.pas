@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Luca Zebro - Tutti i diritti riservati.
 // Uso, copia e distribuzione non autorizzati sono vietati.
 //
-// Ultima modifica: 2026-07-26
+// Ultima modifica: 2026-11-12
 // ---------------------------------------------------------------------------
 unit dmDocumentazioneFirmaElettronica;
 
@@ -77,6 +77,9 @@ type
       const Motivo: string = '');
     procedure Invia(const Registrazioni: TList<integer>; const Etichette: TEtichetteFirma;
       const RisolviFirmatari: TRisolutoreFirmatari = nil);
+    // Mantis #341 - 2026-11-12: annulla le pratiche non ancora inviate (I e A)
+    procedure Annulla(const Registrazioni: TList<integer>; const Etichette: TEtichetteFirma;
+      const Motivo: string = '');
     procedure AggiornaStato(const Registrazioni: TList<integer>; const Etichette: TEtichetteFirma);
   end;
 
@@ -207,19 +210,59 @@ end;
 
 procedure TDocumentazioneFirmaElettronica.Invia(const Registrazioni: TList<integer>;
   const Etichette: TEtichetteFirma; const RisolviFirmatari: TRisolutoreFirmatari);
+var
+  scadute: TStringList;
 begin
+  // Mantis #341 - 2026-11-12: una pratica scaduta prima dell'invio e' gia' stata chiusa
+  // dal ponte (stato S, motivo scritto): non ferma le altre, si raccoglie il motivo e lo
+  // si mostra a fine giro, invece di interrompere l'elenco al primo caso
+  scadute := TStringList.Create;
+  try
+    EseguiSuElenco(Registrazioni,
+      ComponiDomanda('inviare', Etichette, Registrazioni.Count),
+      Etichette.Titolo,
+      procedure(IdFirmaRegistrazione: integer)
+      begin
+        try
+          // con il risolutore i firmatari sono ricalcolati sui dati vivi e
+          // viaggiano al fornitore completi di segnaposto e identificativi di
+          // firma remota, che non stanno sulle righe firmatari
+          if Assigned(RisolviFirmatari) then
+            Ponte.InviaRegistrazioneConFirmatari(IdFirmaRegistrazione, RisolviFirmatari(IdFirmaRegistrazione))
+          else
+            Ponte.InviaRegistrazione(IdFirmaRegistrazione);
+        except
+          on E: EzFirmaScaduta do
+            scadute.Add('Pratica ' + IdFirmaRegistrazione.ToString + ': ' + E.Message);
+        end;
+      end);
+
+    if scadute.Count > 0 then
+      raise EzFirmaErrore.Create(
+        'Non tutte le pratiche sono state inviate:' + sLineBreak + sLineBreak + Trim(scadute.Text));
+  finally
+    FreeAndNil(scadute);
+  end;
+end;
+
+procedure TDocumentazioneFirmaElettronica.Annulla(const Registrazioni: TList<integer>;
+  const Etichette: TEtichetteFirma; const Motivo: string);
+const
+  MotivoPredefinito = 'Annullata dall''operatore prima dell''invio.';
+var
+  motivoScritto: string;
+begin
+  if Motivo.IsEmpty then
+    motivoScritto := MotivoPredefinito
+  else
+    motivoScritto := Motivo;
+
   EseguiSuElenco(Registrazioni,
-    ComponiDomanda('inviare', Etichette, Registrazioni.Count),
+    ComponiDomanda('annullare', Etichette, Registrazioni.Count),
     Etichette.Titolo,
     procedure(IdFirmaRegistrazione: integer)
     begin
-      // con il risolutore i firmatari sono ricalcolati sui dati vivi e
-      // viaggiano al fornitore completi di segnaposto e identificativi di
-      // firma remota, che non stanno sulle righe firmatari
-      if Assigned(RisolviFirmatari) then
-        Ponte.InviaRegistrazioneConFirmatari(IdFirmaRegistrazione, RisolviFirmatari(IdFirmaRegistrazione))
-      else
-        Ponte.InviaRegistrazione(IdFirmaRegistrazione);
+      Ponte.AnnullaRegistrazione(IdFirmaRegistrazione, Config.CurrentUserID.ToString, motivoScritto);
     end);
 end;
 

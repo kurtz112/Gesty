@@ -44,6 +44,8 @@ type
     procedure Approva(contratti: TList<Integer>);
     procedure Respingi(contratti: TList<Integer>);
     procedure Invia(contratti: TList<Integer>);
+    // Mantis #341 - 2026-11-12: annulla i contratti approvati e non ancora inviati
+    procedure Annulla(contratti: TList<Integer>);
     procedure AggiornaStato;
   end;
 
@@ -92,13 +94,23 @@ end;
 
 procedure TContratti.Invia(contratti: TList<Integer>);
 begin
-  // i firmatari NON salgono nel motore: sono la parte di dominio dei contratti
-  MotoreFirma.Invia(contratti, Etichette,
-    function(IdFirmaRegistrazione: Integer): TArray<TzFirmaFirmatario>
-    begin
-      result := CaricaFirmatari(IdFirmaRegistrazione);
-    end);
+  // Mantis #341 - 2026-11-12: le code si ricaricano anche se il motore solleva l'elenco
+  // dei contratti scaduti prima dell'invio: nel frattempo sono usciti dalla coda
+  try
+    // i firmatari NON salgono nel motore: sono la parte di dominio dei contratti
+    MotoreFirma.Invia(contratti, Etichette,
+      function(IdFirmaRegistrazione: Integer): TArray<TzFirmaFirmatario>
+      begin
+        result := CaricaFirmatari(IdFirmaRegistrazione);
+      end);
+  finally
+    RefreshDataSets;
+  end;
+end;
 
+procedure TContratti.Annulla(contratti: TList<Integer>);
+begin
+  MotoreFirma.Annulla(contratti, Etichette);
   RefreshDataSets;
 end;
 

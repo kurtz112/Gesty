@@ -26,6 +26,11 @@ inherited FormContratti: TFormContratti
       ImageIndex = 1738
       OnExecute = InviaExecute
     end
+    object AnnullaContratto: TAction
+      Caption = 'Annulla Contratto'
+      ImageIndex = 1868
+      OnExecute = AnnullaContrattoExecute
+    end
     object AggiornaStato: TAction
       Caption = 'Aggiorna Stato'
       ImageIndex = 1867
