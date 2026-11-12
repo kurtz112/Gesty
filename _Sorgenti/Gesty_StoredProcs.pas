@@ -8799,6 +8799,13 @@ TSP_cron = class (TzStoredProc)
   public
 end;
 
+[TStoredProcedure('CRON_VERIFICA_CONTRATTI_NON_FIRMATI')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_cron_Verifica_Contratti_Non_Firmati = class (TzStoredProc)
+  private
+  public
+end;
+
 [TStoredProcedure('CRON_VERIFICA_INCARICHI_MANCANTI')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_cron_Verifica_Incarichi_Mancanti = class (TzStoredProc)
@@ -17058,6 +17065,30 @@ TSP_obj_Files_Firma_Registrazione_Add = class (TzStoredProc)
     property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione;
 end;
 
+[TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_ANNULLA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Registrazione_Annulla = class (TzStoredProc)
+  private
+    fId_Firma_Registrazione: TNullableInt64;
+    fUser_Id: TNullableInt64;
+    fMotivo: TStringList;
+  private
+    procedure SetMotivo(const Value: TStringList);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('ID_FIRMA_REGISTRAZIONE', ptInput, False)]
+    property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
+    //
+    [TParamAttribute('USER_ID', ptInput, False)]
+    property User_Id: TNullableInt64 read fUser_Id write fUser_Id;
+    //
+    [TParamAttribute('MOTIVO', ptInput, True)]
+    property Motivo: TStringList read fMotivo write SetMotivo;
+end;
+
 [TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_APPROVA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_obj_Files_Firma_Registrazione_Approva = class (TzStoredProc)
@@ -17295,6 +17326,28 @@ TSP_obj_Files_Firma_Registrazione_Respinta_Fornitore = class (TzStoredProc)
     property Stato_Esterno: TNullableString read fStato_Esterno write fStato_Esterno;
 end;
 
+[TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_SCADENZA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Registrazione_Scadenza = class (TzStoredProc)
+  private
+    fId_Firma_Registrazione: TNullableInt64;
+    fSecondi_Residui: TNullableInt64;
+    fData_Inizio_Incarico: TNullableDate;
+  private
+    property Secondi_Residui_internal: TNullableInt64 read fSecondi_Residui write fSecondi_Residui;
+    property Data_Inizio_Incarico_internal: TNullableDate read fData_Inizio_Incarico write fData_Inizio_Incarico;
+  public
+    //
+    [TParamAttribute('ID_FIRMA_REGISTRAZIONE', ptInput, False)]
+    property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
+    //
+    [TParamAttribute('SECONDI_RESIDUI', ptOutput, False)]
+    property Secondi_Residui: TNullableInt64 read fSecondi_Residui;
+    //
+    [TParamAttribute('DATA_INIZIO_INCARICO', ptOutput, False)]
+    property Data_Inizio_Incarico: TNullableDate read fData_Inizio_Incarico;
+end;
+
 [TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_SCADUTA')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_obj_Files_Firma_Registrazione_Scaduta = class (TzStoredProc)
@@ -17308,6 +17361,25 @@ TSP_obj_Files_Firma_Registrazione_Scaduta = class (TzStoredProc)
     //
     [TParamAttribute('STATO_ESTERNO', ptInput, False)]
     property Stato_Esterno: TNullableString read fStato_Esterno write fStato_Esterno;
+end;
+
+[TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_SCADUTA_PRIMA_INVIO')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_obj_Files_Firma_Registrazione_Scaduta_Prima_Invio = class (TzStoredProc)
+  private
+    fId_Firma_Registrazione: TNullableInt64;
+    fMessaggio: TStringList;
+  private
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  public
+    //
+    [TParamAttribute('ID_FIRMA_REGISTRAZIONE', ptInput, False)]
+    property Id_Firma_Registrazione: TNullableInt64 read fId_Firma_Registrazione write fId_Firma_Registrazione;
+    //
+    [TParamAttribute('MESSAGGIO', ptOutput, True)]
+    property Messaggio: TStringList read fMessaggio;
 end;
 
 [TStoredProcedure('OBJ_FILES_FIRMA_REGISTRAZIONE_STATO_ESTERNO')]
@@ -45762,6 +45834,24 @@ begin
 end;
 
 
+constructor TSP_obj_Files_Firma_Registrazione_Annulla.Create;
+begin
+  inherited;
+  fMotivo := CreateStringList;
+end;
+
+destructor TSP_obj_Files_Firma_Registrazione_Annulla.Destroy;
+begin
+  FreeAndNil(fMotivo);
+  inherited;
+end;
+
+procedure TSP_obj_Files_Firma_Registrazione_Annulla.SetMotivo(const Value: TStringList);
+begin
+  FMotivo.Assign(Value);
+end;
+
+
 constructor TSP_obj_Files_Firma_Registrazione_Errore.Create;
 begin
   inherited;
@@ -45808,6 +45898,19 @@ end;
 procedure TSP_obj_Files_Firma_Registrazione_Respingi.SetMotivo(const Value: TStringList);
 begin
   FMotivo.Assign(Value);
+end;
+
+
+constructor TSP_obj_Files_Firma_Registrazione_Scaduta_Prima_Invio.Create;
+begin
+  inherited;
+  fMessaggio := CreateStringList;
+end;
+
+destructor TSP_obj_Files_Firma_Registrazione_Scaduta_Prima_Invio.Destroy;
+begin
+  FreeAndNil(fMessaggio);
+  inherited;
 end;
 
 
