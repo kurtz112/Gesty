@@ -1,8 +1,8 @@
 ---
 area: Rilevamento ore
 progetto: Gesty
-aggiornato: 2026-10-30
-rilascio: OUT/20261030-specifiche-vive-dei-progetti/007
+aggiornato: 2026-11-12
+rilascio: Ticket_Gesty/345 - rilevamento ore/001
 header: "Gesty | SOLUZIONI PER LA FORMAZIONE PROFESSIONALE E SERVIZI ALLA PERSONA."
 footer: "| www.zebro.it/gesty"
 colore_pagina: "#699E38"
@@ -23,7 +23,7 @@ Questa specifica descrive le regole che Gesty rispetta quando si inseriscono, mo
 
 **Fuori da quest'area**, con una specifica propria quando un lavoro le toccherà: presenze degli allievi, blocco del registro e periodi trasmessi a SIUF; importazioni GRS, Untis e OmniaTime (qui compare solo il rilevamento che generano); timesheet e stampe.
 
-**Origine.** Ricavata il 2026-10-30 dal codice del database master e dalle preanalisi dei ticket 28, 30, 37, 53, 135, 199, 214, 219, 220, 221, 234, 271, 272, 277, 279, 296, 304, 307.
+**Origine.** Ricavata il 2026-10-30 dal codice del database master e dalle preanalisi dei ticket 28, 30, 37, 53, 135, 199, 214, 219, 220, 221, 234, 271, 272, 277, 279, 296, 304, 307. Aggiornata il 2026-11-12 con il ticket 345 (GESTY-RIL-006, DIV-RIL-3).
 
 ## GESTY-RIL-001 Chi rileva
 Ogni rilevamento ha un rilevatore. Se non è indicato, è la risorsa collegata all'utente che sta lavorando; un utente senza risorsa collegata non può rilevare ore.
@@ -47,7 +47,7 @@ Ogni tipo di incarico dichiara da dove si può rilevare (`ZZ_TIPI_INCARICO.TIPO_
 - **Allora** compare "Il valore selezionato è disabilitato." e il valore non viene accettato
 
 ## GESTY-RIL-003 Incarico facoltativo
-Un rilevamento può non avere incarico. Nella scheda personale l'incarico non si sceglie a mano: viene ricavato da progetto, tipo e data; se nessun incarico li copre, il campo resta vuoto e il rilevamento si salva lo stesso. Le ore senza incarico non entrano nei controlli legati all'incarico (GESTY-RIL-006, 013, 014) e nella validazione (GESTY-RIL-008).
+Un rilevamento può non avere incarico. Nella scheda personale e nel modulo Rilevamento Ore l'incarico non si sceglie a mano: viene ricavato da progetto, tipo, data e ore (`INCARICHI_GET_PRESENZE`); se nessun incarico li copre, o se quello che li copre non ha ore residue sufficienti, il campo resta vuoto e il rilevamento si salva lo stesso. Le ore senza incarico non entrano nei controlli legati all'incarico (GESTY-RIL-005, 013, 014, 015) e nella validazione (GESTY-RIL-008); la sovrapposizione con altre ore dello stesso docente viene invece controllata (GESTY-RIL-006).
 
 ### Scenario: nessun incarico copre il rilevamento
 - **Dato** un docente senza incarichi sul progetto per quel tipo e quella data
@@ -73,7 +73,9 @@ Se il rilevamento indica un incarico, l'incarico deve essere valido per progetto
 ## GESTY-RIL-006 Nessuna sovrapposizione per lo stesso docente
 Una persona non può essere in due posti nello stesso momento: due rilevamenti della stessa risorsa nello stesso giorno non si sovrappongono. Le fasce si toccano senza sovrapporsi (09:00-10:00 e 10:00-11:00 sono ammesse). La sovrapposizione è ammessa solo fra incarichi **collegati**: uno è il master dell'altro, oppure hanno lo stesso master (`INCARICO_IS_COLLEGATO`); la sostituzione (`ID_INCARICO_SOSTITUZIONE`) non conta. Due rilevamenti sullo stesso incarico sovrapposti sono invece un errore.
 
-Eccezioni: il controllo non si fa se il rilevamento che si salva non ha incarico, e non si fa per le risorse che sono aziende (`AZIENDE`), che rappresentano più persone. Il controllo si ripete a ogni salvataggio della riga, anche quando cambia un campo che non c'entra con l'orario.
+Il controllo non si fa per le risorse che sono aziende (`AZIENDE`), che rappresentano più persone. Per un rilevamento con incarico si ripete a ogni salvataggio della riga, anche quando cambia un campo che non c'entra con l'orario.
+
+Un rilevamento **senza incarico** viene controllato quando viene inserito e quando cambiano risorsa, data, ora di inizio o ora di fine (ticket 345): è il caso di chi rileva una seconda volta ore già presenti su un incarico esaurito, che resta senza incarico perché la ricerca automatica scarta gli incarichi senza ore residue (GESTY-RIL-003). Non viene controllato in due casi: quando si salva senza toccare l'orario, per non bloccare le righe già sovrapposte prima del ticket 345; e durante le elaborazioni automatiche (OmniaTime con `CONST_FLAGS.ELABORAZIONE_PRESENZE`, importazione GRS con `CONST_FLAGS.IMPORT_FILE_GRS`), che non hanno un utente a cui mostrare il messaggio. Fino al ticket 345 il rilevamento senza incarico non veniva controllato mai: l'esclusione era stata introdotta il 27.10.2023 e confermata il 23.11.2024.
 
 ### Scenario: due progetti nella stessa ora
 - **Dato** un docente con un rilevamento il 12/10 dalle 09:00 alle 11:00 sul progetto A
@@ -95,6 +97,21 @@ Eccezioni: il controllo non si fa se il rilevamento che si salva non ha incarico
 - **Dato** un rilevamento dalle 09:00 alle 11:00 sull'incarico 500
 - **Quando** se ne inserisce un altro dalle 10:00 alle 12:00 sullo stesso incarico
 - **Allora** il salvataggio si ferma per sovrapposizione
+
+### Scenario: rilevamento senza incarico sovrapposto
+- **Dato** un docente con un rilevamento il 16/10 dalle 14:30 alle 15:30 su un incarico esaurito
+- **Quando** si inserisce per lui il 16/10 dalle 14:30 alle 18:30 sullo stesso progetto, e il rilevamento resta senza incarico
+- **Allora** il salvataggio si ferma con "Sovrapposizione con un altro inserimento per lo stesso docente."
+
+### Scenario: nota su una riga senza incarico già sovrapposta
+- **Dato** un rilevamento senza incarico già presente e sovrapposto a un altro
+- **Quando** se ne cambia solo la nota
+- **Allora** il salvataggio riesce
+
+### Scenario: ora senza incarico da un'elaborazione automatica
+- **Dato** un docente con un rilevamento dalle 09:00 alle 11:00
+- **Quando** un'elaborazione automatica (OmniaTime, importazione GRS) inserisce per lui un rilevamento senza incarico dalle 09:30 alle 10:30
+- **Allora** il salvataggio riesce
 
 ### Scenario: risorsa azienda
 - **Dato** una risorsa che è un'azienda fornitrice
@@ -263,7 +280,7 @@ Punti in cui il codice di oggi non mantiene ciò che i requisiti dicono, o in cu
 |---|---|---|
 | DIV-RIL-1 | In `ORE_RILEVATE_BIU0` il controllo "Superato il numero di ore attribuite" confronta la durata con `TOTALE_ORE_RESIDUE`, che in quel blocco non viene letto da `INCARICO_DETAIL`: vale NULL fuori dai piani personalizzati, il residuo del servizio dentro. L'esclusione degli incarichi di docenza (`TIPOLOGIA_INCARICO = 'FD'`) vale solo per questo controllo | Prima della scrittura il tetto dell'incarico non scatta mai, o scatta col residuo sbagliato. Il tetto vero lo applica `ORE_RILEVATE_AIU0` dopo la scrittura (GESTY-RIL-015), su tutti gli incarichi, docenza compresa |
 | DIV-RIL-2 | La sovrapposizione si verifica con due condizioni diverse. Il trigger `BIU0` considera sovrapposti anche due rilevamenti sullo stesso incarico ed esclude le aziende; `ORE_RILEVATE_GENERA_RILEVAMENTO` lascia passare lo stesso incarico e non esclude le aziende, ma per il messaggio usa `ORE_RILEVATE_SOVRAPPOSIZIONE_MSG`, che segue la condizione del trigger | Una generazione automatica può fermarsi su un'azienda che a mano si salverebbe; il messaggio della generazione può elencare rilevamenti che per la procedura non erano in conflitto (ticket 271, 272) |
-| DIV-RIL-3 | Il controllo di sovrapposizione si salta quando il rilevamento che si salva non ha incarico, ma un rilevamento senza incarico già presente conta come conflitto per gli altri (`INCARICO_IS_COLLEGATO` con un incarico nullo restituisce falso) | Un'ora senza incarico entra sopra un'ora esistente; da quel momento ogni salvataggio dell'altra riga, anche un ricalcolo che non tocca l'orario, si ferma per sovrapposizione (ticket 28, rielaborazione OmniaTime; ticket 296, 13:00-17:00 e 13:30-17:00) |
+| DIV-RIL-3 | Ridotta dal ticket 345: a mano un'ora senza incarico non entra più sopra un'ora esistente. Resta che un rilevamento senza incarico già presente, o inserito da un'elaborazione automatica, conta come conflitto per gli altri (`INCARICO_IS_COLLEGATO` con un incarico nullo restituisce falso), mentre lui stesso si risalva senza controllo | Dove un'ora senza incarico è sovrapposta a un'altra, ogni salvataggio dell'altra riga, anche un ricalcolo che non tocca l'orario, si ferma per sovrapposizione (ticket 28, rielaborazione OmniaTime; ticket 296, 13:00-17:00 e 13:30-17:00) |
 | DIV-RIL-4 | Un conflitto nella generazione automatica ha tre esiti: blocca l'inserimento di una presenza individuale e l'importazione del sostegno GRS; viene ignorato nella modifica di una presenza individuale; viene ingoiato senza avviso nell'importazione GRS della collettiva (`ORARIO_GENERA_RILEVAMENTO(..., FALSE)`) | Nella collettiva una supplenza in conflitto resta a 0 ore e la lezione senza rilevamento, senza che nessuno lo sappia (ticket 307) |
 | DIV-RIL-5 | `STUDENTI_PRESENZE_INDIVIDUALE_RILEVAMENTO_BIU` esce subito se la presenza ha già un rilevamento | Cambiando data, ora o durata di una presenza già agganciata, il rilevamento del docente resta quello vecchio; l'analisi del ticket 219 chiedeva il riallineamento |
 | DIV-RIL-6 | `ORE_RILEVATE_GET_RILEVAMENTO` legge il rilevamento da riusare con un'assegnazione a valore singolo | Se esistono già due rilevamenti sovrapposti con gli stessi dati (possibile per DIV-RIL-3), la generazione si ferma con l'errore di Firebird "multiple rows in singleton select" invece di un messaggio comprensibile. Un rilevamento si riusa anche se ha un piano personalizzato diverso (ticket 221) |

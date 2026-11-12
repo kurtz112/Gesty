@@ -120,7 +120,8 @@ BEGIN
   VALUES ('GESTY-RIL-006', 'stesso incarico due volte (10-12 sull incarico 502801)', 'errore', IIF(:MSG IS NULL, 'riuscito', 'errore'), :MSG);
 END^
 
--- DIV-RIL-3: un rilevamento senza incarico non viene controllato, ma conta come conflitto per gli altri
+-- Mantis #345 - 2026-11-12: rilevamento senza incarico sovrapposto, inserito a mano
+-- GESTY-RIL-006: dal ticket 345 anche un rilevamento senza incarico viene controllato all'inserimento.
 EXECUTE BLOCK AS
 DECLARE VARIABLE MSG VARCHAR(1000);
 BEGIN
@@ -132,9 +133,51 @@ BEGIN
     MSG = SUBSTRING(RDB$ERROR(MESSAGE) FROM 1 FOR 1000);
   END
   INSERT INTO CARATT_ESITI (REQUISITO, CASO, ATTESO, ESITO, MESSAGGIO)
-  VALUES ('DIV-RIL-3', 'ora senza incarico sopra un rilevamento esistente (la divergenza dice: riesce)', 'riuscito', IIF(:MSG IS NULL, 'riuscito', 'errore'), :MSG);
+  VALUES ('GESTY-RIL-006', 'ora senza incarico sopra un rilevamento esistente, inserita a mano', 'errore', IIF(:MSG IS NULL, 'riuscito', 'errore'), :MSG);
 END^
 
+-- GESTY-RIL-006: durante un'elaborazione automatica (qui ELABORAZIONE_PRESENZE, come OmniaTime) la stessa ora
+-- senza incarico entra. Serve anche da preparazione per i due casi che seguono.
+EXECUTE BLOCK AS
+DECLARE VARIABLE MSG VARCHAR(1000);
+DECLARE VARIABLE DUMMY VARCHAR(255);
+BEGIN
+  MSG = NULL;
+  DUMMY = RDB$SET_CONTEXT('USER_TRANSACTION', (SELECT CONST_FLAGS.ELABORAZIONE_PRESENZE FROM CONST_FLAGS), TRUE);
+  BEGIN
+    INSERT INTO ORE_RILEVATE (ID_RILEVATORE, ID_RISORSA, DATA, ORA_INIZIO, ORA_FINE, ID_PROGETTO, TIPO_INCARICO, ID_INCARICO)
+    VALUES (470021, 470021, CAST('2026-12-15' AS DATE), '09:30:00', '10:30:00', 500341, 'tutor', NULL);
+  WHEN ANY DO
+    MSG = SUBSTRING(RDB$ERROR(MESSAGE) FROM 1 FOR 1000);
+  END
+  DUMMY = RDB$SET_CONTEXT('USER_TRANSACTION', (SELECT CONST_FLAGS.ELABORAZIONE_PRESENZE FROM CONST_FLAGS), NULL);
+  INSERT INTO CARATT_ESITI (REQUISITO, CASO, ATTESO, ESITO, MESSAGGIO)
+  VALUES ('GESTY-RIL-006', 'ora senza incarico sopra un rilevamento esistente, da elaborazione automatica', 'riuscito', IIF(:MSG IS NULL, 'riuscito', 'errore'), :MSG);
+END^
+
+-- Mantis #345 - 2026-11-12: nota su una riga senza incarico gia' sovrapposta
+-- GESTY-RIL-006: una riga senza incarico gia' sovrapposta si risalva se non cambia l'orario.
+EXECUTE BLOCK AS
+DECLARE VARIABLE MSG VARCHAR(1000);
+BEGIN
+  MSG = NULL;
+  BEGIN
+    UPDATE ORE_RILEVATE
+    SET
+        ORE_RILEVATE.NOTE = 'nota su una riga senza incarico gia sovrapposta'
+    WHERE
+        ORE_RILEVATE.ID_RISORSA = 470021 AND
+        ORE_RILEVATE.DATA = CAST('2026-12-15' AS DATE) AND
+        ORE_RILEVATE.ORA_INIZIO = '09:30:00' AND
+        ORE_RILEVATE.ID_INCARICO IS NULL;
+  WHEN ANY DO
+    MSG = SUBSTRING(RDB$ERROR(MESSAGE) FROM 1 FOR 1000);
+  END
+  INSERT INTO CARATT_ESITI (REQUISITO, CASO, ATTESO, ESITO, MESSAGGIO)
+  VALUES ('GESTY-RIL-006', 'nota su una riga senza incarico gia sovrapposta', 'riuscito', IIF(:MSG IS NULL, 'riuscito', 'errore'), :MSG);
+END^
+
+-- DIV-RIL-3 (parte rimasta): una riga senza incarico gia' presente conta come conflitto per le altre
 EXECUTE BLOCK AS
 DECLARE VARIABLE MSG VARCHAR(1000);
 BEGIN

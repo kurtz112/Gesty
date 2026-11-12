@@ -839,18 +839,23 @@ END^
 ------------------------------------------------------------------------------------------------------------
 -- DIV-RIL-6: due rilevamenti sovrapposti che soddisfano la ricerca (uno con incarico, uno senza, DIV-RIL-3)
 -- fanno fermare la generazione con l'errore di Firebird. Docente 470021, progetto 500341, 25/01/2027.
+-- Mantis #345 - 2026-11-12: a mano la riga senza incarico sovrapposta non entra piu'; la preparazione la
+-- inserisce come farebbe un'elaborazione automatica (ELABORAZIONE_PRESENZE), che resta esclusa dal controllo.
 EXECUTE BLOCK AS
 DECLARE VARIABLE MSG VARCHAR(1000);
+DECLARE VARIABLE DUMMY VARCHAR(255);
 BEGIN
   MSG = NULL;
   BEGIN
     INSERT INTO ORE_RILEVATE (ID_RILEVATORE, ID_RISORSA, DATA, ORA_INIZIO, ORA_FINE, ID_PROGETTO, TIPO_INCARICO, ID_INCARICO)
     VALUES (470021, 470021, CAST('2027-01-25' AS DATE), '09:00:00', '11:00:00', 500341, 'tutor', 502801);
+    DUMMY = RDB$SET_CONTEXT('USER_TRANSACTION', (SELECT CONST_FLAGS.ELABORAZIONE_PRESENZE FROM CONST_FLAGS), TRUE);
     INSERT INTO ORE_RILEVATE (ID_RILEVATORE, ID_RISORSA, DATA, ORA_INIZIO, ORA_FINE, ID_PROGETTO, TIPO_INCARICO, ID_INCARICO)
     VALUES (470021, 470021, CAST('2027-01-25' AS DATE), '09:30:00', '10:30:00', 500341, 'tutor', NULL);
   WHEN ANY DO
     MSG = SUBSTRING(RDB$ERROR(MESSAGE) FROM 1 FOR 1000);
   END
+  DUMMY = RDB$SET_CONTEXT('USER_TRANSACTION', (SELECT CONST_FLAGS.ELABORAZIONE_PRESENZE FROM CONST_FLAGS), NULL);
   EXECUTE PROCEDURE CARATT_REGISTRA('DIV-RIL-6', 'preparazione: due rilevamenti sovrapposti (con e senza incarico)', 'riuscito', :MSG);
 END^
 

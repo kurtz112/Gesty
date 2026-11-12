@@ -17,7 +17,7 @@
         "tabella:ORE_RILEVATE"
       ],
       "prove": [
-        "caratterizzazione SQL 01, 03, 04 (65 casi)"
+        "caratterizzazione SQL 01, 03, 04 (79 casi; dal ticket 345 il database di partenza deve avere ORE_RILEVATE_BIU0 con il controllo di sovrapposizione anche senza incarico)"
       ],
       "caratterizzazione": [
         "Prove/caratterizzazione/01-rilevamento-ore.sql",
