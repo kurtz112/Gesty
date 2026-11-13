@@ -8806,6 +8806,13 @@ TSP_cron_Verifica_Contratti_Non_Firmati = class (TzStoredProc)
   public
 end;
 
+[TStoredProcedure('CRON_VERIFICA_DOCUMENTI_IN_SCADENZA')]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_cron_Verifica_Documenti_In_Scadenza = class (TzStoredProc)
+  private
+  public
+end;
+
 [TStoredProcedure('CRON_VERIFICA_INCARICHI_MANCANTI')]
 {$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
 TSP_cron_Verifica_Incarichi_Mancanti = class (TzStoredProc)
@@ -27752,6 +27759,70 @@ TSP_studenti_Tirocini_Inden_Elabora = class (TzStoredProc)
     //
     [TParamAttribute('MESE', ptInput, False)]
     property Mese: TNullableInteger read fMese write fMese;
+end;
+
+[TStoredProcedure('STUDENTI_TIROCINI_ORE_OLTRE_TETTO', True)]
+{$RTTI EXPLICIT PROPERTIES([vcPrivate, vcPublic, vcPublished])}
+TSP_studenti_Tirocini_Ore_Oltre_Tetto = class (TzStoredProc)
+  private
+    fDal_Giorno: TNullableDate;
+    fAl_Giorno: TNullableDate;
+    fFiltro_Id_Studente: TNullableInt64;
+    fTetto_Ore: TNullableDouble;
+    fId_Studente: TNullableInt64;
+    fNominativo_Studente: TNullableString;
+    fLunedi: TNullableDate;
+    fDomenica: TNullableDate;
+    fOre_Settimana: TNullableDouble;
+    fTetto: TNullableDouble;
+    fOre_In_Eccesso: TNullableDouble;
+    fNumero_Tirocini: TNullableInteger;
+  private
+    property Id_Studente_internal: TNullableInt64 read fId_Studente write fId_Studente;
+    property Nominativo_Studente_internal: TNullableString read fNominativo_Studente write fNominativo_Studente;
+    property Lunedi_internal: TNullableDate read fLunedi write fLunedi;
+    property Domenica_internal: TNullableDate read fDomenica write fDomenica;
+    property Ore_Settimana_internal: TNullableDouble read fOre_Settimana write fOre_Settimana;
+    property Tetto_internal: TNullableDouble read fTetto write fTetto;
+    property Ore_In_Eccesso_internal: TNullableDouble read fOre_In_Eccesso write fOre_In_Eccesso;
+    property Numero_Tirocini_internal: TNullableInteger read fNumero_Tirocini write fNumero_Tirocini;
+  public
+    //
+    [TParamAttribute('DAL_GIORNO', ptInput, False)]
+    property Dal_Giorno: TNullableDate read fDal_Giorno write fDal_Giorno;
+    //
+    [TParamAttribute('AL_GIORNO', ptInput, False)]
+    property Al_Giorno: TNullableDate read fAl_Giorno write fAl_Giorno;
+    //
+    [TParamAttribute('FILTRO_ID_STUDENTE', ptInput, False)]
+    property Filtro_Id_Studente: TNullableInt64 read fFiltro_Id_Studente write fFiltro_Id_Studente;
+    //
+    [TParamAttribute('TETTO_ORE', ptInput, False)]
+    property Tetto_Ore: TNullableDouble read fTetto_Ore write fTetto_Ore;
+    //
+    [TParamAttribute('ID_STUDENTE', ptOutput, False)]
+    property Id_Studente: TNullableInt64 read fId_Studente;
+    //
+    [TParamAttribute('NOMINATIVO_STUDENTE', ptOutput, False)]
+    property Nominativo_Studente: TNullableString read fNominativo_Studente;
+    //
+    [TParamAttribute('LUNEDI', ptOutput, False)]
+    property Lunedi: TNullableDate read fLunedi;
+    //
+    [TParamAttribute('DOMENICA', ptOutput, False)]
+    property Domenica: TNullableDate read fDomenica;
+    //
+    [TParamAttribute('ORE_SETTIMANA', ptOutput, False)]
+    property Ore_Settimana: TNullableDouble read fOre_Settimana;
+    //
+    [TParamAttribute('TETTO', ptOutput, False)]
+    property Tetto: TNullableDouble read fTetto;
+    //
+    [TParamAttribute('ORE_IN_ECCESSO', ptOutput, False)]
+    property Ore_In_Eccesso: TNullableDouble read fOre_In_Eccesso;
+    //
+    [TParamAttribute('NUMERO_TIROCINI', ptOutput, False)]
+    property Numero_Tirocini: TNullableInteger read fNumero_Tirocini;
 end;
 
 [TStoredProcedure('STUDENTI_TIROCINI_PAGAM_MESE', True)]
